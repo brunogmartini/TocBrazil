@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import heroImg from "@/assets/hero-paciente.jpg";
-import { PROFISSIONAIS_DEMO, formatarPreco } from "@/lib/profissionais-mock";
+import { PROFISSIONAIS_DEMO } from "@/lib/profissionais-mock";
 import { CONTEUDOS } from "@/lib/conteudos-mock";
 import { track } from "@/lib/analytics";
 
@@ -66,22 +66,58 @@ const pilares = [
   },
 ];
 
-const beneficiosPaciente = [
-  { t: "Informação primeiro", d: "Conteúdo educativo sobre TOC antes de qualquer decisão." },
-  { t: "Escolha sua", d: "Filtros por preferências, não ranking de popularidade." },
-  { t: "Agenda real", d: "Você vê os horários disponíveis do profissional." },
-  { t: "Pagamento online", d: "Cartão ou Pix, com confirmação da consulta." },
-  { t: "Consulta no navegador", d: "Videochamada sem instalar nada e sem links externos." },
-  { t: "Tudo em um lugar", d: "Histórico, documentos e reagendamentos na sua área." },
+const identificacao = [
+  {
+    t: "Checagens que não terminam",
+    d: "Conferir a porta, o gás, mensagens enviadas ou o próprio corpo várias vezes, sem que a dúvida realmente passe.",
+  },
+  {
+    t: "Pensamentos que assustam",
+    d: "Imagens ou ideias intrusivas sobre agressão, contaminação, moral, religião ou sexualidade que aparecem sem convite.",
+  },
+  {
+    t: "Rituais mentais",
+    d: "Contar, repetir frases, revisar lembranças ou pedir garantias para tentar aliviar o desconforto.",
+  },
+  {
+    t: "Evitação do dia a dia",
+    d: "Deixar de tocar objetos, ir a lugares, dirigir ou ficar sozinho com certas pessoas para não sentir a angústia.",
+  },
+  {
+    t: "Tempo consumido",
+    d: "Horas do dia comprometidas, atrasos no trabalho ou nos estudos e cansaço que ninguém ao redor entende.",
+  },
+  {
+    t: "Explicar de novo cansa",
+    d: "Já tentou terapia antes e sentiu que precisava explicar o TOC ao profissional em vez de ser cuidado.",
+  },
 ];
 
-const beneficiosProfissional = [
-  { t: "Mais visibilidade", d: "Apresente seu trabalho para pessoas que já estão buscando cuidado." },
-  { t: "Agenda", d: "Defina seus horários e deixe a plataforma organizar os agendamentos." },
-  { t: "Pagamentos", d: "Uma experiência simples para receber pelos atendimentos." },
-  { t: "Videochamada", d: "Atenda online sem precisar enviar links externos." },
-  { t: "Financeiro", d: "Acompanhe consultas, pagamentos, taxas e repasses." },
-  { t: "Tecnologia", d: "Uma infraestrutura completa para sua prática online." },
+const praticidade = [
+  {
+    t: "Consulta 100% online",
+    d: "Videochamada no navegador, sem instalar aplicativo, sem link externo e sem gravação por padrão.",
+  },
+  {
+    t: "Sem deslocamento",
+    d: "Você atende de casa, do trabalho ou de qualquer lugar com internet, no Brasil ou fora dele.",
+  },
+  {
+    t: "Horários que cabem na rotina",
+    d: "Você vê a agenda real do profissional e escolhe o horário livre que funciona para você.",
+  },
+  {
+    t: "Você escolhe o profissional",
+    d: "Compare formação, abordagem, áreas de atuação, idiomas e estilo de atendimento antes de decidir.",
+  },
+  {
+    t: "Identificação em primeiro lugar",
+    d: "Sem ranking e sem ordenação por popularidade: a escolha é sua, pelo que faz sentido para você.",
+  },
+  {
+    t: "Trocar de profissional é normal",
+    d: "Se não houver identificação, você pode escolher outro profissional a qualquer momento.",
+  },
 ];
 
 function Home() {
@@ -135,25 +171,33 @@ function Home() {
 
       {/* 3. Identificação */}
       <section aria-labelledby="identificacao" className="border-y border-border bg-surface">
-        <div className="container-page grid gap-10 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:py-20">
-          <div>
+        <div className="container-page py-16 lg:py-20">
+          <div className="max-w-2xl">
             <span className="section-label">Identificação</span>
             <h2 id="identificacao" className="mt-3 text-3xl sm:text-4xl">
-              O TOC nem sempre é fácil de explicar.
+              Talvez você já reconheça alguma destas situações.
             </h2>
+            <p className="mt-4 text-muted-foreground">
+              Nem todo profissional tem experiência com TOC — e explicar tudo de novo a cada
+              tentativa cansa. Aqui, os profissionais já atuam nessa área.
+            </p>
           </div>
-          <div className="space-y-5 text-lg leading-relaxed text-muted-foreground">
-            <p>
-              Pensamentos intrusivos, dúvidas que parecem não ter fim, necessidade de verificar,
-              evitar ou buscar garantias. Cada pessoa pode vivenciar o TOC de uma maneira
-              diferente.
-            </p>
-            <p>
-              Encontrar informação confiável e um profissional com experiência adequada pode ser
-              um passo importante para buscar cuidado.
-            </p>
-            <Link to="/profissionais" className="btn-base btn-ghost">
-              Conhecer profissionais
+
+          <ul className="mt-10 grid gap-5 md:grid-cols-3">
+            {identificacao.map((item) => (
+              <li key={item.t} className="card-soft p-6">
+                <h3 className="text-lg">{item.t}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.d}</p>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <Link to="/profissionais" className="btn-base btn-primary">
+              Encontrar um especialista em TOC
+            </Link>
+            <Link to="/entenda-o-toc" className="btn-base btn-ghost">
+              Quero entender o TOC
             </Link>
           </div>
         </div>
@@ -251,12 +295,12 @@ function Home() {
           <div className="max-w-2xl">
             <span className="section-label">Profissionais</span>
             <h2 id="profissionais" className="mt-3 text-3xl sm:text-4xl">
-              Psicólogos e psiquiatras com informações claras.
+              Psicólogos e psiquiatras com experiência na área.
             </h2>
             <p className="mt-4 text-muted-foreground">
               Cada profissional declara formação, abordagem, áreas de atuação e experiência, e a
-              documentação é verificada antes da publicação do perfil. Não há ranking de
-              popularidade nem indicação de “melhor profissional”.
+              documentação é verificada antes da publicação do perfil. Você escolhe quem faz mais
+              sentido para você: não existe ranking de popularidade nem “melhor profissional”.
             </p>
           </div>
 
@@ -272,9 +316,8 @@ function Home() {
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                   {p.apresentacao}
                 </p>
-                <p className="mt-auto pt-5 text-sm font-semibold">
-                  {formatarPreco(p.precoCentavos)}{" "}
-                  <span className="font-normal text-muted-foreground">por sessão</span>
+                <p className="mt-auto pt-5 text-xs text-muted-foreground">
+                  Atendimento online, por videochamada.
                 </p>
                 <Link
                   to="/profissionais/$slug"
@@ -304,9 +347,9 @@ function Home() {
               Encontre um profissional que combine com você.
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Responda a algumas perguntas simples sobre suas preferências — faixa de
-              investimento, horários, profissão, idioma e estilo de atendimento — e veja
-              profissionais que podem fazer sentido para você.
+              Responda a algumas perguntas simples sobre suas preferências — horários,
+              profissão, idioma, preferência de gênero e estilo de atendimento — e veja
+              profissionais com quem você pode se identificar.
             </p>
             <p className="mt-4 text-sm text-muted-foreground">
               O resultado considera apenas preferências, disponibilidade e informações declaradas
@@ -317,7 +360,7 @@ function Home() {
             </Link>
           </div>
           <ul className="grid gap-4 sm:grid-cols-2">
-            {["Faixa de investimento", "Horários possíveis", "Psicólogo ou psiquiatra", "Preferência de gênero", "Idioma", "Estilo de atendimento"].map(
+            {["Horários possíveis", "Psicólogo ou psiquiatra", "Preferência de gênero", "Idioma", "Estilo de atendimento", "Áreas de atuação"].map(
               (item) => (
                 <li key={item} className="card-soft p-5 text-sm">
                   {item}
@@ -357,50 +400,23 @@ function Home() {
         </div>
       </section>
 
-      {/* 10. Benefícios para pacientes */}
-      <section aria-labelledby="pacientes" className="container-page py-16 lg:py-24">
-        <span className="section-label">Para pacientes</span>
-        <h2 id="pacientes" className="mt-3 max-w-2xl text-3xl sm:text-4xl">
-          Uma jornada pensada para reduzir a fricção.
+      {/* 10. Praticidade das consultas online */}
+      <section aria-labelledby="online" className="container-page py-16 lg:py-24">
+        <span className="section-label">Consultas online</span>
+        <h2 id="online" className="mt-3 max-w-2xl text-3xl sm:text-4xl">
+          Simples de encaixar na rotina — e a escolha é sempre sua.
         </h2>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {beneficiosPaciente.map((b) => (
+          {praticidade.map((b) => (
             <article key={b.t} className="card-soft card-soft-hover p-6">
               <h3 className="text-lg">{b.t}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{b.d}</p>
             </article>
           ))}
         </div>
-      </section>
-
-      {/* 11-13. Benefícios e páginas para profissionais */}
-      <section aria-labelledby="profissionais-beneficios" className="border-y border-border bg-surface">
-        <div className="container-page py-16 lg:py-24">
-          <span className="section-label">Para profissionais</span>
-          <h2 id="profissionais-beneficios" className="mt-3 max-w-2xl text-3xl sm:text-4xl">
-            Você cuida do paciente. Nós cuidamos da infraestrutura.
-          </h2>
-          <p className="mt-4 max-w-2xl text-muted-foreground">
-            Faça parte de uma rede especializada em conectar profissionais a pessoas que procuram
-            acompanhamento relacionado ao TOC.
-          </p>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {beneficiosProfissional.map((b) => (
-              <article key={b.t} className="card-soft card-soft-hover p-6">
-                <h3 className="text-lg">{b.t}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{b.d}</p>
-              </article>
-            ))}
-          </div>
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <Link to="/para-psicologos" className="btn-base btn-primary">
-              Sou psicólogo
-            </Link>
-            <Link to="/para-psiquiatras" className="btn-base btn-ghost">
-              Sou psiquiatra
-            </Link>
-          </div>
-        </div>
+        <Link to="/profissionais" className="btn-base btn-primary mt-10">
+          Encontrar um especialista em TOC
+        </Link>
       </section>
 
       {/* Por que somos diferentes */}
@@ -464,17 +480,8 @@ function Home() {
             <Link to="/profissionais" className="btn-base btn-primary">
               Encontrar um especialista em TOC
             </Link>
-            <Link to="/entenda-o-toc" className="btn-base btn-ghost">
-              Quero entender o TOC
-            </Link>
-          </div>
-          <div className="mt-8 flex flex-col items-center justify-center gap-4 text-sm sm:flex-row">
-            <span className="text-muted-foreground">Para profissionais:</span>
-            <Link to="/para-psicologos" className="font-semibold underline-offset-4 hover:underline">
-              Sou psicólogo
-            </Link>
-            <Link to="/para-psiquiatras" className="font-semibold underline-offset-4 hover:underline">
-              Sou psiquiatra
+            <Link to="/seja-parceiro" className="btn-base btn-ghost">
+              Quero ser um profissional parceiro
             </Link>
           </div>
         </div>
