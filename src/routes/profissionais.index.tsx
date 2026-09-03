@@ -60,7 +60,7 @@ function Busca() {
         (abordagem === TODOS || p.abordagem === abordagem) &&
         (idioma === TODOS || p.idiomas.includes(idioma)) &&
         (genero === TODOS || p.genero === genero) &&
-        p.experienciaAnos >= experienciaMin &&
+        p.experienciaAnos >= experienciaMin,
     );
     if (ordem === "disponibilidade")
       return [...list].sort((a, b) => a.horarios[0]!.localeCompare(b.horarios[0]!));
