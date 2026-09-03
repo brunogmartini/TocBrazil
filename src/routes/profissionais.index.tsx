@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { PROFISSIONAIS_DEMO, formatarPreco } from "@/lib/profissionais-mock";
+import { PROFISSIONAIS_DEMO } from "@/lib/profissionais-mock";
 import { track } from "@/lib/analytics";
 
 export const Route = createFileRoute("/profissionais/")({
@@ -34,8 +34,7 @@ function Busca() {
   const [idioma, setIdioma] = useState(TODOS);
   const [genero, setGenero] = useState(TODOS);
   const [experienciaMin, setExperienciaMin] = useState(0);
-  const [precoMax, setPrecoMax] = useState(50000);
-  const [ordem, setOrdem] = useState<"nome" | "preco" | "disponibilidade">("nome");
+  const [ordem, setOrdem] = useState<"nome" | "disponibilidade">("nome");
 
   const areas = useMemo(
     () => [TODOS, ...new Set(PROFISSIONAIS_DEMO.flatMap((p) => p.areas))],
@@ -62,13 +61,11 @@ function Busca() {
         (idioma === TODOS || p.idiomas.includes(idioma)) &&
         (genero === TODOS || p.genero === genero) &&
         p.experienciaAnos >= experienciaMin &&
-        p.precoCentavos <= precoMax,
     );
-    if (ordem === "preco") return [...list].sort((a, b) => a.precoCentavos - b.precoCentavos);
     if (ordem === "disponibilidade")
       return [...list].sort((a, b) => a.horarios[0]!.localeCompare(b.horarios[0]!));
     return [...list].sort((a, b) => a.nome.localeCompare(b.nome));
-  }, [profissao, area, abordagem, idioma, genero, experienciaMin, precoMax, ordem]);
+  }, [profissao, area, abordagem, idioma, genero, experienciaMin, ordem]);
 
   useEffect(() => {
     track("professional_search", {
@@ -78,10 +75,9 @@ function Busca() {
       idioma,
       genero,
       experienciaMin,
-      precoMax,
       resultados: resultados.length,
     });
-  }, [profissao, area, abordagem, idioma, genero, experienciaMin, precoMax, resultados.length]);
+  }, [profissao, area, abordagem, idioma, genero, experienciaMin, resultados.length]);
 
   return (
     <div className="container-page py-12 lg:py-16">
@@ -140,21 +136,6 @@ function Busca() {
           />
         </div>
         <div>
-          <label htmlFor="preco" className="section-label">
-            Até {formatarPreco(precoMax)}
-          </label>
-          <input
-            id="preco"
-            type="range"
-            min={10000}
-            max={50000}
-            step={1000}
-            value={precoMax}
-            onChange={(e) => setPrecoMax(Number(e.target.value))}
-            className="mt-3 w-full accent-[var(--color-primary)]"
-          />
-        </div>
-        <div>
           <label htmlFor="ordem" className="section-label">
             Ordenar por
           </label>
@@ -165,7 +146,6 @@ function Busca() {
             className="field-base mt-2"
           >
             <option value="nome">Nome (A–Z)</option>
-            <option value="preco">Valor da sessão</option>
             <option value="disponibilidade">Próxima disponibilidade</option>
           </select>
         </div>
@@ -193,9 +173,8 @@ function Busca() {
             </ul>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{p.apresentacao}</p>
             <p className="mt-4 text-xs text-muted-foreground">Idiomas: {p.idiomas.join(", ")}</p>
-            <p className="mt-4 text-sm font-semibold">
-              {formatarPreco(p.precoCentavos)}{" "}
-              <span className="font-normal text-muted-foreground">por sessão</span>
+            <p className="mt-4 text-xs text-muted-foreground">
+              Valores da sessão ficam disponíveis após o cadastro na plataforma.
             </p>
             <p className="mt-3 text-xs text-muted-foreground">
               Próximos horários: {p.horarios.join(" · ")}

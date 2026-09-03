@@ -9,6 +9,7 @@ const nav = [
 ] as const;
 
 const profissionais = [
+  { to: "/seja-parceiro", label: "Quero ser um profissional parceiro" },
   { to: "/para-psicologos", label: "Sou psicólogo" },
   { to: "/para-psiquiatras", label: "Sou psiquiatra" },
   { to: "/cadastro-profissional", label: "Cadastro profissional" },
