@@ -8,17 +8,17 @@ import { track } from "@/lib/analytics";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "TOC Brazil — entenda o TOC e encontre o cuidado certo" },
+      { title: "TOC Brazil — especialistas em TOC em consultas online" },
       {
         name: "description",
         content:
-          "Plataforma especializada em TOC: informação confiável e acesso a profissionais de Psicologia e Psiquiatria para quem busca acompanhamento, com agenda, pagamento e videochamada.",
+          "TOC Brazil conecta pacientes a psicólogos e psiquiatras com experiência em TOC. Consultas online, no seu horário, com o profissional que você escolher.",
       },
-      { property: "og:title", content: "Entenda o TOC. Encontre o cuidado certo." },
+      { property: "og:title", content: "Conectando pacientes aos maiores especialistas em TOC no Brasil" },
       {
         property: "og:description",
         content:
-          "Informação confiável e acesso a profissionais de Psicologia e Psiquiatria para quem busca acompanhamento relacionado ao TOC.",
+          "Consultas online com psicólogos e psiquiatras com experiência em TOC. Você escolhe o profissional com quem mais se identifica.",
       },
       { property: "og:url", content: "/" },
     ],
@@ -44,8 +44,8 @@ const passos = [
   { titulo: "Entenda", texto: "Aprenda sobre TOC através de conteúdos educativos." },
   { titulo: "Encontre", texto: "Conheça profissionais e suas áreas de atuação." },
   { titulo: "Escolha", texto: "Encontre alguém que combine com suas preferências." },
-  { titulo: "Agende", texto: "Escolha um horário e faça o pagamento online." },
-  { titulo: "Comece", texto: "Realize sua consulta por videochamada." },
+  { titulo: "Agende", texto: "Escolha um horário livre na agenda do profissional." },
+  { titulo: "Comece", texto: "Sua consulta acontece por videochamada, no navegador." },
 ];
 
 const pilares = [
@@ -95,24 +95,25 @@ function Home() {
       <section className="relative overflow-hidden">
         <div className="container-page grid items-center gap-12 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
           <div className="rise-in">
-            <span className="pill">Plataforma especializada em TOC</span>
+            <span className="pill">Plataforma de acompanhamento especializado</span>
             <h1 className="mt-6 text-[2.1rem] leading-[1.1] sm:text-5xl lg:text-[3.6rem]">
-              Entenda o TOC. Encontre o cuidado certo.
+              Conectando pacientes aos maiores especialistas em TOC no Brasil.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Informação confiável e acesso a profissionais de Psicologia e Psiquiatria para quem
-              busca acompanhamento relacionado ao TOC.
+              Consultas online com psicólogos e psiquiatras com experiência em TOC, sem
+              deslocamento e no horário que cabe na sua rotina. Você escolhe o profissional com
+              quem mais se identifica.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link to="/profissionais" className="btn-base btn-primary">
               Encontrar um especialista em TOC
               </Link>
-              <Link to="/entenda-o-toc" className="btn-base btn-ghost">
+              <Link to="/seja-parceiro" className="btn-base btn-ghost">
                 Quero ser um profissional parceiro
               </Link>
             </div>
             <p className="mt-6 text-sm text-muted-foreground">
-              Uma plataforma especializada em conectar pessoas a profissionais de saúde mental.
+              Consulta por videochamada no navegador, sem instalar nada e sem gravação.
             </p>
           </div>
 
