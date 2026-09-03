@@ -10,8 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CadastroProfissionalRouteImport } from './routes/cadastro-profissional'
+import { Route as ComoFuncionaRouteImport } from './routes/como-funciona'
+import { Route as CookiesRouteImport } from './routes/cookies'
+import { Route as EntendaOTocRouteImport } from './routes/entenda-o-toc'
+import { Route as MatchingRouteImport } from './routes/matching'
+import { Route as MeuCuidadoRouteImport } from './routes/meu-cuidado'
 import { Route as ParaPsicologosRouteImport } from './routes/para-psicologos'
+import { Route as ParaPsiquiatrasRouteImport } from './routes/para-psiquiatras'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as SegurancaRouteImport } from './routes/seguranca'
+import { Route as SuporteRouteImport } from './routes/suporte'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as TocRouteImport } from './routes/toc'
+import { Route as ConteudosIndexRouteImport } from './routes/conteudos.index'
+import { Route as ConteudosSlugRouteImport } from './routes/conteudos.$slug'
+import { Route as ProfissionaisIndexRouteImport } from './routes/profissionais.index'
+import { Route as ProfissionaisSlugRouteImport } from './routes/profissionais.$slug'
 import { Route as PsicologosIndexRouteImport } from './routes/psicologos.index'
 import { Route as PsicologosSlugRouteImport } from './routes/psicologos.$slug'
 
@@ -20,14 +35,89 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CadastroProfissionalRoute = CadastroProfissionalRouteImport.update({
+  id: '/cadastro-profissional',
+  path: '/cadastro-profissional',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComoFuncionaRoute = ComoFuncionaRouteImport.update({
+  id: '/como-funciona',
+  path: '/como-funciona',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntendaOTocRoute = EntendaOTocRouteImport.update({
+  id: '/entenda-o-toc',
+  path: '/entenda-o-toc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MatchingRoute = MatchingRouteImport.update({
+  id: '/matching',
+  path: '/matching',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MeuCuidadoRoute = MeuCuidadoRouteImport.update({
+  id: '/meu-cuidado',
+  path: '/meu-cuidado',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ParaPsicologosRoute = ParaPsicologosRouteImport.update({
   id: '/para-psicologos',
   path: '/para-psicologos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ParaPsiquiatrasRoute = ParaPsiquiatrasRouteImport.update({
+  id: '/para-psiquiatras',
+  path: '/para-psiquiatras',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SegurancaRoute = SegurancaRouteImport.update({
+  id: '/seguranca',
+  path: '/seguranca',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuporteRoute = SuporteRouteImport.update({
+  id: '/suporte',
+  path: '/suporte',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TocRoute = TocRouteImport.update({
   id: '/toc',
   path: '/toc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConteudosIndexRoute = ConteudosIndexRouteImport.update({
+  id: '/conteudos/',
+  path: '/conteudos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConteudosSlugRoute = ConteudosSlugRouteImport.update({
+  id: '/conteudos/$slug',
+  path: '/conteudos/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfissionaisIndexRoute = ProfissionaisIndexRouteImport.update({
+  id: '/profissionais/',
+  path: '/profissionais/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfissionaisSlugRoute = ProfissionaisSlugRouteImport.update({
+  id: '/profissionais/$slug',
+  path: '/profissionais/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PsicologosIndexRoute = PsicologosIndexRouteImport.update({
@@ -43,46 +133,160 @@ const PsicologosSlugRoute = PsicologosSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cadastro-profissional': typeof CadastroProfissionalRoute
+  '/como-funciona': typeof ComoFuncionaRoute
+  '/cookies': typeof CookiesRoute
+  '/entenda-o-toc': typeof EntendaOTocRoute
+  '/matching': typeof MatchingRoute
+  '/meu-cuidado': typeof MeuCuidadoRoute
   '/para-psicologos': typeof ParaPsicologosRoute
+  '/para-psiquiatras': typeof ParaPsiquiatrasRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/seguranca': typeof SegurancaRoute
+  '/suporte': typeof SuporteRoute
+  '/termos': typeof TermosRoute
   '/toc': typeof TocRoute
+  '/conteudos/$slug': typeof ConteudosSlugRoute
+  '/profissionais/$slug': typeof ProfissionaisSlugRoute
   '/psicologos/$slug': typeof PsicologosSlugRoute
+  '/conteudos/': typeof ConteudosIndexRoute
+  '/profissionais/': typeof ProfissionaisIndexRoute
   '/psicologos/': typeof PsicologosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cadastro-profissional': typeof CadastroProfissionalRoute
+  '/como-funciona': typeof ComoFuncionaRoute
+  '/cookies': typeof CookiesRoute
+  '/entenda-o-toc': typeof EntendaOTocRoute
+  '/matching': typeof MatchingRoute
+  '/meu-cuidado': typeof MeuCuidadoRoute
   '/para-psicologos': typeof ParaPsicologosRoute
+  '/para-psiquiatras': typeof ParaPsiquiatrasRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/seguranca': typeof SegurancaRoute
+  '/suporte': typeof SuporteRoute
+  '/termos': typeof TermosRoute
   '/toc': typeof TocRoute
+  '/conteudos/$slug': typeof ConteudosSlugRoute
+  '/profissionais/$slug': typeof ProfissionaisSlugRoute
   '/psicologos/$slug': typeof PsicologosSlugRoute
+  '/conteudos': typeof ConteudosIndexRoute
+  '/profissionais': typeof ProfissionaisIndexRoute
   '/psicologos': typeof PsicologosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cadastro-profissional': typeof CadastroProfissionalRoute
+  '/como-funciona': typeof ComoFuncionaRoute
+  '/cookies': typeof CookiesRoute
+  '/entenda-o-toc': typeof EntendaOTocRoute
+  '/matching': typeof MatchingRoute
+  '/meu-cuidado': typeof MeuCuidadoRoute
   '/para-psicologos': typeof ParaPsicologosRoute
+  '/para-psiquiatras': typeof ParaPsiquiatrasRoute
+  '/privacidade': typeof PrivacidadeRoute
+  '/seguranca': typeof SegurancaRoute
+  '/suporte': typeof SuporteRoute
+  '/termos': typeof TermosRoute
   '/toc': typeof TocRoute
+  '/conteudos/$slug': typeof ConteudosSlugRoute
+  '/profissionais/$slug': typeof ProfissionaisSlugRoute
   '/psicologos/$slug': typeof PsicologosSlugRoute
+  '/conteudos/': typeof ConteudosIndexRoute
+  '/profissionais/': typeof ProfissionaisIndexRoute
   '/psicologos/': typeof PsicologosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/para-psicologos' | '/toc' | '/psicologos/$slug' | '/psicologos/'
+    | '/'
+    | '/cadastro-profissional'
+    | '/como-funciona'
+    | '/cookies'
+    | '/entenda-o-toc'
+    | '/matching'
+    | '/meu-cuidado'
+    | '/para-psicologos'
+    | '/para-psiquiatras'
+    | '/privacidade'
+    | '/seguranca'
+    | '/suporte'
+    | '/termos'
+    | '/toc'
+    | '/conteudos/$slug'
+    | '/profissionais/$slug'
+    | '/psicologos/$slug'
+    | '/conteudos/'
+    | '/profissionais/'
+    | '/psicologos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/para-psicologos' | '/toc' | '/psicologos/$slug' | '/psicologos'
+  to:
+    | '/'
+    | '/cadastro-profissional'
+    | '/como-funciona'
+    | '/cookies'
+    | '/entenda-o-toc'
+    | '/matching'
+    | '/meu-cuidado'
+    | '/para-psicologos'
+    | '/para-psiquiatras'
+    | '/privacidade'
+    | '/seguranca'
+    | '/suporte'
+    | '/termos'
+    | '/toc'
+    | '/conteudos/$slug'
+    | '/profissionais/$slug'
+    | '/psicologos/$slug'
+    | '/conteudos'
+    | '/profissionais'
+    | '/psicologos'
   id:
     | '__root__'
     | '/'
+    | '/cadastro-profissional'
+    | '/como-funciona'
+    | '/cookies'
+    | '/entenda-o-toc'
+    | '/matching'
+    | '/meu-cuidado'
     | '/para-psicologos'
+    | '/para-psiquiatras'
+    | '/privacidade'
+    | '/seguranca'
+    | '/suporte'
+    | '/termos'
     | '/toc'
+    | '/conteudos/$slug'
+    | '/profissionais/$slug'
     | '/psicologos/$slug'
+    | '/conteudos/'
+    | '/profissionais/'
     | '/psicologos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CadastroProfissionalRoute: typeof CadastroProfissionalRoute
+  ComoFuncionaRoute: typeof ComoFuncionaRoute
+  CookiesRoute: typeof CookiesRoute
+  EntendaOTocRoute: typeof EntendaOTocRoute
+  MatchingRoute: typeof MatchingRoute
+  MeuCuidadoRoute: typeof MeuCuidadoRoute
   ParaPsicologosRoute: typeof ParaPsicologosRoute
+  ParaPsiquiatrasRoute: typeof ParaPsiquiatrasRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
+  SegurancaRoute: typeof SegurancaRoute
+  SuporteRoute: typeof SuporteRoute
+  TermosRoute: typeof TermosRoute
   TocRoute: typeof TocRoute
+  ConteudosSlugRoute: typeof ConteudosSlugRoute
+  ProfissionaisSlugRoute: typeof ProfissionaisSlugRoute
   PsicologosSlugRoute: typeof PsicologosSlugRoute
+  ConteudosIndexRoute: typeof ConteudosIndexRoute
+  ProfissionaisIndexRoute: typeof ProfissionaisIndexRoute
   PsicologosIndexRoute: typeof PsicologosIndexRoute
 }
 
@@ -95,6 +299,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cadastro-profissional': {
+      id: '/cadastro-profissional'
+      path: '/cadastro-profissional'
+      fullPath: '/cadastro-profissional'
+      preLoaderRoute: typeof CadastroProfissionalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/como-funciona': {
+      id: '/como-funciona'
+      path: '/como-funciona'
+      fullPath: '/como-funciona'
+      preLoaderRoute: typeof ComoFuncionaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entenda-o-toc': {
+      id: '/entenda-o-toc'
+      path: '/entenda-o-toc'
+      fullPath: '/entenda-o-toc'
+      preLoaderRoute: typeof EntendaOTocRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/matching': {
+      id: '/matching'
+      path: '/matching'
+      fullPath: '/matching'
+      preLoaderRoute: typeof MatchingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/meu-cuidado': {
+      id: '/meu-cuidado'
+      path: '/meu-cuidado'
+      fullPath: '/meu-cuidado'
+      preLoaderRoute: typeof MeuCuidadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/para-psicologos': {
       id: '/para-psicologos'
       path: '/para-psicologos'
@@ -102,11 +348,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParaPsicologosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/para-psiquiatras': {
+      id: '/para-psiquiatras'
+      path: '/para-psiquiatras'
+      fullPath: '/para-psiquiatras'
+      preLoaderRoute: typeof ParaPsiquiatrasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/seguranca': {
+      id: '/seguranca'
+      path: '/seguranca'
+      fullPath: '/seguranca'
+      preLoaderRoute: typeof SegurancaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/suporte': {
+      id: '/suporte'
+      path: '/suporte'
+      fullPath: '/suporte'
+      preLoaderRoute: typeof SuporteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/toc': {
       id: '/toc'
       path: '/toc'
       fullPath: '/toc'
       preLoaderRoute: typeof TocRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conteudos/': {
+      id: '/conteudos/'
+      path: '/conteudos'
+      fullPath: '/conteudos/'
+      preLoaderRoute: typeof ConteudosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conteudos/$slug': {
+      id: '/conteudos/$slug'
+      path: '/conteudos/$slug'
+      fullPath: '/conteudos/$slug'
+      preLoaderRoute: typeof ConteudosSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profissionais/': {
+      id: '/profissionais/'
+      path: '/profissionais'
+      fullPath: '/profissionais/'
+      preLoaderRoute: typeof ProfissionaisIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profissionais/$slug': {
+      id: '/profissionais/$slug'
+      path: '/profissionais/$slug'
+      fullPath: '/profissionais/$slug'
+      preLoaderRoute: typeof ProfissionaisSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/psicologos/': {
@@ -128,9 +437,24 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CadastroProfissionalRoute: CadastroProfissionalRoute,
+  ComoFuncionaRoute: ComoFuncionaRoute,
+  CookiesRoute: CookiesRoute,
+  EntendaOTocRoute: EntendaOTocRoute,
+  MatchingRoute: MatchingRoute,
+  MeuCuidadoRoute: MeuCuidadoRoute,
   ParaPsicologosRoute: ParaPsicologosRoute,
+  ParaPsiquiatrasRoute: ParaPsiquiatrasRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
+  SegurancaRoute: SegurancaRoute,
+  SuporteRoute: SuporteRoute,
+  TermosRoute: TermosRoute,
   TocRoute: TocRoute,
+  ConteudosSlugRoute: ConteudosSlugRoute,
+  ProfissionaisSlugRoute: ProfissionaisSlugRoute,
   PsicologosSlugRoute: PsicologosSlugRoute,
+  ConteudosIndexRoute: ConteudosIndexRoute,
+  ProfissionaisIndexRoute: ProfissionaisIndexRoute,
   PsicologosIndexRoute: PsicologosIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,59 +1,83 @@
 import { Link } from "@tanstack/react-router";
 
+const colunas = [
+  {
+    titulo: "Pacientes",
+    links: [
+      { to: "/profissionais", label: "Encontrar profissional" },
+      { to: "/como-funciona", label: "Como funciona" },
+      { to: "/conteudos", label: "Conteúdos" },
+      { to: "/meu-cuidado", label: "Minhas consultas" },
+    ],
+  },
+  {
+    titulo: "Profissionais",
+    links: [
+      { to: "/para-psicologos", label: "Sou psicólogo" },
+      { to: "/para-psiquiatras", label: "Sou psiquiatra" },
+      { to: "/cadastro-profissional", label: "Cadastro" },
+      { to: "/meu-cuidado", label: "Login" },
+    ],
+  },
+  {
+    titulo: "Institucional",
+    links: [
+      { to: "/entenda-o-toc", label: "Sobre o TOC" },
+      { to: "/termos", label: "Termos de Uso" },
+      { to: "/privacidade", label: "Privacidade e LGPD" },
+      { to: "/cookies", label: "Cookies" },
+    ],
+  },
+  {
+    titulo: "Confiança",
+    links: [
+      { to: "/seguranca", label: "Segurança" },
+      { to: "/privacidade", label: "Seus direitos" },
+      { to: "/suporte", label: "Suporte" },
+    ],
+  },
+] as const;
+
 export function SiteFooter() {
   return (
-    <footer className="mt-24 border-t border-border bg-surface text-surface-foreground">
-      <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
-        <div>
+    <footer className="mt-24 border-t border-border bg-surface pb-20 text-surface-foreground lg:pb-0">
+      <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="lg:col-span-1">
           <div className="flex items-center gap-2.5">
-            <span aria-hidden="true" className="h-6 w-6 rounded-full bg-primary ring-4 ring-accent" />
-            <span className="font-display text-lg">Acolher</span>
+            <span aria-hidden="true" className="logo-mark" />
+            <span className="font-display text-lg">Clarea</span>
           </div>
+          <p className="mt-4 font-display text-base">Do entendimento ao cuidado.</p>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-            Infraestrutura tecnológica que conecta pacientes a psicólogos habilitados para
-            atendimento online. O atendimento é de responsabilidade do profissional.
+            Plataforma especializada em TOC que reúne informação confiável e acesso a
+            profissionais de Psicologia e Psiquiatria. O atendimento é de responsabilidade do
+            profissional habilitado.
           </p>
         </div>
 
-        <nav aria-label="Pacientes" className="text-sm">
-          <h2 className="eyebrow">Pacientes</h2>
-          <ul className="mt-4 space-y-3">
-            <li>
-              <Link to="/psicologos" className="text-muted-foreground hover:text-foreground">
-                Encontrar psicólogo
-              </Link>
-            </li>
-            <li>
-              <Link to="/toc" className="text-muted-foreground hover:text-foreground">
-                Atendimento em TOC
-              </Link>
-            </li>
-          </ul>
-        </nav>
-
-        <nav aria-label="Profissionais" className="text-sm">
-          <h2 className="eyebrow">Profissionais</h2>
-          <ul className="mt-4 space-y-3">
-            <li>
-              <Link to="/para-psicologos" className="text-muted-foreground hover:text-foreground">
-                Sou psicólogo
-              </Link>
-            </li>
-          </ul>
-        </nav>
-
-        <div className="text-sm">
-          <h2 className="eyebrow">Privacidade</h2>
-          <p className="mt-4 text-muted-foreground">
-            Tratamos dados pessoais conforme a LGPD, com minimização de dados e controle de
-            acesso. Termos de Uso, Política de Privacidade e Política de Cookies serão
-            publicados antes do lançamento.
-          </p>
-        </div>
+        {colunas.map((coluna) => (
+          <nav key={coluna.titulo} aria-label={coluna.titulo} className="text-sm">
+            <h2 className="eyebrow">{coluna.titulo}</h2>
+            <ul className="mt-4 space-y-3">
+              {coluna.links.map((link) => (
+                <li key={link.to + link.label}>
+                  <Link
+                    to={link.to}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
       </div>
-      <div className="container-page border-t border-border py-6 text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Acolher. Esta plataforma não realiza diagnósticos, não
-        prescreve medicamentos e não promete resultados terapêuticos.
+
+      <div className="container-page border-t border-border py-6 text-xs leading-relaxed text-muted-foreground">
+        © {new Date().getFullYear()} Clarea. Esta plataforma é infraestrutura tecnológica: não
+        realiza diagnósticos, não prescreve medicamentos e não promete resultados. Conteúdo
+        educativo não substitui avaliação profissional.
       </div>
     </footer>
   );

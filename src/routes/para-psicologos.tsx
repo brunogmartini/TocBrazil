@@ -4,19 +4,21 @@ import fotoPerfil from "@/assets/psicologa-perfil.jpg";
 export const Route = createFileRoute("/para-psicologos")({
   head: () => ({
     meta: [
-      { title: "Para psicólogos — atenda online com agenda e pagamentos | Acolher" },
+      { title: "Para psicólogos: atenda online com agenda e pagamentos | Clarea" },
       {
         name: "description",
         content:
-          "Crie seu perfil, configure disponibilidade e valores, receba agendamentos e acompanhe seus repasses em um painel simples.",
+          "Crie seu perfil, configure disponibilidade e valores, receba agendamentos de pessoas que buscam acompanhamento em TOC e acompanhe seus repasses.",
       },
-      { property: "og:title", content: "Para psicólogos: atenda online com estrutura completa" },
+      { property: "og:title", content: "Para psicólogos: estrutura completa para atender online" },
       {
         property: "og:description",
         content:
           "Perfil verificado, agenda própria, checkout para o paciente e painel financeiro com repasses e comprovantes.",
       },
+      { property: "og:url", content: "/para-psicologos" },
     ],
+    links: [{ rel: "canonical", href: "/para-psicologos" }],
   }),
   component: ParaPsicologos,
 });
@@ -43,17 +45,18 @@ function ParaPsicologos() {
         <div className="rise-in">
           <span className="pill">Para profissionais</span>
           <h1 className="mt-6 text-3xl leading-tight sm:text-5xl">
-            Sua operação de atendimento online, sem complexidade.
+            Você cuida do paciente. Nós cuidamos da infraestrutura.
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-            Perfil público verificado, agenda própria com controle de horários, checkout para o
-            paciente e painel financeiro com repasses e comprovantes.
+            A Clarea é especializada em TOC e conecta você a pessoas que já estão buscando
+            acompanhamento. Perfil verificado, agenda própria, checkout para o paciente e painel
+            financeiro com repasses e comprovantes.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <button type="button" className="btn-base btn-primary">
+            <Link to="/cadastro-profissional" className="btn-base btn-primary">
               Criar meu cadastro profissional
-            </button>
-            <Link to="/psicologos" className="btn-base btn-ghost">
+            </Link>
+            <Link to="/profissionais" className="btn-base btn-ghost">
               Ver como aparece o perfil
             </Link>
           </div>
@@ -95,10 +98,13 @@ function ParaPsicologos() {
           {[
             { t: "Agenda", d: "Dias, horários, recorrências, bloqueios, duração e intervalos." },
             { t: "Consultas", d: "Próximas sessões, histórico, status e reagendamentos." },
+            { t: "Videochamada", d: "Atendimento no navegador, sem gravação por padrão." },
             { t: "Financeiro", d: "Saldo, valores pendentes, repasses, taxas e comprovantes." },
             { t: "Perfil", d: "Apresentação, abordagem, áreas de atuação e valores." },
-            { t: "Documentos", d: "Credenciais enviadas e documentos fiscais das sessões." },
-            { t: "Configurações", d: "Preferências, segurança da conta e autenticação em duas etapas." },
+            {
+              t: "Segurança",
+              d: "Preferências, autenticação em duas etapas e sessões ativas.",
+            },
           ].map((i) => (
             <article key={i.t} className="card-soft card-soft-hover p-6">
               <h3 className="text-lg">{i.t}</h3>
@@ -106,9 +112,10 @@ function ParaPsicologos() {
             </article>
           ))}
         </div>
-        <p className="mt-8 max-w-3xl text-xs text-muted-foreground">
-          A plataforma atua como infraestrutura tecnológica e cobra uma taxa pelo uso. O
-          atendimento psicológico permanece sob responsabilidade do profissional habilitado.
+        <p className="mt-8 max-w-3xl text-xs leading-relaxed text-muted-foreground">
+          A Clarea atua como infraestrutura tecnológica e cobra uma taxa pelo uso. O atendimento
+          psicológico permanece sob responsabilidade do profissional habilitado, conforme as
+          normas do CFP. Não prometemos volume de pacientes nem resultados.
         </p>
       </section>
     </>
