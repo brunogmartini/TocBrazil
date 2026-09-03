@@ -3,7 +3,7 @@ import { useState } from "react";
 
 const nav = [
   { to: "/entenda-o-toc", label: "Entenda o TOC" },
-  { to: "/profissionais", label: "Encontrar profissional" },
+  { to: "/profissionais", label: "Encontrar um especialista em TOC" },
   { to: "/como-funciona", label: "Como funciona" },
   { to: "/conteudos", label: "Conteúdos" },
 ] as const;
@@ -82,7 +82,7 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <Link to="/profissionais" className="btn-base btn-primary">
-            Encontrar profissional
+            Encontrar um especialista em TOC
           </Link>
         </div>
 

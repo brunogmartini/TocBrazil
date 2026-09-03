@@ -59,7 +59,7 @@ function MeuCuidado() {
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <Link to="/profissionais" className="btn-base btn-primary">
-            Encontrar um profissional
+            Encontrar um especialista em TOC
           </Link>
           <Link to="/conteudos" className="btn-base btn-ghost">
             Ver conteúdos

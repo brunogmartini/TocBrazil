@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
+import { MobileCta } from "../components/mobile-cta";
 
 function NotFoundComponent() {
   return (
@@ -79,11 +80,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Acolher — psicoterapia online com profissionais habilitados" },
+      { title: "Clarea — entenda o TOC e encontre o cuidado certo" },
       {
         name: "description",
         content:
-          "Plataforma que conecta pacientes a psicólogos habilitados para atendimento online, com agendamento, pagamento e consulta por videochamada em um só lugar.",
+          "Plataforma especializada em TOC: informação confiável e acesso a profissionais de Psicologia e Psiquiatria para quem busca acompanhamento, com agenda, pagamento e videochamada.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -97,7 +98,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
@@ -133,6 +134,7 @@ function RootComponent() {
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
         </main>
+        <MobileCta />
         <SiteFooter />
       </div>
     </QueryClientProvider>

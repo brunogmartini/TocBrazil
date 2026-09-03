@@ -105,10 +105,10 @@ function Home() {
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link to="/profissionais" className="btn-base btn-primary">
-                Encontrar um profissional
+              Encontrar um especialista em TOC
               </Link>
               <Link to="/entenda-o-toc" className="btn-base btn-ghost">
-                Quero entender melhor o TOC
+                Quero ser um profissional parceiro
               </Link>
             </div>
             <p className="mt-6 text-sm text-muted-foreground">
@@ -174,7 +174,7 @@ function Home() {
             segurança.
           </p>
           <Link to="/profissionais" className="btn-base btn-primary mt-8">
-            Encontrar um profissional
+                Encontrar um especialista em TOC
           </Link>
         </div>
       </section>
@@ -461,7 +461,7 @@ function Home() {
           </p>
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
             <Link to="/profissionais" className="btn-base btn-primary">
-              Encontrar um profissional
+              Encontrar um especialista em TOC
             </Link>
             <Link to="/entenda-o-toc" className="btn-base btn-ghost">
               Quero entender o TOC
