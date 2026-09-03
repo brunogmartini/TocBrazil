@@ -1,0 +1,116 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import fotoPerfil from "@/assets/psicologa-perfil.jpg";
+
+export const Route = createFileRoute("/para-psicologos")({
+  head: () => ({
+    meta: [
+      { title: "Para psicólogos — atenda online com agenda e pagamentos | Acolher" },
+      {
+        name: "description",
+        content:
+          "Crie seu perfil, configure disponibilidade e valores, receba agendamentos e acompanhe seus repasses em um painel simples.",
+      },
+      { property: "og:title", content: "Para psicólogos: atenda online com estrutura completa" },
+      {
+        property: "og:description",
+        content:
+          "Perfil verificado, agenda própria, checkout para o paciente e painel financeiro com repasses e comprovantes.",
+      },
+    ],
+  }),
+  component: ParaPsicologos,
+});
+
+const etapas = [
+  "Criar conta",
+  "Dados pessoais",
+  "CRP",
+  "Formação",
+  "Abordagem",
+  "Áreas de atuação",
+  "Documentos para validação",
+  "Preço da sessão",
+  "Disponibilidade",
+  "Dados de recebimento",
+  "Termos profissionais",
+  "Aguardar aprovação",
+];
+
+function ParaPsicologos() {
+  return (
+    <>
+      <section className="container-page grid items-center gap-10 py-14 lg:grid-cols-2 lg:py-20">
+        <div className="rise-in">
+          <span className="pill">Para profissionais</span>
+          <h1 className="mt-6 text-3xl leading-tight sm:text-5xl">
+            Sua operação de atendimento online, sem complexidade.
+          </h1>
+          <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
+            Perfil público verificado, agenda própria com controle de horários, checkout para o
+            paciente e painel financeiro com repasses e comprovantes.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <button type="button" className="btn-base btn-primary">
+              Criar meu cadastro profissional
+            </button>
+            <Link to="/psicologos" className="btn-base btn-ghost">
+              Ver como aparece o perfil
+            </Link>
+          </div>
+        </div>
+        <img
+          src={fotoPerfil}
+          alt="Psicóloga em seu consultório em casa, em frente ao computador"
+          loading="lazy"
+          width={1200}
+          height={912}
+          className="w-full rounded-[2rem] object-cover shadow-[var(--shadow-soft)]"
+        />
+      </section>
+
+      <section className="border-y border-border bg-surface">
+        <div className="container-page py-14 lg:py-20">
+          <h2 className="text-2xl sm:text-3xl">Como funciona o cadastro</h2>
+          <p className="mt-3 max-w-2xl text-muted-foreground">
+            Seu perfil fica público apenas após a verificação dos requisitos definidos pela
+            plataforma. Os status possíveis são: cadastro incompleto, em análise, aprovado,
+            requer correção e suspenso.
+          </p>
+          <ol className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {etapas.map((e, i) => (
+              <li key={e} className="card-soft flex items-center gap-4 p-4">
+                <span className="font-display text-lg text-muted-foreground">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="text-sm">{e}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="container-page py-14 lg:py-20">
+        <h2 className="text-2xl sm:text-3xl">O que você administra no painel</h2>
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { t: "Agenda", d: "Dias, horários, recorrências, bloqueios, duração e intervalos." },
+            { t: "Consultas", d: "Próximas sessões, histórico, status e reagendamentos." },
+            { t: "Financeiro", d: "Saldo, valores pendentes, repasses, taxas e comprovantes." },
+            { t: "Perfil", d: "Apresentação, abordagem, áreas de atuação e valores." },
+            { t: "Documentos", d: "Credenciais enviadas e documentos fiscais das sessões." },
+            { t: "Configurações", d: "Preferências, segurança da conta e autenticação em duas etapas." },
+          ].map((i) => (
+            <article key={i.t} className="card-soft card-soft-hover p-6">
+              <h3 className="text-lg">{i.t}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{i.d}</p>
+            </article>
+          ))}
+        </div>
+        <p className="mt-8 max-w-3xl text-xs text-muted-foreground">
+          A plataforma atua como infraestrutura tecnológica e cobra uma taxa pelo uso. O
+          atendimento psicológico permanece sob responsabilidade do profissional habilitado.
+        </p>
+      </section>
+    </>
+  );
+}
