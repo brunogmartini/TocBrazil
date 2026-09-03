@@ -10,33 +10,80 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ParaPsicologosRouteImport } from './routes/para-psicologos'
+import { Route as TocRouteImport } from './routes/toc'
+import { Route as PsicologosIndexRouteImport } from './routes/psicologos.index'
+import { Route as PsicologosSlugRouteImport } from './routes/psicologos.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ParaPsicologosRoute = ParaPsicologosRouteImport.update({
+  id: '/para-psicologos',
+  path: '/para-psicologos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TocRoute = TocRouteImport.update({
+  id: '/toc',
+  path: '/toc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PsicologosIndexRoute = PsicologosIndexRouteImport.update({
+  id: '/psicologos/',
+  path: '/psicologos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PsicologosSlugRoute = PsicologosSlugRouteImport.update({
+  id: '/psicologos/$slug',
+  path: '/psicologos/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/para-psicologos': typeof ParaPsicologosRoute
+  '/toc': typeof TocRoute
+  '/psicologos/$slug': typeof PsicologosSlugRoute
+  '/psicologos/': typeof PsicologosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/para-psicologos': typeof ParaPsicologosRoute
+  '/toc': typeof TocRoute
+  '/psicologos/$slug': typeof PsicologosSlugRoute
+  '/psicologos': typeof PsicologosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/para-psicologos': typeof ParaPsicologosRoute
+  '/toc': typeof TocRoute
+  '/psicologos/$slug': typeof PsicologosSlugRoute
+  '/psicologos/': typeof PsicologosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/para-psicologos' | '/toc' | '/psicologos/$slug' | '/psicologos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/para-psicologos' | '/toc' | '/psicologos/$slug' | '/psicologos'
+  id:
+    | '__root__'
+    | '/'
+    | '/para-psicologos'
+    | '/toc'
+    | '/psicologos/$slug'
+    | '/psicologos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ParaPsicologosRoute: typeof ParaPsicologosRoute
+  TocRoute: typeof TocRoute
+  PsicologosSlugRoute: typeof PsicologosSlugRoute
+  PsicologosIndexRoute: typeof PsicologosIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +95,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/para-psicologos': {
+      id: '/para-psicologos'
+      path: '/para-psicologos'
+      fullPath: '/para-psicologos'
+      preLoaderRoute: typeof ParaPsicologosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/toc': {
+      id: '/toc'
+      path: '/toc'
+      fullPath: '/toc'
+      preLoaderRoute: typeof TocRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/psicologos/': {
+      id: '/psicologos/'
+      path: '/psicologos'
+      fullPath: '/psicologos/'
+      preLoaderRoute: typeof PsicologosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/psicologos/$slug': {
+      id: '/psicologos/$slug'
+      path: '/psicologos/$slug'
+      fullPath: '/psicologos/$slug'
+      preLoaderRoute: typeof PsicologosSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ParaPsicologosRoute: ParaPsicologosRoute,
+  TocRoute: TocRoute,
+  PsicologosSlugRoute: PsicologosSlugRoute,
+  PsicologosIndexRoute: PsicologosIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
