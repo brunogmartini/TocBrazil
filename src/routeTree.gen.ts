@@ -20,6 +20,7 @@ import { Route as ParaPsicologosRouteImport } from './routes/para-psicologos'
 import { Route as ParaPsiquiatrasRouteImport } from './routes/para-psiquiatras'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as SegurancaRouteImport } from './routes/seguranca'
+import { Route as SuporteRouteImport } from './routes/suporte'
 import { Route as TermosRouteImport } from './routes/termos'
 import { Route as TocRouteImport } from './routes/toc'
 import { Route as ConteudosIndexRouteImport } from './routes/conteudos.index'
@@ -84,6 +85,11 @@ const SegurancaRoute = SegurancaRouteImport.update({
   path: '/seguranca',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SuporteRoute = SuporteRouteImport.update({
+  id: '/suporte',
+  path: '/suporte',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermosRoute = TermosRouteImport.update({
   id: '/termos',
   path: '/termos',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/para-psiquiatras': typeof ParaPsiquiatrasRoute
   '/privacidade': typeof PrivacidadeRoute
   '/seguranca': typeof SegurancaRoute
+  '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
   '/toc': typeof TocRoute
   '/conteudos/$slug': typeof ConteudosSlugRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/para-psiquiatras': typeof ParaPsiquiatrasRoute
   '/privacidade': typeof PrivacidadeRoute
   '/seguranca': typeof SegurancaRoute
+  '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
   '/toc': typeof TocRoute
   '/conteudos/$slug': typeof ConteudosSlugRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/para-psiquiatras': typeof ParaPsiquiatrasRoute
   '/privacidade': typeof PrivacidadeRoute
   '/seguranca': typeof SegurancaRoute
+  '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
   '/toc': typeof TocRoute
   '/conteudos/$slug': typeof ConteudosSlugRoute
@@ -203,6 +212,7 @@ export interface FileRouteTypes {
     | '/para-psiquiatras'
     | '/privacidade'
     | '/seguranca'
+    | '/suporte'
     | '/termos'
     | '/toc'
     | '/conteudos/$slug'
@@ -224,6 +234,7 @@ export interface FileRouteTypes {
     | '/para-psiquiatras'
     | '/privacidade'
     | '/seguranca'
+    | '/suporte'
     | '/termos'
     | '/toc'
     | '/conteudos/$slug'
@@ -245,6 +256,7 @@ export interface FileRouteTypes {
     | '/para-psiquiatras'
     | '/privacidade'
     | '/seguranca'
+    | '/suporte'
     | '/termos'
     | '/toc'
     | '/conteudos/$slug'
@@ -267,6 +279,7 @@ export interface RootRouteChildren {
   ParaPsiquiatrasRoute: typeof ParaPsiquiatrasRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   SegurancaRoute: typeof SegurancaRoute
+  SuporteRoute: typeof SuporteRoute
   TermosRoute: typeof TermosRoute
   TocRoute: typeof TocRoute
   ConteudosSlugRoute: typeof ConteudosSlugRoute
@@ -356,6 +369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SegurancaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/suporte': {
+      id: '/suporte'
+      path: '/suporte'
+      fullPath: '/suporte'
+      preLoaderRoute: typeof SuporteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/termos': {
       id: '/termos'
       path: '/termos'
@@ -427,6 +447,7 @@ const rootRouteChildren: RootRouteChildren = {
   ParaPsiquiatrasRoute: ParaPsiquiatrasRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   SegurancaRoute: SegurancaRoute,
+  SuporteRoute: SuporteRoute,
   TermosRoute: TermosRoute,
   TocRoute: TocRoute,
   ConteudosSlugRoute: ConteudosSlugRoute,
