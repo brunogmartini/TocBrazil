@@ -79,11 +79,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Acolher — psicoterapia online com profissionais habilitados" },
+      { title: "Clarea — entenda o TOC e encontre o cuidado certo" },
       {
         name: "description",
         content:
-          "Plataforma que conecta pacientes a psicólogos habilitados para atendimento online, com agendamento, pagamento e consulta por videochamada em um só lugar.",
+          "Plataforma especializada em TOC: informação confiável e acesso a profissionais de Psicologia e Psiquiatria para quem busca acompanhamento, com agenda, pagamento e videochamada.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
