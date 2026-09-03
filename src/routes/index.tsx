@@ -174,7 +174,7 @@ function Home() {
             segurança.
           </p>
           <Link to="/profissionais" className="btn-base btn-primary mt-8">
-            Encontrar um profissional
+                Encontrar um especialista em TOC
           </Link>
         </div>
       </section>
