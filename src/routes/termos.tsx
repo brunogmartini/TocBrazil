@@ -3,17 +3,17 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/termos")({
   head: () => ({
     meta: [
-      { title: "Termos de Uso | Clarea" },
+      { title: "Termos de Uso | TOC Brazil" },
       {
         name: "description",
         content:
-          "Condições de uso da Clarea: papel da plataforma como infraestrutura tecnológica, responsabilidades do profissional e do paciente, pagamentos e cancelamentos.",
+          "Condições de uso da TOC Brazil: papel da plataforma como infraestrutura tecnológica, responsabilidades do profissional e do paciente, pagamentos e cancelamentos.",
       },
-      { property: "og:title", content: "Termos de Uso da Clarea" },
+      { property: "og:title", content: "Termos de Uso da TOC Brazil" },
       {
         property: "og:description",
         content:
-          "Regras de uso da plataforma, responsabilidades e limites de atuação da Clarea.",
+          "Regras de uso da plataforma, responsabilidades e limites de atuação da TOC Brazil.",
       },
       { property: "og:url", content: "/termos" },
     ],
@@ -26,8 +26,8 @@ const secoes = [
   {
     t: "1. Natureza da plataforma",
     p: [
-      "A Clarea é uma plataforma de tecnologia que conecta pessoas interessadas em acompanhamento de saúde mental a profissionais habilitados de Psicologia e Psiquiatria.",
-      "A Clarea não presta serviços de saúde, não realiza diagnósticos, não prescreve tratamentos e não promete resultados terapêuticos.",
+      "A TOC Brazil é uma plataforma de tecnologia que conecta pessoas interessadas em acompanhamento de saúde mental a profissionais habilitados de Psicologia e Psiquiatria.",
+      "A TOC Brazil não presta serviços de saúde, não realiza diagnósticos, não prescreve tratamentos e não promete resultados terapêuticos.",
     ],
   },
   {
@@ -55,7 +55,7 @@ const secoes = [
     t: "5. Uso adequado",
     p: [
       "É vedado utilizar a plataforma para fins ilícitos, para divulgar informação enganosa em saúde ou para prometer cura, diagnóstico automático ou resultado garantido.",
-      "Conteúdos educativos publicados pela Clarea têm finalidade informativa e não substituem avaliação profissional.",
+      "Conteúdos educativos publicados pela TOC Brazil têm finalidade informativa e não substituem avaliação profissional.",
     ],
   },
   {
@@ -72,7 +72,7 @@ function Termos() {
       <span className="section-label">Institucional</span>
       <h1 className="mt-3 text-3xl sm:text-4xl">Termos de Uso</h1>
       <p className="mt-4 max-w-2xl text-sm text-muted-foreground">
-        Este documento descreve as condições de uso da Clarea. Ele será revisado por assessoria
+        Este documento descreve as condições de uso da TOC Brazil. Ele será revisado por assessoria
         jurídica antes do lançamento comercial.
       </p>
 

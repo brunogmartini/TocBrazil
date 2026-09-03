@@ -4,7 +4,7 @@ import fotoPerfil from "@/assets/psicologa-perfil.jpg";
 export const Route = createFileRoute("/para-psicologos")({
   head: () => ({
     meta: [
-      { title: "Para psicólogos: atenda online com agenda e pagamentos | Clarea" },
+      { title: "Para psicólogos: atenda online com agenda e pagamentos | TOC Brazil" },
       {
         name: "description",
         content:
@@ -48,7 +48,7 @@ function ParaPsicologos() {
             Você cuida do paciente. Nós cuidamos da infraestrutura.
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-            A Clarea é especializada em TOC e conecta você a pessoas que já estão buscando
+            A TOC Brazil é especializada em TOC e conecta você a pessoas que já estão buscando
             acompanhamento. Perfil verificado, agenda própria, checkout para o paciente e painel
             financeiro com repasses e comprovantes.
           </p>
@@ -113,7 +113,7 @@ function ParaPsicologos() {
           ))}
         </div>
         <p className="mt-8 max-w-3xl text-xs leading-relaxed text-muted-foreground">
-          A Clarea atua como infraestrutura tecnológica e cobra uma taxa pelo uso. O atendimento
+          A TOC Brazil atua como infraestrutura tecnológica e cobra uma taxa pelo uso. O atendimento
           psicológico permanece sob responsabilidade do profissional habilitado, conforme as
           normas do CFP. Não prometemos volume de pacientes nem resultados.
         </p>

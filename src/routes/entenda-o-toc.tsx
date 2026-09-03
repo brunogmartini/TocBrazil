@@ -6,7 +6,7 @@ import { track } from "@/lib/analytics";
 export const Route = createFileRoute("/entenda-o-toc")({
   head: () => ({
     meta: [
-      { title: "Entenda o TOC: obsessões, compulsões e como buscar cuidado | Clarea" },
+      { title: "Entenda o TOC: obsessões, compulsões e como buscar cuidado | TOC Brazil" },
       {
         name: "description",
         content:

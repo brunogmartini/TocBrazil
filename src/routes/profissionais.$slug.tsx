@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { PROFISSIONAIS_DEMO, formatarPreco } from "@/lib/profissionais-mock";
+import { PROFISSIONAIS_DEMO } from "@/lib/profissionais-mock";
 import { track } from "@/lib/analytics";
 
 export const Route = createFileRoute("/profissionais/$slug")({
@@ -12,11 +12,11 @@ export const Route = createFileRoute("/profissionais/$slug")({
   head: ({ params, loaderData }) => {
     if (!loaderData) {
       return {
-        meta: [{ title: "Perfil indisponível — Clarea" }, { name: "robots", content: "noindex" }],
+        meta: [{ title: "Perfil indisponível — TOC Brazil" }, { name: "robots", content: "noindex" }],
       };
     }
     const p = loaderData.profissional;
-    const titulo = `${p.nome} — ${p.profissao} online | Clarea`;
+    const titulo = `${p.nome} — ${p.profissao} online | TOC Brazil`;
     const desc = `${p.nome} (${p.registro}) atende online. ${p.apresentacao}`;
     return {
       meta: [
@@ -121,15 +121,17 @@ function Perfil() {
 
           <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
             As informações deste perfil são declaradas pelo profissional e sua documentação é
-            verificada pela plataforma. A Clarea não realiza diagnósticos, não prescreve
+            verificada pela plataforma. A TOC Brazil não realiza diagnósticos, não prescreve
             tratamentos e não promete resultados.
           </p>
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="card-soft p-6">
-            <p className="text-2xl font-semibold">{formatarPreco(p.precoCentavos)}</p>
-            <p className="text-sm text-muted-foreground">por sessão de 50 minutos</p>
+            <p className="text-lg">Sessão de 50 minutos, online</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Valores e formas de pagamento ficam disponíveis após o cadastro na plataforma.
+            </p>
 
             <h2 className="section-label mt-7">Próximos horários</h2>
             <ul className="mt-3 grid gap-2">

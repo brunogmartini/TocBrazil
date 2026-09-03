@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/meu-cuidado")({
   head: () => ({
     meta: [
-      { title: "Meu cuidado — suas consultas e seu acompanhamento | Clarea" },
+      { title: "Meu cuidado — suas consultas e seu acompanhamento | TOC Brazil" },
       {
         name: "description",
         content:
           "Área do paciente: próximas consultas, histórico, documentos, pagamentos e reagendamentos em um único lugar.",
       },
-      { property: "og:title", content: "Meu cuidado na Clarea" },
+      { property: "og:title", content: "Meu cuidado na TOC Brazil" },
       {
         property: "og:description",
         content: "Acompanhe suas consultas, pagamentos e documentos com privacidade.",

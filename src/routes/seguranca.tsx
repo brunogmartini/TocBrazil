@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/seguranca")({
   head: () => ({
     meta: [
-      { title: "Segurança: como protegemos seus dados | Clarea" },
+      { title: "Segurança: como protegemos seus dados | TOC Brazil" },
       {
         name: "description",
         content:
           "Autenticação, acesso por papel, criptografia em trânsito, videochamada sem gravação, logs de auditoria e verificação de profissionais.",
       },
-      { property: "og:title", content: "Segurança na Clarea" },
+      { property: "og:title", content: "Segurança na TOC Brazil" },
       {
         property: "og:description",
         content:
@@ -55,7 +55,7 @@ function Seguranca() {
       <div className="card-soft mt-10 max-w-3xl p-6">
         <h2 className="text-lg">Limites da plataforma</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          A Clarea não realiza diagnósticos, não prescreve medicamentos e não promete resultados.
+          A TOC Brazil não realiza diagnósticos, não prescreve medicamentos e não promete resultados.
           Também não somos um serviço de emergência: em situação de risco imediato, procure
           atendimento de urgência na sua região.
         </p>

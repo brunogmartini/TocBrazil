@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/cookies")({
   head: () => ({
     meta: [
-      { title: "Política de Cookies | Clarea" },
+      { title: "Política de Cookies | TOC Brazil" },
       {
         name: "description",
         content:
-          "Quais cookies a Clarea utiliza, para que servem e como você pode gerenciar suas preferências de cookies e medição de campanhas.",
+          "Quais cookies a TOC Brazil utiliza, para que servem e como você pode gerenciar suas preferências de cookies e medição de campanhas.",
       },
-      { property: "og:title", content: "Política de Cookies da Clarea" },
+      { property: "og:title", content: "Política de Cookies da TOC Brazil" },
       {
         property: "og:description",
         content: "Cookies essenciais, de preferência e de medição — com controle do usuário.",

@@ -5,13 +5,13 @@ import { track } from "@/lib/analytics";
 export const Route = createFileRoute("/cadastro-profissional")({
   head: () => ({
     meta: [
-      { title: "Cadastro profissional — psicólogos e psiquiatras | Clarea" },
+      { title: "Cadastro profissional — psicólogos e psiquiatras | TOC Brazil" },
       {
         name: "description",
         content:
-          "Envie seus dados e documentos para verificação e publique seu perfil na Clarea, plataforma especializada em TOC com agenda e pagamentos integrados.",
+          "Envie seus dados e documentos para verificação e publique seu perfil na TOC Brazil, plataforma especializada em TOC com agenda e pagamentos integrados.",
       },
-      { property: "og:title", content: "Cadastro profissional na Clarea" },
+      { property: "og:title", content: "Cadastro profissional na TOC Brazil" },
       {
         property: "og:description",
         content:

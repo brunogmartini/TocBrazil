@@ -6,7 +6,7 @@ import { track } from "@/lib/analytics";
 export const Route = createFileRoute("/conteudos/")({
   head: () => ({
     meta: [
-      { title: "Conteúdos sobre TOC: pensamentos intrusivos, rituais e tratamento | Clarea" },
+      { title: "Conteúdos sobre TOC: pensamentos intrusivos, rituais e tratamento | TOC Brazil" },
       {
         name: "description",
         content:
