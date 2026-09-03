@@ -41,7 +41,6 @@ export const Route = createFileRoute("/")({
 });
 
 const passos = [
-  { titulo: "Entenda", texto: "Aprenda sobre TOC através de conteúdos educativos." },
   { titulo: "Encontre", texto: "Conheça profissionais e suas áreas de atuação." },
   { titulo: "Escolha", texto: "Encontre alguém que combine com suas preferências." },
   { titulo: "Agende", texto: "Escolha um horário livre na agenda do profissional." },
@@ -249,10 +248,7 @@ function Home() {
               <p className="font-display text-2xl text-primary-foreground">
                 Você não precisa descobrir tudo sozinho.
               </p>
-              <p>
-                Comece pela informação. Quando fizer sentido para você, encontre um
-                profissional.
-              </p>
+              <p>Deixe que um profissional qualificado lhe ajude no processo.</p>
               <Link
                 to="/profissionais"
                 className="btn-base mt-2 bg-background text-foreground hover:bg-background/90"
@@ -268,9 +264,9 @@ function Home() {
       <section aria-labelledby="como-funciona" className="container-page py-16 lg:py-24">
         <span className="section-label">Como funciona</span>
         <h2 id="como-funciona" className="mt-3 max-w-2xl text-3xl sm:text-4xl">
-          Cinco passos, do primeiro conteúdo até a sua consulta.
+          Quatro passos, do primeiro contato até a sua consulta.
         </h2>
-        <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+        <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {passos.map((passo, i) => (
             <li key={passo.titulo} className="card-soft card-soft-hover p-6">
               <span className="step-index">{i + 1}</span>
