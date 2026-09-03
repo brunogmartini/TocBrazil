@@ -82,7 +82,7 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <Link to="/profissionais" className="btn-base btn-primary">
-            Encontrar profissional
+            Encontrar um especialista em TOC
           </Link>
         </div>
 
