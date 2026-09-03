@@ -47,7 +47,7 @@ export function SiteFooter() {
             <span aria-hidden="true" className="logo-mark" />
             <span className="font-display text-lg">TOC Brazil</span>
           </div>
-          <p className="mt-4 font-display text-base">Do entendimento ao cuidado.</p>
+          <p className="mt-4 font-display text-base">Plataforma de acompanhamento especializado.</p>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
             Plataforma especializada em TOC que reúne informação confiável e acesso a
             profissionais de Psicologia e Psiquiatria. O atendimento é de responsabilidade do

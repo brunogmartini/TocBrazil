@@ -7,12 +7,12 @@
 /*
  * Design system — plataforma de psicologia online.
  * Institucional: azul petróleo profundo. Secundária: verde-sálvia suave.
- * Fundo off-white, tipografia Space Grotesk (títulos) + Plus Jakarta Sans (texto).
+ * Fundo off-white, tipografia Outfit (títulos) + Open Sans (texto).
  */
 
 @theme inline {
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Open Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
