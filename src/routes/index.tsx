@@ -108,7 +108,7 @@ function Home() {
               Encontrar um especialista em TOC
               </Link>
               <Link to="/entenda-o-toc" className="btn-base btn-ghost">
-                Quero entender melhor o TOC
+                Quero ser um profissional parceiro
               </Link>
             </div>
             <p className="mt-6 text-sm text-muted-foreground">
