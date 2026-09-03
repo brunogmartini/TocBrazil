@@ -3,8 +3,8 @@ import { Link } from "@tanstack/react-router";
 export function MobileCta() {
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-xl lg:hidden">
-      <Link to="/profissionais" className="btn-base btn-primary w-full">
-        Encontrar profissional
+      <Link to="/profissionais" className="btn-base btn-primary w-full" data-mobile-cta>
+        Encontrar um especialista em TOC
       </Link>
     </div>
   );
