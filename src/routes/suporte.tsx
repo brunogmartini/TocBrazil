@@ -4,13 +4,13 @@ import { useState } from "react";
 export const Route = createFileRoute("/suporte")({
   head: () => ({
     meta: [
-      { title: "Suporte e contato | Clarea" },
+      { title: "Suporte e contato | TOC Brazil" },
       {
         name: "description",
         content:
-          "Tire dúvidas sobre agendamento, pagamentos, cancelamentos, cadastro profissional e privacidade de dados na Clarea.",
+          "Tire dúvidas sobre agendamento, pagamentos, cancelamentos, cadastro profissional e privacidade de dados na TOC Brazil.",
       },
-      { property: "og:title", content: "Suporte da Clarea" },
+      { property: "og:title", content: "Suporte da TOC Brazil" },
       {
         property: "og:description",
         content: "Canal de contato para dúvidas sobre consultas, pagamentos e privacidade.",

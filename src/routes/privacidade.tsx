@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/privacidade")({
   head: () => ({
     meta: [
-      { title: "Privacidade e LGPD | Clarea" },
+      { title: "Privacidade e LGPD | TOC Brazil" },
       {
         name: "description",
         content:
-          "Como a Clarea trata dados pessoais e dados sensíveis de saúde: finalidades, minimização, base legal, seus direitos e retenção de informações.",
+          "Como a TOC Brazil trata dados pessoais e dados sensíveis de saúde: finalidades, minimização, base legal, seus direitos e retenção de informações.",
       },
-      { property: "og:title", content: "Privacidade e LGPD na Clarea" },
+      { property: "og:title", content: "Privacidade e LGPD na TOC Brazil" },
       {
         property: "og:description",
         content:

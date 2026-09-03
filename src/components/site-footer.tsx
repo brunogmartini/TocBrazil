@@ -45,7 +45,7 @@ export function SiteFooter() {
         <div className="lg:col-span-1">
           <div className="flex items-center gap-2.5">
             <span aria-hidden="true" className="logo-mark" />
-            <span className="font-display text-lg">Clarea</span>
+            <span className="font-display text-lg">TOC Brazil</span>
           </div>
           <p className="mt-4 font-display text-base">Do entendimento ao cuidado.</p>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
@@ -75,7 +75,7 @@ export function SiteFooter() {
       </div>
 
       <div className="container-page border-t border-border py-6 text-xs leading-relaxed text-muted-foreground">
-        © {new Date().getFullYear()} Clarea. Esta plataforma é infraestrutura tecnológica: não
+        © {new Date().getFullYear()} TOC Brazil. Esta plataforma é infraestrutura tecnológica: não
         realiza diagnósticos, não prescreve medicamentos e não promete resultados. Conteúdo
         educativo não substitui avaliação profissional.
       </div>

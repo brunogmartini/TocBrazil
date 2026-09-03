@@ -12,11 +12,11 @@ export const Route = createFileRoute("/profissionais/$slug")({
   head: ({ params, loaderData }) => {
     if (!loaderData) {
       return {
-        meta: [{ title: "Perfil indisponível — Clarea" }, { name: "robots", content: "noindex" }],
+        meta: [{ title: "Perfil indisponível — TOC Brazil" }, { name: "robots", content: "noindex" }],
       };
     }
     const p = loaderData.profissional;
-    const titulo = `${p.nome} — ${p.profissao} online | Clarea`;
+    const titulo = `${p.nome} — ${p.profissao} online | TOC Brazil`;
     const desc = `${p.nome} (${p.registro}) atende online. ${p.apresentacao}`;
     return {
       meta: [
@@ -121,7 +121,7 @@ function Perfil() {
 
           <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
             As informações deste perfil são declaradas pelo profissional e sua documentação é
-            verificada pela plataforma. A Clarea não realiza diagnósticos, não prescreve
+            verificada pela plataforma. A TOC Brazil não realiza diagnósticos, não prescreve
             tratamentos e não promete resultados.
           </p>
         </div>

@@ -21,9 +21,9 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-xl">
       <div className="container-page flex h-16 items-center justify-between gap-4">
-        <Link to="/" className="flex items-center gap-2.5" aria-label="Clarea — página inicial">
+        <Link to="/" className="flex items-center gap-2.5" aria-label="TOC Brazil — página inicial">
           <span aria-hidden="true" className="logo-mark" />
-          <span className="font-display text-lg tracking-tight">Clarea</span>
+          <span className="font-display text-lg tracking-tight">TOC Brazil</span>
         </Link>
 
         <nav aria-label="Principal" className="hidden items-center gap-1 lg:flex">

@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/como-funciona")({
   head: () => ({
     meta: [
-      { title: "Como funciona: do conteúdo à consulta online | Clarea" },
+      { title: "Como funciona: do conteúdo à consulta online | TOC Brazil" },
       {
         name: "description",
         content:
           "Entenda cada etapa: conteúdo educativo sobre TOC, escolha do profissional, agendamento, pagamento, videochamada e acompanhamento.",
       },
-      { property: "og:title", content: "Como funciona a Clarea" },
+      { property: "og:title", content: "Como funciona a TOC Brazil" },
       {
         property: "og:description",
         content:
@@ -47,7 +47,7 @@ const etapas = [
 
 const perguntas = [
   {
-    q: "A Clarea faz diagnóstico?",
+    q: "A TOC Brazil faz diagnóstico?",
     a: "Não. Somos infraestrutura tecnológica e conteúdo educativo. Avaliação, diagnóstico e conduta são de responsabilidade do profissional habilitado.",
   },
   {

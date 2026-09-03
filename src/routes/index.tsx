@@ -8,7 +8,7 @@ import { track } from "@/lib/analytics";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Clarea — entenda o TOC e encontre o cuidado certo" },
+      { title: "TOC Brazil — entenda o TOC e encontre o cuidado certo" },
       {
         name: "description",
         content:
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Clarea",
+          name: "TOC Brazil",
           description:
             "Plataforma especializada em TOC que reúne informação confiável e acesso a profissionais de Psicologia e Psiquiatria.",
           url: "/",

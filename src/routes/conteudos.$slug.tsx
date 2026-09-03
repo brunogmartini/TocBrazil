@@ -13,7 +13,7 @@ export const Route = createFileRoute("/conteudos/$slug")({
     if (!loaderData) {
       return {
         meta: [
-          { title: "Conteúdo indisponível — Clarea" },
+          { title: "Conteúdo indisponível — TOC Brazil" },
           { name: "robots", content: "noindex" },
         ],
       };
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/conteudos/$slug")({
     const c = loaderData.conteudo;
     return {
       meta: [
-        { title: `${c.titulo} | Clarea` },
+        { title: `${c.titulo} | TOC Brazil` },
         { name: "description", content: c.resumo.slice(0, 158) },
         { property: "og:title", content: c.titulo },
         { property: "og:description", content: c.resumo.slice(0, 158) },

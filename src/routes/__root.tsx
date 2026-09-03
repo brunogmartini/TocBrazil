@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Clarea — entenda o TOC e encontre o cuidado certo" },
+      { title: "TOC Brazil — entenda o TOC e encontre o cuidado certo" },
       {
         name: "description",
         content:

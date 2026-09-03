@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/para-psiquiatras")({
   head: () => ({
     meta: [
-      { title: "Para psiquiatras: atenda online com agenda e pagamentos | Clarea" },
+      { title: "Para psiquiatras: atenda online com agenda e pagamentos | TOC Brazil" },
       {
         name: "description",
         content:
@@ -54,7 +54,7 @@ function ParaPsiquiatras() {
           Atenda online com estrutura, sem montar operação própria.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          A Clarea é uma plataforma especializada em TOC. Cuidamos de agenda, pagamentos,
+          A TOC Brazil é uma plataforma especializada em TOC. Cuidamos de agenda, pagamentos,
           teleconsulta e documentação, para que você foque na consulta.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -99,7 +99,7 @@ function ParaPsiquiatras() {
           ))}
         </div>
         <p className="mt-8 max-w-3xl text-xs leading-relaxed text-muted-foreground">
-          A Clarea atua como infraestrutura tecnológica e cobra uma taxa pelo uso. A consulta
+          A TOC Brazil atua como infraestrutura tecnológica e cobra uma taxa pelo uso. A consulta
           médica, incluindo avaliação, diagnóstico e prescrição, é de responsabilidade exclusiva
           do profissional habilitado, conforme as normas do CFM. A plataforma não interfere na
           conduta clínica.

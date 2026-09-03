@@ -6,7 +6,7 @@ import { track } from "@/lib/analytics";
 export const Route = createFileRoute("/matching")({
   head: () => ({
     meta: [
-      { title: "Matching por preferências: encontre um profissional | Clarea" },
+      { title: "Matching por preferências: encontre um profissional | TOC Brazil" },
       {
         name: "description",
         content:

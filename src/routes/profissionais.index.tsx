@@ -6,7 +6,7 @@ import { track } from "@/lib/analytics";
 export const Route = createFileRoute("/profissionais/")({
   head: () => ({
     meta: [
-      { title: "Encontrar psicólogo ou psiquiatra online — Clarea" },
+      { title: "Encontrar psicólogo ou psiquiatra online — TOC Brazil" },
       {
         name: "description",
         content:
