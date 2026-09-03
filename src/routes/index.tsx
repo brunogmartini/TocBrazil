@@ -105,7 +105,7 @@ function Home() {
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link to="/profissionais" className="btn-base btn-primary">
-                Encontrar um profissional
+              Encontrar um especialista em TOC
               </Link>
               <Link to="/entenda-o-toc" className="btn-base btn-ghost">
                 Quero entender melhor o TOC
