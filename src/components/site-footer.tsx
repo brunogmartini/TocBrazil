@@ -5,7 +5,7 @@ const colunas = [
     titulo: "Pacientes",
     links: [
       { to: "/profissionais", label: "Encontrar um especialista" },
-      { to: "/como-funciona", label: "Como funciona" },
+      { to: "/como-funciona", label: "Nossa metodologia" },
       { to: "/conteudos", label: "Conteúdos" },
       { to: "/painel", label: "Minhas consultas" },
     ],
@@ -23,7 +23,7 @@ const colunas = [
   {
     titulo: "Institucional",
     links: [
-      { to: "/entenda-o-toc", label: "Sobre o TOC" },
+      { to: "/entenda-o-toc", label: "Sobre o transtorno" },
       { to: "/termos", label: "Termos de Uso" },
       { to: "/privacidade", label: "Privacidade e LGPD" },
       { to: "/cookies", label: "Cookies" },
