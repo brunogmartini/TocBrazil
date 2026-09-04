@@ -135,10 +135,15 @@ function Home() {
               Conectando pacientes aos maiores especialistas em TOC no Brasil.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Consultas online com psicólogos e psiquiatras com experiência em TOC, sem
-              deslocamento e no horário que cabe na sua rotina. Você escolhe o profissional com
-              quem mais se identifica.
+              Consultas online com psicólogos e psiquiatras{" "}
+              <strong className="font-semibold text-foreground">
+                especializados em Transtorno Obsessivo Compulsivo
+              </strong>
+              , sem sair de casa e no horário que cabe na sua rotina. Você{" "}
+              <strong className="font-semibold text-foreground">dá match</strong> com o
+              profissional com quem mais se identifica.
             </p>
+
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link to="/profissionais" className="btn-base btn-primary">
               Encontrar um especialista em TOC
@@ -167,6 +172,54 @@ function Home() {
           </div>
         </div>
       </section>
+
+      {/* Dúvida se tem TOC */}
+      <section aria-labelledby="duvida-toc" className="container-page pb-4 lg:pb-8">
+        <div className="card-soft overflow-hidden p-8 sm:p-12">
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div>
+              <span className="section-label">Diagnóstico</span>
+              <h2 id="duvida-toc" className="mt-3 text-3xl leading-tight sm:text-5xl">
+                Dúvida se você tem TOC?
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Agende um horário com um especialista e descubra.
+              </p>
+              <p className="mt-6 font-display text-2xl text-foreground sm:text-3xl">
+                O diagnóstico é o primeiro passo.
+              </p>
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                Você não precisa continuar tentando entender sozinho o que está acontecendo.
+                Conversar com um profissional especializado em TOC ajuda a dar nome ao que você
+                sente e a encontrar o cuidado adequado, no seu tempo e sem julgamento.
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link to="/profissionais" className="btn-base btn-primary">
+                  Quero conversar com um especialista
+                </Link>
+                <Link to="/entenda-o-toc" className="btn-base btn-ghost">
+                  Entender melhor o TOC
+                </Link>
+              </div>
+            </div>
+            <ul className="space-y-3 text-sm leading-relaxed text-muted-foreground">
+              <li className="rounded-2xl bg-surface p-5">
+                Uma primeira conversa serve para entender sua história — não é um teste nem um
+                rótulo.
+              </li>
+              <li className="rounded-2xl bg-surface p-5">
+                Quem avalia é sempre um psicólogo ou psiquiatra habilitado; a plataforma não faz
+                diagnóstico.
+              </li>
+              <li className="rounded-2xl bg-surface p-5">
+                Tudo acontece por videochamada, no seu horário, de onde você estiver.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+
 
       {/* 3. Identificação */}
       <section aria-labelledby="identificacao" className="border-y border-border bg-surface">
@@ -466,9 +519,10 @@ function Home() {
       {/* 15. CTA final */}
       <section aria-labelledby="cta-final" className="container-page py-20 lg:py-28">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 id="cta-final" className="text-3xl sm:text-5xl">
-            Seu próximo passo pode começar aqui.
+          <h2 id="cta-final" className="text-4xl leading-tight sm:text-6xl">
+            Seu tratamento correto começa aqui.
           </h2>
+
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
             Encontre informação confiável e profissionais para acompanhamento relacionado ao TOC.
           </p>

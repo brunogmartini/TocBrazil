@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CadastroProfissionalRouteImport } from './routes/cadastro-profissional'
 import { Route as ComoFuncionaRouteImport } from './routes/como-funciona'
 import { Route as CookiesRouteImport } from './routes/cookies'
@@ -24,6 +26,7 @@ import { Route as SejaParceiroRouteImport } from './routes/seja-parceiro'
 import { Route as SuporteRouteImport } from './routes/suporte'
 import { Route as TermosRouteImport } from './routes/termos'
 import { Route as TocRouteImport } from './routes/toc'
+import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as ConteudosIndexRouteImport } from './routes/conteudos.index'
 import { Route as ConteudosSlugRouteImport } from './routes/conteudos.$slug'
 import { Route as ProfissionaisIndexRouteImport } from './routes/profissionais.index'
@@ -34,6 +37,15 @@ import { Route as PsicologosSlugRouteImport } from './routes/psicologos.$slug'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CadastroProfissionalRoute = CadastroProfissionalRouteImport.update({
@@ -106,6 +118,11 @@ const TocRoute = TocRouteImport.update({
   path: '/toc',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ConteudosIndexRoute = ConteudosIndexRouteImport.update({
   id: '/conteudos/',
   path: '/conteudos/',
@@ -139,6 +156,7 @@ const PsicologosSlugRoute = PsicologosSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/cadastro-profissional': typeof CadastroProfissionalRoute
   '/como-funciona': typeof ComoFuncionaRoute
   '/cookies': typeof CookiesRoute
@@ -153,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
   '/toc': typeof TocRoute
+  '/painel': typeof AuthenticatedPainelRoute
   '/conteudos/$slug': typeof ConteudosSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
   '/psicologos/$slug': typeof PsicologosSlugRoute
@@ -162,6 +181,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/cadastro-profissional': typeof CadastroProfissionalRoute
   '/como-funciona': typeof ComoFuncionaRoute
   '/cookies': typeof CookiesRoute
@@ -176,6 +196,7 @@ export interface FileRoutesByTo {
   '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
   '/toc': typeof TocRoute
+  '/painel': typeof AuthenticatedPainelRoute
   '/conteudos/$slug': typeof ConteudosSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
   '/psicologos/$slug': typeof PsicologosSlugRoute
@@ -186,6 +207,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/cadastro-profissional': typeof CadastroProfissionalRoute
   '/como-funciona': typeof ComoFuncionaRoute
   '/cookies': typeof CookiesRoute
@@ -200,6 +223,7 @@ export interface FileRoutesById {
   '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
   '/toc': typeof TocRoute
+  '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/conteudos/$slug': typeof ConteudosSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
   '/psicologos/$slug': typeof PsicologosSlugRoute
@@ -211,6 +235,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/cadastro-profissional'
     | '/como-funciona'
     | '/cookies'
@@ -225,6 +250,7 @@ export interface FileRouteTypes {
     | '/suporte'
     | '/termos'
     | '/toc'
+    | '/painel'
     | '/conteudos/$slug'
     | '/profissionais/$slug'
     | '/psicologos/$slug'
@@ -234,6 +260,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/cadastro-profissional'
     | '/como-funciona'
     | '/cookies'
@@ -248,6 +275,7 @@ export interface FileRouteTypes {
     | '/suporte'
     | '/termos'
     | '/toc'
+    | '/painel'
     | '/conteudos/$slug'
     | '/profissionais/$slug'
     | '/psicologos/$slug'
@@ -257,6 +285,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
     | '/cadastro-profissional'
     | '/como-funciona'
     | '/cookies'
@@ -271,6 +301,7 @@ export interface FileRouteTypes {
     | '/suporte'
     | '/termos'
     | '/toc'
+    | '/_authenticated/painel'
     | '/conteudos/$slug'
     | '/profissionais/$slug'
     | '/psicologos/$slug'
@@ -281,6 +312,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   CadastroProfissionalRoute: typeof CadastroProfissionalRoute
   ComoFuncionaRoute: typeof ComoFuncionaRoute
   CookiesRoute: typeof CookiesRoute
@@ -310,6 +343,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cadastro-profissional': {
@@ -410,6 +457,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TocRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/painel': {
+      id: '/_authenticated/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof AuthenticatedPainelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/conteudos/': {
       id: '/conteudos/'
       path: '/conteudos'
@@ -455,8 +509,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPainelRoute: AuthenticatedPainelRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   CadastroProfissionalRoute: CadastroProfissionalRoute,
   ComoFuncionaRoute: ComoFuncionaRoute,
   CookiesRoute: CookiesRoute,
