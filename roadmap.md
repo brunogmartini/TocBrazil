@@ -1,29 +1,23 @@
-# Roadmap — plataforma de psicologia online
+# Roadmap — TOC Brazil
 
 ## Concluído
-- [x] Design system (azul petróleo + verde-sálvia, off-white, Space Grotesk + Plus Jakarta Sans)
-- [x] Landing page de conversão (hero, como funciona, filtros, prova de confiança)
-- [x] Marketplace de profissionais com filtros e ordenação neutra (dados de demonstração)
-- [x] Perfil público do profissional com calendário de disponibilidade
-- [x] Hub de conteúdos educativos sobre TOC
-- [x] Matching por preferências declaradas
-- [x] Landing de campanha /toc redirecionada para /entenda-o-toc
-- [x] Páginas para profissionais (/para-psicologos, /para-psiquiatras) com fluxo de cadastro
-- [x] Páginas legais e de confiança (Termos, Privacidade, Cookies, Segurança, Suporte)
-- [x] Roteamento consolidado em /profissionais com redirecionamentos de /psicologos
-- [x] CTA mobile fixo e navegação Clarea
+- [x] Design system, landing page e conteúdos educativos sobre TOC
+- [x] Marketplace de profissionais, perfis, matching e páginas legais
+- [x] Seção "Dúvida se você tem TOC?" e CTA final "Seu tratamento correto começa aqui"
+- [x] Backend (Lovable Cloud) ligado
+- [x] Login e cadastro de paciente (e-mail/senha + Google), papéis e regras de acesso (RLS)
+- [x] Banco: perfis, papéis, profissionais, dados de repasse, disponibilidade, bloqueios,
+      consultas, pagamentos, repasses, notificações, configurações
+- [x] Agenda real com horários livres calculados e proteção contra dois agendamentos no mesmo horário
+- [x] Fluxo de agendamento (reserva + resumo + valor) e painel do paciente com histórico e lembretes
+- [x] Vitrine e perfis lendo dados reais do banco
 
 ## Próximas etapas
-- [ ] Backend (Lovable Cloud): autenticação, papéis (paciente/psicólogo/psiquiatra/admin), RLS
-- [ ] Cadastro de paciente (mínimo de dados, consentimentos LGPD)
-- [ ] Cadastro + verificação documental do profissional (status e aprovação)
-- [ ] Banco de dados: User, Patient, Psychologist, Psychiatrist, Verification, Availability,
-      Appointment, Payment, PaymentSplit, Payout, Refund, Invoice, VideoSession,
-      Notification, Consent, AuditLog, SupportTicket, Report, PlatformSettings
-- [ ] Agenda/disponibilidade com prevenção de double booking
-- [ ] Fluxo de agendamento + checkout (provedor com split payment BR)
-- [ ] Dashboards: paciente, profissional, admin
-- [ ] Videochamada via SDK (sem gravação por padrão)
-- [ ] InvoiceService (NFS-e) e NotificationService (e-mail transacional)
-- [ ] Segurança: 2FA, rate limiting, logs de auditoria, retenção de dados
-- [ ] SEO: sitemap, schema, UTM/analytics de funil
+- [ ] Pagamento com cartão (definir provedor com split para o Brasil) + confirmação automática
+- [ ] Cadastro e verificação documental do profissional (aprovação pelo admin)
+- [ ] Painel do profissional: agenda, disponibilidade, consultas, ganhos e repasses
+- [ ] Painel do administrador: aprovações, consultas, pagamentos, suporte e configurações
+- [ ] Videochamada no navegador (sem gravação por padrão)
+- [ ] Envio real de e-mails/WhatsApp dos lembretes já gravados
+- [ ] Recibo/NFS-e, política de cancelamento e reembolso automatizada
+- [ ] 2FA, logs de auditoria, retenção de dados e sitemap/analytics de funil
