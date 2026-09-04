@@ -290,11 +290,27 @@ function CadastroProfissional() {
           value={form.experiencia_anos}
           onChange={(v) => setForm({ ...form, experiencia_anos: v })}
         />
-        <Campo
-          label="Abordagem principal"
-          value={form.abordagem}
-          onChange={(v) => setForm({ ...form, abordagem: v })}
-        />
+        <div>
+          <label htmlFor="abordagem" className="section-label">
+            Abordagem teórica principal
+          </label>
+          <input
+            id="abordagem"
+            list="abordagens-sugeridas"
+            className="field-base mt-2"
+            value={form.abordagem}
+            onChange={(e) => setForm({ ...form, abordagem: e.target.value })}
+          />
+          <datalist id="abordagens-sugeridas">
+            <option value="Exposição e Prevenção de Resposta (EPR)" />
+            <option value="Terapia Cognitivo-Comportamental" />
+            <option value="Terapia de Aceitação e Compromisso" />
+            <option value="Terapia Comportamental" />
+            <option value="Psicanálise" />
+            <option value="Humanista" />
+          </datalist>
+        </div>
+
         <Campo
           label="Frase de destaque do perfil"
           value={form.destaque}
