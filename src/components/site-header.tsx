@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const nav = [
   { to: "/entenda-o-toc", label: "Entenda o TOC" },
-  { to: "/profissionais", label: "Encontrar um especialista em TOC" },
+  { to: "/profissionais", label: "Encontrar um especialista" },
   { to: "/como-funciona", label: "Como funciona" },
   { to: "/conteudos", label: "Conteúdos" },
 ] as const;
@@ -107,7 +107,7 @@ export function SiteHeader() {
             {logado ? "Minha área" : "Entrar"}
           </Link>
           <Link to="/profissionais" className="btn-base btn-primary">
-            Encontrar um especialista em TOC
+            Encontrar um especialista
           </Link>
         </div>
 

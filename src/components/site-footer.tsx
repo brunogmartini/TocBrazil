@@ -4,7 +4,7 @@ const colunas = [
   {
     titulo: "Pacientes",
     links: [
-      { to: "/profissionais", label: "Encontrar um especialista em TOC" },
+      { to: "/profissionais", label: "Encontrar um especialista" },
       { to: "/como-funciona", label: "Como funciona" },
       { to: "/conteudos", label: "Conteúdos" },
       { to: "/painel", label: "Minhas consultas" },

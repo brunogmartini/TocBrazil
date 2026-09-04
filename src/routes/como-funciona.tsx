@@ -91,7 +91,7 @@ function ComoFunciona() {
           </ol>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link to="/profissionais" className="btn-base btn-primary">
-              Encontrar um especialista em TOC
+              Encontrar um especialista
             </Link>
             <Link to="/matching" className="btn-base btn-ghost">
               Responder o matching

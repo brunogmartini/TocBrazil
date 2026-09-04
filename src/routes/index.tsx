@@ -146,7 +146,7 @@ function Home() {
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link to="/profissionais" className="btn-base btn-primary">
-              Encontrar um especialista em TOC
+              Encontrar um especialista
               </Link>
               <Link to="/seja-parceiro" className="btn-base btn-ghost">
                 Quero ser um profissional parceiro
@@ -246,7 +246,7 @@ function Home() {
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link to="/profissionais" className="btn-base btn-primary">
-              Encontrar um especialista em TOC
+              Encontrar um especialista
             </Link>
             <Link to="/entenda-o-toc" className="btn-base btn-ghost">
               Quero entender o TOC
@@ -271,7 +271,7 @@ function Home() {
             segurança.
           </p>
           <Link to="/profissionais" className="btn-base btn-primary mt-8">
-                Encontrar um especialista em TOC
+                Encontrar um especialista
           </Link>
         </div>
       </section>
@@ -464,7 +464,7 @@ function Home() {
           ))}
         </div>
         <Link to="/profissionais" className="btn-base btn-primary mt-10">
-          Encontrar um especialista em TOC
+          Encontrar um especialista
         </Link>
       </section>
 
@@ -528,7 +528,7 @@ function Home() {
           </p>
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
             <Link to="/profissionais" className="btn-base btn-primary">
-              Encontrar um especialista em TOC
+              Encontrar um especialista
             </Link>
             <Link to="/seja-parceiro" className="btn-base btn-ghost">
               Quero ser um profissional parceiro
