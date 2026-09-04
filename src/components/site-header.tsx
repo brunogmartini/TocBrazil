@@ -50,11 +50,7 @@ export function SiteHeader() {
             </Link>
           ))}
 
-          <div
-            className="relative"
-            onMouseEnter={() => setDropdown(true)}
-            onMouseLeave={() => setDropdown(false)}
-          >
+          <div className="relative">
             <button
               type="button"
               aria-expanded={dropdown}
@@ -63,6 +59,7 @@ export function SiteHeader() {
             >
               Sou profissional
             </button>
+
             {dropdown && (
               <div className="absolute right-0 top-full w-60 pt-2">
                 <ul className="card-soft overflow-hidden p-2">
