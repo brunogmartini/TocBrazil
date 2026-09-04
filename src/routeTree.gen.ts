@@ -38,6 +38,7 @@ import { Route as AuthenticatedAgendarSlugRouteImport } from './routes/_authenti
 import { Route as AuthenticatedProfissionalIndexRouteImport } from './routes/_authenticated/profissional.index'
 import { Route as AuthenticatedProfissionalAgendaRouteImport } from './routes/_authenticated/profissional.agenda'
 import { Route as AuthenticatedProfissionalCadastroRouteImport } from './routes/_authenticated/profissional.cadastro'
+import { Route as ApiPublicMercadopagoVinculoRouteImport } from './routes/api/public/mercadopago/vinculo'
 import { Route as ApiPublicWebhooksMercadopagoRouteImport } from './routes/api/public/webhooks/mercadopago'
 
 const IndexRoute = IndexRouteImport.update({
@@ -188,6 +189,12 @@ const AuthenticatedProfissionalCadastroRoute =
     path: '/profissional/cadastro',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicMercadopagoVinculoRoute =
+  ApiPublicMercadopagoVinculoRouteImport.update({
+    id: '/api/public/mercadopago/vinculo',
+    path: '/api/public/mercadopago/vinculo',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicWebhooksMercadopagoRoute =
   ApiPublicWebhooksMercadopagoRouteImport.update({
     id: '/api/public/webhooks/mercadopago',
@@ -224,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/profissional/': typeof AuthenticatedProfissionalIndexRoute
+  '/api/public/mercadopago/vinculo': typeof ApiPublicMercadopagoVinculoRoute
   '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
 }
 export interface FileRoutesByTo {
@@ -255,6 +263,7 @@ export interface FileRoutesByTo {
   '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/profissional': typeof AuthenticatedProfissionalIndexRoute
+  '/api/public/mercadopago/vinculo': typeof ApiPublicMercadopagoVinculoRoute
   '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
 }
 export interface FileRoutesById {
@@ -288,6 +297,7 @@ export interface FileRoutesById {
   '/_authenticated/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/_authenticated/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/_authenticated/profissional/': typeof AuthenticatedProfissionalIndexRoute
+  '/api/public/mercadopago/vinculo': typeof ApiPublicMercadopagoVinculoRoute
   '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
 }
 export interface FileRouteTypes {
@@ -321,6 +331,7 @@ export interface FileRouteTypes {
     | '/profissional/agenda'
     | '/profissional/cadastro'
     | '/profissional/'
+    | '/api/public/mercadopago/vinculo'
     | '/api/public/webhooks/mercadopago'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/profissional/agenda'
     | '/profissional/cadastro'
     | '/profissional'
+    | '/api/public/mercadopago/vinculo'
     | '/api/public/webhooks/mercadopago'
   id:
     | '__root__'
@@ -384,6 +396,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profissional/agenda'
     | '/_authenticated/profissional/cadastro'
     | '/_authenticated/profissional/'
+    | '/api/public/mercadopago/vinculo'
     | '/api/public/webhooks/mercadopago'
   fileRoutesById: FileRoutesById
 }
@@ -411,6 +424,7 @@ export interface RootRouteChildren {
   ConteudosIndexRoute: typeof ConteudosIndexRoute
   ProfissionaisIndexRoute: typeof ProfissionaisIndexRoute
   PsicologosIndexRoute: typeof PsicologosIndexRoute
+  ApiPublicMercadopagoVinculoRoute: typeof ApiPublicMercadopagoVinculoRoute
   ApiPublicWebhooksMercadopagoRoute: typeof ApiPublicWebhooksMercadopagoRoute
 }
 
@@ -619,6 +633,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfissionalCadastroRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/mercadopago/vinculo': {
+      id: '/api/public/mercadopago/vinculo'
+      path: '/api/public/mercadopago/vinculo'
+      fullPath: '/api/public/mercadopago/vinculo'
+      preLoaderRoute: typeof ApiPublicMercadopagoVinculoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/webhooks/mercadopago': {
       id: '/api/public/webhooks/mercadopago'
       path: '/api/public/webhooks/mercadopago'
@@ -675,6 +696,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConteudosIndexRoute: ConteudosIndexRoute,
   ProfissionaisIndexRoute: ProfissionaisIndexRoute,
   PsicologosIndexRoute: PsicologosIndexRoute,
+  ApiPublicMercadopagoVinculoRoute: ApiPublicMercadopagoVinculoRoute,
   ApiPublicWebhooksMercadopagoRoute: ApiPublicWebhooksMercadopagoRoute,
 }
 export const routeTree = rootRouteImport

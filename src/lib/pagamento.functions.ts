@@ -22,7 +22,7 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
     const { data: consulta } = await supabase
       .from("appointments")
       .select(
-        "id, inicio, patient_id, status, payment_status, valor_centavos, professionals(nome, slug)",
+        "id, inicio, patient_id, professional_id, status, payment_status, valor_centavos, valor_plataforma_centavos, professionals(nome, slug, comissao_percent, mp_user_id)",
       )
       .eq("id", data.consultaId)
       .maybeSingle();
@@ -34,7 +34,31 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
       return { ok: false as const, erro: "Esta consulta já está paga." };
     }
 
-    const prof = consulta.professionals as { nome?: string; slug?: string } | null;
+    const prof = consulta.professionals as {
+      nome?: string;
+      slug?: string;
+      comissao_percent?: number;
+      mp_user_id?: string | null;
+    } | null;
+
+    // Split: quando o profissional já ligou a conta Mercado Pago, o pagamento
+    // é criado na conta dele e a plataforma retém apenas a comissão.
+    let tokenCobranca = token;
+    let taxaPlataforma: number | null = null;
+    if (prof?.mp_user_id) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: contaMp } = await supabaseAdmin
+        .from("mercadopago_contas")
+        .select("access_token")
+        .eq("professional_id", consulta.professional_id)
+        .maybeSingle();
+      if (contaMp?.access_token) {
+        tokenCobranca = contaMp.access_token;
+        const comissao = Number(prof.comissao_percent ?? 30);
+        const valorReais = consulta.valor_centavos / 100;
+        taxaPlataforma = Math.round(valorReais * (comissao / 100) * 100) / 100;
+      }
+    }
     const quando = new Date(consulta.inicio).toLocaleString("pt-BR", {
       timeZone: "America/Sao_Paulo",
       dateStyle: "short",
@@ -45,7 +69,7 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
     const resposta = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${tokenCobranca}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -68,6 +92,7 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
         },
         auto_return: "approved",
         notification_url: `${base}/api/public/webhooks/mercadopago`,
+        ...(taxaPlataforma !== null ? { marketplace_fee: taxaPlataforma } : {}),
       }),
     });
 
