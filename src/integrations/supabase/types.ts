@@ -334,6 +334,50 @@ export type Database = {
         }
         Relationships: []
       }
+      professional_documents: {
+        Row: {
+          caminho: string
+          created_at: string
+          id: string
+          nome_arquivo: string
+          observacao_admin: string | null
+          professional_id: string
+          status: Database["public"]["Enums"]["doc_status"]
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          caminho: string
+          created_at?: string
+          id?: string
+          nome_arquivo: string
+          observacao_admin?: string | null
+          professional_id: string
+          status?: Database["public"]["Enums"]["doc_status"]
+          tipo: string
+          updated_at?: string
+        }
+        Update: {
+          caminho?: string
+          created_at?: string
+          id?: string
+          nome_arquivo?: string
+          observacao_admin?: string | null
+          professional_id?: string
+          status?: Database["public"]["Enums"]["doc_status"]
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_documents_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_payout_details: {
         Row: {
           agencia: string | null
@@ -380,8 +424,11 @@ export type Database = {
           abordagem: string | null
           apresentacao: string | null
           areas: string[]
+          cidade: string | null
           comissao_percent: number
           created_at: string
+          destaque: string | null
+          email_contato: string | null
           especializacoes: string[]
           experiencia_anos: number
           experiencia_toc: string | null
@@ -396,16 +443,21 @@ export type Database = {
           slot_minutos: number
           slug: string
           status: Database["public"]["Enums"]["prof_status"]
+          telefone: string | null
           uf: string
           updated_at: string
           user_id: string | null
+          valor_centavos: number
         }
         Insert: {
           abordagem?: string | null
           apresentacao?: string | null
           areas?: string[]
+          cidade?: string | null
           comissao_percent?: number
           created_at?: string
+          destaque?: string | null
+          email_contato?: string | null
           especializacoes?: string[]
           experiencia_anos?: number
           experiencia_toc?: string | null
@@ -420,16 +472,21 @@ export type Database = {
           slot_minutos?: number
           slug: string
           status?: Database["public"]["Enums"]["prof_status"]
+          telefone?: string | null
           uf: string
           updated_at?: string
           user_id?: string | null
+          valor_centavos?: number
         }
         Update: {
           abordagem?: string | null
           apresentacao?: string | null
           areas?: string[]
+          cidade?: string | null
           comissao_percent?: number
           created_at?: string
+          destaque?: string | null
+          email_contato?: string | null
           especializacoes?: string[]
           experiencia_anos?: number
           experiencia_toc?: string | null
@@ -444,9 +501,11 @@ export type Database = {
           slot_minutos?: number
           slug?: string
           status?: Database["public"]["Enums"]["prof_status"]
+          telefone?: string | null
           uf?: string
           updated_at?: string
           user_id?: string | null
+          valor_centavos?: number
         }
         Relationships: []
       }
@@ -544,6 +603,7 @@ export type Database = {
         | "cancelada"
         | "remarcada"
         | "nao_compareceu"
+      doc_status: "enviado" | "aprovado" | "recusado"
       payment_status:
         | "pendente"
         | "aprovado"
@@ -689,6 +749,7 @@ export const Constants = {
         "remarcada",
         "nao_compareceu",
       ],
+      doc_status: ["enviado", "aprovado", "recusado"],
       payment_status: [
         "pendente",
         "aprovado",
