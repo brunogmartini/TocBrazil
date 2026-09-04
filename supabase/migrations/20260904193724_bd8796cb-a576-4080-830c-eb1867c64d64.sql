@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS payments_provider_ref_unico ON public.payments (provider_ref) WHERE provider_ref IS NOT NULL;

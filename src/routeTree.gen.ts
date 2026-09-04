@@ -38,6 +38,7 @@ import { Route as AuthenticatedAgendarSlugRouteImport } from './routes/_authenti
 import { Route as AuthenticatedProfissionalIndexRouteImport } from './routes/_authenticated/profissional.index'
 import { Route as AuthenticatedProfissionalAgendaRouteImport } from './routes/_authenticated/profissional.agenda'
 import { Route as AuthenticatedProfissionalCadastroRouteImport } from './routes/_authenticated/profissional.cadastro'
+import { Route as ApiPublicWebhooksMercadopagoRouteImport } from './routes/api/public/webhooks/mercadopago'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -187,6 +188,12 @@ const AuthenticatedProfissionalCadastroRoute =
     path: '/profissional/cadastro',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicWebhooksMercadopagoRoute =
+  ApiPublicWebhooksMercadopagoRouteImport.update({
+    id: '/api/public/webhooks/mercadopago',
+    path: '/api/public/webhooks/mercadopago',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/profissional/': typeof AuthenticatedProfissionalIndexRoute
+  '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -247,6 +255,7 @@ export interface FileRoutesByTo {
   '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/profissional': typeof AuthenticatedProfissionalIndexRoute
+  '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -279,6 +288,7 @@ export interface FileRoutesById {
   '/_authenticated/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/_authenticated/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/_authenticated/profissional/': typeof AuthenticatedProfissionalIndexRoute
+  '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/profissional/agenda'
     | '/profissional/cadastro'
     | '/profissional/'
+    | '/api/public/webhooks/mercadopago'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -341,6 +352,7 @@ export interface FileRouteTypes {
     | '/profissional/agenda'
     | '/profissional/cadastro'
     | '/profissional'
+    | '/api/public/webhooks/mercadopago'
   id:
     | '__root__'
     | '/'
@@ -372,6 +384,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profissional/agenda'
     | '/_authenticated/profissional/cadastro'
     | '/_authenticated/profissional/'
+    | '/api/public/webhooks/mercadopago'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -398,6 +411,7 @@ export interface RootRouteChildren {
   ConteudosIndexRoute: typeof ConteudosIndexRoute
   ProfissionaisIndexRoute: typeof ProfissionaisIndexRoute
   PsicologosIndexRoute: typeof PsicologosIndexRoute
+  ApiPublicWebhooksMercadopagoRoute: typeof ApiPublicWebhooksMercadopagoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -605,6 +619,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfissionalCadastroRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/webhooks/mercadopago': {
+      id: '/api/public/webhooks/mercadopago'
+      path: '/api/public/webhooks/mercadopago'
+      fullPath: '/api/public/webhooks/mercadopago'
+      preLoaderRoute: typeof ApiPublicWebhooksMercadopagoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -654,6 +675,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConteudosIndexRoute: ConteudosIndexRoute,
   ProfissionaisIndexRoute: ProfissionaisIndexRoute,
   PsicologosIndexRoute: PsicologosIndexRoute,
+  ApiPublicWebhooksMercadopagoRoute: ApiPublicWebhooksMercadopagoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
