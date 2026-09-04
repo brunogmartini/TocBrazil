@@ -181,10 +181,11 @@ export const definirStatusPagamento = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("appointments")
-      .update({
-        payment_status: data.status,
-        status: data.status === "aprovado" ? "confirmada" : undefined,
-      })
+      .update(
+        data.status === "aprovado"
+          ? { payment_status: data.status, status: "confirmada" as const }
+          : { payment_status: data.status },
+      )
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível atualizar." };
     return { ok: true as const };
