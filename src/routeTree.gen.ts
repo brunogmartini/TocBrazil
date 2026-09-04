@@ -26,6 +26,7 @@ import { Route as SejaParceiroRouteImport } from './routes/seja-parceiro'
 import { Route as SuporteRouteImport } from './routes/suporte'
 import { Route as TermosRouteImport } from './routes/termos'
 import { Route as TocRouteImport } from './routes/toc'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as ConteudosIndexRouteImport } from './routes/conteudos.index'
 import { Route as ConteudosSlugRouteImport } from './routes/conteudos.$slug'
@@ -122,6 +123,11 @@ const TocRoute = TocRouteImport.update({
   path: '/toc',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
   id: '/painel',
   path: '/painel',
@@ -199,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
   '/toc': typeof TocRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/conteudos/$slug': typeof ConteudosSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
@@ -228,6 +235,7 @@ export interface FileRoutesByTo {
   '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
   '/toc': typeof TocRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/conteudos/$slug': typeof ConteudosSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
@@ -259,6 +267,7 @@ export interface FileRoutesById {
   '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
   '/toc': typeof TocRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/conteudos/$slug': typeof ConteudosSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
@@ -290,6 +299,7 @@ export interface FileRouteTypes {
     | '/suporte'
     | '/termos'
     | '/toc'
+    | '/admin'
     | '/painel'
     | '/conteudos/$slug'
     | '/profissionais/$slug'
@@ -319,6 +329,7 @@ export interface FileRouteTypes {
     | '/suporte'
     | '/termos'
     | '/toc'
+    | '/admin'
     | '/painel'
     | '/conteudos/$slug'
     | '/profissionais/$slug'
@@ -349,6 +360,7 @@ export interface FileRouteTypes {
     | '/suporte'
     | '/termos'
     | '/toc'
+    | '/_authenticated/admin'
     | '/_authenticated/painel'
     | '/conteudos/$slug'
     | '/profissionais/$slug'
@@ -509,6 +521,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TocRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel': {
       id: '/_authenticated/painel'
       path: '/painel'
@@ -590,6 +609,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedAgendarSlugRoute: typeof AuthenticatedAgendarSlugRoute
   AuthenticatedProfissionalAgendaRoute: typeof AuthenticatedProfissionalAgendaRoute
@@ -598,6 +618,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedAgendarSlugRoute: AuthenticatedAgendarSlugRoute,
   AuthenticatedProfissionalAgendaRoute: AuthenticatedProfissionalAgendaRoute,
