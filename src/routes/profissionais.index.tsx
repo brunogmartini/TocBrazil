@@ -1,71 +1,85 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { PROFISSIONAIS_DEMO } from "@/lib/profissionais-mock";
+import { listarProfissionais } from "@/lib/plataforma.functions";
 import { track } from "@/lib/analytics";
 
 export const Route = createFileRoute("/profissionais/")({
+  loader: () => listarProfissionais(),
   head: () => ({
     meta: [
       { title: "Encontrar psicólogo ou psiquiatra online — TOC Brazil" },
       {
         name: "description",
         content:
-          "Compare perfis de psicólogos e psiquiatras por profissão, abordagem, área de atuação, idioma, valor e disponibilidade para atendimento online relacionado ao TOC.",
+          "Compare perfis de psicólogos e psiquiatras por profissão, abordagem, área de atuação, idioma e experiência para atendimento online relacionado ao TOC.",
       },
-      { property: "og:title", content: "Encontre um profissional para acompanhamento em TOC" },
+      { property: "og:title", content: "Encontre um especialista em TOC" },
       {
         property: "og:description",
         content:
           "Filtros por preferências, informações declaradas e verificadas, sem ranking de popularidade.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "/profissionais" },
     ],
     links: [{ rel: "canonical", href: "/profissionais" }],
   }),
+  errorComponent: () => (
+    <div className="container-page py-20">
+      <h1 className="text-3xl">Não conseguimos carregar os profissionais</h1>
+      <p className="mt-4 text-muted-foreground">Atualize a página em alguns instantes.</p>
+    </div>
+  ),
   component: Busca,
 });
 
 const TODOS = "Todos";
+export const LABEL_PROFISSAO: Record<string, string> = {
+  psicologo: "Psicólogo(a)",
+  psiquiatra: "Psiquiatra",
+};
 
 function Busca() {
+  const { profissionais } = Route.useLoaderData();
   const [profissao, setProfissao] = useState(TODOS);
   const [area, setArea] = useState(TODOS);
   const [abordagem, setAbordagem] = useState(TODOS);
   const [idioma, setIdioma] = useState(TODOS);
   const [genero, setGenero] = useState(TODOS);
   const [experienciaMin, setExperienciaMin] = useState(0);
-  const [ordem, setOrdem] = useState<"nome" | "disponibilidade">("nome");
 
   const areas = useMemo(
-    () => [TODOS, ...new Set(PROFISSIONAIS_DEMO.flatMap((p) => p.areas))],
-    [],
+    () => [TODOS, ...new Set(profissionais.flatMap((p) => p.areas))],
+    [profissionais],
   );
   const abordagens = useMemo(
     () => [
       TODOS,
-      ...new Set(PROFISSIONAIS_DEMO.map((p) => p.abordagem).filter((a): a is string => !!a)),
+      ...new Set(profissionais.map((p) => p.abordagem).filter((a): a is string => !!a)),
     ],
-    [],
+    [profissionais],
   );
   const idiomas = useMemo(
-    () => [TODOS, ...new Set(PROFISSIONAIS_DEMO.flatMap((p) => p.idiomas))],
-    [],
+    () => [TODOS, ...new Set(profissionais.flatMap((p) => p.idiomas))],
+    [profissionais],
   );
 
-  const resultados = useMemo(() => {
-    const list = PROFISSIONAIS_DEMO.filter(
-      (p) =>
-        (profissao === TODOS || p.profissao === profissao) &&
-        (area === TODOS || p.areas.includes(area)) &&
-        (abordagem === TODOS || p.abordagem === abordagem) &&
-        (idioma === TODOS || p.idiomas.includes(idioma)) &&
-        (genero === TODOS || p.genero === genero) &&
-        p.experienciaAnos >= experienciaMin,
-    );
-    if (ordem === "disponibilidade")
-      return [...list].sort((a, b) => a.horarios[0]!.localeCompare(b.horarios[0]!));
-    return [...list].sort((a, b) => a.nome.localeCompare(b.nome));
-  }, [profissao, area, abordagem, idioma, genero, experienciaMin, ordem]);
+  const resultados = useMemo(
+    () =>
+      profissionais
+        .filter(
+          (p) =>
+            (profissao === TODOS || LABEL_PROFISSAO[p.profissao] === profissao) &&
+            (area === TODOS || p.areas.includes(area)) &&
+            (abordagem === TODOS || p.abordagem === abordagem) &&
+            (idioma === TODOS || p.idiomas.includes(idioma)) &&
+            (genero === TODOS || p.genero === genero.toLowerCase()) &&
+            p.experiencia_anos >= experienciaMin,
+        )
+        .sort((a, b) => a.nome.localeCompare(b.nome)),
+    [profissionais, profissao, area, abordagem, idioma, genero, experienciaMin],
+  );
 
   useEffect(() => {
     track("professional_search", {
@@ -82,11 +96,10 @@ function Busca() {
   return (
     <div className="container-page py-12 lg:py-16">
       <span className="section-label">Profissionais</span>
-      <h1 className="mt-3 text-3xl sm:text-4xl">Encontre um profissional</h1>
+      <h1 className="mt-3 text-3xl sm:text-4xl">Encontre um especialista em TOC</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
         As informações são declaradas pelos profissionais e a documentação é verificada pela
-        plataforma. A ordenação é neutra: não indicamos que um profissional é melhor do que
-        outro.
+        plataforma. A ordenação é neutra: não indicamos que um profissional é melhor do que outro.
       </p>
       <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
         Prefere ajuda para escolher?{" "}
@@ -97,7 +110,7 @@ function Busca() {
       </p>
 
       <form
-        className="card-soft mt-8 grid gap-5 p-6 md:grid-cols-2 lg:grid-cols-4"
+        className="card-soft mt-8 grid gap-5 p-6 md:grid-cols-2 lg:grid-cols-3"
         onSubmit={(e) => e.preventDefault()}
       >
         <Select
@@ -135,20 +148,6 @@ function Busca() {
             className="mt-3 w-full accent-[var(--color-primary)]"
           />
         </div>
-        <div>
-          <label htmlFor="ordem" className="section-label">
-            Ordenar por
-          </label>
-          <select
-            id="ordem"
-            value={ordem}
-            onChange={(e) => setOrdem(e.target.value as typeof ordem)}
-            className="field-base mt-2"
-          >
-            <option value="nome">Nome (A–Z)</option>
-            <option value="disponibilidade">Próxima disponibilidade</option>
-          </select>
-        </div>
       </form>
 
       <p className="mt-8 text-sm text-muted-foreground" role="status">
@@ -158,10 +157,10 @@ function Busca() {
       <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {resultados.map((p) => (
           <article key={p.slug} className="card-soft card-soft-hover flex flex-col p-6">
-            <span className="pill self-start">{p.profissao}</span>
+            <span className="pill self-start">{LABEL_PROFISSAO[p.profissao]}</span>
             <h2 className="mt-4 text-lg">{p.nome}</h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              {p.registro} · {p.uf} · {p.experienciaAnos} anos declarados
+              {p.registro} · {p.uf} · {p.experiencia_anos} anos declarados
             </p>
             {p.abordagem && <p className="mt-4 text-sm">{p.abordagem}</p>}
             <ul className="mt-3 flex flex-wrap gap-2">
@@ -173,17 +172,13 @@ function Busca() {
             </ul>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{p.apresentacao}</p>
             <p className="mt-4 text-xs text-muted-foreground">Idiomas: {p.idiomas.join(", ")}</p>
-            <p className="mt-4 text-xs text-muted-foreground">
-              Valores da sessão ficam disponíveis após o cadastro na plataforma.
-            </p>
             <p className="mt-3 text-xs text-muted-foreground">
-              Próximos horários: {p.horarios.join(" · ")}
+              Valores e horários disponíveis aparecem após o cadastro na plataforma.
             </p>
             <Link
               to="/profissionais/$slug"
               params={{ slug: p.slug }}
-              className="btn-base btn-ghost mt-auto w-full"
-              style={{ marginTop: "1.5rem" }}
+              className="btn-base btn-ghost mt-6 w-full"
             >
               Ver perfil
             </Link>
@@ -193,8 +188,8 @@ function Busca() {
 
       {resultados.length === 0 && (
         <p className="card-soft mt-5 p-6 text-sm text-muted-foreground">
-          Nenhum profissional corresponde a esses filtros no momento. Tente ampliar a faixa de
-          valor ou remover uma preferência.
+          Nenhum profissional corresponde a esses filtros no momento. Tente remover uma
+          preferência.
         </p>
       )}
     </div>

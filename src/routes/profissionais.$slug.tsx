@@ -1,23 +1,31 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { PROFISSIONAIS_DEMO } from "@/lib/profissionais-mock";
+import { useEffect } from "react";
+import { obterProfissional } from "@/lib/plataforma.functions";
 import { track } from "@/lib/analytics";
 
+const LABEL_PROFISSAO: Record<string, string> = {
+  psicologo: "Psicólogo(a)",
+  psiquiatra: "Psiquiatra",
+};
+
 export const Route = createFileRoute("/profissionais/$slug")({
-  loader: ({ params }) => {
-    const profissional = PROFISSIONAIS_DEMO.find((p) => p.slug === params.slug);
+  loader: async ({ params }) => {
+    const { profissional } = await obterProfissional({ data: { slug: params.slug } });
     if (!profissional) throw notFound();
     return { profissional };
   },
   head: ({ params, loaderData }) => {
     if (!loaderData) {
       return {
-        meta: [{ title: "Perfil indisponível — TOC Brazil" }, { name: "robots", content: "noindex" }],
+        meta: [
+          { title: "Perfil indisponível — TOC Brazil" },
+          { name: "robots", content: "noindex" },
+        ],
       };
     }
     const p = loaderData.profissional;
-    const titulo = `${p.nome} — ${p.profissao} online | TOC Brazil`;
-    const desc = `${p.nome} (${p.registro}) atende online. ${p.apresentacao}`;
+    const titulo = `${p.nome} — ${LABEL_PROFISSAO[p.profissao]} online | TOC Brazil`;
+    const desc = `${p.nome} (${p.registro}) atende online. ${p.apresentacao ?? ""}`;
     return {
       meta: [
         { title: titulo },
@@ -25,11 +33,13 @@ export const Route = createFileRoute("/profissionais/$slug")({
         { property: "og:title", content: titulo },
         { property: "og:description", content: desc.slice(0, 158) },
         { property: "og:type", content: "profile" },
+        { name: "twitter:card", content: "summary" },
         { property: "og:url", content: `/profissionais/${params.slug}` },
       ],
       links: [{ rel: "canonical", href: `/profissionais/${params.slug}` }],
     };
   },
+  errorComponent: NaoEncontrado,
   notFoundComponent: NaoEncontrado,
   component: Perfil,
 });
@@ -50,7 +60,6 @@ function NaoEncontrado() {
 
 function Perfil() {
   const { profissional: p } = Route.useLoaderData();
-  const [horario, setHorario] = useState<string | null>(null);
 
   useEffect(() => {
     track("professional_profile_view", { slug: p.slug, profissao: p.profissao });
@@ -67,10 +76,10 @@ function Perfil() {
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[1.4fr_0.9fr]">
         <div>
-          <span className="pill">{p.profissao}</span>
+          <span className="pill">{LABEL_PROFISSAO[p.profissao]}</span>
           <h1 className="mt-4 text-3xl sm:text-4xl">{p.nome}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            {p.registro} · {p.uf} · {p.experienciaAnos} anos de experiência declarados
+            {p.registro} · {p.uf} · {p.experiencia_anos} anos de experiência declarados
           </p>
 
           <div className="card-soft mt-8 p-6">
@@ -90,15 +99,15 @@ function Perfil() {
             <section className="card-soft p-6">
               <h2 className="text-lg">Abordagem</h2>
               <p className="mt-3 text-sm text-muted-foreground">
-                {p.abordagem ?? "Acompanhamento médico psiquiátrico (sem abordagem psicoterápica)."}
-              </p>
-              <p className="mt-3 text-sm text-muted-foreground">
-                Estilo declarado: {p.estilo.toLowerCase()}
-                {p.didatico ? ", com explicações didáticas ao longo do processo." : "."}
+                {p.abordagem ?? "Acompanhamento médico psiquiátrico."}
               </p>
             </section>
             <section className="card-soft p-6">
-              <h2 className="text-lg">Áreas de atuação</h2>
+              <h2 className="text-lg">Experiência com TOC</h2>
+              <p className="mt-3 text-sm text-muted-foreground">{p.experiencia_toc}</p>
+            </section>
+            <section className="card-soft p-6">
+              <h2 className="text-lg">Atendimento</h2>
               <ul className="mt-3 flex flex-wrap gap-2">
                 {p.areas.map((a) => (
                   <li key={a} className="pill">
@@ -106,13 +115,7 @@ function Perfil() {
                   </li>
                 ))}
               </ul>
-            </section>
-            <section className="card-soft p-6">
-              <h2 className="text-lg">Atendimento</h2>
               <p className="mt-3 text-sm text-muted-foreground">
-                Público: {p.publicos.join(", ")}
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground">
                 Idiomas: {p.idiomas.join(", ")}
               </p>
               <p className="mt-2 text-sm text-muted-foreground">Modalidade: online</p>
@@ -128,48 +131,21 @@ function Perfil() {
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="card-soft p-6">
-            <p className="text-lg">Sessão de 50 minutos, online</p>
+            <p className="text-lg">Sessão de {p.slot_minutos} minutos, online</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Valores e formas de pagamento ficam disponíveis após o cadastro na plataforma.
+              Os horários livres e o valor da consulta aparecem depois que você cria sua conta.
             </p>
-
-            <h2 className="section-label mt-7">Próximos horários</h2>
-            <ul className="mt-3 grid gap-2">
-              {p.horarios.map((h) => (
-                <li key={h}>
-                  <button
-                    type="button"
-                    aria-pressed={horario === h}
-                    onClick={() => {
-                      setHorario(h);
-                      track("schedule_started", { slug: p.slug, horario: h });
-                    }}
-                    className={`w-full rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
-                      horario === h
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-background hover:bg-muted"
-                    }`}
-                  >
-                    {h}
-                  </button>
-                </li>
-              ))}
-            </ul>
-
-            <button
-              type="button"
-              disabled={!horario}
-              onClick={() => track("checkout_started", { slug: p.slug, horario })}
-              className="btn-base btn-primary mt-6 w-full disabled:opacity-50"
+            <Link
+              to="/agendar/$slug"
+              params={{ slug: p.slug }}
+              className="btn-base btn-primary mt-6 w-full"
+              onClick={() => track("schedule_started", { slug: p.slug })}
             >
-              {horario ? `Agendar ${horario}` : "Escolha um horário"}
-            </button>
-            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-              O agendamento é confirmado após a aprovação do pagamento. O checkout ainda não está
-              conectado a um provedor de pagamentos nesta versão.
-            </p>
-            <p className="mt-4 border-t border-border pt-4 text-xs leading-relaxed text-muted-foreground">
-              {p.politicaCancelamento}
+              Ver horários e agendar
+            </Link>
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+              A consulta é confirmada após a aprovação do pagamento. Cancelamento sem custo até 24
+              horas antes do horário marcado.
             </p>
           </div>
         </aside>

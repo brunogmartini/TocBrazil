@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const nav = [
   { to: "/entenda-o-toc", label: "Entenda o TOC" },
@@ -18,6 +19,15 @@ const profissionais = [
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [dropdown, setDropdown] = useState(false);
+  const [logado, setLogado] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setLogado(!!data.session));
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setLogado(!!session);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-xl">
@@ -68,11 +78,11 @@ export function SiteHeader() {
                   ))}
                   <li>
                     <Link
-                      to="/meu-cuidado"
+                      to={logado ? "/painel" : "/auth"}
                       onClick={() => setDropdown(false)}
                       className="block rounded-xl px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted"
                     >
-                      Entrar
+                      {logado ? "Minha área" : "Entrar"}
                     </Link>
                   </li>
                 </ul>
@@ -82,6 +92,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <Link
+            to={logado ? "/painel" : "/auth"}
+            className="text-sm font-medium text-muted-foreground hover:text-foreground"
+          >
+            {logado ? "Minha área" : "Entrar"}
+          </Link>
           <Link to="/profissionais" className="btn-base btn-primary">
             Encontrar um especialista em TOC
           </Link>
@@ -112,11 +128,11 @@ export function SiteHeader() {
               </Link>
             ))}
             <Link
-              to="/meu-cuidado"
+              to={logado ? "/painel" : "/auth"}
               onClick={() => setOpen(false)}
               className="rounded-xl px-2 py-3 text-sm font-medium text-muted-foreground"
             >
-              Entrar
+              {logado ? "Minha área" : "Entrar"}
             </Link>
           </nav>
         </div>

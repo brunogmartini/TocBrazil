@@ -7,7 +7,7 @@ const colunas = [
       { to: "/profissionais", label: "Encontrar um especialista em TOC" },
       { to: "/como-funciona", label: "Como funciona" },
       { to: "/conteudos", label: "Conteúdos" },
-      { to: "/meu-cuidado", label: "Minhas consultas" },
+      { to: "/painel", label: "Minhas consultas" },
     ],
   },
   {
@@ -17,7 +17,7 @@ const colunas = [
       { to: "/para-psicologos", label: "Sou psicólogo" },
       { to: "/para-psiquiatras", label: "Sou psiquiatra" },
       { to: "/cadastro-profissional", label: "Cadastro" },
-      { to: "/meu-cuidado", label: "Login" },
+      { to: "/auth", label: "Entrar" },
     ],
   },
   {
