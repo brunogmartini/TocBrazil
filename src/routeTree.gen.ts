@@ -35,6 +35,7 @@ import { Route as PsicologosIndexRouteImport } from './routes/psicologos.index'
 import { Route as PsicologosSlugRouteImport } from './routes/psicologos.$slug'
 import { Route as AuthenticatedAgendarSlugRouteImport } from './routes/_authenticated/agendar.$slug'
 import { Route as AuthenticatedProfissionalIndexRouteImport } from './routes/_authenticated/profissional.index'
+import { Route as AuthenticatedProfissionalAgendaRouteImport } from './routes/_authenticated/profissional.agenda'
 import { Route as AuthenticatedProfissionalCadastroRouteImport } from './routes/_authenticated/profissional.cadastro'
 
 const IndexRoute = IndexRouteImport.update({
@@ -168,6 +169,12 @@ const AuthenticatedProfissionalIndexRoute =
     path: '/profissional/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProfissionalAgendaRoute =
+  AuthenticatedProfissionalAgendaRouteImport.update({
+    id: '/profissional/agenda',
+    path: '/profissional/agenda',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProfissionalCadastroRoute =
   AuthenticatedProfissionalCadastroRouteImport.update({
     id: '/profissional/cadastro',
@@ -200,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/profissionais/': typeof ProfissionaisIndexRoute
   '/psicologos/': typeof PsicologosIndexRoute
   '/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
+  '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/profissional/': typeof AuthenticatedProfissionalIndexRoute
 }
@@ -228,6 +236,7 @@ export interface FileRoutesByTo {
   '/profissionais': typeof ProfissionaisIndexRoute
   '/psicologos': typeof PsicologosIndexRoute
   '/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
+  '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/profissional': typeof AuthenticatedProfissionalIndexRoute
 }
@@ -258,6 +267,7 @@ export interface FileRoutesById {
   '/profissionais/': typeof ProfissionaisIndexRoute
   '/psicologos/': typeof PsicologosIndexRoute
   '/_authenticated/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
+  '/_authenticated/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/_authenticated/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/_authenticated/profissional/': typeof AuthenticatedProfissionalIndexRoute
 }
@@ -288,6 +298,7 @@ export interface FileRouteTypes {
     | '/profissionais/'
     | '/psicologos/'
     | '/agendar/$slug'
+    | '/profissional/agenda'
     | '/profissional/cadastro'
     | '/profissional/'
   fileRoutesByTo: FileRoutesByTo
@@ -316,6 +327,7 @@ export interface FileRouteTypes {
     | '/profissionais'
     | '/psicologos'
     | '/agendar/$slug'
+    | '/profissional/agenda'
     | '/profissional/cadastro'
     | '/profissional'
   id:
@@ -345,6 +357,7 @@ export interface FileRouteTypes {
     | '/profissionais/'
     | '/psicologos/'
     | '/_authenticated/agendar/$slug'
+    | '/_authenticated/profissional/agenda'
     | '/_authenticated/profissional/cadastro'
     | '/_authenticated/profissional/'
   fileRoutesById: FileRoutesById
@@ -559,6 +572,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfissionalIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profissional/agenda': {
+      id: '/_authenticated/profissional/agenda'
+      path: '/profissional/agenda'
+      fullPath: '/profissional/agenda'
+      preLoaderRoute: typeof AuthenticatedProfissionalAgendaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profissional/cadastro': {
       id: '/_authenticated/profissional/cadastro'
       path: '/profissional/cadastro'
@@ -572,6 +592,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedAgendarSlugRoute: typeof AuthenticatedAgendarSlugRoute
+  AuthenticatedProfissionalAgendaRoute: typeof AuthenticatedProfissionalAgendaRoute
   AuthenticatedProfissionalCadastroRoute: typeof AuthenticatedProfissionalCadastroRoute
   AuthenticatedProfissionalIndexRoute: typeof AuthenticatedProfissionalIndexRoute
 }
@@ -579,6 +600,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedAgendarSlugRoute: AuthenticatedAgendarSlugRoute,
+  AuthenticatedProfissionalAgendaRoute: AuthenticatedProfissionalAgendaRoute,
   AuthenticatedProfissionalCadastroRoute:
     AuthenticatedProfissionalCadastroRoute,
   AuthenticatedProfissionalIndexRoute: AuthenticatedProfissionalIndexRoute,
