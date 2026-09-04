@@ -35,6 +35,7 @@ import { Route as PsicologosIndexRouteImport } from './routes/psicologos.index'
 import { Route as PsicologosSlugRouteImport } from './routes/psicologos.$slug'
 import { Route as AuthenticatedAgendarSlugRouteImport } from './routes/_authenticated/agendar.$slug'
 import { Route as AuthenticatedProfissionalIndexRouteImport } from './routes/_authenticated/profissional.index'
+import { Route as AuthenticatedProfissionalCadastroRouteImport } from './routes/_authenticated/profissional.cadastro'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -167,6 +168,12 @@ const AuthenticatedProfissionalIndexRoute =
     path: '/profissional/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProfissionalCadastroRoute =
+  AuthenticatedProfissionalCadastroRouteImport.update({
+    id: '/profissional/cadastro',
+    path: '/profissional/cadastro',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/profissionais/': typeof ProfissionaisIndexRoute
   '/psicologos/': typeof PsicologosIndexRoute
   '/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
+  '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/profissional/': typeof AuthenticatedProfissionalIndexRoute
 }
 export interface FileRoutesByTo {
@@ -220,6 +228,7 @@ export interface FileRoutesByTo {
   '/profissionais': typeof ProfissionaisIndexRoute
   '/psicologos': typeof PsicologosIndexRoute
   '/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
+  '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/profissional': typeof AuthenticatedProfissionalIndexRoute
 }
 export interface FileRoutesById {
@@ -249,6 +258,7 @@ export interface FileRoutesById {
   '/profissionais/': typeof ProfissionaisIndexRoute
   '/psicologos/': typeof PsicologosIndexRoute
   '/_authenticated/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
+  '/_authenticated/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/_authenticated/profissional/': typeof AuthenticatedProfissionalIndexRoute
 }
 export interface FileRouteTypes {
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
     | '/profissionais/'
     | '/psicologos/'
     | '/agendar/$slug'
+    | '/profissional/cadastro'
     | '/profissional/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '/profissionais'
     | '/psicologos'
     | '/agendar/$slug'
+    | '/profissional/cadastro'
     | '/profissional'
   id:
     | '__root__'
@@ -333,6 +345,7 @@ export interface FileRouteTypes {
     | '/profissionais/'
     | '/psicologos/'
     | '/_authenticated/agendar/$slug'
+    | '/_authenticated/profissional/cadastro'
     | '/_authenticated/profissional/'
   fileRoutesById: FileRoutesById
 }
@@ -546,18 +559,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfissionalIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profissional/cadastro': {
+      id: '/_authenticated/profissional/cadastro'
+      path: '/profissional/cadastro'
+      fullPath: '/profissional/cadastro'
+      preLoaderRoute: typeof AuthenticatedProfissionalCadastroRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedAgendarSlugRoute: typeof AuthenticatedAgendarSlugRoute
+  AuthenticatedProfissionalCadastroRoute: typeof AuthenticatedProfissionalCadastroRoute
   AuthenticatedProfissionalIndexRoute: typeof AuthenticatedProfissionalIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedAgendarSlugRoute: AuthenticatedAgendarSlugRoute,
+  AuthenticatedProfissionalCadastroRoute:
+    AuthenticatedProfissionalCadastroRoute,
   AuthenticatedProfissionalIndexRoute: AuthenticatedProfissionalIndexRoute,
 }
 
