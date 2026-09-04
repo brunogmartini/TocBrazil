@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { obterProfissional } from "@/lib/plataforma.functions";
+import { avaliacoesDoProfissional, obterProfissional } from "@/lib/plataforma.functions";
+import { Estrelas } from "@/components/estrelas";
 import { track } from "@/lib/analytics";
 
 const LABEL_PROFISSAO: Record<string, string> = {
@@ -12,7 +13,10 @@ export const Route = createFileRoute("/profissionais/$slug")({
   loader: async ({ params }) => {
     const { profissional } = await obterProfissional({ data: { slug: params.slug } });
     if (!profissional) throw notFound();
-    return { profissional };
+    const avaliacoes = await avaliacoesDoProfissional({
+      data: { professionalId: profissional.id },
+    });
+    return { profissional, avaliacoes };
   },
   head: ({ params, loaderData }) => {
     if (!loaderData) {
@@ -59,7 +63,7 @@ function NaoEncontrado() {
 }
 
 function Perfil() {
-  const { profissional: p } = Route.useLoaderData();
+  const { profissional: p, avaliacoes } = Route.useLoaderData();
 
   useEffect(() => {
     track("professional_profile_view", { slug: p.slug, profissao: p.profissao });
@@ -121,6 +125,34 @@ function Perfil() {
               <p className="mt-2 text-sm text-muted-foreground">Modalidade: online</p>
             </section>
           </div>
+
+          <section className="card-soft mt-5 p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-lg">Avaliações de pacientes</h2>
+              {avaliacoes.total > 0 && (
+                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Estrelas nota={avaliacoes.media} />
+                  {avaliacoes.media.toFixed(1)} · {avaliacoes.total}{" "}
+                  {avaliacoes.total === 1 ? "avaliação" : "avaliações"}
+                </span>
+              )}
+            </div>
+            {avaliacoes.total === 0 ? (
+              <p className="mt-3 text-sm text-muted-foreground">
+                Este profissional ainda não recebeu avaliações. Depois da consulta, você pode dar
+                até 5 estrelas na sua área.
+              </p>
+            ) : (
+              <ul className="mt-4 space-y-3">
+                {avaliacoes.avaliacoes.map((a) => (
+                  <li key={a.id} className="rounded-xl bg-muted p-4 text-sm">
+                    <Estrelas nota={a.nota} />
+                    {a.comentario && <p className="mt-2 text-muted-foreground">{a.comentario}</p>}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
 
           <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
             As informações deste perfil são declaradas pelo profissional e sua documentação é

@@ -14,7 +14,7 @@ export const Route = createFileRoute("/")({
         content:
           "TOC Brazil conecta pacientes a psicólogos e psiquiatras com experiência em TOC. Consultas online, no seu horário, com o profissional que você escolher.",
       },
-      { property: "og:title", content: "Conectando pacientes aos maiores especialistas em TOC no Brasil" },
+      { property: "og:title", content: "Conectando pacientes aos melhores especialistas em TOC do Brasil" },
       {
         property: "og:description",
         content:
@@ -132,7 +132,7 @@ function Home() {
           <div className="rise-in">
             <span className="pill">Plataforma de acompanhamento especializado</span>
             <h1 className="mt-6 text-[2.1rem] leading-[1.1] sm:text-5xl lg:text-[3.6rem]">
-              Conectando pacientes aos maiores especialistas em TOC no Brasil.
+              Conectando pacientes aos melhores especialistas em TOC do Brasil.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
               Consultas online com psicólogos e psiquiatras{" "}
@@ -397,7 +397,7 @@ function Home() {
             </h2>
             <p className="mt-4 text-muted-foreground">
               Responda a algumas perguntas simples sobre suas preferências — horários,
-              profissão, idioma, preferência de gênero e estilo de atendimento — e veja
+              profissionais, idioma, preferência de gênero e estilo de atendimento — e veja
               profissionais com quem você pode se identificar.
             </p>
             <p className="mt-4 text-sm text-muted-foreground">
@@ -409,7 +409,7 @@ function Home() {
             </Link>
           </div>
           <ul className="grid gap-4 sm:grid-cols-2">
-            {["Horários possíveis", "Psicólogo ou psiquiatra", "Preferência de gênero", "Idioma", "Estilo de atendimento", "Áreas de atuação"].map(
+            {["Horários disponíveis", "Psicólogo ou psiquiatra", "Preferência de gênero", "Idioma", "Estilo de atendimento", "Áreas de atuação"].map(
               (item) => (
                 <li key={item} className="card-soft p-5 text-sm">
                   {item}
@@ -520,7 +520,7 @@ function Home() {
       <section aria-labelledby="cta-final" className="container-page py-20 lg:py-28">
         <div className="mx-auto max-w-3xl text-center">
           <h2 id="cta-final" className="text-4xl leading-tight sm:text-6xl">
-            Seu tratamento correto começa aqui.
+            Seu tratamento assertivo começa aqui.
           </h2>
 
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">

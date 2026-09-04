@@ -190,6 +190,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
     const plataforma = Math.round((valor * comissao) / 100);
 
     const fim = new Date(new Date(inicioIso).getTime() + prof.slot_minutos * 60000).toISOString();
+    const salaVideo = `https://meet.jit.si/tocbrazil-${crypto.randomUUID().slice(0, 12)}`;
 
     const { data: criada, error } = await supabase
       .from("appointments")
@@ -203,7 +204,9 @@ export const criarAgendamento = createServerFn({ method: "POST" })
         valor_centavos: valor,
         valor_plataforma_centavos: plataforma,
         valor_profissional_centavos: valor - plataforma,
+        video_url: salaVideo,
       })
+
       .select("id, inicio, fim, valor_centavos")
       .single();
 
@@ -289,4 +292,82 @@ export const minhasNotificacoes = createServerFn({ method: "GET" })
       .order("agendada_para", { ascending: true })
       .limit(30);
     return { notificacoes: data ?? [] };
+  });
+
+/* ---------- avaliações ---------- */
+
+export type AvaliacaoPublica = {
+  id: string;
+  nota: number;
+  comentario: string | null;
+  created_at: string;
+};
+
+export const avaliacoesDoProfissional = createServerFn({ method: "GET" })
+  .inputValidator((data: { professionalId: string }) => ({
+    professionalId: String(data.professionalId),
+  }))
+  .handler(async ({ data }) => {
+    const cliente = clientePublico();
+    const [{ data: rows }, { data: resumo }] = await Promise.all([
+      cliente
+        .from("avaliacoes")
+        .select("id, nota, comentario, created_at")
+        .eq("professional_id", data.professionalId)
+        .eq("publica", true)
+        .order("created_at", { ascending: false })
+        .limit(20),
+      cliente.rpc("avaliacoes_resumo", { _professional_id: data.professionalId }),
+    ]);
+    const linha = (resumo ?? [])[0] as { media: number; total: number } | undefined;
+    return {
+      avaliacoes: (rows ?? []) as AvaliacaoPublica[],
+      media: Number(linha?.media ?? 0),
+      total: Number(linha?.total ?? 0),
+    };
+  });
+
+export const minhasAvaliacoes = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data } = await supabase
+      .from("avaliacoes")
+      .select("id, appointment_id, professional_id, nota, comentario")
+      .eq("patient_id", userId);
+    return { avaliacoes: data ?? [] };
+  });
+
+export const salvarAvaliacao = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { consultaId: string; nota: number; comentario?: string }) => ({
+    consultaId: String(data.consultaId),
+    nota: Math.min(Math.max(Math.round(Number(data.nota)), 1), 5),
+    comentario: data.comentario ? String(data.comentario).trim().slice(0, 800) : null,
+  }))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: consulta } = await supabase
+      .from("appointments")
+      .select("id, patient_id, professional_id, status")
+      .eq("id", data.consultaId)
+      .maybeSingle();
+    if (!consulta || consulta.patient_id !== userId) {
+      return { ok: false as const, erro: "Consulta não encontrada." };
+    }
+    if (consulta.status !== "realizada") {
+      return { ok: false as const, erro: "Você pode avaliar depois que a consulta acontecer." };
+    }
+    const { error } = await supabase.from("avaliacoes").upsert(
+      {
+        appointment_id: consulta.id,
+        patient_id: userId,
+        professional_id: consulta.professional_id,
+        nota: data.nota,
+        comentario: data.comentario,
+      },
+      { onConflict: "appointment_id" },
+    );
+    if (error) return { ok: false as const, erro: "Não foi possível salvar sua avaliação." };
+    return { ok: true as const };
   });
