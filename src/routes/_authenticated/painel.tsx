@@ -14,6 +14,7 @@ import {
 } from "@/lib/plataforma.functions";
 import { CalendarioConsultas } from "@/components/calendario-consultas";
 import { Estrelas, SeletorEstrelas } from "@/components/estrelas";
+import { iniciarPagamento } from "@/lib/pagamento.functions";
 
 export const Route = createFileRoute("/_authenticated/painel")({
   head: () => ({
@@ -57,6 +58,7 @@ function Painel() {
   const cancelar = useServerFn(cancelarConsulta);
   const carregarAvaliacoes = useServerFn(minhasAvaliacoes);
   const enviarAvaliacao = useServerFn(salvarAvaliacao);
+  const pagar = useServerFn(iniciarPagamento);
 
   const contexto = useQuery({ queryKey: ["contexto"], queryFn: () => carregarContexto() });
   const consultas = useQuery({ queryKey: ["consultas"], queryFn: () => carregarConsultas() });
@@ -72,6 +74,7 @@ function Painel() {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [salvo, setSalvo] = useState(false);
+  const [erroPagamento, setErroPagamento] = useState<string | null>(null);
 
   useEffect(() => {
     const perfil = contexto.data?.perfil;
@@ -193,10 +196,29 @@ function Painel() {
                     </p>
                   )}
                   {c.status === "aguardando_pagamento" && (
-                    <p className="mt-3 rounded-xl bg-muted p-4 text-sm text-muted-foreground">
-                      Sua reserva está guardada. A consulta é confirmada assim que o pagamento for
-                      aprovado — o meio de pagamento ainda está sendo conectado à plataforma.
-                    </p>
+                    <div className="mt-3 rounded-xl bg-muted p-4 text-sm text-muted-foreground">
+                      <p>
+                        Sua reserva está guardada por tempo limitado. A consulta é confirmada assim
+                        que o pagamento for aprovado.
+                      </p>
+                      <button
+                        type="button"
+                        className="btn-base btn-primary mt-4"
+                        onClick={async () => {
+                          setErroPagamento(null);
+                          const r = await pagar({
+                            data: { consultaId: c.id, origem: window.location.origin },
+                          });
+                          if (r.ok) window.location.href = r.link;
+                          else setErroPagamento(r.erro);
+                        }}
+                      >
+                        Pagar com Mercado Pago
+                      </button>
+                      {erroPagamento && (
+                        <p className="mt-3 text-destructive">{erroPagamento}</p>
+                      )}
+                    </div>
                   )}
                   <button
                     type="button"
