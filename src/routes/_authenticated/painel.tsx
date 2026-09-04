@@ -6,10 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   cancelarConsulta,
   meuContexto,
+  minhasAvaliacoes,
   minhasConsultas,
   minhasNotificacoes,
+  salvarAvaliacao,
   salvarPerfil,
 } from "@/lib/plataforma.functions";
+import { CalendarioConsultas } from "@/components/calendario-consultas";
+import { Estrelas, SeletorEstrelas } from "@/components/estrelas";
 
 export const Route = createFileRoute("/_authenticated/painel")({
   head: () => ({
@@ -51,12 +55,18 @@ function Painel() {
   const carregarNotificacoes = useServerFn(minhasNotificacoes);
   const salvar = useServerFn(salvarPerfil);
   const cancelar = useServerFn(cancelarConsulta);
+  const carregarAvaliacoes = useServerFn(minhasAvaliacoes);
+  const enviarAvaliacao = useServerFn(salvarAvaliacao);
 
   const contexto = useQuery({ queryKey: ["contexto"], queryFn: () => carregarContexto() });
   const consultas = useQuery({ queryKey: ["consultas"], queryFn: () => carregarConsultas() });
   const notificacoes = useQuery({
     queryKey: ["notificacoes"],
     queryFn: () => carregarNotificacoes(),
+  });
+  const avaliacoes = useQuery({
+    queryKey: ["minhas-avaliacoes"],
+    queryFn: () => carregarAvaliacoes(),
   });
 
   const [nome, setNome] = useState("");
@@ -100,6 +110,11 @@ function Painel() {
           </p>
         </div>
         <div className="flex gap-3">
+          {(contexto.data?.papeis ?? []).includes("admin") && (
+            <Link to="/admin" className="btn-base btn-ghost">
+              Painel do administrador
+            </Link>
+          )}
           <Link to="/profissionais" className="btn-base btn-primary">
             Agendar consulta
           </Link>
@@ -121,6 +136,22 @@ function Painel() {
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.3fr_0.9fr]">
         <div>
           <section>
+            <h2 className="text-xl">Calendário de consultas</h2>
+            <div className="mt-4">
+              <CalendarioConsultas
+                itens={lista
+                  .filter((c) => c.status !== "cancelada")
+                  .map((c) => ({
+                    id: c.id,
+                    inicio: c.inicio,
+                    titulo: c.professionals?.nome ?? "Consulta",
+                    status: c.status,
+                  }))}
+              />
+            </div>
+          </section>
+
+          <section className="mt-12">
             <h2 className="text-xl">Próximas consultas</h2>
             {consultas.isLoading && <p className="mt-3 text-sm text-muted-foreground">Carregando…</p>}
             {!consultas.isLoading && proximas.length === 0 && (
@@ -146,6 +177,21 @@ function Painel() {
                     {c.professionals?.nome} · {c.professionals?.profissao}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">{formatarData(c.inicio)}</p>
+                  {c.video_url && c.status === "confirmada" && (
+                    <a
+                      href={c.video_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-base btn-primary mt-4"
+                    >
+                      Entrar na videochamada
+                    </a>
+                  )}
+                  {c.video_url && c.status === "aguardando_pagamento" && (
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      O link da videochamada fica ativo aqui quando a consulta for confirmada.
+                    </p>
+                  )}
                   {c.status === "aguardando_pagamento" && (
                     <p className="mt-3 rounded-xl bg-muted p-4 text-sm text-muted-foreground">
                       Sua reserva está guardada. A consulta é confirmada assim que o pagamento for
@@ -173,16 +219,41 @@ function Painel() {
             <section className="mt-12">
               <h2 className="text-xl">Histórico</h2>
               <ul className="mt-4 space-y-3">
-                {historico.map((c) => (
-                  <li key={c.id} className="card-soft flex flex-wrap justify-between gap-2 p-5 text-sm">
-                    <span>
-                      {c.professionals?.nome} — {formatarData(c.inicio)}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {rotuloStatus[c.status] ?? c.status}
-                    </span>
-                  </li>
-                ))}
+                {historico.map((c) => {
+                  const feita = (avaliacoes.data?.avaliacoes ?? []).find(
+                    (a) => a.appointment_id === c.id,
+                  );
+                  return (
+                    <li key={c.id} className="card-soft p-5 text-sm">
+                      <div className="flex flex-wrap justify-between gap-2">
+                        <span>
+                          {c.professionals?.nome} — {formatarData(c.inicio)}
+                        </span>
+                        <span className="text-muted-foreground">
+                          {rotuloStatus[c.status] ?? c.status}
+                        </span>
+                      </div>
+                      {c.status === "realizada" && (
+                        <FormularioAvaliacao
+                          consultaId={c.id}
+                          notaAtual={feita?.nota ?? 0}
+                          comentarioAtual={feita?.comentario ?? ""}
+                          onSalvar={async (nota, comentario) => {
+                            const r = await enviarAvaliacao({
+                              data: { consultaId: c.id, nota, comentario },
+                            });
+                            if (r.ok) {
+                              await queryClient.invalidateQueries({
+                                queryKey: ["minhas-avaliacoes"],
+                              });
+                            }
+                            return r.ok ? null : r.erro;
+                          }}
+                        />
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </section>
           )}
@@ -243,5 +314,75 @@ function Painel() {
         </aside>
       </div>
     </div>
+  );
+}
+
+function FormularioAvaliacao({
+  consultaId,
+  notaAtual,
+  comentarioAtual,
+  onSalvar,
+}: {
+  consultaId: string;
+  notaAtual: number;
+  comentarioAtual: string;
+  onSalvar: (nota: number, comentario: string) => Promise<string | null>;
+}) {
+  const [aberto, setAberto] = useState(notaAtual === 0);
+  const [nota, setNota] = useState(notaAtual);
+  const [comentario, setComentario] = useState(comentarioAtual);
+  const [erro, setErro] = useState<string | null>(null);
+  const [salvando, setSalvando] = useState(false);
+
+  if (!aberto) {
+    return (
+      <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/60 pt-4">
+        <Estrelas nota={notaAtual} />
+        <span className="text-xs text-muted-foreground">Sua avaliação foi registrada.</span>
+        <button
+          type="button"
+          className="text-xs underline underline-offset-4"
+          onClick={() => setAberto(true)}
+        >
+          Alterar
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      className="mt-4 space-y-3 border-t border-border/60 pt-4"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        if (nota < 1) {
+          setErro("Escolha de 1 a 5 estrelas.");
+          return;
+        }
+        setSalvando(true);
+        const falha = await onSalvar(nota, comentario);
+        setSalvando(false);
+        setErro(falha);
+        if (!falha) setAberto(false);
+      }}
+    >
+      <p className="text-sm font-semibold text-foreground">Como foi sua consulta?</p>
+      <SeletorEstrelas valor={nota} onChange={setNota} />
+      <label className="block text-sm" htmlFor={`comentario-${consultaId}`}>
+        Comentário (opcional)
+        <textarea
+          id={`comentario-${consultaId}`}
+          className="field-base mt-1"
+          rows={3}
+          maxLength={800}
+          value={comentario}
+          onChange={(e) => setComentario(e.target.value)}
+        />
+      </label>
+      {erro && <p className="text-sm text-destructive">{erro}</p>}
+      <button type="submit" disabled={salvando} className="btn-base btn-primary disabled:opacity-60">
+        {salvando ? "Enviando…" : "Enviar avaliação"}
+      </button>
+    </form>
   );
 }
