@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect } from "react";
 import { track } from "@/lib/analytics";
 
 export const Route = createFileRoute("/cadastro-profissional")({
