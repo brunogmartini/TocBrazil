@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/profissional/")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: PainelProfissional;
+  component: PainelProfissional,
 });
 
 const rotuloStatus: Record<string, string> = {
