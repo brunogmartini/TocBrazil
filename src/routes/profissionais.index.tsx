@@ -35,6 +35,7 @@ export const Route = createFileRoute("/profissionais/")({
 });
 
 const TODOS = "Todos";
+export const ABORDAGEM_EPR = "Exposição e Prevenção de Resposta (EPR)";
 export const LABEL_PROFISSAO: Record<string, string> = {
   psicologo: "Psicólogo(a)",
   psiquiatra: "Psiquiatra",
