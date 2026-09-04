@@ -115,7 +115,7 @@ function Busca() {
         onSubmit={(e) => e.preventDefault()}
       >
         <Select
-          label="Profissão"
+          label="Profissionais"
           value={profissao}
           onChange={setProfissao}
           options={[TODOS, "Psicólogo(a)", "Psiquiatra"]}
@@ -134,21 +134,7 @@ function Busca() {
           onChange={setGenero}
           options={[TODOS, "Feminino", "Masculino"]}
         />
-        <div>
-          <label htmlFor="experiencia" className="section-label">
-            Experiência declarada: {experienciaMin}+ anos
-          </label>
-          <input
-            id="experiencia"
-            type="range"
-            min={0}
-            max={15}
-            step={1}
-            value={experienciaMin}
-            onChange={(e) => setExperienciaMin(Number(e.target.value))}
-            className="mt-3 w-full accent-[var(--color-primary)]"
-          />
-        </div>
+
       </form>
 
       <p className="mt-8 text-sm text-muted-foreground" role="status">
