@@ -47,7 +47,6 @@ function Busca() {
   const [abordagem, setAbordagem] = useState(TODOS);
   const [idioma, setIdioma] = useState(TODOS);
   const [genero, setGenero] = useState(TODOS);
-  const [experienciaMin, setExperienciaMin] = useState(0);
 
   const areas = useMemo(
     () => [TODOS, ...new Set(profissionais.flatMap((p) => p.areas))],
@@ -56,7 +55,10 @@ function Busca() {
   const abordagens = useMemo(
     () => [
       TODOS,
-      ...new Set(profissionais.map((p) => p.abordagem).filter((a): a is string => !!a)),
+      ...new Set([
+        ABORDAGEM_EPR,
+        ...profissionais.map((p) => p.abordagem).filter((a): a is string => !!a),
+      ]),
     ],
     [profissionais],
   );
@@ -74,11 +76,10 @@ function Busca() {
             (area === TODOS || p.areas.includes(area)) &&
             (abordagem === TODOS || p.abordagem === abordagem) &&
             (idioma === TODOS || p.idiomas.includes(idioma)) &&
-            (genero === TODOS || p.genero === genero.toLowerCase()) &&
-            p.experiencia_anos >= experienciaMin,
+            (genero === TODOS || p.genero === genero.toLowerCase()),
         )
         .sort((a, b) => a.nome.localeCompare(b.nome)),
-    [profissionais, profissao, area, abordagem, idioma, genero, experienciaMin],
+    [profissionais, profissao, area, abordagem, idioma, genero],
   );
 
   useEffect(() => {
@@ -88,10 +89,10 @@ function Busca() {
       abordagem,
       idioma,
       genero,
-      experienciaMin,
       resultados: resultados.length,
     });
-  }, [profissao, area, abordagem, idioma, genero, experienciaMin, resultados.length]);
+  }, [profissao, area, abordagem, idioma, genero, resultados.length]);
+
 
   return (
     <div className="container-page py-12 lg:py-16">
