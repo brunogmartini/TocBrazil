@@ -34,6 +34,7 @@ import { Route as ProfissionaisSlugRouteImport } from './routes/profissionais.$s
 import { Route as PsicologosIndexRouteImport } from './routes/psicologos.index'
 import { Route as PsicologosSlugRouteImport } from './routes/psicologos.$slug'
 import { Route as AuthenticatedAgendarSlugRouteImport } from './routes/_authenticated/agendar.$slug'
+import { Route as AuthenticatedProfissionalIndexRouteImport } from './routes/_authenticated/profissional.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -160,6 +161,12 @@ const AuthenticatedAgendarSlugRoute =
     path: '/agendar/$slug',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProfissionalIndexRoute =
+  AuthenticatedProfissionalIndexRouteImport.update({
+    id: '/profissional/',
+    path: '/profissional/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -186,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/profissionais/': typeof ProfissionaisIndexRoute
   '/psicologos/': typeof PsicologosIndexRoute
   '/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
+  '/profissional/': typeof AuthenticatedProfissionalIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -212,6 +220,7 @@ export interface FileRoutesByTo {
   '/profissionais': typeof ProfissionaisIndexRoute
   '/psicologos': typeof PsicologosIndexRoute
   '/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
+  '/profissional': typeof AuthenticatedProfissionalIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -240,6 +249,7 @@ export interface FileRoutesById {
   '/profissionais/': typeof ProfissionaisIndexRoute
   '/psicologos/': typeof PsicologosIndexRoute
   '/_authenticated/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
+  '/_authenticated/profissional/': typeof AuthenticatedProfissionalIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/profissionais/'
     | '/psicologos/'
     | '/agendar/$slug'
+    | '/profissional/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -294,6 +305,7 @@ export interface FileRouteTypes {
     | '/profissionais'
     | '/psicologos'
     | '/agendar/$slug'
+    | '/profissional'
   id:
     | '__root__'
     | '/'
@@ -321,6 +333,7 @@ export interface FileRouteTypes {
     | '/profissionais/'
     | '/psicologos/'
     | '/_authenticated/agendar/$slug'
+    | '/_authenticated/profissional/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -526,17 +539,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAgendarSlugRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profissional/': {
+      id: '/_authenticated/profissional/'
+      path: '/profissional'
+      fullPath: '/profissional/'
+      preLoaderRoute: typeof AuthenticatedProfissionalIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
   AuthenticatedAgendarSlugRoute: typeof AuthenticatedAgendarSlugRoute
+  AuthenticatedProfissionalIndexRoute: typeof AuthenticatedProfissionalIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
   AuthenticatedAgendarSlugRoute: AuthenticatedAgendarSlugRoute,
+  AuthenticatedProfissionalIndexRoute: AuthenticatedProfissionalIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
