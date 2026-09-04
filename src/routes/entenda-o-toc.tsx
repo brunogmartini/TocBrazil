@@ -6,13 +6,13 @@ import { track } from "@/lib/analytics";
 export const Route = createFileRoute("/entenda-o-toc")({
   head: () => ({
     meta: [
-      { title: "Entenda o TOC: obsessões, compulsões e como buscar cuidado | TOC Brazil" },
+      { title: "Sobre o transtorno: obsessões, compulsões e como buscar cuidado | TOC Brazil" },
       {
         name: "description",
         content:
           "O que caracteriza o Transtorno Obsessivo-Compulsivo, como ele se manifesta de formas diferentes e por que apenas um profissional qualificado pode avaliar.",
       },
-      { property: "og:title", content: "Entenda o TOC em linguagem simples" },
+      { property: "og:title", content: "Sobre o transtorno em linguagem simples" },
       {
         property: "og:description",
         content:
@@ -54,7 +54,7 @@ function EntendaOToc() {
       <section className="container-page py-14 lg:py-20">
         <span className="section-label">Conteúdo educativo</span>
         <h1 className="mt-4 max-w-3xl text-3xl leading-tight sm:text-5xl">
-          Entenda o TOC antes de decidir qualquer próximo passo.
+          Sobre o transtorno: entenda antes de decidir qualquer próximo passo.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
           Reunimos informação clara sobre o Transtorno Obsessivo-Compulsivo para que você possa
