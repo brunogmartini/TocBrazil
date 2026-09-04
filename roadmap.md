@@ -11,13 +11,15 @@
 - [x] Agenda real com horários livres calculados e proteção contra dois agendamentos no mesmo horário
 - [x] Fluxo de agendamento (reserva + resumo + valor) e painel do paciente com histórico e lembretes
 - [x] Vitrine e perfis lendo dados reais do banco
+- [x] Cadastro e verificação documental do profissional + painel do profissional
+- [x] Painel do administrador: usuários, consultas, status de pagamento e aprovações
+- [x] Avaliação do profissional pelo paciente (até 5 estrelas) exibida no perfil
+- [x] Calendário de consultas e link de videochamada na área do paciente
+- [x] Pagamento com Mercado Pago (Checkout Pro) + confirmação automática por webhook
 
 ## Próximas etapas
-- [ ] Pagamento com cartão (definir provedor com split para o Brasil) + confirmação automática
-- [ ] Cadastro e verificação documental do profissional (aprovação pelo admin)
-- [ ] Painel do profissional: agenda, disponibilidade, consultas, ganhos e repasses
-- [ ] Painel do administrador: aprovações, consultas, pagamentos, suporte e configurações
-- [ ] Videochamada no navegador (sem gravação por padrão)
+- [ ] Split automático do repasse ao profissional (exige adesão de cada profissional ao Mercado Pago)
+- [ ] Videochamada com sala própria (hoje usa sala segura gerada por consulta)
 - [ ] Envio real de e-mails/WhatsApp dos lembretes já gravados
 - [ ] Recibo/NFS-e, política de cancelamento e reembolso automatizada
 - [ ] 2FA, logs de auditoria, retenção de dados e sitemap/analytics de funil
