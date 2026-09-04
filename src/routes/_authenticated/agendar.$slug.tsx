@@ -22,8 +22,9 @@ export const Route = createFileRoute("/_authenticated/agendar/$slug")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: Agendar;
+  component: Agendar,
 });
+
 
 const TZ = "America/Sao_Paulo";
 
