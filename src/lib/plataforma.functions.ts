@@ -190,6 +190,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
     const plataforma = Math.round((valor * comissao) / 100);
 
     const fim = new Date(new Date(inicioIso).getTime() + prof.slot_minutos * 60000).toISOString();
+    const salaVideo = `https://meet.jit.si/tocbrazil-${crypto.randomUUID().slice(0, 12)}`;
 
     const { data: criada, error } = await supabase
       .from("appointments")
@@ -203,7 +204,9 @@ export const criarAgendamento = createServerFn({ method: "POST" })
         valor_centavos: valor,
         valor_plataforma_centavos: plataforma,
         valor_profissional_centavos: valor - plataforma,
+        video_url: salaVideo,
       })
+
       .select("id, inicio, fim, valor_centavos")
       .single();
 
