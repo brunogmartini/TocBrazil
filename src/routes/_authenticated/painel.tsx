@@ -75,7 +75,7 @@ function Painel() {
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabase.auth.signOut();
-    navigate({ to: "/auth", search: { modo: "entrar" }, replace: true });
+    navigate({ to: "/auth", search: { modo: "entrar" as const, redirect: undefined }, replace: true });
   }
 
   const perfilIncompleto = !contexto.data?.perfil?.nome;

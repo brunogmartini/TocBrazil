@@ -6,8 +6,8 @@ import { lovable } from "@/integrations/lovable/index";
 export const Route = createFileRoute("/auth")({
   ssr: false,
   validateSearch: (search: Record<string, unknown>) => ({
-    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
-    modo: search.modo === "cadastro" ? ("cadastro" as const) : ("entrar" as const),
+    redirect: typeof search["redirect"] === "string" ? (search["redirect"] as string) : undefined,
+    modo: search["modo"] === "cadastro" ? ("cadastro" as const) : ("entrar" as const),
   }),
   head: () => ({
     meta: [
