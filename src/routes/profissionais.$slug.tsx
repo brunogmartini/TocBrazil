@@ -136,7 +136,7 @@ function Perfil() {
               Os horários livres e o valor da consulta aparecem depois que você cria sua conta.
             </p>
             <Link
-              to="/_authenticated/agendar/$slug"
+              to="/agendar/$slug"
               params={{ slug: p.slug }}
               className="btn-base btn-primary mt-6 w-full"
               onClick={() => track("schedule_started", { slug: p.slug })}
