@@ -171,7 +171,7 @@ function PainelProfissional() {
                   </span>
                 </div>
                 <p className="mt-4 text-sm">
-                  {(c.profiles as { nome: string | null } | null)?.nome ?? "Paciente"}
+                  Paciente
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">{dataHora(c.inicio)}</p>
                 <div className="mt-5 flex flex-wrap gap-3">
@@ -213,7 +213,6 @@ function PainelProfissional() {
               <li key={c.id} className="card-soft flex flex-wrap justify-between gap-3 p-5 text-sm">
                 <span>{dataHora(c.inicio)}</span>
                 <span className="text-muted-foreground">
-                  {(c.profiles as { nome: string | null } | null)?.nome ?? "Paciente"} ·{" "}
                   {rotuloStatus[c.status] ?? c.status}
                 </span>
               </li>

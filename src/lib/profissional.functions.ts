@@ -106,7 +106,8 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     if (registro.length < 3) throw new Error("Informe seu registro profissional (CRP ou CRM).");
     const uf = String(data.uf ?? "").trim().toUpperCase().slice(0, 2);
     if (uf.length !== 2) throw new Error("Informe a UF do registro.");
-    const profissao = data.profissao === "psiquiatra" ? "psiquiatra" : "psicologo";
+    const profissao: "psicologo" | "psiquiatra" =
+      data.profissao === "psiquiatra" ? "psiquiatra" : "psicologo";
     return {
       nome,
       registro,
@@ -330,7 +331,7 @@ export const minhaAgendaProfissional = createServerFn({ method: "GET" })
       supabase
         .from("appointments")
         .select(
-          "id, inicio, fim, status, payment_status, valor_centavos, valor_profissional_centavos, video_url, profiles(nome)",
+          "id, inicio, fim, status, payment_status, valor_centavos, valor_profissional_centavos, video_url, patient_id",
         )
         .eq("professional_id", prof.id)
         .order("inicio", { ascending: false })
