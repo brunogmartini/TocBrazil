@@ -73,7 +73,7 @@ function SejaParceiro() {
             Quero ser um profissional parceiro
           </Link>
           <Link to="/como-funciona" className="btn-base btn-ghost">
-            Como funciona a plataforma
+            Nossa metodologia
           </Link>
         </div>
       </section>

@@ -315,7 +315,7 @@ function Home() {
 
       {/* 6. Como funciona */}
       <section aria-labelledby="como-funciona" className="container-page py-16 lg:py-24">
-        <span className="section-label">Como funciona</span>
+        <span className="section-label">Nossa metodologia</span>
         <h2 id="como-funciona" className="mt-3 max-w-2xl text-3xl sm:text-4xl">
           Quatro passos, do primeiro contato até a sua consulta.
         </h2>
