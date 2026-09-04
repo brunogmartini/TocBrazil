@@ -3,19 +3,16 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 const nav = [
-  { to: "/entenda-o-toc", label: "Entenda o TOC" },
-  { to: "/profissionais", label: "Encontrar um especialista em TOC" },
-  { to: "/como-funciona", label: "Como funciona" },
+  { to: "/entenda-o-toc", label: "Sobre o transtorno" },
+  { to: "/como-funciona", label: "Nossa metodologia" },
   { to: "/conteudos", label: "Conteúdos" },
 ] as const;
 
 const profissionais = [
   { to: "/seja-parceiro", label: "Quero ser um profissional parceiro" },
-  { to: "/para-psicologos", label: "Sou psicólogo" },
-  { to: "/para-psiquiatras", label: "Sou psiquiatra" },
-  { to: "/cadastro-profissional", label: "Cadastro profissional" },
   { to: "/profissional", label: "Área do profissional" },
 ] as const;
+
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -107,7 +104,7 @@ export function SiteHeader() {
             {logado ? "Minha área" : "Entrar"}
           </Link>
           <Link to="/profissionais" className="btn-base btn-primary">
-            Encontrar um especialista em TOC
+            Encontrar um especialista
           </Link>
         </div>
 

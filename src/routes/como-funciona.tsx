@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/como-funciona")({
   head: () => ({
     meta: [
-      { title: "Como funciona: do conteúdo à consulta online | TOC Brazil" },
+      { title: "Nossa metodologia: do conteúdo à consulta online | TOC Brazil" },
       {
         name: "description",
         content:
           "Entenda cada etapa: conteúdo educativo sobre TOC, escolha do profissional, agendamento, pagamento, videochamada e acompanhamento.",
       },
-      { property: "og:title", content: "Como funciona a TOC Brazil" },
+      { property: "og:title", content: "Nossa metodologia na TOC Brazil" },
       {
         property: "og:description",
         content:
@@ -68,7 +68,7 @@ function ComoFunciona() {
   return (
     <>
       <section className="container-page py-14 lg:py-20">
-        <span className="section-label">Como funciona</span>
+        <span className="section-label">Nossa metodologia</span>
         <h1 className="mt-4 max-w-3xl text-3xl leading-tight sm:text-5xl">
           Da primeira leitura até a sua consulta.
         </h1>
@@ -91,7 +91,7 @@ function ComoFunciona() {
           </ol>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link to="/profissionais" className="btn-base btn-primary">
-              Encontrar um especialista em TOC
+              Encontrar um especialista
             </Link>
             <Link to="/matching" className="btn-base btn-ghost">
               Responder o matching

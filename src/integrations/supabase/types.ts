@@ -203,6 +203,47 @@ export type Database = {
           },
         ]
       }
+      mercadopago_contas: {
+        Row: {
+          access_token: string
+          created_at: string
+          expira_em: string | null
+          mp_user_id: string
+          professional_id: string
+          public_key: string | null
+          refresh_token: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          expira_em?: string | null
+          mp_user_id: string
+          professional_id: string
+          public_key?: string | null
+          refresh_token?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          expira_em?: string | null
+          mp_user_id?: string
+          professional_id?: string
+          public_key?: string | null
+          refresh_token?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mercadopago_contas_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: true
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           agendada_para: string
@@ -488,6 +529,8 @@ export type Database = {
           genero: string | null
           id: string
           idiomas: string[]
+          mp_user_id: string | null
+          mp_vinculado_em: string | null
           nome: string
           profissao: Database["public"]["Enums"]["profissao"]
           registro: string
@@ -517,6 +560,8 @@ export type Database = {
           genero?: string | null
           id?: string
           idiomas?: string[]
+          mp_user_id?: string | null
+          mp_vinculado_em?: string | null
           nome: string
           profissao: Database["public"]["Enums"]["profissao"]
           registro: string
@@ -546,6 +591,8 @@ export type Database = {
           genero?: string | null
           id?: string
           idiomas?: string[]
+          mp_user_id?: string | null
+          mp_vinculado_em?: string | null
           nome?: string
           profissao?: Database["public"]["Enums"]["profissao"]
           registro?: string
