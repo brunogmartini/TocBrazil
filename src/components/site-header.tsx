@@ -14,6 +14,7 @@ const profissionais = [
   { to: "/para-psicologos", label: "Sou psicólogo" },
   { to: "/para-psiquiatras", label: "Sou psiquiatra" },
   { to: "/cadastro-profissional", label: "Cadastro profissional" },
+  { to: "/profissional", label: "Área do profissional" },
 ] as const;
 
 export function SiteHeader() {
