@@ -10,6 +10,12 @@ import {
   salvarCadastroProfissional,
   salvarDadosRepasse,
 } from "@/lib/profissional.functions";
+import {
+  desvincularMercadoPago,
+  iniciarVinculoMercadoPago,
+  statusVinculoMercadoPago,
+} from "@/lib/mercadopago.functions";
+
 
 export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
   head: () => ({
@@ -452,10 +458,67 @@ function CadastroProfissional() {
       </section>
 
       <section className="mt-12">
+        <h2 className="text-2xl">Receber direto na sua conta Mercado Pago</h2>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+          Ao ligar sua conta Mercado Pago, o valor de cada consulta cai direto na sua conta e a
+          plataforma retém apenas a comissão combinada, de forma automática.
+        </p>
+        <div className="card-soft mt-5 p-7">
+          {!vinculo.data?.configurado ? (
+            <p className="text-sm text-muted-foreground">
+              O recebimento ainda está sendo configurado pela plataforma. Enquanto isso, seus
+              repasses são feitos pelos dados informados abaixo.
+            </p>
+          ) : vinculo.data.vinculado ? (
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold">Conta ligada</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Comissão da plataforma: {vinculo.data.comissaoPercent}% por consulta.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="btn-base btn-ghost"
+                onClick={async () => {
+                  await desvincular();
+                  vinculo.refetch();
+                  setAviso("Conta Mercado Pago desligada.");
+                }}
+              >
+                Desligar conta
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <p className="max-w-xl text-sm text-muted-foreground">
+                {vinculo.data.temCadastro
+                  ? "Sua conta ainda não está ligada. Você será levado ao Mercado Pago para autorizar o recebimento."
+                  : "Salve seus dados profissionais acima antes de ligar a conta."}
+              </p>
+              <button
+                type="button"
+                disabled={!vinculo.data.temCadastro}
+                className="btn-base btn-primary disabled:opacity-50"
+                onClick={async () => {
+                  const r = await iniciarVinculo({ data: { origem: window.location.origin } });
+                  if (r.ok) window.location.href = r.link;
+                  else setAviso(r.erro);
+                }}
+              >
+                Ligar conta Mercado Pago
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="mt-12">
         <h2 className="text-2xl">Dados para receber seus repasses</h2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
           Usamos estes dados apenas para transferir a sua parte do valor das consultas.
         </p>
+
         <form onSubmit={enviarRepasse} className="card-soft mt-5 grid gap-5 p-7 sm:grid-cols-2">
           <Campo
             label="CPF ou CNPJ"
