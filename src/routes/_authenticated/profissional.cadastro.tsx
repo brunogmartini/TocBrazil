@@ -142,6 +142,16 @@ function CadastroProfissional() {
     }
   }, [dados.data]);
 
+  useEffect(() => {
+    const situacao = new URLSearchParams(window.location.search).get("recebimento");
+    if (!situacao) return;
+    if (situacao === "ok") setAviso("Conta Mercado Pago ligada com sucesso.");
+    else if (situacao === "cancelado") setAviso("A autorização no Mercado Pago foi cancelada.");
+    else setAviso("Não conseguimos ligar sua conta Mercado Pago. Tente novamente.");
+    window.history.replaceState(null, "", window.location.pathname);
+  }, []);
+
+
   async function enviarCadastro(e: React.FormEvent) {
     e.preventDefault();
     setErro(null);
