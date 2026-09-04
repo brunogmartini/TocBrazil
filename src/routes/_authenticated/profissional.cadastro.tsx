@@ -59,8 +59,16 @@ function CadastroProfissional() {
   const salvarRepasse = useServerFn(salvarDadosRepasse);
   const registrar = useServerFn(registrarDocumento);
   const remover = useServerFn(removerDocumento);
+  const statusVinculo = useServerFn(statusVinculoMercadoPago);
+  const iniciarVinculo = useServerFn(iniciarVinculoMercadoPago);
+  const desvincular = useServerFn(desvincularMercadoPago);
 
   const dados = useQuery({ queryKey: ["cadastro-profissional"], queryFn: () => carregar() });
+  const vinculo = useQuery({
+    queryKey: ["vinculo-mercadopago"],
+    queryFn: () => statusVinculo(),
+  });
+
 
   const [form, setForm] = useState({
     nome: "",
