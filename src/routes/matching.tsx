@@ -10,7 +10,7 @@ export const Route = createFileRoute("/matching")({
       {
         name: "description",
         content:
-          "Responda perguntas sobre investimento, horários, profissão, idioma e estilo de atendimento e veja profissionais compatíveis com suas preferências.",
+          "Responda perguntas sobre investimento, horários, profissionais, idioma e estilo de atendimento e veja profissionais compatíveis com suas preferências.",
       },
       { property: "og:title", content: "Encontre um profissional que combine com você" },
       {
