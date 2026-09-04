@@ -152,6 +152,57 @@ export type Database = {
           },
         ]
       }
+      avaliacoes: {
+        Row: {
+          appointment_id: string
+          comentario: string | null
+          created_at: string
+          id: string
+          nota: number
+          patient_id: string
+          professional_id: string
+          publica: boolean
+          updated_at: string
+        }
+        Insert: {
+          appointment_id: string
+          comentario?: string | null
+          created_at?: string
+          id?: string
+          nota: number
+          patient_id: string
+          professional_id: string
+          publica?: boolean
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string
+          comentario?: string | null
+          created_at?: string
+          id?: string
+          nota?: number
+          patient_id?: string
+          professional_id?: string
+          publica?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avaliacoes_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           agendada_para: string
@@ -568,6 +619,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      avaliacoes_resumo: {
+        Args: { _professional_id: string }
+        Returns: {
+          media: number
+          total: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
