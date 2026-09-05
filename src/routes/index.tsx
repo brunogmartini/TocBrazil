@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import heroImg from "@/assets/hero-paciente.jpg";
 import { PROFISSIONAIS_DEMO } from "@/lib/profissionais-mock";
-import { CONTEUDOS } from "@/lib/conteudos-mock";
+
 import { track } from "@/lib/analytics";
 
 export const Route = createFileRoute("/")({
