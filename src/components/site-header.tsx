@@ -57,39 +57,79 @@ export function SiteHeader() {
             </Link>
           ))}
 
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative flex items-center gap-1" ref={dropdownRef}>
             <button
               type="button"
-              aria-expanded={dropdown}
-              onClick={() => setDropdown((v) => !v)}
+              aria-expanded={dropdown === "paciente"}
+              onClick={() => setDropdown((v) => (v === "paciente" ? null : "paciente"))}
+              className="rounded-full px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              Sou paciente
+            </button>
+            <button
+              type="button"
+              aria-expanded={dropdown === "profissional"}
+              onClick={() => setDropdown((v) => (v === "profissional" ? null : "profissional"))}
               className="rounded-full px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               Sou profissional
             </button>
 
-            {dropdown && (
+            {dropdown === "paciente" && (
+              <div className="absolute right-0 top-full w-60 pt-2">
+                <ul className="card-soft overflow-hidden p-2">
+                  {logado ? (
+                    <li>
+                      <Link
+                        to="/painel"
+                        onClick={() => setDropdown(null)}
+                        className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
+                      >
+                        Minhas consultas
+                      </Link>
+                    </li>
+                  ) : (
+                    <>
+                      <li>
+                        <Link
+                          to="/auth"
+                          search={{ modo: "entrar" as const, redirect: undefined }}
+                          onClick={() => setDropdown(null)}
+                          className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
+                        >
+                          Entrar na minha conta
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/auth"
+                          search={{ modo: "cadastro" as const, redirect: undefined }}
+                          onClick={() => setDropdown(null)}
+                          className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
+                        >
+                          Criar minha conta
+                        </Link>
+                      </li>
+                    </>
+                  )}
+                </ul>
+              </div>
+            )}
+
+            {dropdown === "profissional" && (
               <div className="absolute right-0 top-full w-60 pt-2">
                 <ul className="card-soft overflow-hidden p-2">
                   {profissionais.map((item) => (
                     <li key={item.to}>
                       <Link
                         to={item.to}
-                        onClick={() => setDropdown(false)}
+                        onClick={() => setDropdown(null)}
                         className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
                       >
                         {item.label}
                       </Link>
                     </li>
                   ))}
-                  <li>
-                    <Link
-                      to={logado ? "/painel" : "/auth"}
-                      onClick={() => setDropdown(false)}
-                      className="block rounded-xl px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted"
-                    >
-                      {logado ? "Minha área" : "Entrar"}
-                    </Link>
-                  </li>
                 </ul>
               </div>
             )}
@@ -97,12 +137,6 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <Link
-            to={logado ? "/painel" : "/auth"}
-            className="text-sm font-medium text-muted-foreground hover:text-foreground"
-          >
-            {logado ? "Minha área" : "Entrar"}
-          </Link>
           <Link to="/profissionais" className="btn-base btn-primary">
             Encontrar um especialista
           </Link>
