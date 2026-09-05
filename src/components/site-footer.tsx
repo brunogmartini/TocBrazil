@@ -6,7 +6,7 @@ const colunas = [
     links: [
       { to: "/profissionais", label: "Encontrar um especialista" },
       { to: "/como-funciona", label: "Nossa metodologia" },
-      { to: "/conteudos", label: "Conteúdos" },
+      { to: "/entenda-o-toc", label: "Sobre o transtorno" },
       { to: "/painel", label: "Minhas consultas" },
     ],
   },
