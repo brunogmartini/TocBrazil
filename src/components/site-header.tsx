@@ -156,7 +156,7 @@ export function SiteHeader() {
       {open && (
         <div className="border-t border-border bg-card lg:hidden">
           <nav aria-label="Principal (mobile)" className="container-page flex flex-col py-3">
-            {[...nav, ...profissionais].map((item) => (
+            {nav.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
@@ -166,13 +166,52 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            <Link
-              to={logado ? "/painel" : "/auth"}
-              onClick={() => setOpen(false)}
-              className="rounded-xl px-2 py-3 text-sm font-medium text-muted-foreground"
-            >
-              {logado ? "Minha área" : "Entrar"}
-            </Link>
+
+            <span className="mt-3 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Sou paciente
+            </span>
+            {logado ? (
+              <Link
+                to="/painel"
+                onClick={() => setOpen(false)}
+                className="rounded-xl px-2 py-3 text-sm font-medium text-foreground"
+              >
+                Minhas consultas
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/auth"
+                  search={{ modo: "entrar" as const, redirect: undefined }}
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-2 py-3 text-sm font-medium text-foreground"
+                >
+                  Entrar na minha conta
+                </Link>
+                <Link
+                  to="/auth"
+                  search={{ modo: "cadastro" as const, redirect: undefined }}
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-2 py-3 text-sm font-medium text-foreground"
+                >
+                  Criar minha conta
+                </Link>
+              </>
+            )}
+
+            <span className="mt-3 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Sou profissional
+            </span>
+            {profissionais.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => setOpen(false)}
+                className="rounded-xl px-2 py-3 text-sm font-medium text-foreground"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
         </div>
       )}
