@@ -24,26 +24,23 @@ export const Route = createFileRoute("/como-funciona")({
 
 const etapas = [
   {
-    t: "Entender",
-    d: "Comece pelos conteúdos educativos sobre TOC. Você decide o ritmo e não precisa preencher nada para ler.",
+    t: "Entenda mais sobre o transtorno",
+    d: "Textos didáticos e explicativos sobre TOC.",
   },
   {
-    t: "Encontrar",
-    d: "Veja perfis de psicólogos e psiquiatras com formação, abordagem, áreas de atuação, idiomas, valores e horários.",
+    t: "Encontre o profissional ideal",
+    d: "Escolha o profissional que melhor atende às suas necessidades a partir de filtros de pesquisa avançados.",
   },
   {
-    t: "Escolher",
-    d: "Use os filtros ou responda ao matching de preferências. A ordenação é neutra: não há ranking de popularidade.",
+    t: "Agende uma sessão online",
+    d: "Escolha o melhor horário pra você disponível na agenda do profissional.",
   },
   {
-    t: "Agendar",
-    d: "Escolha um horário disponível na agenda do profissional e conclua o pagamento online. A consulta é confirmada após a aprovação.",
-  },
-  {
-    t: "Começar",
-    d: "A consulta acontece por videochamada no navegador, no horário combinado, sem instalar nada e sem gravação por padrão.",
+    t: "Realize sua consulta online",
+    d: "A consulta acontece por videochamada, no horário combinado, através da plataforma.",
   },
 ];
+
 
 const perguntas = [
   {

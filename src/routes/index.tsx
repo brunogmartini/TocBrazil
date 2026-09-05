@@ -132,7 +132,7 @@ function Home() {
           <div className="rise-in">
             <span className="pill">Plataforma de acompanhamento especializado</span>
             <h1 className="mt-6 text-[2.1rem] leading-[1.1] sm:text-5xl lg:text-[3.6rem]">
-              Conectando pacientes aos melhores especialistas em TOC do Brasil.
+              Conectando pacientes aos melhores especialistas em TOC do Brasil
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
               Consultas online com psicólogos e psiquiatras{" "}
