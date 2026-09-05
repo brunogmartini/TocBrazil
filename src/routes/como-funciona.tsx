@@ -90,9 +90,8 @@ function ComoFunciona() {
               Encontrar um especialista
             </Link>
           </div>
-
-          </div>
         </div>
+
       </section>
 
       <section aria-labelledby="duvidas" className="container-page py-14 lg:py-20">
