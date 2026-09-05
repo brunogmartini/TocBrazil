@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import heroImg from "@/assets/hero-paciente.jpg";
 import { PROFISSIONAIS_DEMO } from "@/lib/profissionais-mock";
-import { CONTEUDOS } from "@/lib/conteudos-mock";
+
 import { track } from "@/lib/analytics";
 
 export const Route = createFileRoute("/")({
@@ -132,7 +132,7 @@ function Home() {
           <div className="rise-in">
             <span className="pill">Plataforma de acompanhamento especializado</span>
             <h1 className="mt-6 text-[2.1rem] leading-[1.1] sm:text-5xl lg:text-[3.6rem]">
-              Conectando pacientes aos melhores especialistas em TOC do Brasil.
+              Conectando pacientes aos melhores especialistas em TOC do Brasil
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
               Consultas online com psicólogos e psiquiatras{" "}
@@ -420,34 +420,6 @@ function Home() {
         </div>
       </section>
 
-      {/* 9. Conteúdo */}
-      <section aria-labelledby="conteudo" className="border-y border-border bg-surface">
-        <div className="container-page py-16 lg:py-24">
-          <span className="section-label">Conteúdos</span>
-          <h2 id="conteudo" className="mt-3 max-w-2xl text-3xl sm:text-4xl">
-            Conteúdo para entender o TOC.
-          </h2>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {CONTEUDOS.slice(0, 3).map((c) => (
-              <article key={c.slug} className="card-soft card-soft-hover flex flex-col p-6">
-                <span className="section-label">{c.categoria}</span>
-                <h3 className="mt-3 text-lg">{c.titulo}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{c.resumo}</p>
-                <Link
-                  to="/conteudos/$slug"
-                  params={{ slug: c.slug }}
-                  className="mt-auto pt-5 text-sm font-semibold text-foreground underline-offset-4 hover:underline"
-                >
-                  Ler ({c.leitura})
-                </Link>
-              </article>
-            ))}
-          </div>
-          <Link to="/conteudos" className="btn-base btn-ghost mt-10">
-            Ver todos os conteúdos
-          </Link>
-        </div>
-      </section>
 
       {/* 10. Praticidade das consultas online */}
       <section aria-labelledby="online" className="container-page py-16 lg:py-24">

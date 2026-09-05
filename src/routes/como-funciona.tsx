@@ -3,18 +3,19 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/como-funciona")({
   head: () => ({
     meta: [
-      { title: "Nossa metodologia: do conteúdo à consulta online | TOC Brazil" },
+      { title: "Como funciona nossa plataforma de consultas em TOC | TOC Brazil" },
       {
         name: "description",
         content:
-          "Entenda cada etapa: conteúdo educativo sobre TOC, escolha do profissional, agendamento, pagamento, videochamada e acompanhamento.",
+          "Estas são as etapas do seu tratamento: entender o transtorno, encontrar o profissional ideal, agendar a sessão e realizar a consulta online.",
       },
-      { property: "og:title", content: "Nossa metodologia na TOC Brazil" },
+      { property: "og:title", content: "Como funciona nossa Plataforma — TOC Brazil" },
       {
         property: "og:description",
         content:
-          "Cinco etapas simples: entender, encontrar, escolher, agendar e começar o acompanhamento online.",
+          "Quatro etapas: entenda o transtorno, encontre o profissional ideal, agende a sessão e realize sua consulta online.",
       },
+
       { property: "og:url", content: "/como-funciona" },
     ],
     links: [{ rel: "canonical", href: "/como-funciona" }],
@@ -24,26 +25,23 @@ export const Route = createFileRoute("/como-funciona")({
 
 const etapas = [
   {
-    t: "Entender",
-    d: "Comece pelos conteúdos educativos sobre TOC. Você decide o ritmo e não precisa preencher nada para ler.",
+    t: "Entenda mais sobre o transtorno",
+    d: "Textos didáticos e explicativos sobre TOC.",
   },
   {
-    t: "Encontrar",
-    d: "Veja perfis de psicólogos e psiquiatras com formação, abordagem, áreas de atuação, idiomas, valores e horários.",
+    t: "Encontre o profissional ideal",
+    d: "Escolha o profissional que melhor atende às suas necessidades a partir de filtros de pesquisa avançados.",
   },
   {
-    t: "Escolher",
-    d: "Use os filtros ou responda ao matching de preferências. A ordenação é neutra: não há ranking de popularidade.",
+    t: "Agende uma sessão online",
+    d: "Escolha o melhor horário pra você disponível na agenda do profissional.",
   },
   {
-    t: "Agendar",
-    d: "Escolha um horário disponível na agenda do profissional e conclua o pagamento online. A consulta é confirmada após a aprovação.",
-  },
-  {
-    t: "Começar",
-    d: "A consulta acontece por videochamada no navegador, no horário combinado, sem instalar nada e sem gravação por padrão.",
+    t: "Realize sua consulta online",
+    d: "A consulta acontece por videochamada, no horário combinado, através da plataforma.",
   },
 ];
+
 
 const perguntas = [
   {
@@ -70,17 +68,16 @@ function ComoFunciona() {
       <section className="container-page py-14 lg:py-20">
         <span className="section-label">Nossa metodologia</span>
         <h1 className="mt-4 max-w-3xl text-3xl leading-tight sm:text-5xl">
-          Da primeira leitura até a sua consulta.
+          Como funciona nossa Plataforma
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          A jornada foi desenhada para reduzir fricção e devolver a você o controle de cada
-          decisão.
+          Estas são as etapas para o seu tratamento.
         </p>
       </section>
 
       <section className="border-y border-border bg-surface">
         <div className="container-page py-14 lg:py-20">
-          <ol className="grid gap-5 lg:grid-cols-5">
+          <ol className="grid gap-5 lg:grid-cols-4">
             {etapas.map((e, i) => (
               <li key={e.t} className="card-soft p-6">
                 <span className="step-index">{i + 1}</span>
@@ -93,11 +90,9 @@ function ComoFunciona() {
             <Link to="/profissionais" className="btn-base btn-primary">
               Encontrar um especialista
             </Link>
-            <Link to="/matching" className="btn-base btn-ghost">
-              Responder o matching
-            </Link>
           </div>
         </div>
+
       </section>
 
       <section aria-labelledby="duvidas" className="container-page py-14 lg:py-20">

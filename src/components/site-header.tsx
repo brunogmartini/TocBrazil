@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 const nav = [
-  { to: "/entenda-o-toc", label: "Sobre o transtorno" },
   { to: "/como-funciona", label: "Nossa metodologia" },
-  { to: "/conteudos", label: "Conteúdos" },
+  { to: "/entenda-o-toc", label: "Sobre o transtorno" },
 ] as const;
+
 
 const profissionais = [
   { to: "/seja-parceiro", label: "Quero ser um profissional parceiro" },

@@ -54,7 +54,7 @@ function EntendaOToc() {
       <section className="container-page py-14 lg:py-20">
         <span className="section-label">Conteúdo educativo</span>
         <h1 className="mt-4 max-w-3xl text-3xl leading-tight sm:text-5xl">
-          Sobre o transtorno: entenda antes de decidir qualquer próximo passo.
+          Entendendo o transtorno
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
           Reunimos informação clara sobre o Transtorno Obsessivo-Compulsivo para que você possa
