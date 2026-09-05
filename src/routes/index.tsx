@@ -41,10 +41,21 @@ export const Route = createFileRoute("/")({
 });
 
 const passos = [
-  { titulo: "Encontre", texto: "Conheça profissionais e suas áreas de atuação." },
-  { titulo: "Escolha", texto: "Encontre alguém que combine com suas preferências." },
-  { titulo: "Agende", texto: "Escolha um horário livre na agenda do profissional." },
-  { titulo: "Comece", texto: "Sua consulta acontece por videochamada, no navegador." },
+  { titulo: "Entenda mais sobre o transtorno", texto: "Textos didáticos e explicativos sobre TOC" },
+  {
+    titulo: "Encontre o profissional ideal",
+    texto:
+      "Escolha o profissional que melhor atende às suas necessidades a partir de filtros de pesquisa avançados.",
+  },
+  {
+    titulo: "Agende uma sessão online",
+    texto: "Escolha o melhor horário pra você disponível na agenda do profissional",
+  },
+  {
+    titulo: "Realize sua consulta online",
+    texto:
+      "A consulta acontece por videochamada, no horário combinado, através da plataforma.",
+  },
 ];
 
 const pilares = [
@@ -317,7 +328,7 @@ function Home() {
       <section aria-labelledby="como-funciona" className="container-page py-16 lg:py-24">
         <span className="section-label">Nossa metodologia</span>
         <h2 id="como-funciona" className="mt-3 max-w-2xl text-3xl sm:text-4xl">
-          Quatro passos, do primeiro contato até a sua consulta.
+          Como funciona nossa Plataforma
         </h2>
         <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {passos.map((passo, i) => (

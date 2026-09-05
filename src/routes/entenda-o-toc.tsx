@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { CONTEUDOS } from "@/lib/conteudos-mock";
 import { track } from "@/lib/analytics";
 
 export const Route = createFileRoute("/entenda-o-toc")({
@@ -62,9 +61,6 @@ function EntendaOToc() {
           qualificado pode avaliar.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link to="/conteudos" className="btn-base btn-primary">
-            Ver conteúdos
-          </Link>
           <Link to="/profissionais" className="btn-base btn-ghost">
             Encontrar um especialista
           </Link>
@@ -89,28 +85,6 @@ function EntendaOToc() {
             acontecem apenas mentalmente. Ter um pensamento intrusivo isolado é uma experiência
             comum e não caracteriza, por si só, um transtorno.
           </p>
-        </div>
-      </section>
-
-      <section aria-labelledby="leituras" className="container-page py-14 lg:py-20">
-        <h2 id="leituras" className="text-2xl sm:text-3xl">
-          Leituras para começar
-        </h2>
-        <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {CONTEUDOS.map((c) => (
-            <article key={c.slug} className="card-soft card-soft-hover flex flex-col p-6">
-              <span className="section-label">{c.categoria}</span>
-              <h3 className="mt-3 text-lg">{c.titulo}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{c.resumo}</p>
-              <Link
-                to="/conteudos/$slug"
-                params={{ slug: c.slug }}
-                className="mt-auto pt-5 text-sm font-semibold underline-offset-4 hover:underline"
-              >
-                Ler ({c.leitura})
-              </Link>
-            </article>
-          ))}
         </div>
       </section>
 

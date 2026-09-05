@@ -7,7 +7,7 @@ export const Route = createFileRoute("/como-funciona")({
       {
         name: "description",
         content:
-          "Estas são as etapas do seu tratamento: entender o transtorno, encontrar o profissional ideal, agendar a sessão e realizar a consulta online.",
+          "Conheça as etapas para entender o transtorno, encontrar o profissional ideal, agendar a sessão e realizar a consulta online.",
       },
       { property: "og:title", content: "Como funciona nossa Plataforma — TOC Brazil" },
       {
@@ -25,8 +25,8 @@ export const Route = createFileRoute("/como-funciona")({
 
 const etapas = [
   {
-    t: "Entenda sobre o transtorno",
-    d: "Textos didáticos e explicativos sobre TOC.",
+    t: "Entenda mais sobre o transtorno",
+    d: "Textos didáticos e explicativos sobre TOC",
   },
   {
     t: "Encontre o profissional ideal",
@@ -34,7 +34,7 @@ const etapas = [
   },
   {
     t: "Agende uma sessão online",
-    d: "Escolha o melhor horário pra você disponível na agenda do profissional.",
+    d: "Escolha o melhor horário pra você disponível na agenda do profissional",
   },
   {
     t: "Realize sua consulta online",
