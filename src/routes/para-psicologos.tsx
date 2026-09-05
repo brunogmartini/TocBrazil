@@ -45,7 +45,7 @@ function ParaPsicologos() {
         <div className="rise-in">
           <span className="pill">Para profissionais</span>
           <h1 className="mt-6 text-3xl leading-tight sm:text-5xl">
-            Você cuida do paciente. Nós cuidamos da infraestrutura.
+            Você cuida do paciente. Nós cuidamos do resto.
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
             A TOC Brazil é especializada em TOC e conecta você a pessoas que já estão buscando

@@ -62,7 +62,7 @@ function SejaParceiro() {
       <section className="container-page py-14 lg:py-20">
         <span className="section-label">Para profissionais</span>
         <h1 className="mt-4 max-w-3xl text-3xl leading-tight sm:text-5xl">
-          Você cuida do paciente. Nós cuidamos da infraestrutura.
+          Você cuida do paciente. Nós cuidamos do resto.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
           Faça parte de uma rede especializada em conectar psicólogos e psiquiatras com

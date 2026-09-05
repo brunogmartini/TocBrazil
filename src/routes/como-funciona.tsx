@@ -25,7 +25,7 @@ export const Route = createFileRoute("/como-funciona")({
 
 const etapas = [
   {
-    t: "Entenda mais sobre o transtorno",
+    t: "Entenda sobre o transtorno",
     d: "Textos didáticos e explicativos sobre TOC.",
   },
   {
