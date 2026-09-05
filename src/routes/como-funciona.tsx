@@ -3,18 +3,19 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/como-funciona")({
   head: () => ({
     meta: [
-      { title: "Nossa metodologia: do conteúdo à consulta online | TOC Brazil" },
+      { title: "Como funciona nossa plataforma de consultas em TOC | TOC Brazil" },
       {
         name: "description",
         content:
-          "Entenda cada etapa: conteúdo educativo sobre TOC, escolha do profissional, agendamento, pagamento, videochamada e acompanhamento.",
+          "Estas são as etapas do seu tratamento: entender o transtorno, encontrar o profissional ideal, agendar a sessão e realizar a consulta online.",
       },
-      { property: "og:title", content: "Nossa metodologia na TOC Brazil" },
+      { property: "og:title", content: "Como funciona nossa Plataforma — TOC Brazil" },
       {
         property: "og:description",
         content:
-          "Cinco etapas simples: entender, encontrar, escolher, agendar e começar o acompanhamento online.",
+          "Quatro etapas: entenda o transtorno, encontre o profissional ideal, agende a sessão e realize sua consulta online.",
       },
+
       { property: "og:url", content: "/como-funciona" },
     ],
     links: [{ rel: "canonical", href: "/como-funciona" }],
