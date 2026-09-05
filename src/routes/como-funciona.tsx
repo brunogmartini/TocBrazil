@@ -67,17 +67,16 @@ function ComoFunciona() {
       <section className="container-page py-14 lg:py-20">
         <span className="section-label">Nossa metodologia</span>
         <h1 className="mt-4 max-w-3xl text-3xl leading-tight sm:text-5xl">
-          Da primeira leitura até a sua consulta.
+          Como funciona nossa Plataforma
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          A jornada foi desenhada para reduzir fricção e devolver a você o controle de cada
-          decisão.
+          Estas são as etapas para o seu tratamento.
         </p>
       </section>
 
       <section className="border-y border-border bg-surface">
         <div className="container-page py-14 lg:py-20">
-          <ol className="grid gap-5 lg:grid-cols-5">
+          <ol className="grid gap-5 lg:grid-cols-4">
             {etapas.map((e, i) => (
               <li key={e.t} className="card-soft p-6">
                 <span className="step-index">{i + 1}</span>
@@ -90,9 +89,8 @@ function ComoFunciona() {
             <Link to="/profissionais" className="btn-base btn-primary">
               Encontrar um especialista
             </Link>
-            <Link to="/matching" className="btn-base btn-ghost">
-              Responder o matching
-            </Link>
+          </div>
+
           </div>
         </div>
       </section>
