@@ -16,14 +16,14 @@ const profissionais = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const [dropdown, setDropdown] = useState(false);
+  const [dropdown, setDropdown] = useState<null | "paciente" | "profissional">(null);
   const [logado, setLogado] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!dropdown) return;
     function fora(e: MouseEvent) {
-      if (!dropdownRef.current?.contains(e.target as Node)) setDropdown(false);
+      if (!dropdownRef.current?.contains(e.target as Node)) setDropdown(null);
     }
     document.addEventListener("mousedown", fora);
     return () => document.removeEventListener("mousedown", fora);
