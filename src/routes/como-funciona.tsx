@@ -70,9 +70,6 @@ function ComoFunciona() {
         <h1 className="mt-4 max-w-3xl text-3xl leading-tight sm:text-5xl">
           Como funciona nossa Plataforma
         </h1>
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          Estas são as etapas para o seu tratamento.
-        </p>
       </section>
 
       <section className="border-y border-border bg-surface">
