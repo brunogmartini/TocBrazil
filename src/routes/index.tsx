@@ -387,38 +387,8 @@ function Home() {
         </div>
       </section>
 
-      {/* 8. Matching */}
-      <section aria-labelledby="matching" className="container-page py-16 lg:py-24">
-        <div className="grid items-center gap-10 lg:grid-cols-2">
-          <div>
-            <span className="section-label">Matching</span>
-            <h2 id="matching" className="mt-3 text-3xl sm:text-4xl">
-              Encontre um profissional que combine com você.
-            </h2>
-            <p className="mt-4 text-muted-foreground">
-              Responda a algumas perguntas simples sobre suas preferências — horários,
-              profissionais, idioma, preferência de gênero e estilo de atendimento — e veja
-              profissionais com quem você pode se identificar.
-            </p>
-            <p className="mt-4 text-sm text-muted-foreground">
-              O resultado considera apenas preferências, disponibilidade e informações declaradas
-              pelos profissionais. Não é avaliação clínica e não indica diagnóstico.
-            </p>
-            <Link to="/matching" className="btn-base btn-primary mt-8">
-              Começar o matching
-            </Link>
-          </div>
-          <ul className="grid gap-4 sm:grid-cols-2">
-            {["Horários disponíveis", "Psicólogo ou psiquiatra", "Preferência de gênero", "Idioma", "Estilo de atendimento", "Áreas de atuação"].map(
-              (item) => (
-                <li key={item} className="card-soft p-5 text-sm">
-                  {item}
-                </li>
-              ),
-            )}
-          </ul>
-        </div>
-      </section>
+
+
 
 
       {/* 10. Praticidade das consultas online */}
