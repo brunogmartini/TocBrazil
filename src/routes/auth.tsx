@@ -20,7 +20,7 @@ export const Route = createFileRoute("/auth")({
       { property: "og:title", content: "Entrar ou criar conta — TOC Brazil" },
       {
         property: "og:description",
-        content: "Crie sua conta para agendar consultas online com especialistas em TOC.",
+        content: "Crie sua conta para agendar consultas online com profissionais com experiência em TOC.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

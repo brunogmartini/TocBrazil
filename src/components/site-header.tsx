@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import logoAsset from "@/assets/toc-brazil-logo.jpg.asset.json";
 
 const nav = [
   { to: "/como-funciona", label: "Nossa metodologia" },
@@ -41,8 +42,13 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-xl">
       <div className="container-page flex h-16 items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2.5" aria-label="TOC Brazil — página inicial">
-          <span aria-hidden="true" className="logo-mark" />
-          <span className="font-display text-lg tracking-tight">TOC Brazil</span>
+          <img
+            src={logoAsset.url}
+            alt="TOC Brazil — Plataforma de Apoio Especializado"
+            width={1251}
+            height={541}
+            className="h-11 w-auto rounded-sm"
+          />
         </Link>
 
         <nav aria-label="Principal" className="hidden items-center gap-1 lg:flex">
@@ -138,7 +144,7 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <Link to="/profissionais" className="btn-base btn-primary">
-            Encontrar um especialista
+            Encontrar profissional com experiência em TOC
           </Link>
         </div>
 

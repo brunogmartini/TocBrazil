@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
+import logoAsset from "@/assets/toc-brazil-logo.jpg.asset.json";
 
 const colunas = [
   {
     titulo: "Pacientes",
     links: [
-      { to: "/profissionais", label: "Encontrar um especialista" },
+      { to: "/profissionais", label: "Encontrar profissional com experiência em TOC" },
       { to: "/como-funciona", label: "Nossa metodologia" },
       { to: "/entenda-o-toc", label: "Sobre o transtorno" },
       { to: "/painel", label: "Minhas consultas" },
@@ -45,8 +46,14 @@ export function SiteFooter() {
       <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-5">
         <div className="lg:col-span-1">
           <div className="flex items-center gap-2.5">
-            <span aria-hidden="true" className="logo-mark" />
-            <span className="font-display text-lg">TOC Brazil</span>
+            <img
+              src={logoAsset.url}
+              alt="TOC Brazil — Plataforma de Apoio Especializado"
+              width={1251}
+              height={541}
+              loading="lazy"
+              className="h-16 w-auto rounded-sm"
+            />
           </div>
           <p className="mt-4 font-display text-base">Plataforma de acompanhamento especializado.</p>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">

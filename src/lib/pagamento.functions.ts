@@ -78,7 +78,7 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
         items: [
           {
             id: consulta.id,
-            title: `Consulta com ${prof?.nome ?? "especialista"} — ${quando}`,
+            title: `Consulta com ${prof?.nome ?? "profissional com experiência em TOC"} — ${quando}`,
             description: "Consulta online de 50 minutos na TOC Brazil",
             quantity: 1,
             currency_id: "BRL",

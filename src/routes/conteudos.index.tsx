@@ -88,7 +88,7 @@ function Conteudos() {
           pronto.
         </p>
         <Link to="/profissionais" className="btn-base btn-primary mt-6">
-          Encontrar um especialista
+          Encontrar profissional com experiência em TOC
         </Link>
       </div>
     </div>

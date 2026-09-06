@@ -163,7 +163,7 @@ function Painel() {
                   Você ainda não tem consulta agendada.
                 </p>
                 <Link to="/profissionais" className="btn-base btn-primary mt-5">
-                  Escolher um especialista
+                  Escolher profissional com experiência em TOC
                 </Link>
               </div>
             )}
