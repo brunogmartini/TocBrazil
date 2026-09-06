@@ -8,13 +8,13 @@ import { track } from "@/lib/analytics";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "TOC Brazil — especialistas em TOC em consultas online" },
+      { title: "TOC Brazil — profissionais com experiência em TOC" },
       {
         name: "description",
         content:
           "TOC Brazil conecta pacientes a psicólogos e psiquiatras com experiência em TOC. Consultas online, no seu horário, com o profissional que você escolher.",
       },
-      { property: "og:title", content: "Conectando pacientes aos melhores especialistas em TOC do Brasil" },
+      { property: "og:title", content: "Conectando pacientes aos melhores profissionais com experiência em TOC do Brasil" },
       {
         property: "og:description",
         content:
@@ -143,7 +143,7 @@ function Home() {
           <div className="rise-in">
             <span className="pill">Plataforma de acompanhamento especializado</span>
             <h1 className="mt-6 text-[2.1rem] leading-[1.1] sm:text-5xl lg:text-[3.6rem]">
-              Conectando pacientes aos melhores especialistas em TOC do Brasil
+              Conectando pacientes aos melhores profissionais com experiência em TOC do Brasil
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
               Consultas online com psicólogos e psiquiatras{" "}
@@ -157,15 +157,12 @@ function Home() {
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link to="/profissionais" className="btn-base btn-primary">
-              Encontrar um especialista
+              Encontrar profissional com experiência em TOC
               </Link>
               <Link to="/seja-parceiro" className="btn-base btn-ghost">
                 Quero ser um profissional parceiro
               </Link>
             </div>
-            <p className="mt-6 text-sm text-muted-foreground">
-              Consulta por videochamada no navegador, sem instalar nada e sem gravação.
-            </p>
           </div>
 
           <div className="relative">
@@ -194,7 +191,7 @@ function Home() {
                 Dúvida se você tem TOC?
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Agende um horário com um especialista e descubra.
+                Agende um horário com profissional com experiência em TOC e descubra.
               </p>
               <p className="mt-6 font-display text-2xl text-foreground sm:text-3xl">
                 O diagnóstico é o primeiro passo.
@@ -206,7 +203,7 @@ function Home() {
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/profissionais" className="btn-base btn-primary">
-                  Quero conversar com um especialista
+                  Quero conversar com profissional com experiência em TOC
                 </Link>
                 <Link to="/entenda-o-toc" className="btn-base btn-ghost">
                   Entender melhor o TOC
@@ -241,8 +238,8 @@ function Home() {
               Talvez você já reconheça alguma destas situações.
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Nem todo profissional tem experiência com TOC — e explicar tudo de novo a cada
-              tentativa cansa. Aqui, os profissionais já atuam nessa área.
+              Nem todo profissional tem experiência com TOC - e explicar tudo novamente, cansa.
+              Aqui, os profissionais já atuam nessa área.
             </p>
           </div>
 
@@ -257,7 +254,7 @@ function Home() {
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link to="/profissionais" className="btn-base btn-primary">
-              Encontrar um especialista
+              Encontrar profissional com experiência em TOC
             </Link>
             <Link to="/entenda-o-toc" className="btn-base btn-ghost">
               Quero entender o TOC
@@ -282,7 +279,7 @@ function Home() {
             segurança.
           </p>
           <Link to="/profissionais" className="btn-base btn-primary mt-8">
-                Encontrar um especialista
+                Encontrar profissional com experiência em TOC
           </Link>
         </div>
       </section>
@@ -417,7 +414,7 @@ function Home() {
           ))}
         </div>
         <Link to="/profissionais" className="btn-base btn-primary mt-10">
-          Encontrar um especialista
+          Encontrar profissional com experiência em TOC
         </Link>
       </section>
 
@@ -481,7 +478,7 @@ function Home() {
           </p>
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
             <Link to="/profissionais" className="btn-base btn-primary">
-              Encontrar um especialista
+              Encontrar profissional com experiência em TOC
             </Link>
             <Link to="/seja-parceiro" className="btn-base btn-ghost">
               Quero ser um profissional parceiro

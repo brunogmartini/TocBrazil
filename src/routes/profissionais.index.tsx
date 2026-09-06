@@ -13,7 +13,7 @@ export const Route = createFileRoute("/profissionais/")({
         content:
           "Compare perfis de psicólogos e psiquiatras por profissão, abordagem, área de atuação, idioma e experiência para atendimento online relacionado ao TOC.",
       },
-      { property: "og:title", content: "Encontre um especialista" },
+      { property: "og:title", content: "Encontre profissional com experiência em TOC" },
       {
         property: "og:description",
         content:
@@ -98,7 +98,7 @@ function Busca() {
   return (
     <div className="container-page py-12 lg:py-16">
       <span className="section-label">Profissionais</span>
-      <h1 className="mt-3 text-3xl sm:text-4xl">Encontre um especialista</h1>
+      <h1 className="mt-3 text-3xl sm:text-4xl">Encontre profissional com experiência em TOC</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
         As informações são declaradas pelos profissionais e a documentação é verificada pela
         plataforma. A ordenação é neutra: não indicamos que um profissional é melhor do que outro.
