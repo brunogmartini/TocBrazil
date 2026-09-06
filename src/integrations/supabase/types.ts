@@ -680,19 +680,8 @@ export type Database = {
         }
         Returns: boolean
       }
-      horarios_ocupados: {
-        Args: { _ate: string; _de: string; _professional_id: string }
-        Returns: {
-          fim: string
-          inicio: string
-        }[]
-      }
-      owns_professional: {
-        Args: { _professional_id: string }
-        Returns: boolean
-      }
       slots_disponiveis: {
-        Args: { _dias?: number; _slug: string }
+        Args: { _dias: number; _slug: string }
         Returns: {
           fim: string
           inicio: string
