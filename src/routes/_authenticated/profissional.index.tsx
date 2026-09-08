@@ -74,13 +74,13 @@ function PainelProfissional() {
   }
 
   if (dados.isLoading) {
-    return <div className="container-page py-16 text-muted-foreground">Carregando…</div>;
+    return <div className="professional-workspace container-page py-16 text-muted-foreground">Carregando…</div>;
   }
 
   if (!prof) {
     return (
-      <div className="container-page py-16">
-        <span className="section-label">Área do profissional</span>
+      <div className="professional-workspace container-page py-16">
+        <span className="professional-label">Área do profissional</span>
         <h1 className="mt-3 text-3xl sm:text-4xl">Vamos começar seu cadastro</h1>
         <p className="mt-4 max-w-xl text-muted-foreground">
           Preencha seus dados profissionais e envie os documentos para verificação. Depois disso
@@ -94,10 +94,11 @@ function PainelProfissional() {
   }
 
   return (
-    <div className="container-page py-12 lg:py-16">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="professional-workspace py-12 lg:py-16">
+      <div className="container-page">
+      <div className="professional-heading flex flex-wrap items-end justify-between gap-6 p-6 sm:p-8">
         <div>
-          <span className="section-label">Área do profissional</span>
+          <span className="professional-label">Consultório digital</span>
           <h1 className="mt-3 text-3xl sm:text-4xl">{prof.nome}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {rotuloCadastro[prof.status] ?? prof.status} · consultas de {prof.slot_minutos} minutos
@@ -128,9 +129,15 @@ function PainelProfissional() {
         </div>
       )}
 
-      <div className="mt-10 grid gap-5 sm:grid-cols-3">
-        <div className="card-soft p-6">
-          <p className="section-label">A receber</p>
+      <nav aria-label="Área do profissional" className="professional-nav mt-5 flex gap-2 overflow-x-auto p-2">
+        <span className="professional-nav-active">Visão geral</span>
+        <Link to="/profissional/agenda" className="professional-nav-item">Agenda</Link>
+        <Link to="/profissional/cadastro" className="professional-nav-item">Perfil e recebimentos</Link>
+      </nav>
+
+      <div className="mt-8 grid gap-5 sm:grid-cols-3">
+        <div className="professional-metric p-6">
+          <p className="professional-label">A receber</p>
           <p className="mt-2 font-display text-2xl">
             {moeda(dados.data?.ganhos?.previstoCentavos ?? 0)}
           </p>
@@ -138,15 +145,15 @@ function PainelProfissional() {
             Consultas agendadas e ainda não repassadas.
           </p>
         </div>
-        <div className="card-soft p-6">
-          <p className="section-label">Já recebido</p>
+        <div className="professional-metric p-6">
+          <p className="professional-label">Já recebido</p>
           <p className="mt-2 font-display text-2xl">
             {moeda(dados.data?.ganhos?.recebidoCentavos ?? 0)}
           </p>
           <p className="mt-2 text-xs text-muted-foreground">Pagamentos aprovados até agora.</p>
         </div>
-        <div className="card-soft p-6">
-          <p className="section-label">Próximas consultas</p>
+        <div className="professional-metric p-6">
+          <p className="professional-label">Próximas consultas</p>
           <p className="mt-2 font-display text-2xl">{proximas.length}</p>
           <p className="mt-2 text-xs text-muted-foreground">
             Sua parte é de {100 - Number(prof.comissao_percent ?? 30)}% do valor da consulta.
@@ -220,6 +227,7 @@ function PainelProfissional() {
           </ul>
         )}
       </section>
+      </div>
     </div>
   );
 }

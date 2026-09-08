@@ -49,6 +49,12 @@ function Auth() {
   const destino = destinoSeguro(search.redirect);
 
   useEffect(() => {
+    setModo(search.modo);
+    setErro(null);
+    setAviso(null);
+  }, [search.modo]);
+
+  useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: destino, replace: true });
     });
@@ -123,13 +129,16 @@ function Auth() {
   return (
     <div className="container-page grid gap-10 py-14 lg:grid-cols-[1fr_0.9fr] lg:py-20">
       <div className="max-w-lg">
-        <span className="section-label">Sua conta</span>
+        <span className="section-label">
+          {modo === "cadastro" ? "Criar conta de paciente" : "Acesso do paciente"}
+        </span>
         <h1 className="mt-3 text-3xl sm:text-4xl">
           {modo === "cadastro" ? "Crie sua conta" : "Entrar na plataforma"}
         </h1>
         <p className="mt-4 text-muted-foreground">
-          Com a conta criada você vê os horários disponíveis, o valor da consulta e agenda com o
-          profissional que escolher.
+          {modo === "cadastro"
+            ? "Cadastre-se para ver os horários disponíveis, os valores e agendar com o profissional que escolher."
+            : "Entre para acessar suas consultas, lembretes e dados de cadastro."}
         </p>
         <ul className="mt-8 space-y-3 text-sm text-muted-foreground">
           <li className="card-soft p-4">Agenda real dos profissionais, com confirmação imediata.</li>

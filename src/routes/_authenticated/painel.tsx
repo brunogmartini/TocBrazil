@@ -104,7 +104,7 @@ function Painel() {
     <div className="container-page py-12 lg:py-16">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <span className="section-label">Minha área</span>
+          <span className="section-label">Área do paciente</span>
           <h1 className="mt-3 text-3xl sm:text-4xl">
             Olá{contexto.data?.perfil?.nome ? `, ${contexto.data.perfil.nome.split(" ")[0]}` : ""}.
           </h1>
