@@ -18,7 +18,7 @@
 - [x] Pagamento com Mercado Pago (Checkout Pro) + confirmação automática por webhook
 
 ## Próximas etapas
-- [ ] Diferenciar os acessos de entrar/criar conta e as áreas de paciente/profissional
+- [x] Diferenciar os acessos de entrar/criar conta e as áreas de paciente/profissional
 - [ ] Split automático do repasse ao profissional (exige adesão de cada profissional ao Mercado Pago)
 - [ ] Videochamada com sala própria (hoje usa sala segura gerada por consulta)
 - [ ] Envio real de e-mails/WhatsApp dos lembretes já gravados

@@ -151,14 +151,26 @@ function Auth() {
         <div className="flex gap-2 rounded-xl bg-muted p-1 text-sm">
           <button
             type="button"
-            onClick={() => setModo("entrar")}
+            onClick={() =>
+              navigate({
+                to: "/auth",
+                search: { modo: "entrar", redirect: search.redirect },
+                replace: true,
+              })
+            }
             className={`flex-1 rounded-lg px-3 py-2 ${modo === "entrar" ? "bg-background font-semibold" : ""}`}
           >
             Entrar
           </button>
           <button
             type="button"
-            onClick={() => setModo("cadastro")}
+            onClick={() =>
+              navigate({
+                to: "/auth",
+                search: { modo: "cadastro", redirect: search.redirect },
+                replace: true,
+              })
+            }
             className={`flex-1 rounded-lg px-3 py-2 ${modo === "cadastro" ? "bg-background font-semibold" : ""}`}
           >
             Criar conta
