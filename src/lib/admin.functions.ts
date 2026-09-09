@@ -30,10 +30,37 @@ export type ProfissionalAdmin = {
   profissao: string;
   registro: string;
   uf: string;
+  cidade: string | null;
   status: string;
   valor_centavos: number;
   consultas: number;
+  telefone: string | null;
+  email_contato: string | null;
+  graduacao: string | null;
+  instituicao: string | null;
+  cursos: string[];
+  formacao: string[];
+  especializacoes: string[];
+  areas: string[];
+  idiomas: string[];
+  abordagem: string | null;
+  apresentacao: string | null;
+  experiencia_toc: string | null;
+  experiencia_anos: number;
+  foto_url: string | null;
+  observacao_admin: string | null;
+  validado_em: string | null;
+  criadoEm: string;
+  documentos: {
+    id: string;
+    tipo: string;
+    nome_arquivo: string;
+    status: string;
+    created_at: string;
+    url: string | null;
+  }[];
 };
+
 
 async function garantirAdmin(context: { supabase: unknown; userId: string }) {
   const supabase = context.supabase as {
