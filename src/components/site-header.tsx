@@ -6,29 +6,24 @@ import logoAsset from "@/assets/toc-brazil-logo.jpg.asset.json";
 const nav = [
   { to: "/como-funciona", label: "Nossa metodologia" },
   { to: "/entenda-o-toc", label: "Sobre o transtorno" },
+  { to: "/profissionais", label: "Ver profissionais" },
 ] as const;
-
-
-const profissionais = [
-  { to: "/seja-parceiro", label: "Quero ser um parceiro" },
-  { to: "/profissional", label: "Área do profissional" },
-] as const;
-
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const [dropdown, setDropdown] = useState<null | "paciente" | "profissional">(null);
+  const [participar, setParticipar] = useState(false);
+  const [participarMobile, setParticiparMobile] = useState(false);
   const [logado, setLogado] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!dropdown) return;
+    if (!participar) return;
     function fora(e: MouseEvent) {
-      if (!dropdownRef.current?.contains(e.target as Node)) setDropdown(null);
+      if (!dropdownRef.current?.contains(e.target as Node)) setParticipar(false);
     }
     document.addEventListener("mousedown", fora);
     return () => document.removeEventListener("mousedown", fora);
-  }, [dropdown]);
+  }, [participar]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setLogado(!!data.session));
@@ -62,90 +57,57 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-
-          <div className="relative flex items-center gap-1" ref={dropdownRef}>
-            <button
-              type="button"
-              aria-expanded={dropdown === "paciente"}
-              onClick={() => setDropdown((v) => (v === "paciente" ? null : "paciente"))}
+          {logado && (
+            <Link
+              to="/painel"
               className="rounded-full px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
-              Sou paciente
-            </button>
-            <button
-              type="button"
-              aria-expanded={dropdown === "profissional"}
-              onClick={() => setDropdown((v) => (v === "profissional" ? null : "profissional"))}
-              className="rounded-full px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              Sou profissional
-            </button>
-
-            {dropdown === "paciente" && (
-              <div className="absolute right-0 top-full w-60 pt-2">
-                <ul className="card-soft overflow-hidden p-2">
-                  {logado ? (
-                    <li>
-                      <Link
-                        to="/painel"
-                        onClick={() => setDropdown(null)}
-                        className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
-                      >
-                        Minhas consultas
-                      </Link>
-                    </li>
-                  ) : (
-                    <>
-                      <li>
-                        <Link
-                          to="/auth"
-                          search={{ modo: "cadastro" as const, redirect: undefined }}
-                          onClick={() => setDropdown(null)}
-                          className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
-                        >
-                          Criar minha conta
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/auth"
-                          search={{ modo: "entrar" as const, redirect: undefined }}
-                          onClick={() => setDropdown(null)}
-                          className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
-                        >
-                          Entrar na minha conta
-                        </Link>
-                      </li>
-                    </>
-                  )}
-                </ul>
-              </div>
-            )}
-
-            {dropdown === "profissional" && (
-              <div className="absolute right-0 top-full w-60 pt-2">
-                <ul className="card-soft overflow-hidden p-2">
-                  {profissionais.map((item) => (
-                    <li key={item.to}>
-                      <Link
-                        to={item.to}
-                        onClick={() => setDropdown(null)}
-                        className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
+              Minha área
+            </Link>
+          )}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
-          <Link to="/profissionais" className="btn-base btn-primary">
-            Ver profissionais
-          </Link>
+        <div
+          className="relative hidden lg:block"
+          ref={dropdownRef}
+          onMouseEnter={() => setParticipar(true)}
+          onMouseLeave={() => setParticipar(false)}
+        >
+          <button
+            type="button"
+            aria-expanded={participar}
+            aria-haspopup="true"
+            onClick={() => setParticipar((v) => !v)}
+            className="btn-base btn-primary"
+          >
+            Quero fazer parte
+          </button>
+
+          {participar && (
+            <div className="absolute right-0 top-full w-60 pt-2">
+              <ul className="card-soft overflow-hidden p-2">
+                <li>
+                  <Link
+                    to="/auth"
+                    search={{ modo: "cadastro" as const, redirect: undefined }}
+                    onClick={() => setParticipar(false)}
+                    className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
+                  >
+                    Sou paciente
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/cadastro-profissional"
+                    onClick={() => setParticipar(false)}
+                    className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
+                  >
+                    Sou profissional
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
 
         <button
@@ -173,51 +135,43 @@ export function SiteHeader() {
               </Link>
             ))}
 
-            <span className="mt-3 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Sou paciente
-            </span>
-            {logado ? (
+            {logado && (
               <Link
                 to="/painel"
                 onClick={() => setOpen(false)}
                 className="rounded-xl px-2 py-3 text-sm font-medium text-foreground"
               >
-                Minhas consultas
+                Minha área
               </Link>
-            ) : (
-              <>
+            )}
+
+            <button
+              type="button"
+              aria-expanded={participarMobile}
+              onClick={() => setParticiparMobile((v) => !v)}
+              className="btn-base btn-primary mt-3 w-full"
+            >
+              Quero fazer parte
+            </button>
+            {participarMobile && (
+              <div className="mt-2 flex flex-col rounded-2xl bg-muted p-2">
                 <Link
                   to="/auth"
                   search={{ modo: "cadastro" as const, redirect: undefined }}
                   onClick={() => setOpen(false)}
-                  className="rounded-xl px-2 py-3 text-sm font-medium text-foreground"
+                  className="rounded-xl px-3 py-3 text-sm font-medium text-foreground"
                 >
-                  Criar minha conta
+                  Sou paciente
                 </Link>
                 <Link
-                  to="/auth"
-                  search={{ modo: "entrar" as const, redirect: undefined }}
+                  to="/cadastro-profissional"
                   onClick={() => setOpen(false)}
-                  className="rounded-xl px-2 py-3 text-sm font-medium text-foreground"
+                  className="rounded-xl px-3 py-3 text-sm font-medium text-foreground"
                 >
-                  Entrar na minha conta
+                  Sou profissional
                 </Link>
-              </>
+              </div>
             )}
-
-            <span className="mt-3 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Sou profissional
-            </span>
-            {profissionais.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                className="rounded-xl px-2 py-3 text-sm font-medium text-foreground"
-              >
-                {item.label}
-              </Link>
-            ))}
           </nav>
         </div>
       )}
