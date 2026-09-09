@@ -145,7 +145,11 @@ function CadastroProfissional() {
         experiencia_toc: p.experiencia_toc ?? "",
         experiencia_anos: String(p.experiencia_anos ?? 0),
         slot_minutos: String(p.slot_minutos ?? 50),
+        graduacao: p.graduacao ?? "",
+        instituicao: p.instituicao ?? "",
+        cursos: (p.cursos ?? []).join(", "),
         formacao: (p.formacao ?? []).join(", "),
+
         especializacoes: (p.especializacoes ?? []).join(", "),
         areas: (p.areas ?? []).join(", "),
         idiomas: (p.idiomas ?? []).join(", "),
