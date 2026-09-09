@@ -629,6 +629,7 @@ function Campo({
   type = "text",
   className = "",
   required = false,
+  list,
 }: {
   label: string;
   value: string;
@@ -636,6 +637,7 @@ function Campo({
   type?: string;
   className?: string;
   required?: boolean;
+  list?: string;
 }) {
   const id = label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   return (
@@ -646,6 +648,7 @@ function Campo({
       <input
         id={id}
         type={type}
+        list={list}
         required={required}
         className="field-base mt-2"
         value={value}
