@@ -94,12 +94,19 @@ function Perfil() {
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
             <section className="card-soft p-6">
               <h2 className="text-lg">Formação</h2>
+              {p.graduacao && (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {p.graduacao}
+                  {p.instituicao ? ` — ${p.instituicao}` : ""}
+                </p>
+              )}
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                {p.formacao.map((f) => (
+                {[...p.formacao, ...(p.especializacoes ?? []), ...(p.cursos ?? [])].map((f) => (
                   <li key={f}>{f}</li>
                 ))}
               </ul>
             </section>
+
             <section className="card-soft p-6">
               <h2 className="text-lg">Abordagem</h2>
               <p className="mt-3 text-sm text-muted-foreground">
