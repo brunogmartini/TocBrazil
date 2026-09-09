@@ -10,7 +10,7 @@ const nav = [
 
 
 const profissionais = [
-  { to: "/seja-parceiro", label: "Quero ser um profissional parceiro" },
+  { to: "/seja-parceiro", label: "Quero ser um parceiro" },
   { to: "/profissional", label: "Área do profissional" },
 ] as const;
 
@@ -99,21 +99,21 @@ export function SiteHeader() {
                       <li>
                         <Link
                           to="/auth"
-                          search={{ modo: "entrar" as const, redirect: undefined }}
-                          onClick={() => setDropdown(null)}
-                          className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
-                        >
-                          Entrar na minha conta
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/auth"
                           search={{ modo: "cadastro" as const, redirect: undefined }}
                           onClick={() => setDropdown(null)}
                           className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
                         >
                           Criar minha conta
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/auth"
+                          search={{ modo: "entrar" as const, redirect: undefined }}
+                          onClick={() => setDropdown(null)}
+                          className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
+                        >
+                          Entrar na minha conta
                         </Link>
                       </li>
                     </>
@@ -144,7 +144,7 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <Link to="/profissionais" className="btn-base btn-primary">
-            Encontrar profissional com experiência em TOC
+            Ver profissionais
           </Link>
         </div>
 
@@ -188,19 +188,19 @@ export function SiteHeader() {
               <>
                 <Link
                   to="/auth"
-                  search={{ modo: "entrar" as const, redirect: undefined }}
-                  onClick={() => setOpen(false)}
-                  className="rounded-xl px-2 py-3 text-sm font-medium text-foreground"
-                >
-                  Entrar na minha conta
-                </Link>
-                <Link
-                  to="/auth"
                   search={{ modo: "cadastro" as const, redirect: undefined }}
                   onClick={() => setOpen(false)}
                   className="rounded-xl px-2 py-3 text-sm font-medium text-foreground"
                 >
                   Criar minha conta
+                </Link>
+                <Link
+                  to="/auth"
+                  search={{ modo: "entrar" as const, redirect: undefined }}
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-2 py-3 text-sm font-medium text-foreground"
+                >
+                  Entrar na minha conta
                 </Link>
               </>
             )}

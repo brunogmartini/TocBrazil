@@ -14,7 +14,7 @@ export const Route = createFileRoute("/")({
         content:
           "TOC Brazil conecta pacientes a psicólogos e psiquiatras com experiência em TOC. Consultas online, no seu horário, com o profissional que você escolher.",
       },
-      { property: "og:title", content: "Conectando pacientes aos melhores profissionais com experiência em TOC do Brasil" },
+      { property: "og:title", content: "Conectando você aos melhores profissionais com experiência em TOC" },
       {
         property: "og:description",
         content:
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/")({
 });
 
 const passos = [
-  { titulo: "Entenda mais sobre o transtorno", texto: "Textos didáticos e explicativos sobre TOC" },
+  { titulo: "Entenda sobre o transtorno", texto: "Textos didáticos e explicativos sobre TOC" },
   {
     titulo: "Encontre o profissional ideal",
     texto:
@@ -142,8 +142,8 @@ function Home() {
         <div className="container-page grid items-center gap-12 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
           <div className="rise-in">
             <span className="pill">Plataforma de acompanhamento especializado</span>
-            <h1 className="mt-6 text-[2.1rem] leading-[1.1] sm:text-5xl lg:text-[3.6rem]">
-              Conectando pacientes aos melhores profissionais com experiência em TOC do Brasil
+            <h1 className="mt-6 text-[2.1rem] leading-[1.1] sm:text-4xl lg:whitespace-nowrap lg:text-[2.15rem] xl:text-[2.55rem]">
+              Conectando você aos melhores profissionais com experiência em TOC
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
               Consultas online com psicólogos e psiquiatras{" "}
@@ -157,10 +157,10 @@ function Home() {
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link to="/profissionais" className="btn-base btn-primary">
-              Encontrar profissional com experiência em TOC
+              Ver profissionais
               </Link>
               <Link to="/seja-parceiro" className="btn-base btn-ghost">
-                Quero ser um profissional parceiro
+                Quero ser um parceiro
               </Link>
             </div>
           </div>
@@ -203,7 +203,7 @@ function Home() {
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/profissionais" className="btn-base btn-primary">
-                  Quero conversar com profissional com experiência em TOC
+                  Agendar avaliação
                 </Link>
                 <Link to="/entenda-o-toc" className="btn-base btn-ghost">
                   Entender melhor o TOC
@@ -254,7 +254,7 @@ function Home() {
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link to="/profissionais" className="btn-base btn-primary">
-              Encontrar profissional com experiência em TOC
+              Ver profissionais
             </Link>
             <Link to="/entenda-o-toc" className="btn-base btn-ghost">
               Quero entender o TOC
@@ -278,9 +278,9 @@ function Home() {
             Aqui, você encontra informação e profissionais para dar o próximo passo com mais
             segurança.
           </p>
-          <Link to="/profissionais" className="btn-base btn-primary mt-8">
-                Encontrar profissional com experiência em TOC
-          </Link>
+            <Link to="/profissionais" className="mt-8 inline-flex font-semibold text-primary underline underline-offset-4">
+              Conhecer profissionais
+            </Link>
         </div>
       </section>
 
@@ -324,8 +324,8 @@ function Home() {
       {/* 6. Como funciona */}
       <section aria-labelledby="como-funciona" className="container-page py-16 lg:py-24">
         <span className="section-label">Nossa metodologia</span>
-        <h2 id="como-funciona" className="mt-3 max-w-2xl text-3xl sm:text-4xl">
-          Como funciona nossa Plataforma
+        <h2 id="como-funciona" className="mt-3 text-3xl sm:text-4xl lg:whitespace-nowrap">
+          Como funciona a Plataforma
         </h2>
         <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {passos.map((passo, i) => (
@@ -413,9 +413,6 @@ function Home() {
             </article>
           ))}
         </div>
-        <Link to="/profissionais" className="btn-base btn-primary mt-10">
-          Encontrar profissional com experiência em TOC
-        </Link>
       </section>
 
       {/* Por que somos diferentes */}
@@ -478,10 +475,10 @@ function Home() {
           </p>
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
             <Link to="/profissionais" className="btn-base btn-primary">
-              Encontrar profissional com experiência em TOC
+              Ver profissionais
             </Link>
             <Link to="/seja-parceiro" className="btn-base btn-ghost">
-              Quero ser um profissional parceiro
+              Quero ser um parceiro
             </Link>
           </div>
         </div>

@@ -5,7 +5,7 @@ const colunas = [
   {
     titulo: "Pacientes",
     links: [
-      { to: "/profissionais", label: "Encontrar profissional com experiência em TOC" },
+      { to: "/profissionais", label: "Ver profissionais" },
       { to: "/como-funciona", label: "Nossa metodologia" },
       { to: "/entenda-o-toc", label: "Sobre o transtorno" },
       { to: "/painel", label: "Minhas consultas" },
@@ -14,7 +14,7 @@ const colunas = [
   {
     titulo: "Profissionais",
     links: [
-      { to: "/seja-parceiro", label: "Quero ser um profissional parceiro" },
+      { to: "/seja-parceiro", label: "Quero ser um parceiro" },
       { to: "/para-psicologos", label: "Sou psicólogo" },
       { to: "/para-psiquiatras", label: "Sou psiquiatra" },
       { to: "/cadastro-profissional", label: "Cadastro" },
