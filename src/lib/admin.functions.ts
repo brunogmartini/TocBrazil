@@ -103,7 +103,9 @@ export const painelAdmin = createServerFn({ method: "GET" })
         .limit(300),
       supabaseAdmin
         .from("professionals")
-        .select("id, nome, slug, profissao, registro, uf, status, valor_centavos"),
+        .select("*")
+        .order("created_at", { ascending: false }),
+
       supabaseAdmin.from("payments").select("id, patient_id, status, valor_centavos, created_at"),
     ]);
 
