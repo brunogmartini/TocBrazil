@@ -1,25 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import heroImg from "@/assets/hero-paciente.jpg";
-import { PROFISSIONAIS_DEMO } from "@/lib/profissionais-mock";
-
 import { track } from "@/lib/analytics";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "TOC Brazil — profissionais com experiência em TOC" },
+      { title: "TOC Brazil — plataforma especializada em TOC" },
       {
         name: "description",
         content:
-          "TOC Brazil conecta pacientes a psicólogos e psiquiatras com experiência em TOC. Consultas online, no seu horário, com o profissional que você escolher.",
+          "Plataforma especializada em Transtorno Obsessivo-Compulsivo: metodologia própria, conteúdo especializado e profissionais selecionados, com atendimento online.",
       },
-      { property: "og:title", content: "Conectando você aos melhores profissionais com experiência em TOC" },
+      {
+        property: "og:title",
+        content: "TOC Brazil — especialização, metodologia e profissionais selecionados",
+      },
       {
         property: "og:description",
         content:
-          "Consultas online com psicólogos e psiquiatras com experiência em TOC. Você escolhe o profissional com quem mais se identifica.",
+          "Uma jornada estruturada de cuidado em TOC: conhecimento, metodologia e profissionais selecionados.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "/" },
     ],
     links: [{ rel: "canonical", href: "/" }],
@@ -31,7 +34,7 @@ export const Route = createFileRoute("/")({
           "@type": "WebSite",
           name: "TOC Brazil",
           description:
-            "Plataforma especializada em TOC que reúne informação confiável e acesso a profissionais de Psicologia e Psiquiatria.",
+            "Plataforma especializada em TOC que reúne conhecimento, metodologia e profissionais selecionados.",
           url: "/",
         }),
       },
@@ -53,8 +56,7 @@ const passos = [
   },
   {
     titulo: "Realize sua consulta online",
-    texto:
-      "A consulta acontece por videochamada, no horário combinado, através da plataforma.",
+    texto: "A consulta acontece por videochamada, no horário combinado, através da plataforma.",
   },
 ];
 
@@ -67,12 +69,17 @@ const pilares = [
   {
     titulo: "Curadoria",
     texto:
-      "Apresentamos profissionais com informações claras sobre formação, áreas de atuação e experiência declarada.",
+      "Profissionais selecionados, com formação, abordagem e experiência verificadas antes da publicação do perfil.",
+  },
+  {
+    titulo: "Metodologia",
+    texto:
+      "Uma sequência clara de etapas, do entendimento do transtorno ao acompanhamento com profissional habilitado.",
   },
   {
     titulo: "Jornada",
     texto:
-      "Da informação à consulta, reunimos descoberta, escolha, agendamento e atendimento em uma experiência integrada.",
+      "Descoberta, escolha, agendamento e atendimento reunidos em uma experiência integrada e contínua.",
   },
 ];
 
@@ -103,29 +110,29 @@ const identificacao = [
   },
 ];
 
-const praticidade = [
+const acessoOnline = [
   {
-    t: "Consulta 100% online",
-    d: "Videochamada no navegador, sem instalar aplicativo, sem link externo e sem gravação por padrão.",
+    t: "Especialização primeiro",
+    d: "O que sustenta o cuidado é a experiência do profissional com TOC, não o formato do atendimento.",
   },
   {
-    t: "Sem deslocamento",
-    d: "Você atende de casa, do trabalho ou de qualquer lugar com internet, no Brasil ou fora dele.",
+    t: "Curadoria de profissionais",
+    d: "Formação, abordagem e áreas de atuação são verificadas antes de qualquer perfil ser publicado.",
   },
   {
-    t: "Horários que cabem na rotina",
-    d: "Você vê a agenda real do profissional e escolhe o horário livre que funciona para você.",
+    t: "Jornada acompanhada",
+    d: "Conteúdo especializado, escolha do profissional, agendamento e atendimento em um só lugar.",
   },
   {
     t: "Você escolhe o profissional",
-    d: "Compare formação, abordagem, áreas de atuação, idiomas e estilo de atendimento antes de decidir.",
+    d: "Compare formação, abordagem, áreas de atuação e idiomas antes de decidir com quem falar.",
   },
   {
-    t: "Identificação em primeiro lugar",
-    d: "Sem ranking e sem ordenação por popularidade: a escolha é sua, pelo que faz sentido para você.",
+    t: "Atendimento por videochamada",
+    d: "A consulta acontece no navegador, sem instalar aplicativo e sem gravação por padrão.",
   },
   {
-    t: "Trocar de profissional é normal",
+    t: "Continuidade sem travas",
     d: "Se não houver identificação, você pode escolher outro profissional a qualquer momento.",
   },
 ];
@@ -137,30 +144,34 @@ function Home() {
 
   return (
     <>
-      {/* 2. Hero */}
+      {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="container-page grid items-center gap-12 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
           <div className="rise-in">
-            <span className="pill">Plataforma de acompanhamento especializado</span>
+            <span className="pill">Plataforma especializada em TOC</span>
             <h1 className="mt-6 text-[2.1rem] leading-[1.1] sm:text-4xl lg:text-[2.15rem] xl:text-[2.55rem]">
               Conectando você aos melhores profissionais com experiência em TOC
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
               Consultas online com psicólogos e psiquiatras{" "}
               <strong className="font-semibold text-foreground">
-                especializados em Transtorno Obsessivo Compulsivo
-              </strong>
-              , sem sair de casa e no horário que cabe na sua rotina. Você{" "}
-              <strong className="font-semibold text-foreground">dá match</strong> com o
-              profissional com quem mais se identifica.
+                especializados em transtorno obsessivo compulsivo
+              </strong>{" "}
+              sem sair de casa e no horário que cabe na sua rotina. Encontre profissionais
+              selecionados e especializados em TOC, de acordo com o seu perfil e as suas
+              necessidades.
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link to="/profissionais" className="btn-base btn-primary">
-              Ver profissionais
+              <Link
+                to="/auth"
+                search={{ modo: "cadastro" as const, redirect: undefined }}
+                className="btn-base btn-primary"
+              >
+                Quero fazer parte
               </Link>
-              <Link to="/seja-parceiro" className="btn-base btn-ghost">
-                Quero ser um parceiro
+              <Link to="/profissionais" className="btn-base btn-ghost">
+                Ver profissionais
               </Link>
             </div>
           </div>
@@ -181,8 +192,104 @@ function Home() {
         </div>
       </section>
 
+      {/* Nossa metodologia + diferencial */}
+      <section aria-labelledby="metodologia" className="border-y border-border bg-surface">
+        <div className="container-page py-16 lg:py-24">
+          <span className="section-label">Nossa metodologia</span>
+          <h2 id="metodologia" className="mt-3 max-w-3xl text-3xl sm:text-4xl">
+            Nossa metodologia
+          </h2>
+          <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
+            Não somos apenas uma plataforma de consultas online. Somos uma plataforma especializada
+            em TOC, que reúne conhecimento, metodologia e profissionais selecionados em uma jornada
+            estruturada de cuidado.
+          </p>
+
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {pilares.map((p) => (
+              <article key={p.titulo} className="card-soft p-7">
+                <h3 className="font-display text-xl">{p.titulo}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.texto}</p>
+              </article>
+            ))}
+          </div>
+
+          <h3 className="mt-14 font-display text-2xl">As etapas da sua jornada</h3>
+          <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {passos.map((passo, i) => (
+              <li key={passo.titulo} className="card-soft card-soft-hover p-6">
+                <span className="step-index">{i + 1}</span>
+                <h4 className="mt-4 text-lg">{passo.titulo}</h4>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{passo.texto}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Profissionais */}
+      <section aria-labelledby="profissionais" className="container-page py-16 lg:py-24">
+        <div className="max-w-2xl">
+          <span className="section-label">Profissionais</span>
+          <h2 id="profissionais" className="mt-3 text-3xl sm:text-4xl">
+            Psicólogos e psiquiatras com experiência na área.
+          </h2>
+          <p className="mt-4 text-muted-foreground">
+            Cada profissional declara formação, abordagem, áreas de atuação e experiência e a
+            documentação é verificada antes da publicação do perfil. Você escolhe quem faz mais
+            sentido para você.
+          </p>
+        </div>
+        <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+          <Link
+            to="/auth"
+            search={{ modo: "cadastro" as const, redirect: undefined }}
+            className="btn-base btn-primary"
+          >
+            Quero fazer parte
+          </Link>
+          <Link to="/profissionais" className="btn-base btn-ghost">
+            Ver profissionais
+          </Link>
+        </div>
+      </section>
+
+      {/* Identificação */}
+      <section aria-labelledby="identificacao" className="border-y border-border bg-surface">
+        <div className="container-page py-16 lg:py-20">
+          <div className="max-w-2xl">
+            <span className="section-label">Identificação</span>
+            <h2 id="identificacao" className="mt-3 text-3xl sm:text-4xl">
+              Talvez você já reconheça alguma destas situações.
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Nem todo profissional tem experiência com TOC - e explicar tudo novamente, cansa.
+              Aqui, os profissionais já atuam nessa área.
+            </p>
+          </div>
+
+          <ul className="mt-10 grid gap-5 md:grid-cols-3">
+            {identificacao.map((item) => (
+              <li key={item.t} className="card-soft p-6">
+                <h3 className="text-lg">{item.t}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.d}</p>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <Link to="/profissionais" className="btn-base btn-primary">
+              Ver profissionais
+            </Link>
+            <Link to="/entenda-o-toc" className="btn-base btn-ghost">
+              Entender melhor o TOC
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Dúvida se tem TOC */}
-      <section aria-labelledby="duvida-toc" className="container-page pb-4 lg:pb-8">
+      <section aria-labelledby="duvida-toc" className="container-page py-16 lg:py-20">
         <div className="card-soft overflow-hidden p-8 sm:p-12">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div>
@@ -227,44 +334,8 @@ function Home() {
         </div>
       </section>
 
-
-
-      {/* 3. Identificação */}
-      <section aria-labelledby="identificacao" className="border-y border-border bg-surface">
-        <div className="container-page py-16 lg:py-20">
-          <div className="max-w-2xl">
-            <span className="section-label">Identificação</span>
-            <h2 id="identificacao" className="mt-3 text-3xl sm:text-4xl">
-              Talvez você já reconheça alguma destas situações.
-            </h2>
-            <p className="mt-4 text-muted-foreground">
-              Nem todo profissional tem experiência com TOC - e explicar tudo novamente, cansa.
-              Aqui, os profissionais já atuam nessa área.
-            </p>
-          </div>
-
-          <ul className="mt-10 grid gap-5 md:grid-cols-3">
-            {identificacao.map((item) => (
-              <li key={item.t} className="card-soft p-6">
-                <h3 className="text-lg">{item.t}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.d}</p>
-              </li>
-            ))}
-          </ul>
-
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <Link to="/profissionais" className="font-semibold text-primary underline underline-offset-4">
-              Ver profissionais
-            </Link>
-            <Link to="/entenda-o-toc" className="btn-base btn-ghost">
-              Quero entender o TOC
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Você não está sozinho */}
-      <section aria-labelledby="acolhimento" className="container-page py-16 lg:py-20">
+      {/* Acolhimento */}
+      <section aria-labelledby="acolhimento" className="container-page pb-4 lg:pb-8">
         <div className="card-soft mx-auto max-w-3xl p-8 text-center sm:p-12">
           <span className="section-label">Acolhimento</span>
           <h2 id="acolhimento" className="mt-4 text-3xl sm:text-4xl">
@@ -275,19 +346,22 @@ function Home() {
             comportamentos causam vergonha, medo ou confusão.
           </p>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Aqui, você encontra informação e profissionais para dar o próximo passo com mais
-            segurança.
+            Aqui, você encontra conteúdo especializado e profissionais selecionados para dar o
+            próximo passo com mais segurança.
           </p>
-            <Link to="/profissionais" className="mt-8 inline-flex font-semibold text-primary underline underline-offset-4">
-              Conhecer profissionais
-            </Link>
+          <Link
+            to="/entenda-o-toc"
+            className="mt-8 inline-flex font-semibold text-primary underline underline-offset-4"
+          >
+            Entender melhor o TOC
+          </Link>
         </div>
       </section>
 
-      {/* 5. Do entendimento ao cuidado */}
+      {/* Do entendimento ao cuidado */}
       <section
         aria-labelledby="conceito"
-        className="border-y border-border bg-primary text-primary-foreground"
+        className="mt-16 border-y border-border bg-primary text-primary-foreground"
       >
         <div className="container-page py-20 lg:py-28">
           <p className="text-xs uppercase tracking-[0.14em] text-primary-foreground/70">
@@ -314,96 +388,26 @@ function Home() {
                 to="/profissionais"
                 className="btn-base mt-2 bg-background text-foreground hover:bg-background/90"
               >
-                Conhecer profissionais
+                Ver profissionais
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 6. Como funciona */}
-      <section aria-labelledby="como-funciona" className="container-page py-16 lg:py-24">
-        <span className="section-label">Nossa metodologia</span>
-        <h2 id="como-funciona" className="mt-3 text-3xl sm:text-4xl lg:whitespace-nowrap">
-          Como funciona a Plataforma
-        </h2>
-        <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {passos.map((passo, i) => (
-            <li key={passo.titulo} className="card-soft card-soft-hover p-6">
-              <span className="step-index">{i + 1}</span>
-              <h3 className="mt-4 text-lg">{passo.titulo}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{passo.texto}</p>
-            </li>
-          ))}
-        </ol>
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <Link to="/como-funciona" className="btn-base btn-ghost">
-            Ver detalhes de cada etapa
-          </Link>
-        </div>
-      </section>
-
-      {/* 7. Profissionais */}
-      <section aria-labelledby="profissionais" className="border-y border-border bg-surface">
-        <div className="container-page py-16 lg:py-24">
-          <div className="max-w-2xl">
-            <span className="section-label">Profissionais</span>
-            <h2 id="profissionais" className="mt-3 text-3xl sm:text-4xl">
-              Psicólogos e psiquiatras com experiência na área.
-            </h2>
-            <p className="mt-4 text-muted-foreground">
-              Cada profissional declara formação, abordagem, áreas de atuação e experiência, e a
-              documentação é verificada antes da publicação do perfil. Você escolhe quem faz mais
-              sentido para você: não existe ranking de popularidade nem “melhor profissional”.
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {PROFISSIONAIS_DEMO.slice(0, 3).map((p) => (
-              <article key={p.slug} className="card-soft card-soft-hover flex flex-col p-6">
-                <span className="pill self-start">{p.profissao}</span>
-                <h3 className="mt-4 text-lg">{p.nome}</h3>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {p.registro} · {p.uf} · {p.experienciaAnos} anos declarados
-                </p>
-                {p.abordagem && <p className="mt-4 text-sm">{p.abordagem}</p>}
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  {p.apresentacao}
-                </p>
-                <p className="mt-auto pt-5 text-xs text-muted-foreground">
-                  Atendimento online, por videochamada.
-                </p>
-                <Link
-                  to="/profissionais/$slug"
-                  params={{ slug: p.slug }}
-                  className="btn-base btn-ghost mt-4 w-full"
-                >
-                  Ver perfil
-                </Link>
-              </article>
-            ))}
-          </div>
-
-          <div className="mt-10">
-            <Link to="/profissionais" className="btn-base btn-primary">
-              Ver todos os profissionais
-            </Link>
-          </div>
-        </div>
-      </section>
-
-
-
-
-
-      {/* 10. Praticidade das consultas online */}
+      {/* Consulta online como forma de acesso */}
       <section aria-labelledby="online" className="container-page py-16 lg:py-24">
-        <span className="section-label">Consultas online</span>
+        <span className="section-label">Acesso ao cuidado</span>
         <h2 id="online" className="mt-3 max-w-2xl text-3xl sm:text-4xl">
-          Simples de encaixar na rotina — e a escolha é sempre sua.
+          Cuidado especializado em TOC, onde você estiver.
         </h2>
+        <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
+          Tenha acesso a profissionais selecionados e especializados em TOC, dentro de uma jornada
+          estruturada pela nossa metodologia. A consulta online torna esse cuidado mais acessível,
+          sem abrir mão da especialização, da curadoria e da qualidade da experiência.
+        </p>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {praticidade.map((b) => (
+          {acessoOnline.map((b) => (
             <article key={b.t} className="card-soft card-soft-hover p-6">
               <h3 className="text-lg">{b.t}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{b.d}</p>
@@ -412,23 +416,7 @@ function Home() {
         </div>
       </section>
 
-      {/* Por que somos diferentes */}
-      <section aria-labelledby="diferenciais" className="container-page py-16 lg:py-24">
-        <span className="section-label">Por que somos diferentes</span>
-        <h2 id="diferenciais" className="mt-3 max-w-2xl text-3xl sm:text-4xl">
-          Especialização, curadoria e uma jornada integrada.
-        </h2>
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
-          {pilares.map((p) => (
-            <article key={p.titulo} className="card-soft p-7">
-              <h3 className="font-display text-xl">{p.titulo}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.texto}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* 14. Segurança e privacidade */}
+      {/* Segurança e privacidade */}
       <section aria-labelledby="seguranca" className="border-y border-border bg-surface">
         <div className="container-page grid gap-10 py-16 lg:grid-cols-2 lg:py-24">
           <div>
@@ -449,8 +437,9 @@ function Home() {
               As consultas acontecem por videochamada no navegador e não são gravadas por padrão.
             </li>
             <li className="card-soft p-5">
-              Acesso segmentado por papel: você acessa apenas os seus dados; o profissional
-              acessa apenas o necessário para o atendimento.
+              Acesso segmentado por papel: você acessa apenas os seus dados; o profissional acessa
+              apenas o necessário para o atendimento. Documentos de verificação ficam restritos à
+              equipe autorizada.
             </li>
             <li className="card-soft p-5">
               A plataforma não realiza diagnósticos, não prescreve tratamentos e não promete
@@ -460,7 +449,7 @@ function Home() {
         </div>
       </section>
 
-      {/* 15. CTA final */}
+      {/* CTA final */}
       <section aria-labelledby="cta-final" className="container-page py-20 lg:py-28">
         <div className="mx-auto max-w-3xl text-center">
           <h2 id="cta-final" className="text-4xl leading-tight sm:text-6xl">
@@ -468,16 +457,27 @@ function Home() {
           </h2>
 
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-            Encontre informação confiável e profissionais para acompanhamento relacionado ao TOC.
+            Pacientes e profissionais fazem parte da mesma jornada de cuidado especializado em TOC.
           </p>
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link to="/profissionais" className="btn-base btn-primary">
+            <Link
+              to="/auth"
+              search={{ modo: "cadastro" as const, redirect: undefined }}
+              className="btn-base btn-primary"
+            >
+              Quero fazer parte
+            </Link>
+            <Link to="/profissionais" className="btn-base btn-ghost">
               Ver profissionais
             </Link>
-            <Link to="/seja-parceiro" className="btn-base btn-ghost">
-              Quero ser um parceiro
-            </Link>
           </div>
+          <p className="mt-6 text-sm text-muted-foreground">
+            É profissional de saúde mental?{" "}
+            <Link to="/cadastro-profissional" className="font-semibold underline underline-offset-4">
+              Comece seu cadastro profissional
+            </Link>
+            .
+          </p>
         </div>
       </section>
     </>
