@@ -373,11 +373,28 @@ function CadastroProfissional() {
           className="sm:col-span-2"
         />
         <Campo
+          label="Graduação"
+          value={form.graduacao}
+          onChange={(v) => setForm({ ...form, graduacao: v })}
+        />
+        <Campo
+          label="Instituição de graduação"
+          value={form.instituicao}
+          onChange={(v) => setForm({ ...form, instituicao: v })}
+        />
+        <Campo
           label="Formação (separe por vírgula)"
           value={form.formacao}
           onChange={(v) => setForm({ ...form, formacao: v })}
           className="sm:col-span-2"
         />
+        <Campo
+          label="Cursos relevantes (separe por vírgula)"
+          value={form.cursos}
+          onChange={(v) => setForm({ ...form, cursos: v })}
+          className="sm:col-span-2"
+        />
+
         <Campo
           label="Especializações (separe por vírgula)"
           value={form.especializacoes}
