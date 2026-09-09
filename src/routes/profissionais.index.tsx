@@ -124,12 +124,9 @@ function Busca() {
         plataforma. A ordenação é neutra: não indicamos que um profissional é melhor do que outro.
       </p>
       <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-        Prefere ajuda para escolher?{" "}
-        <Link to="/matching" className="font-semibold underline-offset-4 hover:underline">
-          Responda algumas perguntas de preferência
-        </Link>
-        .
+        Somente perfis com documentação verificada e aprovados pela nossa equipe aparecem aqui.
       </p>
+
 
       <form
         className="card-soft mt-8 grid gap-5 p-6 md:grid-cols-2 lg:grid-cols-3"
@@ -195,11 +192,25 @@ function Busca() {
       </div>
 
       {resultados.length === 0 && (
-        <p className="card-soft mt-5 p-6 text-sm text-muted-foreground">
-          Nenhum profissional corresponde a esses filtros no momento. Tente remover uma
-          preferência.
-        </p>
+        <div className="card-soft mt-5 p-8">
+          <h2 className="text-xl">
+            {profissionais.length === 0
+              ? "Em breve, novos profissionais especializados em TOC estarão disponíveis na plataforma."
+              : "Nenhum profissional corresponde a esses filtros no momento."}
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            {profissionais.length === 0
+              ? "Cada perfil passa por verificação de registro e documentos antes de ser publicado. Assim que a análise for concluída, os profissionais aparecem aqui."
+              : "Tente remover uma preferência para ampliar o resultado."}
+          </p>
+          {profissionais.length === 0 && (
+            <Link to="/cadastro-profissional" className="btn-base btn-ghost mt-6">
+              Sou profissional e quero fazer parte
+            </Link>
+          )}
+        </div>
       )}
+
     </div>
   );
 }
