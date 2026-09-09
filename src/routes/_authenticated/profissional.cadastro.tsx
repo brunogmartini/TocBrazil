@@ -46,6 +46,26 @@ const TIPOS_DOCUMENTO = [
   "Comprovante de endereço",
 ];
 
+const SUBTIPOS_TOC = [
+  "Contaminação e limpeza",
+  "Dúvida e checagem",
+  "Simetria, ordem e exatidão",
+  "Pensamentos intrusivos de agressão",
+  "Pensamentos intrusivos sexuais",
+  "Pensamentos intrusivos religiosos ou escrupulosidade",
+  "TOC de relacionamento",
+  "TOC de orientação sexual",
+  "TOC somático ou sensório-motor",
+  "TOC existencial",
+  "Medo de perder o controle",
+  "Responsabilidade excessiva e medo de causar dano",
+  "Acumulação relacionada ao TOC",
+  "Rituais mentais e ruminação",
+  "Repetição, contagem e necessidade de completude",
+  "Busca de certeza e pedidos de garantia",
+  "TOC predominantemente obsessivo",
+];
+
 const rotuloDoc: Record<string, string> = {
   enviado: "Em análise",
   aprovado: "Aprovado",
@@ -358,7 +378,13 @@ function CadastroProfissional() {
           value={form.areas}
           onChange={(v) => setForm({ ...form, areas: v })}
           className="sm:col-span-2"
+          list="subtipos-toc"
         />
+        <datalist id="subtipos-toc">
+          {SUBTIPOS_TOC.map((subtipo) => (
+            <option key={subtipo} value={subtipo} />
+          ))}
+        </datalist>
         <Campo
           label="Idiomas (separe por vírgula)"
           value={form.idiomas}

@@ -19,6 +19,7 @@
 
 ## Próximas etapas
 - [x] Diferenciar os acessos de entrar/criar conta e as áreas de paciente/profissional
+- [x] Revisar textos, menu do paciente, subtipos de TOC e chamadas repetidas
 - [ ] Split automático do repasse ao profissional (exige adesão de cada profissional ao Mercado Pago)
 - [ ] Videochamada com sala própria (hoje usa sala segura gerada por consulta)
 - [ ] Envio real de e-mails/WhatsApp dos lembretes já gravados
