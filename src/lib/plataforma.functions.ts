@@ -15,7 +15,12 @@ export type ProfissionalPublico = {
   apresentacao: string | null;
   experiencia_toc: string | null;
   experiencia_anos: number;
+  cidade: string | null;
+  graduacao: string | null;
+  instituicao: string | null;
+  cursos: string[];
   formacao: string[];
+
   especializacoes: string[];
   areas: string[];
   idiomas: string[];
