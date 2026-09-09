@@ -105,7 +105,11 @@ function CadastroProfissional() {
     experiencia_toc: "",
     experiencia_anos: "0",
     slot_minutos: "50",
+    graduacao: "",
+    instituicao: "",
+    cursos: "",
     formacao: "",
+
     especializacoes: "",
     areas: "",
     idiomas: "",
