@@ -41,6 +41,26 @@ export const LABEL_PROFISSAO: Record<string, string> = {
   psiquiatra: "Psiquiatra",
 };
 
+const SUBTIPOS_TOC = [
+  "Contaminação e limpeza",
+  "Dúvida e checagem",
+  "Simetria, ordem e exatidão",
+  "Pensamentos intrusivos de agressão",
+  "Pensamentos intrusivos sexuais",
+  "Pensamentos intrusivos religiosos ou escrupulosidade",
+  "TOC de relacionamento",
+  "TOC de orientação sexual",
+  "TOC somático ou sensório-motor",
+  "TOC existencial",
+  "Medo de perder o controle",
+  "Responsabilidade excessiva e medo de causar dano",
+  "Acumulação relacionada ao TOC",
+  "Rituais mentais e ruminação",
+  "Repetição, contagem e necessidade de completude",
+  "Busca de certeza e pedidos de garantia",
+  "TOC predominantemente obsessivo",
+];
+
 function Busca() {
   const { profissionais } = Route.useLoaderData();
   const [profissao, setProfissao] = useState(TODOS);
@@ -50,7 +70,7 @@ function Busca() {
   const [genero, setGenero] = useState(TODOS);
 
   const areas = useMemo(
-    () => [TODOS, ...new Set(profissionais.flatMap((p) => p.areas))],
+    () => [TODOS, ...new Set([...SUBTIPOS_TOC, ...profissionais.flatMap((p) => p.areas)])],
     [profissionais],
   );
   const abordagens = useMemo(

@@ -46,6 +46,26 @@ const TIPOS_DOCUMENTO = [
   "Comprovante de endereço",
 ];
 
+const SUBTIPOS_TOC = [
+  "Contaminação e limpeza",
+  "Dúvida e checagem",
+  "Simetria, ordem e exatidão",
+  "Pensamentos intrusivos de agressão",
+  "Pensamentos intrusivos sexuais",
+  "Pensamentos intrusivos religiosos ou escrupulosidade",
+  "TOC de relacionamento",
+  "TOC de orientação sexual",
+  "TOC somático ou sensório-motor",
+  "TOC existencial",
+  "Medo de perder o controle",
+  "Responsabilidade excessiva e medo de causar dano",
+  "Acumulação relacionada ao TOC",
+  "Rituais mentais e ruminação",
+  "Repetição, contagem e necessidade de completude",
+  "Busca de certeza e pedidos de garantia",
+  "TOC predominantemente obsessivo",
+];
+
 const rotuloDoc: Record<string, string> = {
   enviado: "Em análise",
   aprovado: "Aprovado",
@@ -212,6 +232,17 @@ function CadastroProfissional() {
 
   const temCadastro = Boolean(dados.data?.profissional);
   const documentos = dados.data?.documentos ?? [];
+  const areasSelecionadas = form.areas
+    .split(",")
+    .map((area) => area.trim())
+    .filter(Boolean);
+
+  function alternarArea(area: string) {
+    const proximaLista = areasSelecionadas.includes(area)
+      ? areasSelecionadas.filter((item) => item !== area)
+      : [...areasSelecionadas, area];
+    setForm({ ...form, areas: proximaLista.join(", ") });
+  }
 
   return (
     <div className="container-page py-12 lg:py-16">
@@ -353,12 +384,30 @@ function CadastroProfissional() {
           onChange={(v) => setForm({ ...form, especializacoes: v })}
           className="sm:col-span-2"
         />
-        <Campo
-          label="Áreas de atuação (separe por vírgula)"
-          value={form.areas}
-          onChange={(v) => setForm({ ...form, areas: v })}
-          className="sm:col-span-2"
-        />
+        <fieldset className="sm:col-span-2">
+          <legend className="section-label">Áreas de atuação em TOC</legend>
+          <p className="mt-2 text-sm text-muted-foreground">Selecione todos os subtipos que você atende.</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {SUBTIPOS_TOC.map((subtipo) => (
+              <label key={subtipo} className="flex items-start gap-3 rounded-lg border border-border p-3 text-sm">
+                <input
+                  type="checkbox"
+                  checked={areasSelecionadas.includes(subtipo)}
+                  onChange={() => alternarArea(subtipo)}
+                  className="mt-0.5 size-4 accent-primary"
+                />
+                <span>{subtipo}</span>
+              </label>
+            ))}
+          </div>
+          <label htmlFor="outras-areas" className="section-label mt-5 block">Outras áreas, separadas por vírgula</label>
+          <input
+            id="outras-areas"
+            className="field-base mt-2"
+            value={form.areas}
+            onChange={(e) => setForm({ ...form, areas: e.target.value })}
+          />
+        </fieldset>
         <Campo
           label="Idiomas (separe por vírgula)"
           value={form.idiomas}

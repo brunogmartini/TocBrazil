@@ -102,7 +102,7 @@ function Artigo() {
             Conheça profissionais de Psicologia e Psiquiatria com atendimento online.
           </p>
           <Link to="/profissionais" className="btn-base btn-primary mt-6">
-            Encontrar um profissional
+            Ver profissionais
           </Link>
         </div>
       </article>

@@ -62,7 +62,7 @@ function EntendaOToc() {
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link to="/profissionais" className="btn-base btn-ghost">
-            Encontrar profissional com experiência em TOC
+            Ver profissionais
           </Link>
         </div>
       </section>
@@ -97,7 +97,7 @@ function EntendaOToc() {
             Conheça profissionais de Psicologia e Psiquiatria com atendimento online.
           </p>
           <Link to="/profissionais" className="btn-base btn-primary mt-8">
-            Encontrar profissional com experiência em TOC
+            Ver profissionais
           </Link>
         </div>
       </section>
