@@ -47,7 +47,8 @@ function clientePublico() {
 }
 
 const CAMPOS =
-  "id, slug, nome, profissao, registro, uf, foto_url, abordagem, apresentacao, experiencia_toc, experiencia_anos, formacao, especializacoes, areas, idiomas, genero, slot_minutos";
+  "id, slug, nome, profissao, registro, uf, cidade, foto_url, abordagem, apresentacao, experiencia_toc, experiencia_anos, graduacao, instituicao, cursos, formacao, especializacoes, areas, idiomas, genero, slot_minutos";
+
 
 export const listarProfissionais = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await clientePublico()
