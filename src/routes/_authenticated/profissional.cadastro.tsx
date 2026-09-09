@@ -232,6 +232,17 @@ function CadastroProfissional() {
 
   const temCadastro = Boolean(dados.data?.profissional);
   const documentos = dados.data?.documentos ?? [];
+  const areasSelecionadas = form.areas
+    .split(",")
+    .map((area) => area.trim())
+    .filter(Boolean);
+
+  function alternarArea(area: string) {
+    const proximaLista = areasSelecionadas.includes(area)
+      ? areasSelecionadas.filter((item) => item !== area)
+      : [...areasSelecionadas, area];
+    setForm({ ...form, areas: proximaLista.join(", ") });
+  }
 
   return (
     <div className="container-page py-12 lg:py-16">
@@ -373,18 +384,30 @@ function CadastroProfissional() {
           onChange={(v) => setForm({ ...form, especializacoes: v })}
           className="sm:col-span-2"
         />
-        <Campo
-          label="Áreas de atuação (separe por vírgula)"
-          value={form.areas}
-          onChange={(v) => setForm({ ...form, areas: v })}
-          className="sm:col-span-2"
-          list="subtipos-toc"
-        />
-        <datalist id="subtipos-toc">
-          {SUBTIPOS_TOC.map((subtipo) => (
-            <option key={subtipo} value={subtipo} />
-          ))}
-        </datalist>
+        <fieldset className="sm:col-span-2">
+          <legend className="section-label">Áreas de atuação em TOC</legend>
+          <p className="mt-2 text-sm text-muted-foreground">Selecione todos os subtipos que você atende.</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {SUBTIPOS_TOC.map((subtipo) => (
+              <label key={subtipo} className="flex items-start gap-3 rounded-lg border border-border p-3 text-sm">
+                <input
+                  type="checkbox"
+                  checked={areasSelecionadas.includes(subtipo)}
+                  onChange={() => alternarArea(subtipo)}
+                  className="mt-0.5 size-4 accent-primary"
+                />
+                <span>{subtipo}</span>
+              </label>
+            ))}
+          </div>
+          <label htmlFor="outras-areas" className="section-label mt-5 block">Outras áreas, separadas por vírgula</label>
+          <input
+            id="outras-areas"
+            className="field-base mt-2"
+            value={form.areas}
+            onChange={(e) => setForm({ ...form, areas: e.target.value })}
+          />
+        </fieldset>
         <Campo
           label="Idiomas (separe por vírgula)"
           value={form.idiomas}
@@ -629,7 +652,6 @@ function Campo({
   type = "text",
   className = "",
   required = false,
-  list,
 }: {
   label: string;
   value: string;
@@ -637,7 +659,6 @@ function Campo({
   type?: string;
   className?: string;
   required?: boolean;
-  list?: string;
 }) {
   const id = label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   return (
@@ -648,7 +669,6 @@ function Campo({
       <input
         id={id}
         type={type}
-        list={list}
         required={required}
         className="field-base mt-2"
         value={value}

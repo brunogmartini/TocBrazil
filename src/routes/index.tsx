@@ -142,7 +142,7 @@ function Home() {
         <div className="container-page grid items-center gap-12 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
           <div className="rise-in">
             <span className="pill">Plataforma de acompanhamento especializado</span>
-            <h1 className="mt-6 text-[2.1rem] leading-[1.1] sm:text-4xl lg:whitespace-nowrap lg:text-[2.15rem] xl:text-[2.55rem]">
+            <h1 className="mt-6 text-[2.1rem] leading-[1.1] sm:text-4xl lg:text-[2.15rem] xl:text-[2.55rem]">
               Conectando você aos melhores profissionais com experiência em TOC
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
@@ -253,7 +253,7 @@ function Home() {
           </ul>
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <Link to="/profissionais" className="btn-base btn-primary">
+            <Link to="/profissionais" className="font-semibold text-primary underline underline-offset-4">
               Ver profissionais
             </Link>
             <Link to="/entenda-o-toc" className="btn-base btn-ghost">
@@ -337,9 +337,6 @@ function Home() {
           ))}
         </ol>
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <Link to="/profissionais" className="btn-base btn-primary">
-            Começar agora
-          </Link>
           <Link to="/como-funciona" className="btn-base btn-ghost">
             Ver detalhes de cada etapa
           </Link>

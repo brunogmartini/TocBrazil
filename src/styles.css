@@ -167,6 +167,7 @@
     font-family: var(--font-display);
     font-weight: 400;
     letter-spacing: -0.015em;
+    text-wrap: balance;
   }
 
   :focus-visible {
