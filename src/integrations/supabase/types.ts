@@ -519,6 +519,7 @@ export type Database = {
           cidade: string | null
           comissao_percent: number
           created_at: string
+          cursos: string[]
           destaque: string | null
           email_contato: string | null
           especializacoes: string[]
@@ -527,11 +528,14 @@ export type Database = {
           formacao: string[]
           foto_url: string | null
           genero: string | null
+          graduacao: string | null
           id: string
           idiomas: string[]
+          instituicao: string | null
           mp_user_id: string | null
           mp_vinculado_em: string | null
           nome: string
+          observacao_admin: string | null
           profissao: Database["public"]["Enums"]["profissao"]
           registro: string
           slot_minutos: number
@@ -541,6 +545,8 @@ export type Database = {
           uf: string
           updated_at: string
           user_id: string | null
+          validado_em: string | null
+          validado_por: string | null
           valor_centavos: number
         }
         Insert: {
@@ -550,6 +556,7 @@ export type Database = {
           cidade?: string | null
           comissao_percent?: number
           created_at?: string
+          cursos?: string[]
           destaque?: string | null
           email_contato?: string | null
           especializacoes?: string[]
@@ -558,11 +565,14 @@ export type Database = {
           formacao?: string[]
           foto_url?: string | null
           genero?: string | null
+          graduacao?: string | null
           id?: string
           idiomas?: string[]
+          instituicao?: string | null
           mp_user_id?: string | null
           mp_vinculado_em?: string | null
           nome: string
+          observacao_admin?: string | null
           profissao: Database["public"]["Enums"]["profissao"]
           registro: string
           slot_minutos?: number
@@ -572,6 +582,8 @@ export type Database = {
           uf: string
           updated_at?: string
           user_id?: string | null
+          validado_em?: string | null
+          validado_por?: string | null
           valor_centavos?: number
         }
         Update: {
@@ -581,6 +593,7 @@ export type Database = {
           cidade?: string | null
           comissao_percent?: number
           created_at?: string
+          cursos?: string[]
           destaque?: string | null
           email_contato?: string | null
           especializacoes?: string[]
@@ -589,11 +602,14 @@ export type Database = {
           formacao?: string[]
           foto_url?: string | null
           genero?: string | null
+          graduacao?: string | null
           id?: string
           idiomas?: string[]
+          instituicao?: string | null
           mp_user_id?: string | null
           mp_vinculado_em?: string | null
           nome?: string
+          observacao_admin?: string | null
           profissao?: Database["public"]["Enums"]["profissao"]
           registro?: string
           slot_minutos?: number
@@ -603,6 +619,8 @@ export type Database = {
           uf?: string
           updated_at?: string
           user_id?: string | null
+          validado_em?: string | null
+          validado_por?: string | null
           valor_centavos?: number
         }
         Relationships: []
@@ -705,7 +723,7 @@ export type Database = {
         | "estornado"
         | "cancelado"
       payout_status: "pendente" | "processando" | "pago" | "falhou"
-      prof_status: "pendente" | "aprovado" | "suspenso"
+      prof_status: "pendente" | "aprovado" | "suspenso" | "rejeitado"
       profissao: "psicologo" | "psiquiatra"
     }
     CompositeTypes: {
@@ -852,7 +870,7 @@ export const Constants = {
         "cancelado",
       ],
       payout_status: ["pendente", "processando", "pago", "falhou"],
-      prof_status: ["pendente", "aprovado", "suspenso"],
+      prof_status: ["pendente", "aprovado", "suspenso", "rejeitado"],
       profissao: ["psicologo", "psiquiatra"],
     },
   },
