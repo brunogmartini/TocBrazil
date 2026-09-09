@@ -14,10 +14,10 @@ const colunas = [
   {
     titulo: "Profissionais",
     links: [
-      { to: "/seja-parceiro", label: "Quero ser um parceiro" },
+      { to: "/cadastro-profissional", label: "Quero fazer parte" },
       { to: "/para-psicologos", label: "Sou psicólogo" },
       { to: "/para-psiquiatras", label: "Sou psiquiatra" },
-      { to: "/cadastro-profissional", label: "Cadastro" },
+      { to: "/profissional", label: "Área do profissional" },
       { to: "/auth", label: "Entrar" },
     ],
   },
@@ -55,11 +55,10 @@ export function SiteFooter() {
               className="h-16 w-auto rounded-sm"
             />
           </div>
-          <p className="mt-4 font-display text-base">Plataforma de acompanhamento especializado.</p>
+          <p className="mt-4 font-display text-base">Plataforma especializada em TOC.</p>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-            Plataforma especializada em TOC que reúne informação confiável e acesso a
-            profissionais de Psicologia e Psiquiatria. O atendimento é de responsabilidade do
-            profissional habilitado.
+            Conhecimento, metodologia e profissionais selecionados em uma jornada estruturada de
+            cuidado relacionado ao TOC.
           </p>
         </div>
 
@@ -69,10 +68,7 @@ export function SiteFooter() {
             <ul className="mt-4 space-y-3">
               {coluna.links.map((link) => (
                 <li key={link.to + link.label}>
-                  <Link
-                    to={link.to}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
+                  <Link to={link.to} className="text-muted-foreground hover:text-foreground">
                     {link.label}
                   </Link>
                 </li>
@@ -83,9 +79,12 @@ export function SiteFooter() {
       </div>
 
       <div className="container-page border-t border-border py-6 text-xs leading-relaxed text-muted-foreground">
-        © {new Date().getFullYear()} TOC Brazil. Esta plataforma é infraestrutura tecnológica: não
-        realiza diagnósticos, não prescreve medicamentos e não promete resultados. Conteúdo
-        educativo não substitui avaliação profissional.
+        <p>
+          Esta plataforma é uma infraestrutura tecnológica e não realiza diagnósticos, não prescreve
+          medicamentos e não promete resultados. Conteúdo educativo não substitui avaliação
+          profissional. O atendimento é de responsabilidade do profissional habilitado.
+        </p>
+        <p className="mt-2">© {new Date().getFullYear()} TOC Brazil.</p>
       </div>
     </footer>
   );

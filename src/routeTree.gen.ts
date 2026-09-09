@@ -16,7 +16,6 @@ import { Route as CadastroProfissionalRouteImport } from './routes/cadastro-prof
 import { Route as ComoFuncionaRouteImport } from './routes/como-funciona'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as EntendaOTocRouteImport } from './routes/entenda-o-toc'
-import { Route as MatchingRouteImport } from './routes/matching'
 import { Route as MeuCuidadoRouteImport } from './routes/meu-cuidado'
 import { Route as ParaPsicologosRouteImport } from './routes/para-psicologos'
 import { Route as ParaPsiquiatrasRouteImport } from './routes/para-psiquiatras'
@@ -32,8 +31,6 @@ import { Route as ConteudosIndexRouteImport } from './routes/conteudos.index'
 import { Route as ConteudosSlugRouteImport } from './routes/conteudos.$slug'
 import { Route as ProfissionaisIndexRouteImport } from './routes/profissionais.index'
 import { Route as ProfissionaisSlugRouteImport } from './routes/profissionais.$slug'
-import { Route as PsicologosIndexRouteImport } from './routes/psicologos.index'
-import { Route as PsicologosSlugRouteImport } from './routes/psicologos.$slug'
 import { Route as AuthenticatedAgendarSlugRouteImport } from './routes/_authenticated/agendar.$slug'
 import { Route as AuthenticatedProfissionalIndexRouteImport } from './routes/_authenticated/profissional.index'
 import { Route as AuthenticatedProfissionalAgendaRouteImport } from './routes/_authenticated/profissional.agenda'
@@ -73,11 +70,6 @@ const CookiesRoute = CookiesRouteImport.update({
 const EntendaOTocRoute = EntendaOTocRouteImport.update({
   id: '/entenda-o-toc',
   path: '/entenda-o-toc',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MatchingRoute = MatchingRouteImport.update({
-  id: '/matching',
-  path: '/matching',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MeuCuidadoRoute = MeuCuidadoRouteImport.update({
@@ -155,16 +147,6 @@ const ProfissionaisSlugRoute = ProfissionaisSlugRouteImport.update({
   path: '/profissionais/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PsicologosIndexRoute = PsicologosIndexRouteImport.update({
-  id: '/psicologos/',
-  path: '/psicologos/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PsicologosSlugRoute = PsicologosSlugRouteImport.update({
-  id: '/psicologos/$slug',
-  path: '/psicologos/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedAgendarSlugRoute =
   AuthenticatedAgendarSlugRouteImport.update({
     id: '/agendar/$slug',
@@ -209,7 +191,6 @@ export interface FileRoutesByFullPath {
   '/como-funciona': typeof ComoFuncionaRoute
   '/cookies': typeof CookiesRoute
   '/entenda-o-toc': typeof EntendaOTocRoute
-  '/matching': typeof MatchingRoute
   '/meu-cuidado': typeof MeuCuidadoRoute
   '/para-psicologos': typeof ParaPsicologosRoute
   '/para-psiquiatras': typeof ParaPsiquiatrasRoute
@@ -223,10 +204,8 @@ export interface FileRoutesByFullPath {
   '/painel': typeof AuthenticatedPainelRoute
   '/conteudos/$slug': typeof ConteudosSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
-  '/psicologos/$slug': typeof PsicologosSlugRoute
   '/conteudos/': typeof ConteudosIndexRoute
   '/profissionais/': typeof ProfissionaisIndexRoute
-  '/psicologos/': typeof PsicologosIndexRoute
   '/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
   '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
@@ -241,7 +220,6 @@ export interface FileRoutesByTo {
   '/como-funciona': typeof ComoFuncionaRoute
   '/cookies': typeof CookiesRoute
   '/entenda-o-toc': typeof EntendaOTocRoute
-  '/matching': typeof MatchingRoute
   '/meu-cuidado': typeof MeuCuidadoRoute
   '/para-psicologos': typeof ParaPsicologosRoute
   '/para-psiquiatras': typeof ParaPsiquiatrasRoute
@@ -255,10 +233,8 @@ export interface FileRoutesByTo {
   '/painel': typeof AuthenticatedPainelRoute
   '/conteudos/$slug': typeof ConteudosSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
-  '/psicologos/$slug': typeof PsicologosSlugRoute
   '/conteudos': typeof ConteudosIndexRoute
   '/profissionais': typeof ProfissionaisIndexRoute
-  '/psicologos': typeof PsicologosIndexRoute
   '/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
   '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
@@ -275,7 +251,6 @@ export interface FileRoutesById {
   '/como-funciona': typeof ComoFuncionaRoute
   '/cookies': typeof CookiesRoute
   '/entenda-o-toc': typeof EntendaOTocRoute
-  '/matching': typeof MatchingRoute
   '/meu-cuidado': typeof MeuCuidadoRoute
   '/para-psicologos': typeof ParaPsicologosRoute
   '/para-psiquiatras': typeof ParaPsiquiatrasRoute
@@ -289,10 +264,8 @@ export interface FileRoutesById {
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/conteudos/$slug': typeof ConteudosSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
-  '/psicologos/$slug': typeof PsicologosSlugRoute
   '/conteudos/': typeof ConteudosIndexRoute
   '/profissionais/': typeof ProfissionaisIndexRoute
-  '/psicologos/': typeof PsicologosIndexRoute
   '/_authenticated/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
   '/_authenticated/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/_authenticated/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
@@ -309,7 +282,6 @@ export interface FileRouteTypes {
     | '/como-funciona'
     | '/cookies'
     | '/entenda-o-toc'
-    | '/matching'
     | '/meu-cuidado'
     | '/para-psicologos'
     | '/para-psiquiatras'
@@ -323,10 +295,8 @@ export interface FileRouteTypes {
     | '/painel'
     | '/conteudos/$slug'
     | '/profissionais/$slug'
-    | '/psicologos/$slug'
     | '/conteudos/'
     | '/profissionais/'
-    | '/psicologos/'
     | '/agendar/$slug'
     | '/profissional/agenda'
     | '/profissional/cadastro'
@@ -341,7 +311,6 @@ export interface FileRouteTypes {
     | '/como-funciona'
     | '/cookies'
     | '/entenda-o-toc'
-    | '/matching'
     | '/meu-cuidado'
     | '/para-psicologos'
     | '/para-psiquiatras'
@@ -355,10 +324,8 @@ export interface FileRouteTypes {
     | '/painel'
     | '/conteudos/$slug'
     | '/profissionais/$slug'
-    | '/psicologos/$slug'
     | '/conteudos'
     | '/profissionais'
-    | '/psicologos'
     | '/agendar/$slug'
     | '/profissional/agenda'
     | '/profissional/cadastro'
@@ -374,7 +341,6 @@ export interface FileRouteTypes {
     | '/como-funciona'
     | '/cookies'
     | '/entenda-o-toc'
-    | '/matching'
     | '/meu-cuidado'
     | '/para-psicologos'
     | '/para-psiquiatras'
@@ -388,10 +354,8 @@ export interface FileRouteTypes {
     | '/_authenticated/painel'
     | '/conteudos/$slug'
     | '/profissionais/$slug'
-    | '/psicologos/$slug'
     | '/conteudos/'
     | '/profissionais/'
-    | '/psicologos/'
     | '/_authenticated/agendar/$slug'
     | '/_authenticated/profissional/agenda'
     | '/_authenticated/profissional/cadastro'
@@ -408,7 +372,6 @@ export interface RootRouteChildren {
   ComoFuncionaRoute: typeof ComoFuncionaRoute
   CookiesRoute: typeof CookiesRoute
   EntendaOTocRoute: typeof EntendaOTocRoute
-  MatchingRoute: typeof MatchingRoute
   MeuCuidadoRoute: typeof MeuCuidadoRoute
   ParaPsicologosRoute: typeof ParaPsicologosRoute
   ParaPsiquiatrasRoute: typeof ParaPsiquiatrasRoute
@@ -420,10 +383,8 @@ export interface RootRouteChildren {
   TocRoute: typeof TocRoute
   ConteudosSlugRoute: typeof ConteudosSlugRoute
   ProfissionaisSlugRoute: typeof ProfissionaisSlugRoute
-  PsicologosSlugRoute: typeof PsicologosSlugRoute
   ConteudosIndexRoute: typeof ConteudosIndexRoute
   ProfissionaisIndexRoute: typeof ProfissionaisIndexRoute
-  PsicologosIndexRoute: typeof PsicologosIndexRoute
   ApiPublicMercadopagoVinculoRoute: typeof ApiPublicMercadopagoVinculoRoute
   ApiPublicWebhooksMercadopagoRoute: typeof ApiPublicWebhooksMercadopagoRoute
 }
@@ -477,13 +438,6 @@ declare module '@tanstack/react-router' {
       path: '/entenda-o-toc'
       fullPath: '/entenda-o-toc'
       preLoaderRoute: typeof EntendaOTocRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/matching': {
-      id: '/matching'
-      path: '/matching'
-      fullPath: '/matching'
-      preLoaderRoute: typeof MatchingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/meu-cuidado': {
@@ -591,20 +545,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfissionaisSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/psicologos/': {
-      id: '/psicologos/'
-      path: '/psicologos'
-      fullPath: '/psicologos/'
-      preLoaderRoute: typeof PsicologosIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/psicologos/$slug': {
-      id: '/psicologos/$slug'
-      path: '/psicologos/$slug'
-      fullPath: '/psicologos/$slug'
-      preLoaderRoute: typeof PsicologosSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/agendar/$slug': {
       id: '/_authenticated/agendar/$slug'
       path: '/agendar/$slug'
@@ -680,7 +620,6 @@ const rootRouteChildren: RootRouteChildren = {
   ComoFuncionaRoute: ComoFuncionaRoute,
   CookiesRoute: CookiesRoute,
   EntendaOTocRoute: EntendaOTocRoute,
-  MatchingRoute: MatchingRoute,
   MeuCuidadoRoute: MeuCuidadoRoute,
   ParaPsicologosRoute: ParaPsicologosRoute,
   ParaPsiquiatrasRoute: ParaPsiquiatrasRoute,
@@ -692,10 +631,8 @@ const rootRouteChildren: RootRouteChildren = {
   TocRoute: TocRoute,
   ConteudosSlugRoute: ConteudosSlugRoute,
   ProfissionaisSlugRoute: ProfissionaisSlugRoute,
-  PsicologosSlugRoute: PsicologosSlugRoute,
   ConteudosIndexRoute: ConteudosIndexRoute,
   ProfissionaisIndexRoute: ProfissionaisIndexRoute,
-  PsicologosIndexRoute: PsicologosIndexRoute,
   ApiPublicMercadopagoVinculoRoute: ApiPublicMercadopagoVinculoRoute,
   ApiPublicWebhooksMercadopagoRoute: ApiPublicWebhooksMercadopagoRoute,
 }

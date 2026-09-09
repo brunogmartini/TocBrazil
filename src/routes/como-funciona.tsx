@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/como-funciona")({
   head: () => ({
     meta: [
-      { title: "Como funciona a plataforma de consultas em TOC | TOC Brazil" },
+      { title: "Nossa metodologia especializada em TOC | TOC Brazil" },
       {
         name: "description",
         content:
           "Conheça as etapas para entender o transtorno, encontrar o profissional ideal, agendar a sessão e realizar a consulta online.",
       },
-      { property: "og:title", content: "Como funciona a Plataforma — TOC Brazil" },
+      { property: "og:title", content: "Nossa metodologia — TOC Brazil" },
       {
         property: "og:description",
         content:
@@ -67,10 +67,14 @@ function ComoFunciona() {
     <>
       <section className="container-page py-14 lg:py-20">
         <span className="section-label">Nossa metodologia</span>
-        <h1 className="mt-4 text-3xl leading-tight sm:text-5xl lg:whitespace-nowrap">
-          Como funciona a Plataforma
-        </h1>
+        <h1 className="mt-4 text-3xl leading-tight sm:text-5xl">Nossa metodologia</h1>
+        <p className="mt-6 max-w-3xl text-lg leading-relaxed text-muted-foreground">
+          Não somos apenas uma plataforma de consultas online. Somos uma plataforma especializada em
+          TOC, que reúne conhecimento, metodologia e profissionais selecionados em uma jornada
+          estruturada de cuidado.
+        </p>
       </section>
+
 
       <section className="border-y border-border bg-surface">
         <div className="container-page py-14 lg:py-20">

@@ -35,9 +35,13 @@ export type CadastroProfissionalEntrada = {
   experiencia_toc?: string;
   experiencia_anos?: number;
   slot_minutos?: number;
+  graduacao?: string;
+  instituicao?: string;
+  cursos?: string[] | string;
   formacao?: string[] | string;
   especializacoes?: string[] | string;
   areas?: string[] | string;
+
   idiomas?: string[] | string;
 };
 
@@ -125,8 +129,12 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       slot_minutos: [30, 40, 50, 60].includes(Number(data.slot_minutos))
         ? Number(data.slot_minutos)
         : 50,
+      graduacao: String(data.graduacao ?? "").trim().slice(0, 160) || null,
+      instituicao: String(data.instituicao ?? "").trim().slice(0, 160) || null,
+      cursos: lista(data.cursos),
       formacao: lista(data.formacao),
       especializacoes: lista(data.especializacoes),
+
       areas: lista(data.areas),
       idiomas: lista(data.idiomas),
     };

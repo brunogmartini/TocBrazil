@@ -105,7 +105,11 @@ function CadastroProfissional() {
     experiencia_toc: "",
     experiencia_anos: "0",
     slot_minutos: "50",
+    graduacao: "",
+    instituicao: "",
+    cursos: "",
     formacao: "",
+
     especializacoes: "",
     areas: "",
     idiomas: "",
@@ -141,7 +145,11 @@ function CadastroProfissional() {
         experiencia_toc: p.experiencia_toc ?? "",
         experiencia_anos: String(p.experiencia_anos ?? 0),
         slot_minutos: String(p.slot_minutos ?? 50),
+        graduacao: p.graduacao ?? "",
+        instituicao: p.instituicao ?? "",
+        cursos: (p.cursos ?? []).join(", "),
         formacao: (p.formacao ?? []).join(", "),
+
         especializacoes: (p.especializacoes ?? []).join(", "),
         areas: (p.areas ?? []).join(", "),
         idiomas: (p.idiomas ?? []).join(", "),
@@ -253,8 +261,29 @@ function CadastroProfissional() {
         verificação e ficam visíveis somente para você e para a equipe da plataforma.
       </p>
 
+      {dados.data?.profissional && (
+        <div className="card-soft mt-6 p-5">
+          <p className="section-label">Situação do seu cadastro</p>
+          <p className="mt-2 text-sm font-semibold">
+            {dados.data.profissional.status === "aprovado"
+              ? "Aprovado — seu perfil está publicado na página pública de profissionais."
+              : dados.data.profissional.status === "rejeitado"
+                ? "Cadastro rejeitado. Veja a observação da equipe, ajuste os dados e salve novamente."
+                : dados.data.profissional.status === "suspenso"
+                  ? "Perfil suspenso temporariamente. Fale com a equipe da plataforma."
+                  : "Recebemos seu cadastro. Ele está aguardando a validação da equipe e o perfil ainda não aparece publicamente."}
+          </p>
+          {dados.data.profissional.observacao_admin && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              Observação da equipe: {dados.data.profissional.observacao_admin}
+            </p>
+          )}
+        </div>
+      )}
+
       {aviso && <p className="mt-6 text-sm font-semibold">{aviso}</p>}
       {erro && <p className="mt-6 text-sm font-semibold text-destructive">{erro}</p>}
+
 
       <form onSubmit={enviarCadastro} className="card-soft mt-8 grid gap-5 p-7 sm:grid-cols-2">
         <Campo
@@ -373,11 +402,28 @@ function CadastroProfissional() {
           className="sm:col-span-2"
         />
         <Campo
+          label="Graduação"
+          value={form.graduacao}
+          onChange={(v) => setForm({ ...form, graduacao: v })}
+        />
+        <Campo
+          label="Instituição de graduação"
+          value={form.instituicao}
+          onChange={(v) => setForm({ ...form, instituicao: v })}
+        />
+        <Campo
           label="Formação (separe por vírgula)"
           value={form.formacao}
           onChange={(v) => setForm({ ...form, formacao: v })}
           className="sm:col-span-2"
         />
+        <Campo
+          label="Cursos relevantes (separe por vírgula)"
+          value={form.cursos}
+          onChange={(v) => setForm({ ...form, cursos: v })}
+          className="sm:col-span-2"
+        />
+
         <Campo
           label="Especializações (separe por vírgula)"
           value={form.especializacoes}
