@@ -35,9 +35,13 @@ export type CadastroProfissionalEntrada = {
   experiencia_toc?: string;
   experiencia_anos?: number;
   slot_minutos?: number;
+  graduacao?: string;
+  instituicao?: string;
+  cursos?: string[] | string;
   formacao?: string[] | string;
   especializacoes?: string[] | string;
   areas?: string[] | string;
+
   idiomas?: string[] | string;
 };
 
