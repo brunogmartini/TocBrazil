@@ -5,7 +5,11 @@ import { lovable } from "@/integrations/lovable/index";
 
 type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
 
-type BuscaAuth = { redirect?: string; modo: Modo; perfil?: "profissional" };
+type BuscaAuth = {
+  redirect?: string | undefined;
+  modo: Modo;
+  perfil?: "profissional" | undefined;
+};
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
