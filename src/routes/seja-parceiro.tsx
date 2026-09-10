@@ -15,6 +15,8 @@ export const Route = createFileRoute("/seja-parceiro")({
         content:
           "Faça parte de uma rede especializada em TOC: perfil verificado, agenda organizada e atendimento online sem links externos.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "/seja-parceiro" },
     ],
     links: [{ rel: "canonical", href: "/seja-parceiro" }],

@@ -15,6 +15,8 @@ export const Route = createFileRoute("/para-psiquiatras")({
         content:
           "Faça parte de uma rede especializada em TOC, com agenda, pagamentos e teleconsulta integrados.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "/para-psiquiatras" },
     ],
     links: [{ rel: "canonical", href: "/para-psiquiatras" }],

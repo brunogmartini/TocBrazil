@@ -15,7 +15,8 @@ export const Route = createFileRoute("/como-funciona")({
         content:
           "Quatro etapas: entenda o transtorno, encontre o profissional ideal, agende a sessão e realize sua consulta online.",
       },
-
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "/como-funciona" },
     ],
     links: [{ rel: "canonical", href: "/como-funciona" }],

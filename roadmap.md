@@ -20,6 +20,7 @@
 - [x] Atualização automática da agenda e do financeiro profissional
 - [x] Líquido profissional de 80% nas novas consultas e repasses
 - [x] Validar links exclusivos de videochamada, calendário e anotações por consulta
+- [x] Atualizar subtipos de TOC, idiomas, abordagem TCC, conteúdo educativo e paleta azul
 
 ## Próximas etapas
 - [x] Diferenciar os acessos de entrar/criar conta e as áreas de paciente/profissional

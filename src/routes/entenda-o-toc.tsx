@@ -17,6 +17,8 @@ export const Route = createFileRoute("/entenda-o-toc")({
         content:
           "Conteúdo educativo sobre obsessões, compulsões, checagem e tratamento — sem diagnóstico e sem promessas.",
       },
+      { property: "og:type", content: "article" },
+      { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "/entenda-o-toc" },
     ],
     links: [{ rel: "canonical", href: "/entenda-o-toc" }],

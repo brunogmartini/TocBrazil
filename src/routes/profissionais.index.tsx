@@ -64,8 +64,8 @@ function Busca() {
   const [genero, setGenero] = useState(TODOS);
 
   const areas = useMemo(
-    () => [TODOS, ...new Set([...SUBTIPOS_TOC, ...profissionais.flatMap((p) => p.areas)])],
-    [profissionais],
+    () => [TODOS, ...SUBTIPOS_TOC],
+    [],
   );
   const abordagens = useMemo(
     () => [
@@ -79,8 +79,8 @@ function Busca() {
     [profissionais],
   );
   const idiomas = useMemo(
-    () => [TODOS, ...new Set(["Português", "Espanhol", "Inglês", ...profissionais.flatMap((p) => p.idiomas)])],
-    [profissionais],
+    () => [TODOS, "Português", "Espanhol", "Inglês"],
+    [],
   );
 
   const resultados = useMemo(

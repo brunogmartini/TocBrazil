@@ -16,6 +16,8 @@ export const Route = createFileRoute("/para-psicologos")({
         content:
           "Perfil verificado, agenda própria, checkout para o paciente e painel financeiro com repasses e comprovantes.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "/para-psicologos" },
     ],
     links: [{ rel: "canonical", href: "/para-psicologos" }],

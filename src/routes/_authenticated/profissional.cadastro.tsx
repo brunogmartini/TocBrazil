@@ -148,7 +148,7 @@ function CadastroProfissional() {
         formacao: (p.formacao ?? []).join(", "),
 
         especializacoes: (p.especializacoes ?? []).join(", "),
-        areas: (p.areas ?? []).join(", "),
+        areas: (p.areas ?? []).filter((area) => SUBTIPOS_TOC.includes(area)).join(", "),
         idiomas: (p.idiomas ?? []).join(", "),
       });
     } else if (dados.data?.email) {
