@@ -16,12 +16,16 @@
 - [x] Avaliação do profissional pelo paciente (até 5 estrelas) exibida no perfil
 - [x] Calendário de consultas e link de videochamada na área do paciente
 - [x] Pagamento com Mercado Pago (Checkout Pro) + confirmação automática por webhook
+- [ ] Aba "Pagamentos aos profissionais" com valores a receber e histórico separado
+- [ ] Atualização automática da agenda e do financeiro profissional
+- [ ] Líquido profissional de 80% nas novas consultas e repasses
+- [ ] Validar links exclusivos de videochamada, calendário e anotações por consulta
 
 ## Próximas etapas
 - [x] Diferenciar os acessos de entrar/criar conta e as áreas de paciente/profissional
 - [x] Revisar textos, menu do paciente, subtipos de TOC e chamadas repetidas
 - [x] Revisão dos 3 perfis: calendário do paciente, livro Hotmart (50%), taxa de R$ 50 +
-      comissão 25% só após consulta realizada, agenda visual do profissional (mês/semana/dia),
+      comissão só após consulta realizada, agenda visual do profissional (mês/semana/dia),
       ficha sigilosa e anotações, financeiro/extrato, painel do gestor com abas, página
       "Sou profissional" com login visível e recuperação de senha
 - [ ] Link definitivo da Hotmart (aguardando a TOC Brazil) — campo já existe em Configurações
