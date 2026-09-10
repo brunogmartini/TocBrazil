@@ -6,15 +6,20 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   cancelarConsulta,
   meuContexto,
+  meuLivro,
   minhasAvaliacoes,
   minhasConsultas,
   minhasNotificacoes,
+  registrarInteresseLivro,
   salvarAvaliacao,
   salvarPerfil,
 } from "@/lib/plataforma.functions";
-import { CalendarioConsultas } from "@/components/calendario-consultas";
+import { CalendarioConsultas, type ItemCalendario } from "@/components/calendario-consultas";
 import { Estrelas, SeletorEstrelas } from "@/components/estrelas";
+import { Modal } from "@/components/modal";
 import { iniciarPagamento } from "@/lib/pagamento.functions";
+import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
+import { horaDe, rotuloDiaLongo, chaveDia } from "@/lib/agenda-tempo";
 
 export const Route = createFileRoute("/_authenticated/painel")({
   head: () => ({
@@ -32,21 +37,8 @@ export const Route = createFileRoute("/_authenticated/painel")({
 });
 
 function formatarData(iso: string) {
-  return new Date(iso).toLocaleString("pt-BR", {
-    dateStyle: "full",
-    timeStyle: "short",
-    timeZone: "America/Sao_Paulo",
-  });
+  return `${rotuloDiaLongo(chaveDia(iso))}, ${horaDe(iso)}`;
 }
-
-const rotuloStatus: Record<string, string> = {
-  aguardando_pagamento: "Aguardando pagamento",
-  confirmada: "Confirmada",
-  realizada: "Realizada",
-  cancelada: "Cancelada",
-  remarcada: "Remarcada",
-  nao_compareceu: "Não compareceu",
-};
 
 function Painel() {
   const navigate = useNavigate();
@@ -54,6 +46,8 @@ function Painel() {
   const carregarContexto = useServerFn(meuContexto);
   const carregarConsultas = useServerFn(minhasConsultas);
   const carregarNotificacoes = useServerFn(minhasNotificacoes);
+  const carregarLivro = useServerFn(meuLivro);
+  const interesseLivro = useServerFn(registrarInteresseLivro);
   const salvar = useServerFn(salvarPerfil);
   const cancelar = useServerFn(cancelarConsulta);
   const carregarAvaliacoes = useServerFn(minhasAvaliacoes);
@@ -62,27 +56,22 @@ function Painel() {
 
   const contexto = useQuery({ queryKey: ["contexto"], queryFn: () => carregarContexto() });
   const consultas = useQuery({ queryKey: ["consultas"], queryFn: () => carregarConsultas() });
-  const notificacoes = useQuery({
-    queryKey: ["notificacoes"],
-    queryFn: () => carregarNotificacoes(),
-  });
-  const avaliacoes = useQuery({
-    queryKey: ["minhas-avaliacoes"],
-    queryFn: () => carregarAvaliacoes(),
-  });
+  const notificacoes = useQuery({ queryKey: ["notificacoes"], queryFn: () => carregarNotificacoes() });
+  const avaliacoes = useQuery({ queryKey: ["minhas-avaliacoes"], queryFn: () => carregarAvaliacoes() });
+  const livro = useQuery({ queryKey: ["livro"], queryFn: () => carregarLivro() });
 
-  const [nome, setNome] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [salvo, setSalvo] = useState(false);
+  const [editandoPerfil, setEditandoPerfil] = useState(false);
+  const [selecionada, setSelecionada] = useState<string | null>(null);
   const [erroPagamento, setErroPagamento] = useState<string | null>(null);
+  const [aviso, setAviso] = useState<string | null>(null);
 
   useEffect(() => {
-    const perfil = contexto.data?.perfil;
-    if (perfil) {
-      setNome(perfil.nome ?? "");
-      setTelefone(perfil.telefone ?? "");
-    }
-  }, [contexto.data]);
+    const params = new URLSearchParams(window.location.search);
+    const pg = params.get("pagamento");
+    if (pg === "aprovado") setAviso("Pagamento aprovado. Sua consulta está confirmada.");
+    if (pg === "pendente") setAviso("Pagamento em processamento. Avisaremos assim que for confirmado.");
+    if (pg === "recusado") setAviso("O pagamento não foi aprovado. Você pode tentar novamente abaixo.");
+  }, []);
 
   async function sair() {
     await queryClient.cancelQueries();
@@ -91,14 +80,29 @@ function Painel() {
     navigate({ to: "/auth", search: { modo: "entrar" as const, redirect: undefined }, replace: true });
   }
 
-  const perfilIncompleto = !contexto.data?.perfil?.nome;
+  const perfil = contexto.data?.perfil;
+  const perfilIncompleto = contexto.isSuccess && !perfil?.nome;
   const lista = consultas.data?.consultas ?? [];
+  const agora = Date.now();
   const proximas = lista.filter(
-    (c) => new Date(c.inicio) > new Date() && c.status !== "cancelada",
+    (c) => new Date(c.fim).getTime() > agora && c.status !== "cancelada" && c.status !== "realizada",
   );
   const historico = lista.filter(
-    (c) => new Date(c.inicio) <= new Date() || c.status === "cancelada",
+    (c) => new Date(c.fim).getTime() <= agora || c.status === "cancelada" || c.status === "realizada",
   );
+  const itensCalendario: ItemCalendario[] = lista
+    .filter((c) => c.status !== "cancelada")
+    .map((c) => ({
+      id: c.id,
+      inicio: c.inicio,
+      fim: c.fim,
+      titulo: c.professionals?.nome ?? "Consulta",
+      status: c.status,
+      videoUrl: c.video_url,
+    }));
+  const consultaSelecionada = lista.find((c) => c.id === selecionada) ?? null;
+
+  const papeis = contexto.data?.papeis ?? [];
 
   return (
     <div className="container-page py-12 lg:py-16">
@@ -106,16 +110,21 @@ function Painel() {
         <div>
           <span className="section-label">Área do paciente</span>
           <h1 className="mt-3 text-3xl sm:text-4xl">
-            Olá{contexto.data?.perfil?.nome ? `, ${contexto.data.perfil.nome.split(" ")[0]}` : ""}.
+            Olá{perfil?.nome ? `, ${perfil.nome.split(" ")[0]}` : ""}.
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Aqui ficam suas consultas, lembretes e dados de cadastro.
+            Suas consultas, o link da videochamada e seus lembretes ficam aqui.
           </p>
         </div>
-        <div className="flex gap-3">
-          {(contexto.data?.papeis ?? []).includes("admin") && (
+        <div className="flex flex-wrap gap-3">
+          {papeis.includes("admin") && (
             <Link to="/admin" className="btn-base btn-ghost">
-              Painel do administrador
+              Painel do gestor
+            </Link>
+          )}
+          {papeis.includes("profissional") && (
+            <Link to="/profissional" className="btn-base btn-ghost">
+              Consultório digital
             </Link>
           )}
           <Link to="/profissionais" className="btn-base btn-primary">
@@ -127,29 +136,38 @@ function Painel() {
         </div>
       </div>
 
+      {aviso && (
+        <p className="card-soft mt-6 border-primary/40 p-4 text-sm" role="status">
+          {aviso}
+        </p>
+      )}
+
       {perfilIncompleto && (
-        <div className="card-soft mt-8 border-primary/40 p-6">
-          <h2 className="text-lg">Complete seu cadastro</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Pedimos apenas o mínimo necessário para agendamento e emissão de recibo.
-          </p>
+        <div className="card-soft mt-8 flex flex-wrap items-center justify-between gap-4 border-primary/40 p-6">
+          <div>
+            <h2 className="text-lg">Complete seu cadastro</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Precisamos apenas do seu nome para emitir recibos e identificar você para o profissional.
+            </p>
+          </div>
+          <button type="button" className="btn-base btn-primary" onClick={() => setEditandoPerfil(true)}>
+            Completar agora
+          </button>
         </div>
       )}
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.3fr_0.9fr]">
         <div>
           <section>
-            <h2 className="text-xl">Calendário de consultas</h2>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-xl">Calendário de consultas</h2>
+              <span className="text-xs text-muted-foreground">Toque em uma consulta para ver os detalhes</span>
+            </div>
             <div className="mt-4">
               <CalendarioConsultas
-                itens={lista
-                  .filter((c) => c.status !== "cancelada")
-                  .map((c) => ({
-                    id: c.id,
-                    inicio: c.inicio,
-                    titulo: c.professionals?.nome ?? "Consulta",
-                    status: c.status,
-                  }))}
+                itens={itensCalendario}
+                selecionado={selecionada}
+                onSelecionar={(item) => setSelecionada(item.id)}
               />
             </div>
           </section>
@@ -159,9 +177,7 @@ function Painel() {
             {consultas.isLoading && <p className="mt-3 text-sm text-muted-foreground">Carregando…</p>}
             {!consultas.isLoading && proximas.length === 0 && (
               <div className="card-soft mt-4 p-6">
-                <p className="text-sm text-muted-foreground">
-                  Você ainda não tem consulta agendada.
-                </p>
+                <p className="text-sm text-muted-foreground">Você ainda não tem consulta agendada.</p>
                 <Link to="/profissionais" className="btn-base btn-primary mt-5">
                   Escolher profissional
                 </Link>
@@ -171,15 +187,16 @@ function Painel() {
               {proximas.map((c) => (
                 <li key={c.id} className="card-soft p-6">
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <span className="pill">{rotuloStatus[c.status] ?? c.status}</span>
-                    <span className="text-sm text-muted-foreground">
-                      R$ {(c.valor_centavos / 100).toFixed(2).replace(".", ",")}
+                    <span className="pill">{rotuloStatusConsulta[c.status] ?? c.status}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {c.duracao_minutos} min · consulta {moeda(c.valor_consulta_centavos)}
                     </span>
                   </div>
                   <h3 className="mt-4 text-lg">
-                    {c.professionals?.nome} · {c.professionals?.profissao}
+                    {c.professionals?.nome} · {c.professionals?.profissao === "psiquiatra" ? "Psiquiatra" : "Psicólogo(a)"}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">{formatarData(c.inicio)}</p>
+
                   {c.video_url && c.status === "confirmada" && (
                     <a
                       href={c.video_url}
@@ -190,44 +207,36 @@ function Painel() {
                       Entrar na videochamada
                     </a>
                   )}
-                  {c.video_url && c.status === "aguardando_pagamento" && (
-                    <p className="mt-3 text-xs text-muted-foreground">
-                      O link da videochamada fica ativo aqui quando a consulta for confirmada.
-                    </p>
-                  )}
+
                   {c.status === "aguardando_pagamento" && (
                     <div className="mt-3 rounded-xl bg-muted p-4 text-sm text-muted-foreground">
                       <p>
-                        Sua reserva está guardada por tempo limitado. A consulta é confirmada assim
-                        que o pagamento for aprovado.
+                        Para confirmar a reserva, pague a taxa de agendamento de{" "}
+                        <strong className="text-foreground">{moeda(c.taxa_agendamento_centavos)}</strong>.
+                        O valor da consulta ({moeda(c.valor_consulta_centavos)}) é combinado com o profissional.
                       </p>
                       <button
                         type="button"
                         className="btn-base btn-primary mt-4"
                         onClick={async () => {
                           setErroPagamento(null);
-                          const r = await pagar({
-                            data: { consultaId: c.id, origem: window.location.origin },
-                          });
+                          const r = await pagar({ data: { consultaId: c.id, origem: window.location.origin } });
                           if (r.ok) window.location.href = r.link;
                           else setErroPagamento(r.erro);
                         }}
                       >
-                        Pagar com Mercado Pago
+                        Pagar taxa com Mercado Pago
                       </button>
-                      {erroPagamento && (
-                        <p className="mt-3 text-destructive">{erroPagamento}</p>
-                      )}
+                      {erroPagamento && <p className="mt-3 text-destructive">{erroPagamento}</p>}
                     </div>
                   )}
                   <button
                     type="button"
                     className="btn-base btn-ghost mt-5"
                     onClick={async () => {
+                      if (!window.confirm("Deseja cancelar esta consulta?")) return;
                       const r = await cancelar({ data: { id: c.id } });
-                      if (r.ok) {
-                        await queryClient.invalidateQueries({ queryKey: ["consultas"] });
-                      }
+                      if (r.ok) await queryClient.invalidateQueries({ queryKey: ["consultas"] });
                     }}
                   >
                     Cancelar consulta
@@ -242,18 +251,14 @@ function Painel() {
               <h2 className="text-xl">Histórico</h2>
               <ul className="mt-4 space-y-3">
                 {historico.map((c) => {
-                  const feita = (avaliacoes.data?.avaliacoes ?? []).find(
-                    (a) => a.appointment_id === c.id,
-                  );
+                  const feita = (avaliacoes.data?.avaliacoes ?? []).find((a) => a.appointment_id === c.id);
                   return (
                     <li key={c.id} className="card-soft p-5 text-sm">
                       <div className="flex flex-wrap justify-between gap-2">
                         <span>
                           {c.professionals?.nome} — {formatarData(c.inicio)}
                         </span>
-                        <span className="text-muted-foreground">
-                          {rotuloStatus[c.status] ?? c.status}
-                        </span>
+                        <span className="text-muted-foreground">{rotuloStatusConsulta[c.status] ?? c.status}</span>
                       </div>
                       {c.status === "realizada" && (
                         <FormularioAvaliacao
@@ -261,14 +266,8 @@ function Painel() {
                           notaAtual={feita?.nota ?? 0}
                           comentarioAtual={feita?.comentario ?? ""}
                           onSalvar={async (nota, comentario) => {
-                            const r = await enviarAvaliacao({
-                              data: { consultaId: c.id, nota, comentario },
-                            });
-                            if (r.ok) {
-                              await queryClient.invalidateQueries({
-                                queryKey: ["minhas-avaliacoes"],
-                              });
-                            }
+                            const r = await enviarAvaliacao({ data: { consultaId: c.id, nota, comentario } });
+                            if (r.ok) await queryClient.invalidateQueries({ queryKey: ["minhas-avaliacoes"] });
                             return r.ok ? null : r.erro;
                           }}
                         />
@@ -282,41 +281,41 @@ function Painel() {
         </div>
 
         <aside className="space-y-8">
-          <section className="card-soft p-6">
-            <h2 className="text-lg">Meus dados</h2>
-            <form
-              className="mt-4 space-y-4"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                await salvar({ data: { nome, telefone } });
-                setSalvo(true);
-                await queryClient.invalidateQueries({ queryKey: ["contexto"] });
-              }}
-            >
-              <label className="block text-sm">
-                Nome completo
-                <input
-                  className="field-base mt-1"
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  maxLength={120}
-                  required
-                />
-              </label>
-              <label className="block text-sm">
-                Telefone (WhatsApp)
-                <input
-                  className="field-base mt-1"
-                  value={telefone}
-                  onChange={(e) => setTelefone(e.target.value)}
-                  maxLength={30}
-                />
-              </label>
-              <button type="submit" className="btn-base btn-primary w-full">
-                Salvar
-              </button>
-              {salvo && <p className="text-sm text-muted-foreground">Dados atualizados.</p>}
-            </form>
+          <section className="card-soft overflow-hidden p-6">
+            <span className="section-label">Benefício exclusivo</span>
+            <h2 className="mt-2 text-xl">{livro.data?.titulo ?? "Como Ser Feliz com TOC"}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Pacientes cadastrados na TOC Brazil têm{" "}
+              <strong className="text-foreground">{livro.data?.descontoPercent ?? 50}% de desconto</strong> na
+              aquisição do livro.
+            </p>
+            {livro.data?.status === "confirmada" ? (
+              <p className="mt-4 rounded-xl bg-primary/10 p-3 text-sm">
+                Compra confirmada. Boa leitura!
+              </p>
+            ) : livro.data?.url ? (
+              <a
+                href={livro.data.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-base btn-primary mt-5 w-full"
+                onClick={async () => {
+                  await interesseLivro();
+                  await queryClient.invalidateQueries({ queryKey: ["livro"] });
+                }}
+              >
+                Adquirir com {livro.data.descontoPercent}% de desconto
+              </a>
+            ) : (
+              <p className="mt-4 rounded-xl bg-muted p-3 text-xs text-muted-foreground">
+                O link com desconto será liberado em breve nesta área.
+              </p>
+            )}
+            {livro.data?.status === "pendente" && (
+              <p className="mt-3 text-xs text-muted-foreground">
+                Sua compra está pendente de confirmação. Assim que a Hotmart confirmar, avisaremos aqui.
+              </p>
+            )}
           </section>
 
           <section className="card-soft p-6">
@@ -325,7 +324,7 @@ function Painel() {
               {(notificacoes.data?.notificacoes ?? []).length === 0 && (
                 <li>Você verá aqui as confirmações e lembretes das suas consultas.</li>
               )}
-              {(notificacoes.data?.notificacoes ?? []).map((n) => (
+              {(notificacoes.data?.notificacoes ?? []).slice(0, 6).map((n) => (
                 <li key={n.id} className="rounded-xl bg-muted p-4">
                   <p className="font-semibold text-foreground">{n.titulo}</p>
                   <p className="mt-1">{n.corpo}</p>
@@ -333,9 +332,127 @@ function Painel() {
               ))}
             </ul>
           </section>
+
+          <div className="flex items-center justify-between gap-3 px-1 text-xs text-muted-foreground">
+            <span>
+              {perfil?.nome ?? "Cadastro"} {perfil?.codigo_anonimo ? `· ${perfil.codigo_anonimo}` : ""}
+            </span>
+            <button
+              type="button"
+              className="underline underline-offset-4 hover:text-foreground"
+              onClick={() => setEditandoPerfil(true)}
+            >
+              Atualizar meus dados
+            </button>
+          </div>
         </aside>
       </div>
+
+      <Modal aberto={editandoPerfil} titulo="Meus dados" onFechar={() => setEditandoPerfil(false)} largura="max-w-md">
+        <FormularioPerfil
+          nomeInicial={perfil?.nome ?? ""}
+          telefoneInicial={perfil?.telefone ?? ""}
+          nascimentoInicial={perfil?.data_nascimento ?? ""}
+          onSalvar={async (dados) => {
+            await salvar({ data: dados });
+            await queryClient.invalidateQueries({ queryKey: ["contexto"] });
+            setEditandoPerfil(false);
+          }}
+        />
+      </Modal>
+
+      <Modal
+        aberto={Boolean(consultaSelecionada)}
+        titulo="Detalhes da consulta"
+        onFechar={() => setSelecionada(null)}
+        largura="max-w-lg"
+      >
+        {consultaSelecionada && (
+          <div className="space-y-4 text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className="pill">{rotuloStatusConsulta[consultaSelecionada.status] ?? consultaSelecionada.status}</span>
+              <span className="text-muted-foreground">{consultaSelecionada.duracao_minutos} minutos</span>
+            </div>
+            <div>
+              <p className="text-lg">{consultaSelecionada.professionals?.nome}</p>
+              <p className="text-muted-foreground">
+                {consultaSelecionada.professionals?.registro} · {formatarData(consultaSelecionada.inicio)} às{" "}
+                {horaDe(consultaSelecionada.fim)}
+              </p>
+            </div>
+            <dl className="grid grid-cols-2 gap-3 rounded-xl bg-muted p-4">
+              <div>
+                <dt className="text-xs text-muted-foreground">Taxa de agendamento</dt>
+                <dd className="font-semibold">{moeda(consultaSelecionada.taxa_agendamento_centavos)}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted-foreground">Valor da consulta</dt>
+                <dd className="font-semibold">{moeda(consultaSelecionada.valor_consulta_centavos)}</dd>
+              </div>
+            </dl>
+            {consultaSelecionada.video_url && consultaSelecionada.status === "confirmada" && (
+              <a
+                href={consultaSelecionada.video_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-base btn-primary w-full"
+              >
+                Entrar na videochamada
+              </a>
+            )}
+            {consultaSelecionada.status === "aguardando_pagamento" && (
+              <p className="text-xs text-muted-foreground">
+                O link da videochamada é liberado assim que a taxa de agendamento for confirmada.
+              </p>
+            )}
+          </div>
+        )}
+      </Modal>
     </div>
+  );
+}
+
+function FormularioPerfil({
+  nomeInicial,
+  telefoneInicial,
+  nascimentoInicial,
+  onSalvar,
+}: {
+  nomeInicial: string;
+  telefoneInicial: string;
+  nascimentoInicial: string;
+  onSalvar: (d: { nome: string; telefone: string; data_nascimento: string | null }) => Promise<void>;
+}) {
+  const [nome, setNome] = useState(nomeInicial);
+  const [telefone, setTelefone] = useState(telefoneInicial);
+  const [nascimento, setNascimento] = useState(nascimentoInicial);
+  const [salvando, setSalvando] = useState(false);
+  return (
+    <form
+      className="space-y-4"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setSalvando(true);
+        await onSalvar({ nome, telefone, data_nascimento: nascimento || null });
+        setSalvando(false);
+      }}
+    >
+      <label className="block text-sm">
+        Nome completo
+        <input className="field-base mt-1" value={nome} onChange={(e) => setNome(e.target.value)} maxLength={120} required />
+      </label>
+      <label className="block text-sm">
+        Telefone (WhatsApp)
+        <input className="field-base mt-1" value={telefone} onChange={(e) => setTelefone(e.target.value)} maxLength={30} />
+      </label>
+      <label className="block text-sm">
+        Data de nascimento
+        <input type="date" className="field-base mt-1" value={nascimento} onChange={(e) => setNascimento(e.target.value)} />
+      </label>
+      <button type="submit" disabled={salvando} className="btn-base btn-primary w-full disabled:opacity-60">
+        {salvando ? "Salvando…" : "Salvar"}
+      </button>
+    </form>
   );
 }
 
@@ -361,11 +478,7 @@ function FormularioAvaliacao({
       <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/60 pt-4">
         <Estrelas nota={notaAtual} />
         <span className="text-xs text-muted-foreground">Sua avaliação foi registrada.</span>
-        <button
-          type="button"
-          className="text-xs underline underline-offset-4"
-          onClick={() => setAberto(true)}
-        >
+        <button type="button" className="text-xs underline underline-offset-4" onClick={() => setAberto(true)}>
           Alterar
         </button>
       </div>

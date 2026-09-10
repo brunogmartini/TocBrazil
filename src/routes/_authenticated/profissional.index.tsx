@@ -1,21 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  marcarConsultaRealizada,
-  minhaAgendaProfissional,
-} from "@/lib/profissional.functions";
+import { useState } from "react";
+import { financeiroProfissional, minhaAgendaProfissional, type ConsultaAgenda } from "@/lib/profissional.functions";
+import { ConsultaDetalhe } from "@/components/consulta-detalhe";
+import { EtapasCadastro, ProfessionalNav } from "@/components/professional-nav";
+import { chaveDia, hoje, horaDe, rotuloDiaLongo } from "@/lib/agenda-tempo";
+import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 
 export const Route = createFileRoute("/_authenticated/profissional/")({
   head: () => ({
     meta: [
-      { title: "Área do profissional — TOC Brazil" },
-      {
-        name: "description",
-        content: "Suas consultas, sua agenda e seus ganhos na TOC Brazil.",
-      },
-      { property: "og:title", content: "Área do profissional — TOC Brazil" },
-      { property: "og:description", content: "Consultas, agenda e ganhos em um só lugar." },
+      { title: "Consultório digital — TOC Brazil" },
+      { name: "description", content: "Suas consultas de hoje, próximas sessões e resumo financeiro." },
+      { property: "og:title", content: "Consultório digital — TOC Brazil" },
+      { property: "og:description", content: "Consultas, agenda e financeiro em um só lugar." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -24,53 +23,30 @@ export const Route = createFileRoute("/_authenticated/profissional/")({
   component: PainelProfissional,
 });
 
-const rotuloStatus: Record<string, string> = {
-  aguardando_pagamento: "Aguardando pagamento",
-  confirmada: "Confirmada",
-  realizada: "Realizada",
-  cancelada: "Cancelada",
-  remarcada: "Remarcada",
-  nao_compareceu: "Não compareceu",
-};
-
-const rotuloCadastro: Record<string, string> = {
-  pendente: "Em análise",
-  aprovado: "Perfil publicado",
-  suspenso: "Perfil suspenso",
-};
-
-function moeda(centavos: number) {
-  return (centavos / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-function dataHora(iso: string) {
-  return new Date(iso).toLocaleString("pt-BR", {
-    dateStyle: "full",
-    timeStyle: "short",
-    timeZone: "America/Sao_Paulo",
-  });
-}
-
 function PainelProfissional() {
   const queryClient = useQueryClient();
   const carregar = useServerFn(minhaAgendaProfissional);
-  const atualizar = useServerFn(marcarConsultaRealizada);
-
-  const dados = useQuery({ queryKey: ["agenda-profissional"], queryFn: () => carregar() });
+  const carregarFinanceiro = useServerFn(financeiroProfissional);
+  const dados = useQuery({ queryKey: ["agenda-profissional", "visao-geral"], queryFn: () => carregar() });
+  const financeiro = useQuery({ queryKey: ["financeiro-profissional"], queryFn: () => carregarFinanceiro() });
+  const [selecionada, setSelecionada] = useState<ConsultaAgenda | null>(null);
 
   const prof = dados.data?.profissional ?? null;
   const consultas = dados.data?.consultas ?? [];
-  const agora = new Date();
-  const proximas = consultas.filter(
-    (c) => new Date(c.inicio) > agora && c.status !== "cancelada",
-  );
-  const passadas = consultas.filter(
-    (c) => new Date(c.inicio) <= agora || c.status === "cancelada",
+  const diaHoje = hoje();
+  const agora = Date.now();
+  const deHoje = consultas.filter((c) => chaveDia(c.inicio) === diaHoje && c.status !== "cancelada");
+  const proximas = consultas
+    .filter((c) => new Date(c.inicio).getTime() > agora && c.status !== "cancelada" && chaveDia(c.inicio) !== diaHoje)
+    .slice(0, 6);
+  const pendentesDeConclusao = consultas.filter(
+    (c) => c.status === "confirmada" && new Date(c.fim).getTime() <= agora,
   );
 
-  async function mudarStatus(id: string, status: "realizada" | "nao_compareceu" | "cancelada") {
-    await atualizar({ data: { id, status } });
+  async function recarregar() {
     await queryClient.invalidateQueries({ queryKey: ["agenda-profissional"] });
+    await queryClient.invalidateQueries({ queryKey: ["financeiro-profissional"] });
+    setSelecionada(null);
   }
 
   if (dados.isLoading) {
@@ -83,8 +59,8 @@ function PainelProfissional() {
         <span className="professional-label">Área do profissional</span>
         <h1 className="mt-3 text-3xl sm:text-4xl">Vamos começar seu cadastro</h1>
         <p className="mt-4 max-w-xl text-muted-foreground">
-          Preencha seus dados profissionais e envie os documentos para verificação. Depois disso
-          você define sua agenda e seu perfil fica disponível para agendamentos.
+          Preencha seus dados profissionais e envie os documentos para verificação. Depois disso você
+          define sua agenda e seu perfil fica disponível para agendamentos.
         </p>
         <Link to="/profissional/cadastro" className="btn-base btn-primary mt-8">
           Preencher meu cadastro
@@ -93,141 +69,158 @@ function PainelProfissional() {
     );
   }
 
+  const etapa = dados.data!.etapa;
+  const resumo = financeiro.data?.resumo;
+
   return (
     <div className="professional-workspace py-12 lg:py-16">
       <div className="container-page">
-      <div className="professional-heading flex flex-wrap items-end justify-between gap-6 p-6 sm:p-8">
-        <div>
-          <span className="professional-label">Consultório digital</span>
-          <h1 className="mt-3 text-3xl sm:text-4xl">{prof.nome}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {rotuloCadastro[prof.status] ?? prof.status} · consultas de {prof.slot_minutos} minutos
-          </p>
+        <div className="professional-heading flex flex-wrap items-end justify-between gap-6 p-6 sm:p-8">
+          <div>
+            <span className="professional-label">Consultório digital</span>
+            <h1 className="mt-3 text-3xl sm:text-4xl">{prof.nome}</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {etapa.titulo} · consultas de {prof.slot_minutos} min · {moeda(prof.valor_centavos ?? 0)} por consulta
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link to="/profissional/agenda" className="btn-base btn-primary">
+              Abrir agenda
+            </Link>
+            <Link to="/profissional/financeiro" className="btn-base btn-ghost">
+              Financeiro
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <Link to="/profissional/agenda" className="btn-base btn-primary">
-            Minha agenda
-          </Link>
-          <Link to="/profissional/cadastro" className="btn-base btn-ghost">
-            Meu cadastro
-          </Link>
-        </div>
-      </div>
 
-      {prof.status !== "aprovado" && (
-        <div className="card-soft mt-8 p-6">
-          <p className="text-sm font-semibold">
-            {prof.status === "pendente"
-              ? "Seu cadastro está em análise."
-              : "Seu perfil está suspenso."}
-          </p>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            {prof.status === "pendente"
-              ? "Assim que os documentos forem verificados, seu perfil é publicado e você começa a receber agendamentos."
-              : "Entre em contato com o suporte para entender as pendências e reativar seu perfil."}
-          </p>
-        </div>
-      )}
+        <ProfessionalNav ativo="/profissional" />
 
-      <nav aria-label="Área do profissional" className="professional-nav mt-5 flex gap-2 overflow-x-auto p-2">
-        <span className="professional-nav-active">Visão geral</span>
-        <Link to="/profissional/agenda" className="professional-nav-item">Agenda</Link>
-        <Link to="/profissional/cadastro" className="professional-nav-item">Perfil e recebimentos</Link>
-      </nav>
-
-      <div className="mt-8 grid gap-5 sm:grid-cols-3">
-        <div className="professional-metric p-6">
-          <p className="professional-label">A receber</p>
-          <p className="mt-2 font-display text-2xl">
-            {moeda(dados.data?.ganhos?.previstoCentavos ?? 0)}
-          </p>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Consultas agendadas e ainda não repassadas.
-          </p>
-        </div>
-        <div className="professional-metric p-6">
-          <p className="professional-label">Já recebido</p>
-          <p className="mt-2 font-display text-2xl">
-            {moeda(dados.data?.ganhos?.recebidoCentavos ?? 0)}
-          </p>
-          <p className="mt-2 text-xs text-muted-foreground">Pagamentos aprovados até agora.</p>
-        </div>
-        <div className="professional-metric p-6">
-          <p className="professional-label">Próximas consultas</p>
-          <p className="mt-2 font-display text-2xl">{proximas.length}</p>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Sua parte é de {100 - Number(prof.comissao_percent ?? 30)}% do valor da consulta.
-          </p>
-        </div>
-      </div>
-
-      <section className="mt-12">
-        <h2 className="text-2xl">Próximas consultas</h2>
-        {proximas.length === 0 ? (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Nenhuma consulta agendada no momento.
-          </p>
-        ) : (
-          <ul className="mt-5 space-y-4">
-            {proximas.map((c) => (
-              <li key={c.id} className="card-soft p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <span className="pill">{rotuloStatus[c.status] ?? c.status}</span>
-                  <span className="text-sm font-semibold">
-                    {moeda(c.valor_profissional_centavos ?? 0)} para você
-                  </span>
-                </div>
-                <p className="mt-4 text-sm">
-                  Paciente
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">{dataHora(c.inicio)}</p>
-                <div className="mt-5 flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    onClick={() => mudarStatus(c.id, "realizada")}
-                    className="btn-base btn-ghost"
-                  >
-                    Marcar como realizada
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => mudarStatus(c.id, "nao_compareceu")}
-                    className="btn-base btn-ghost"
-                  >
-                    Paciente não compareceu
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => mudarStatus(c.id, "cancelada")}
-                    className="btn-base btn-ghost"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+        {etapa.chave !== "publicado" && (
+          <div className="card-soft mt-6 p-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold">{etapa.titulo}</p>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{etapa.descricao}</p>
+                {prof.observacao_admin && (etapa.chave === "correcao" || etapa.chave === "rejeitado") && (
+                  <p className="mt-3 rounded-xl bg-muted p-3 text-sm">
+                    <span className="font-semibold">Observação da análise:</span> {prof.observacao_admin}
+                  </p>
+                )}
+              </div>
+              <Link
+                to={etapa.chave === "aprovado" ? "/profissional/agenda" : "/profissional/cadastro"}
+                className="btn-base btn-ghost"
+              >
+                {etapa.chave === "aprovado" ? "Definir disponibilidade" : "Ver cadastro"}
+              </Link>
+            </div>
+            <div className="mt-5">
+              <EtapasCadastro etapaAtual={etapa} />
+            </div>
+          </div>
         )}
-      </section>
 
-      <section className="mt-12">
-        <h2 className="text-2xl">Histórico</h2>
-        {passadas.length === 0 ? (
-          <p className="mt-4 text-sm text-muted-foreground">Nada por aqui ainda.</p>
-        ) : (
-          <ul className="mt-5 space-y-3">
-            {passadas.map((c) => (
-              <li key={c.id} className="card-soft flex flex-wrap justify-between gap-3 p-5 text-sm">
-                <span>{dataHora(c.inicio)}</span>
-                <span className="text-muted-foreground">
-                  {rotuloStatus[c.status] ?? c.status}
-                </span>
-              </li>
-            ))}
-          </ul>
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="professional-metric p-6">
+            <p className="professional-label">Hoje</p>
+            <p className="mt-2 font-display text-2xl">{deHoje.length}</p>
+            <p className="mt-2 text-xs text-muted-foreground">consulta{deHoje.length === 1 ? "" : "s"} no dia</p>
+          </div>
+          <div className="professional-metric p-6">
+            <p className="professional-label">Agendadas</p>
+            <p className="mt-2 font-display text-2xl">{resumo?.consultasAgendadas ?? 0}</p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {moeda(resumo?.futurosLiquido ?? 0)} previstos após realizadas
+            </p>
+          </div>
+          <div className="professional-metric p-6">
+            <p className="professional-label">A receber</p>
+            <p className="mt-2 font-display text-2xl">{moeda(resumo?.aReceber ?? 0)}</p>
+            <p className="mt-2 text-xs text-muted-foreground">consultas realizadas aguardando repasse</p>
+          </div>
+          <div className="professional-metric p-6">
+            <p className="professional-label">Já recebido</p>
+            <p className="mt-2 font-display text-2xl">{moeda(resumo?.recebido ?? 0)}</p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              sua parte é {100 - (resumo?.comissaoPercent ?? 25)}% do valor da consulta
+            </p>
+          </div>
+        </div>
+
+        {pendentesDeConclusao.length > 0 && (
+          <div className="card-soft mt-8 border-primary/40 p-5 text-sm">
+            <p className="font-semibold">
+              {pendentesDeConclusao.length} consulta{pendentesDeConclusao.length > 1 ? "s" : ""} com horário encerrado
+            </p>
+            <p className="mt-1 text-muted-foreground">
+              Confirme se foram realizadas para liberar o valor a receber.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {pendentesDeConclusao.map((c) => (
+                <button key={c.id} type="button" className="pill hover:bg-accent" onClick={() => setSelecionada(c)}>
+                  {rotuloDiaLongo(chaveDia(c.inicio))} · {horaDe(c.inicio)} · {c.paciente}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
-      </section>
+
+        <div className="mt-12 grid gap-8 lg:grid-cols-2">
+          <section>
+            <h2 className="text-2xl">Hoje</h2>
+            {deHoje.length === 0 ? (
+              <p className="mt-4 text-sm text-muted-foreground">Nenhuma consulta hoje.</p>
+            ) : (
+              <ul className="mt-5 space-y-3">
+                {deHoje.map((c) => (
+                  <li key={c.id}>
+                    <button
+                      type="button"
+                      onClick={() => setSelecionada(c)}
+                      className="card-soft flex w-full flex-wrap items-center justify-between gap-3 p-5 text-left hover:border-primary/60"
+                    >
+                      <span>
+                        <span className="font-display text-lg">{horaDe(c.inicio)}</span>{" "}
+                        <span className="text-sm">— {c.paciente}</span>
+                      </span>
+                      <span className="pill">{rotuloStatusConsulta[c.status] ?? c.status}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section>
+            <h2 className="text-2xl">Próximas</h2>
+            {proximas.length === 0 ? (
+              <p className="mt-4 text-sm text-muted-foreground">Nenhuma consulta agendada nos próximos dias.</p>
+            ) : (
+              <ul className="mt-5 space-y-3">
+                {proximas.map((c) => (
+                  <li key={c.id}>
+                    <button
+                      type="button"
+                      onClick={() => setSelecionada(c)}
+                      className="card-soft flex w-full flex-wrap items-center justify-between gap-3 p-5 text-left hover:border-primary/60"
+                    >
+                      <span className="text-sm">
+                        <span className="font-semibold">{rotuloDiaLongo(chaveDia(c.inicio))}</span> · {horaDe(c.inicio)} — {c.paciente}
+                      </span>
+                      <span className="pill">{rotuloStatusConsulta[c.status] ?? c.status}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <Link to="/profissional/agenda" className="mt-4 inline-block text-sm underline underline-offset-4">
+              Ver agenda completa
+            </Link>
+          </section>
+        </div>
       </div>
+
+      <ConsultaDetalhe consulta={selecionada} onFechar={() => setSelecionada(null)} onAtualizado={recarregar} />
     </div>
   );
 }
