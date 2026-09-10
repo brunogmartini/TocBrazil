@@ -19,7 +19,7 @@
 - [x] Aba "Pagamentos aos profissionais" com valores a receber e histórico separado
 - [x] Atualização automática da agenda e do financeiro profissional
 - [x] Líquido profissional de 80% nas novas consultas e repasses
-- [ ] Validar links exclusivos de videochamada, calendário e anotações por consulta
+- [x] Validar links exclusivos de videochamada, calendário e anotações por consulta
 
 ## Próximas etapas
 - [x] Diferenciar os acessos de entrar/criar conta e as áreas de paciente/profissional
