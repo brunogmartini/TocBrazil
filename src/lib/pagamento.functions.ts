@@ -2,9 +2,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /**
- * Checkout Mercado Pago (Checkout Pro).
- * A consulta nasce como "aguardando_pagamento"; ao confirmar o pagamento,
- * o aviso do Mercado Pago (webhook) confirma a consulta e registra o repasse.
+ * Checkout Mercado Pago (Checkout Pro) da TAXA DE AGENDAMENTO.
+ * A consulta nasce como "aguardando_pagamento"; o paciente paga apenas a taxa
+ * de intermediação (receita integral da plataforma). O valor da consulta é
+ * definido pelo profissional e só vira repasse após a consulta ser realizada,
+ * por isso não há split neste pagamento.
  */
 export const iniciarPagamento = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -22,7 +24,7 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
     const { data: consulta } = await supabase
       .from("appointments")
       .select(
-        "id, inicio, patient_id, professional_id, status, payment_status, valor_centavos, valor_plataforma_centavos, professionals(nome, slug, comissao_percent, mp_user_id)",
+        "id, inicio, patient_id, professional_id, status, payment_status, valor_centavos, taxa_agendamento_centavos, duracao_minutos, professionals(nome, slug)",
       )
       .eq("id", data.consultaId)
       .maybeSingle();
@@ -34,31 +36,8 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
       return { ok: false as const, erro: "Esta consulta já está paga." };
     }
 
-    const prof = consulta.professionals as {
-      nome?: string;
-      slug?: string;
-      comissao_percent?: number;
-      mp_user_id?: string | null;
-    } | null;
-
-    // Split: quando o profissional já ligou a conta Mercado Pago, o pagamento
-    // é criado na conta dele e a plataforma retém apenas a comissão.
-    let tokenCobranca = token;
-    let taxaPlataforma: number | null = null;
-    if (prof?.mp_user_id) {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: contaMp } = await supabaseAdmin
-        .from("mercadopago_contas")
-        .select("access_token")
-        .eq("professional_id", consulta.professional_id)
-        .maybeSingle();
-      if (contaMp?.access_token) {
-        tokenCobranca = contaMp.access_token;
-        const comissao = Number(prof.comissao_percent ?? 30);
-        const valorReais = consulta.valor_centavos / 100;
-        taxaPlataforma = Math.round(valorReais * (comissao / 100) * 100) / 100;
-      }
-    }
+    const prof = consulta.professionals as { nome?: string; slug?: string } | null;
+    const taxa = consulta.taxa_agendamento_centavos || consulta.valor_centavos;
     const quando = new Date(consulta.inicio).toLocaleString("pt-BR", {
       timeZone: "America/Sao_Paulo",
       dateStyle: "short",
@@ -69,7 +48,7 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
     const resposta = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${tokenCobranca}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -78,11 +57,11 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
         items: [
           {
             id: consulta.id,
-            title: `Consulta com ${prof?.nome ?? "profissional com experiência em TOC"} — ${quando}`,
-            description: "Consulta online de 50 minutos na TOC Brazil",
+            title: `Taxa de agendamento — consulta com ${prof?.nome ?? "profissional"} em ${quando}`,
+            description: `Reserva de consulta online de ${consulta.duracao_minutos ?? 50} minutos na TOC Brazil`,
             quantity: 1,
             currency_id: "BRL",
-            unit_price: consulta.valor_centavos / 100,
+            unit_price: taxa / 100,
           },
         ],
         back_urls: {
@@ -92,7 +71,6 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
         },
         auto_return: "approved",
         notification_url: `${base}/api/public/webhooks/mercadopago`,
-        ...(taxaPlataforma !== null ? { marketplace_fee: taxaPlataforma } : {}),
       }),
     });
 

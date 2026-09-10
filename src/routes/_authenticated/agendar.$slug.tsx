@@ -8,7 +8,9 @@ import {
   listarHorariosLivres,
   obterProfissional,
 } from "@/lib/plataforma.functions";
+import { iniciarPagamento } from "@/lib/pagamento.functions";
 import { track } from "@/lib/analytics";
+import { moeda } from "@/lib/video-sala";
 
 export const Route = createFileRoute("/_authenticated/agendar/$slug")({
   head: () => ({
@@ -55,6 +57,7 @@ function Agendar() {
   const buscarHorarios = useServerFn(listarHorariosLivres);
   const buscarConfig = useServerFn(configuracoesPlataforma);
   const agendar = useServerFn(criarAgendamento);
+  const pagar = useServerFn(iniciarPagamento);
 
   const [selecionado, setSelecionado] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
@@ -81,7 +84,8 @@ function Agendar() {
   }, [horarios.data]);
 
   const p = prof.data?.profissional;
-  const valor = config.data?.taxaCentavos ?? 5000;
+  const taxa = config.data?.taxaCentavos ?? 5000;
+  const horasCancelamento = config.data?.cancelamentoHoras ?? 24;
 
   if (prof.isLoading) {
     return <div className="container-page py-20 text-muted-foreground">Carregando agenda…</div>;
@@ -107,6 +111,12 @@ function Agendar() {
       if (!r.ok) {
         setErro(r.erro);
         await queryClient.invalidateQueries({ queryKey: ["horarios", slug] });
+        return;
+      }
+      // Vai direto para o pagamento da taxa de agendamento.
+      const pg = await pagar({ data: { consultaId: r.consultaId, origem: window.location.origin } });
+      if (pg.ok) {
+        window.location.href = pg.link;
         return;
       }
       navigate({ to: "/painel" });
@@ -191,11 +201,13 @@ function Agendar() {
                 <dt className="text-muted-foreground">Horário</dt>
                 <dd>{selecionado ? `${diaRotulo(selecionado)}, ${hora(selecionado)}` : "—"}</dd>
               </div>
-              <div className="flex justify-between border-t border-border pt-3 text-base">
-                <dt>Valor</dt>
-                <dd className="font-semibold">
-                  R$ {(valor / 100).toFixed(2).replace(".", ",")}
-                </dd>
+              <div className="flex justify-between border-t border-border pt-3">
+                <dt className="text-muted-foreground">Valor da consulta</dt>
+                <dd>{moeda(p.valor_centavos)}</dd>
+              </div>
+              <div className="flex justify-between text-base">
+                <dt>Taxa de agendamento (agora)</dt>
+                <dd className="font-semibold">{moeda(taxa)}</dd>
               </div>
             </dl>
 
@@ -205,15 +217,16 @@ function Agendar() {
               onClick={confirmar}
               className="btn-base btn-primary mt-6 w-full disabled:opacity-50"
             >
-              {enviando ? "Reservando…" : selecionado ? "Reservar este horário" : "Escolha um horário"}
+              {enviando ? "Reservando…" : selecionado ? "Reservar e pagar a taxa" : "Escolha um horário"}
             </button>
             {erro && <p className="mt-3 text-sm text-destructive">{erro}</p>}
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-              O horário fica reservado no seu nome e a consulta é confirmada após a aprovação do
-              pagamento. O meio de pagamento com cartão ainda está sendo conectado à plataforma.
+              A taxa de agendamento de {moeda(taxa)} confirma sua reserva e é paga agora pelo Mercado
+              Pago. O valor da consulta ({moeda(p.valor_centavos)}) é definido pelo profissional e
+              só é devido após a realização do atendimento.
             </p>
             <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-              Cancelamento sem custo até 24 horas antes do horário marcado.
+              Cancelamento com estorno da taxa até {horasCancelamento} horas antes do horário marcado.
             </p>
           </div>
         </aside>
