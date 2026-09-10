@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
+import { gerarSalaVideo } from "@/lib/video-sala";
 
 export type ProfissionalPublico = {
   id: string;
@@ -89,15 +90,40 @@ export const listarHorariosLivres = createServerFn({ method: "GET" })
     };
   });
 
+export type ConfiguracoesPlataforma = {
+  taxaCentavos: number;
+  comissaoPercent: number;
+  duracaoPadraoMinutos: number;
+  cancelamentoHoras: number;
+  remarcacaoHoras: number;
+  reembolsoTaxaNoPrazo: boolean;
+  hotmartLivroUrl: string;
+  livroTitulo: string;
+  livroDescontoPercent: number;
+  videoProvider: string;
+};
+
+export function mapearConfiguracoes(rows: { chave: string; valor: unknown }[] | null) {
+  const mapa: Record<string, unknown> = {};
+  for (const row of rows ?? []) mapa[row.chave] = row.valor;
+  const cfg: ConfiguracoesPlataforma = {
+    taxaCentavos: Number(mapa["taxa_confirmacao_centavos"] ?? 5000),
+    comissaoPercent: Number(mapa["comissao_plataforma_percent"] ?? 25),
+    duracaoPadraoMinutos: Number(mapa["duracao_padrao_minutos"] ?? 50),
+    cancelamentoHoras: Number(mapa["cancelamento_horas_minimas"] ?? 24),
+    remarcacaoHoras: Number(mapa["remarcacao_horas_minimas"] ?? 24),
+    reembolsoTaxaNoPrazo: Boolean(mapa["reembolso_taxa_no_prazo"] ?? true),
+    hotmartLivroUrl: String(mapa["hotmart_livro_url"] ?? ""),
+    livroTitulo: String(mapa["livro_titulo"] ?? "Como Ser Feliz com TOC"),
+    livroDescontoPercent: Number(mapa["livro_desconto_percent"] ?? 50),
+    videoProvider: String(mapa["video_provider"] ?? "jitsi"),
+  };
+  return cfg;
+}
+
 export const configuracoesPlataforma = createServerFn({ method: "GET" }).handler(async () => {
   const { data } = await clientePublico().from("platform_settings").select("chave, valor");
-  const mapa: Record<string, unknown> = {};
-  for (const row of data ?? []) mapa[row.chave] = row.valor;
-  return {
-    taxaCentavos: Number(mapa["taxa_confirmacao_centavos"] ?? 5000),
-    comissaoPercent: Number(mapa["comissao_plataforma_percent"] ?? 30),
-    cancelamentoHoras: Number(mapa["cancelamento_horas_minimas"] ?? 24),
-  };
+  return mapearConfiguracoes(data);
 });
 
 /* ---------- área autenticada ---------- */
@@ -142,14 +168,28 @@ export const salvarPerfil = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/**
+ * Consultas confirmadas cujo horário final já passou viram "realizada".
+ * Executado pelo servidor (papel de serviço) sempre que uma agenda é carregada.
+ */
+export async function concluirConsultasVencidas() {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.rpc("concluir_consultas_vencidas");
+  } catch {
+    /* sem impacto para o usuário */
+  }
+}
+
 export const minhasConsultas = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
+    await concluirConsultasVencidas();
     const { data, error } = await supabase
       .from("appointments")
       .select(
-        "id, inicio, fim, status, payment_status, valor_centavos, video_url, professionals(nome, profissao, slug, registro)",
+        "id, inicio, fim, status, payment_status, valor_centavos, taxa_agendamento_centavos, valor_consulta_centavos, duracao_minutos, video_url, cancelada_em, professionals(nome, profissao, slug, registro)",
       )
       .eq("patient_id", userId)
       .order("inicio", { ascending: false });
@@ -168,7 +208,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
 
     const { data: prof, error: erroProf } = await supabase
       .from("professionals")
-      .select("id, slug, nome, slot_minutos, comissao_percent, status")
+      .select("id, slug, nome, slot_minutos, comissao_percent, status, valor_centavos")
       .eq("slug", data.slug)
       .maybeSingle();
     if (erroProf || !prof || prof.status !== "aprovado") {
@@ -187,32 +227,41 @@ export const criarAgendamento = createServerFn({ method: "POST" })
       return { ok: false as const, erro: "Este horário acabou de ser reservado. Escolha outro." };
     }
 
-    const { data: cfg } = await supabase
-      .from("platform_settings")
-      .select("chave, valor")
-      .in("chave", ["taxa_confirmacao_centavos"]);
-    const valor = Number(cfg?.[0]?.valor ?? 5000);
-    const comissao = Number(prof.comissao_percent ?? 30);
-    const plataforma = Math.round((valor * comissao) / 100);
+    const { data: cfgRows } = await supabase.from("platform_settings").select("chave, valor");
+    const cfg = mapearConfiguracoes(cfgRows);
 
-    const fim = new Date(new Date(inicioIso).getTime() + prof.slot_minutos * 60000).toISOString();
-    const salaVideo = `https://meet.jit.si/tocbrazil-${crypto.randomUUID().slice(0, 12)}`;
+    // Taxa de agendamento (plataforma) cobrada agora; valor da consulta só
+    // vira crédito do profissional depois que a consulta for realizada.
+    const taxa = cfg.taxaCentavos;
+    const valorConsulta = Number(prof.valor_centavos ?? 0);
+    const comissao = cfg.comissaoPercent;
+    const plataforma = Math.round((valorConsulta * comissao) / 100);
+    const duracao = prof.slot_minutos || cfg.duracaoPadraoMinutos;
+    const fim = new Date(new Date(inicioIso).getTime() + duracao * 60000).toISOString();
+
+    const consultaId = crypto.randomUUID();
+    const sala = gerarSalaVideo(cfg.videoProvider, consultaId);
 
     const { data: criada, error } = await supabase
       .from("appointments")
       .insert({
+        id: consultaId,
         patient_id: userId,
         professional_id: prof.id,
         inicio: inicioIso,
         fim,
+        duracao_minutos: duracao,
         status: "aguardando_pagamento",
         payment_status: "pendente",
-        valor_centavos: valor,
+        valor_centavos: taxa,
+        taxa_agendamento_centavos: taxa,
+        valor_consulta_centavos: valorConsulta,
+        comissao_percent: comissao,
         valor_plataforma_centavos: plataforma,
-        valor_profissional_centavos: valor - plataforma,
-        video_url: salaVideo,
+        valor_profissional_centavos: valorConsulta - plataforma,
+        video_url: sala.url,
+        video_provider: sala.provider,
       })
-
       .select("id, inicio, fim, valor_centavos")
       .single();
 
@@ -236,7 +285,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
         tipo: "reserva_criada",
         canal: "email",
         titulo: "Reserva registrada",
-        corpo: `Seu horário com ${prof.nome} em ${quando} está reservado e aguarda a confirmação do pagamento.`,
+        corpo: `Seu horário com ${prof.nome} em ${quando} está reservado e aguarda a confirmação do pagamento da taxa de agendamento.`,
       },
       {
         user_id: userId,
@@ -274,16 +323,90 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
     if (!consulta || consulta.patient_id !== userId) {
       return { ok: false as const, erro: "Consulta não encontrada." };
     }
+    if (consulta.status === "realizada" || consulta.status === "cancelada") {
+      return { ok: false as const, erro: "Esta consulta não pode mais ser cancelada." };
+    }
+    const { data: cfgRows } = await supabase.from("platform_settings").select("chave, valor");
+    const cfg = mapearConfiguracoes(cfgRows);
+    const horasAntes = (new Date(consulta.inicio).getTime() - Date.now()) / 3600_000;
+    const dentroDoPrazo = horasAntes >= cfg.cancelamentoHoras;
+
     const { error } = await supabase
       .from("appointments")
       .update({
         status: "cancelada",
-        payment_status: "cancelado",
         cancelada_em: new Date().toISOString(),
         cancelada_por: "paciente",
       })
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível cancelar agora." };
+
+    await supabase.from("notifications").insert({
+      user_id: userId,
+      appointment_id: consulta.id,
+      tipo: "consulta_cancelada",
+      canal: "email",
+      titulo: "Consulta cancelada",
+      corpo: dentroDoPrazo
+        ? cfg.reembolsoTaxaNoPrazo
+          ? "Cancelamento dentro do prazo. A taxa de agendamento será estornada pela nossa equipe."
+          : "Cancelamento registrado dentro do prazo."
+        : `Cancelamento fora do prazo de ${cfg.cancelamentoHoras}h. A taxa de agendamento não é reembolsável.`,
+    });
+    return { ok: true as const, dentroDoPrazo };
+  });
+
+/* ---------- livro "Como Ser Feliz com TOC" ---------- */
+
+export const meuLivro = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const [{ data: compra }, { data: cfgRows }] = await Promise.all([
+      supabase
+        .from("livro_compras")
+        .select("status, clicado_em, comprado_em")
+        .eq("user_id", userId)
+        .maybeSingle(),
+      supabase.from("platform_settings").select("chave, valor"),
+    ]);
+    const cfg = mapearConfiguracoes(cfgRows);
+    return {
+      status: (compra?.status ?? "nao_comprado") as
+        | "nao_comprado"
+        | "pendente"
+        | "confirmada"
+        | "cancelada",
+      clicadoEm: compra?.clicado_em ?? null,
+      compradoEm: compra?.comprado_em ?? null,
+      url: cfg.hotmartLivroUrl,
+      titulo: cfg.livroTitulo,
+      descontoPercent: cfg.livroDescontoPercent,
+    };
+  });
+
+export const registrarInteresseLivro = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId, claims } = context;
+    const email = (claims as { email?: string }).email ?? null;
+    const { data: atual } = await supabase
+      .from("livro_compras")
+      .select("id, status")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (atual?.status === "confirmada") return { ok: true as const };
+    const { error } = await supabase.from("livro_compras").upsert(
+      {
+        ...(atual ? { id: atual.id } : {}),
+        user_id: userId,
+        email,
+        status: "pendente",
+        clicado_em: new Date().toISOString(),
+      },
+      { onConflict: "id" },
+    );
+    if (error) return { ok: false as const, erro: "Não foi possível registrar agora." };
     return { ok: true as const };
   });
 

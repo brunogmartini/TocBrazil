@@ -14,11 +14,58 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointment_notes: {
+        Row: {
+          appointment_id: string
+          conteudo: string
+          created_at: string
+          id: string
+          patient_id: string
+          professional_id: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_id: string
+          conteudo: string
+          created_at?: string
+          id?: string
+          patient_id: string
+          professional_id: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string
+          conteudo?: string
+          created_at?: string
+          id?: string
+          patient_id?: string
+          professional_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_notes_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_notes_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           cancelada_em: string | null
           cancelada_por: string | null
+          comissao_percent: number
           created_at: string
+          duracao_minutos: number
           fim: string
           id: string
           inicio: string
@@ -27,17 +74,23 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           primeira_consulta: boolean
           professional_id: string
+          realizada_em: string | null
           status: Database["public"]["Enums"]["appointment_status"]
+          taxa_agendamento_centavos: number
           updated_at: string
           valor_centavos: number
+          valor_consulta_centavos: number
           valor_plataforma_centavos: number
           valor_profissional_centavos: number
+          video_provider: string
           video_url: string | null
         }
         Insert: {
           cancelada_em?: string | null
           cancelada_por?: string | null
+          comissao_percent?: number
           created_at?: string
+          duracao_minutos?: number
           fim: string
           id?: string
           inicio: string
@@ -46,17 +99,23 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           primeira_consulta?: boolean
           professional_id: string
+          realizada_em?: string | null
           status?: Database["public"]["Enums"]["appointment_status"]
+          taxa_agendamento_centavos?: number
           updated_at?: string
           valor_centavos?: number
+          valor_consulta_centavos?: number
           valor_plataforma_centavos?: number
           valor_profissional_centavos?: number
+          video_provider?: string
           video_url?: string | null
         }
         Update: {
           cancelada_em?: string | null
           cancelada_por?: string | null
+          comissao_percent?: number
           created_at?: string
+          duracao_minutos?: number
           fim?: string
           id?: string
           inicio?: string
@@ -65,11 +124,15 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           primeira_consulta?: boolean
           professional_id?: string
+          realizada_em?: string | null
           status?: Database["public"]["Enums"]["appointment_status"]
+          taxa_agendamento_centavos?: number
           updated_at?: string
           valor_centavos?: number
+          valor_consulta_centavos?: number
           valor_plataforma_centavos?: number
           valor_profissional_centavos?: number
+          video_provider?: string
           video_url?: string | null
         }
         Relationships: [
@@ -203,6 +266,51 @@ export type Database = {
           },
         ]
       }
+      livro_compras: {
+        Row: {
+          clicado_em: string | null
+          comprado_em: string | null
+          created_at: string
+          email: string | null
+          hotmart_transacao: string | null
+          id: string
+          origem: string
+          payload: Json | null
+          status: string
+          updated_at: string
+          user_id: string | null
+          valor_centavos: number | null
+        }
+        Insert: {
+          clicado_em?: string | null
+          comprado_em?: string | null
+          created_at?: string
+          email?: string | null
+          hotmart_transacao?: string | null
+          id?: string
+          origem?: string
+          payload?: Json | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          valor_centavos?: number | null
+        }
+        Update: {
+          clicado_em?: string | null
+          comprado_em?: string | null
+          created_at?: string
+          email?: string | null
+          hotmart_transacao?: string | null
+          id?: string
+          origem?: string
+          payload?: Json | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          valor_centavos?: number | null
+        }
+        Relationships: []
+      }
       mercadopago_contas: {
         Row: {
           access_token: string
@@ -294,6 +402,53 @@ export type Database = {
           },
         ]
       }
+      patient_clinical_records: {
+        Row: {
+          created_at: string
+          diagnostico: string | null
+          evolucao: string | null
+          historico: string | null
+          id: string
+          informacoes_relevantes: string | null
+          observacoes: string | null
+          patient_id: string
+          professional_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          diagnostico?: string | null
+          evolucao?: string | null
+          historico?: string | null
+          id?: string
+          informacoes_relevantes?: string | null
+          observacoes?: string | null
+          patient_id: string
+          professional_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          diagnostico?: string | null
+          evolucao?: string | null
+          historico?: string | null
+          id?: string
+          informacoes_relevantes?: string | null
+          observacoes?: string | null
+          patient_id?: string
+          professional_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_clinical_records_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           appointment_id: string
@@ -362,36 +517,61 @@ export type Database = {
       }
       payouts: {
         Row: {
+          appointment_id: string | null
+          comissao_percent: number
           created_at: string
           id: string
+          observacao: string | null
           pago_em: string | null
+          pago_por: string | null
           payment_id: string | null
           previsto_para: string | null
           professional_id: string
           status: Database["public"]["Enums"]["payout_status"]
+          valor_bruto_centavos: number
           valor_centavos: number
+          valor_plataforma_centavos: number
         }
         Insert: {
+          appointment_id?: string | null
+          comissao_percent?: number
           created_at?: string
           id?: string
+          observacao?: string | null
           pago_em?: string | null
+          pago_por?: string | null
           payment_id?: string | null
           previsto_para?: string | null
           professional_id: string
           status?: Database["public"]["Enums"]["payout_status"]
+          valor_bruto_centavos?: number
           valor_centavos: number
+          valor_plataforma_centavos?: number
         }
         Update: {
+          appointment_id?: string | null
+          comissao_percent?: number
           created_at?: string
           id?: string
+          observacao?: string | null
           pago_em?: string | null
+          pago_por?: string | null
           payment_id?: string | null
           previsto_para?: string | null
           professional_id?: string
           status?: Database["public"]["Enums"]["payout_status"]
+          valor_bruto_centavos?: number
           valor_centavos?: number
+          valor_plataforma_centavos?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "payouts_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payouts_payment_id_fkey"
             columns: ["payment_id"]
@@ -511,6 +691,47 @@ export type Database = {
           },
         ]
       }
+      professional_status_history: {
+        Row: {
+          alterado_por: string | null
+          created_at: string
+          id: string
+          observacao: string | null
+          professional_id: string
+          requer_correcao: boolean
+          status_anterior: string | null
+          status_novo: string
+        }
+        Insert: {
+          alterado_por?: string | null
+          created_at?: string
+          id?: string
+          observacao?: string | null
+          professional_id: string
+          requer_correcao?: boolean
+          status_anterior?: string | null
+          status_novo: string
+        }
+        Update: {
+          alterado_por?: string | null
+          created_at?: string
+          id?: string
+          observacao?: string | null
+          professional_id?: string
+          requer_correcao?: boolean
+          status_anterior?: string | null
+          status_novo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_status_history_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professionals: {
         Row: {
           abordagem: string | null
@@ -538,6 +759,7 @@ export type Database = {
           observacao_admin: string | null
           profissao: Database["public"]["Enums"]["profissao"]
           registro: string
+          requer_correcao: boolean
           slot_minutos: number
           slug: string
           status: Database["public"]["Enums"]["prof_status"]
@@ -575,6 +797,7 @@ export type Database = {
           observacao_admin?: string | null
           profissao: Database["public"]["Enums"]["profissao"]
           registro: string
+          requer_correcao?: boolean
           slot_minutos?: number
           slug: string
           status?: Database["public"]["Enums"]["prof_status"]
@@ -612,6 +835,7 @@ export type Database = {
           observacao_admin?: string | null
           profissao?: Database["public"]["Enums"]["profissao"]
           registro?: string
+          requer_correcao?: boolean
           slot_minutos?: number
           slug?: string
           status?: Database["public"]["Enums"]["prof_status"]
@@ -627,6 +851,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          codigo_anonimo: string | null
           created_at: string
           data_nascimento: string | null
           email: string | null
@@ -637,6 +862,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          codigo_anonimo?: string | null
           created_at?: string
           data_nascimento?: string | null
           email?: string | null
@@ -647,6 +873,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          codigo_anonimo?: string | null
           created_at?: string
           data_nascimento?: string | null
           email?: string | null
@@ -691,6 +918,7 @@ export type Database = {
           total: number
         }[]
       }
+      concluir_consultas_vencidas: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
