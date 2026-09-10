@@ -149,17 +149,13 @@ function Home() {
         <div className="container-page grid items-center gap-12 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
           <div className="rise-in">
             <span className="pill">Plataforma especializada em TOC</span>
-            <h1 className="mt-6 text-[2.1rem] leading-[1.1] sm:text-4xl lg:text-[2.15rem] xl:text-[2.55rem]">
+            <h1 className="mt-6 text-[2.3rem] leading-[1.12] sm:text-[2.7rem] lg:text-[2.55rem] xl:text-[3rem]">
               Conectando você aos melhores profissionais com experiência em TOC
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Consultas online com psicólogos e psiquiatras{" "}
-              <strong className="font-semibold text-foreground">
-                especializados em transtorno obsessivo compulsivo
-              </strong>{" "}
-              sem sair de casa e no horário que cabe na sua rotina. Encontre profissionais
-              selecionados e especializados em TOC, de acordo com o seu perfil e as suas
-              necessidades.
+              Consultas online com psicólogos e psiquiatras com experiência em transtorno
+              obsessivo compulsivo sem sair de casa e no horário que cabe na sua rotina. Selecione
+              profissionais de acordo com o seu perfil e as suas necessidades.
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -195,8 +191,8 @@ function Home() {
       {/* Nossa metodologia + diferencial */}
       <section aria-labelledby="metodologia" className="border-y border-border bg-surface">
         <div className="container-page py-16 lg:py-24">
-          <span className="section-label">Nossa metodologia</span>
-          <h2 id="metodologia" className="mt-3 max-w-3xl text-3xl sm:text-4xl">
+          <span className="section-label">Diferencial</span>
+          <h2 id="metodologia" className="mt-3 max-w-3xl text-4xl sm:text-5xl">
             Nossa metodologia
           </h2>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
@@ -214,7 +210,7 @@ function Home() {
             ))}
           </div>
 
-          <h3 className="mt-14 font-display text-2xl">As etapas da sua jornada</h3>
+          <h3 className="mt-14 font-display text-3xl">As etapas da sua jornada</h3>
           <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {passos.map((passo, i) => (
               <li key={passo.titulo} className="card-soft card-soft-hover p-6">
