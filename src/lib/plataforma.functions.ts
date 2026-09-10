@@ -27,6 +27,7 @@ export type ProfissionalPublico = {
   idiomas: string[];
   genero: string | null;
   slot_minutos: number;
+  valor_centavos: number;
 };
 
 function clientePublico() {
@@ -48,7 +49,7 @@ function clientePublico() {
 }
 
 const CAMPOS =
-  "id, slug, nome, profissao, registro, uf, cidade, foto_url, abordagem, apresentacao, experiencia_toc, experiencia_anos, graduacao, instituicao, cursos, formacao, especializacoes, areas, idiomas, genero, slot_minutos";
+  "id, slug, nome, profissao, registro, uf, cidade, foto_url, abordagem, apresentacao, experiencia_toc, experiencia_anos, graduacao, instituicao, cursos, formacao, especializacoes, areas, idiomas, genero, slot_minutos, valor_centavos";
 
 
 export const listarProfissionais = createServerFn({ method: "GET" }).handler(async () => {
