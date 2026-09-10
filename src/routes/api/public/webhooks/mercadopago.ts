@@ -91,39 +91,16 @@ async function processar(request: Request) {
     { onConflict: "provider_ref" },
   );
 
+  // A taxa de agendamento é receita da plataforma. O repasse ao profissional
+  // só nasce quando a consulta é marcada como realizada (gatilho no banco).
   if (status === "aprovado") {
-    const { data: pagamento } = await supabaseAdmin
-      .from("payments")
-      .select("id")
-      .eq("provider_ref", String(pg.id))
-      .maybeSingle();
-
-    if (pagamento) {
-      const { data: existente } = await supabaseAdmin
-        .from("payouts")
-        .select("id")
-        .eq("payment_id", pagamento.id)
-        .maybeSingle();
-      if (!existente) {
-        await supabaseAdmin.from("payouts").insert({
-          professional_id: consulta.professional_id,
-          payment_id: pagamento.id,
-          valor_centavos: consulta.valor_profissional_centavos,
-          status: "pendente",
-          previsto_para: new Date(new Date(consulta.inicio).getTime() + 7 * 86400_000)
-            .toISOString()
-            .slice(0, 10),
-        });
-      }
-    }
-
     await supabaseAdmin.from("notifications").insert({
       user_id: consulta.patient_id,
       appointment_id: consulta.id,
       tipo: "pagamento_aprovado",
       canal: "email",
       titulo: "Consulta confirmada",
-      corpo: "Recebemos seu pagamento. O link da videochamada já está na sua área.",
+      corpo: "Recebemos a taxa de agendamento. O link da videochamada já está na sua área.",
     });
   }
 
