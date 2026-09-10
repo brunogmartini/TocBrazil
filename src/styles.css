@@ -7,7 +7,7 @@
 /*
  * Design system — plataforma de psicologia online.
  * Institucional: azul sereno. Secundária: verde-sálvia suave.
- * Fundo azul sereno, tipografia Poppins SemiBold (títulos) + Open Sans (texto).
+ * Fundo off-white/bege claro, tipografia Poppins SemiBold (títulos) + Open Sans (texto).
  */
 
 @theme inline {
@@ -72,28 +72,28 @@
 :root {
   --radius: 0.875rem;
 
-  --background: oklch(0.89 0.032 225);
-  --foreground: oklch(0.285 0.05 215);
-  --surface: oklch(0.83 0.045 205);
-  --surface-foreground: oklch(0.34 0.042 210);
-  --card: oklch(0.98 0.008 215);
-  --card-foreground: oklch(0.285 0.05 215);
-  --popover: oklch(0.98 0.008 215);
-  --popover-foreground: oklch(0.285 0.05 215);
+  --background: oklch(0.955 0.014 85);
+  --foreground: oklch(0.3 0.035 215);
+  --surface: oklch(0.925 0.02 85);
+  --surface-foreground: oklch(0.34 0.035 210);
+  --card: oklch(0.985 0.006 85);
+  --card-foreground: oklch(0.3 0.035 215);
+  --popover: oklch(0.985 0.006 85);
+  --popover-foreground: oklch(0.3 0.035 215);
 
   --primary: oklch(0.53 0.07 220);
   --primary-foreground: oklch(0.99 0.004 210);
   --secondary: oklch(0.75 0.055 165);
   --secondary-foreground: oklch(0.29 0.04 210);
-  --muted: oklch(0.9 0.018 215);
-  --muted-foreground: oklch(0.45 0.035 215);
-  --accent: oklch(0.86 0.045 170);
+  --muted: oklch(0.93 0.012 85);
+  --muted-foreground: oklch(0.45 0.03 210);
+  --accent: oklch(0.9 0.035 170);
   --accent-foreground: oklch(0.285 0.05 215);
 
   --destructive: oklch(0.63 0.16 25);
   --destructive-foreground: oklch(0.98 0.006 95);
-  --border: oklch(0.73 0.025 205 / 35%);
-  --input: oklch(0.68 0.03 205 / 42%);
+  --border: oklch(0.85 0.015 85 / 55%);
+  --input: oklch(0.8 0.015 85 / 55%);
   --ring: oklch(0.53 0.07 220);
 
   --chart-1: oklch(0.715 0.128 176);
@@ -102,13 +102,13 @@
   --chart-4: oklch(0.5 0.09 215);
   --chart-5: oklch(0.86 0.06 180);
 
-  --sidebar: oklch(0.96 0.014 205);
-  --sidebar-foreground: oklch(0.34 0.042 210);
+  --sidebar: oklch(0.975 0.008 85);
+  --sidebar-foreground: oklch(0.34 0.035 210);
   --sidebar-primary: oklch(0.53 0.07 220);
   --sidebar-primary-foreground: oklch(0.99 0.004 210);
   --sidebar-accent: oklch(0.91 0.035 165);
-  --sidebar-accent-foreground: oklch(0.34 0.045 205);
-  --sidebar-border: oklch(0.73 0.025 205 / 35%);
+  --sidebar-accent-foreground: oklch(0.34 0.04 210);
+  --sidebar-border: oklch(0.85 0.015 85 / 55%);
   --sidebar-ring: oklch(0.53 0.07 220);
   --professional: oklch(0.55 0.075 225);
   --professional-foreground: oklch(0.99 0.004 220);
