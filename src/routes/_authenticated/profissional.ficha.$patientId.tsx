@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { adicionarAnotacao, fichaPaciente, salvarFichaPaciente } from "@/lib/profissional.functions";
 import { ProfessionalNav } from "@/components/professional-nav";
-import { dataBR, dataHoraBR, moeda, rotuloStatusConsulta } from "@/lib/video-sala";
+import { dataBR, dataHoraBR, rotuloStatusConsulta } from "@/lib/video-sala";
 
 export const Route = createFileRoute("/_authenticated/profissional/ficha/$patientId")({
   head: () => ({
@@ -252,6 +252,3 @@ function Ficha() {
     </div>
   );
 }
-
-// evita aviso de import não usado quando não há valores monetários na ficha
-void moeda;

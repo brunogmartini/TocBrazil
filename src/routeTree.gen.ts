@@ -35,6 +35,8 @@ import { Route as AuthenticatedAgendarSlugRouteImport } from './routes/_authenti
 import { Route as AuthenticatedProfissionalIndexRouteImport } from './routes/_authenticated/profissional.index'
 import { Route as AuthenticatedProfissionalAgendaRouteImport } from './routes/_authenticated/profissional.agenda'
 import { Route as AuthenticatedProfissionalCadastroRouteImport } from './routes/_authenticated/profissional.cadastro'
+import { Route as AuthenticatedProfissionalFinanceiroRouteImport } from './routes/_authenticated/profissional.financeiro'
+import { Route as AuthenticatedProfissionalFichaPatientIdRouteImport } from './routes/_authenticated/profissional.ficha.$patientId'
 import { Route as ApiPublicMercadopagoVinculoRouteImport } from './routes/api/public/mercadopago/vinculo'
 import { Route as ApiPublicWebhooksHotmartRouteImport } from './routes/api/public/webhooks/hotmart'
 import { Route as ApiPublicWebhooksMercadopagoRouteImport } from './routes/api/public/webhooks/mercadopago'
@@ -172,6 +174,18 @@ const AuthenticatedProfissionalCadastroRoute =
     path: '/profissional/cadastro',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProfissionalFinanceiroRoute =
+  AuthenticatedProfissionalFinanceiroRouteImport.update({
+    id: '/profissional/financeiro',
+    path: '/profissional/financeiro',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProfissionalFichaPatientIdRoute =
+  AuthenticatedProfissionalFichaPatientIdRouteImport.update({
+    id: '/profissional/ficha/$patientId',
+    path: '/profissional/ficha/$patientId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicMercadopagoVinculoRoute =
   ApiPublicMercadopagoVinculoRouteImport.update({
     id: '/api/public/mercadopago/vinculo',
@@ -216,7 +230,9 @@ export interface FileRoutesByFullPath {
   '/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
   '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
+  '/profissional/financeiro': typeof AuthenticatedProfissionalFinanceiroRoute
   '/profissional/': typeof AuthenticatedProfissionalIndexRoute
+  '/profissional/ficha/$patientId': typeof AuthenticatedProfissionalFichaPatientIdRoute
   '/api/public/mercadopago/vinculo': typeof ApiPublicMercadopagoVinculoRoute
   '/api/public/webhooks/hotmart': typeof ApiPublicWebhooksHotmartRoute
   '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
@@ -246,7 +262,9 @@ export interface FileRoutesByTo {
   '/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
   '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
+  '/profissional/financeiro': typeof AuthenticatedProfissionalFinanceiroRoute
   '/profissional': typeof AuthenticatedProfissionalIndexRoute
+  '/profissional/ficha/$patientId': typeof AuthenticatedProfissionalFichaPatientIdRoute
   '/api/public/mercadopago/vinculo': typeof ApiPublicMercadopagoVinculoRoute
   '/api/public/webhooks/hotmart': typeof ApiPublicWebhooksHotmartRoute
   '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
@@ -278,7 +296,9 @@ export interface FileRoutesById {
   '/_authenticated/agendar/$slug': typeof AuthenticatedAgendarSlugRoute
   '/_authenticated/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/_authenticated/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
+  '/_authenticated/profissional/financeiro': typeof AuthenticatedProfissionalFinanceiroRoute
   '/_authenticated/profissional/': typeof AuthenticatedProfissionalIndexRoute
+  '/_authenticated/profissional/ficha/$patientId': typeof AuthenticatedProfissionalFichaPatientIdRoute
   '/api/public/mercadopago/vinculo': typeof ApiPublicMercadopagoVinculoRoute
   '/api/public/webhooks/hotmart': typeof ApiPublicWebhooksHotmartRoute
   '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
@@ -310,7 +330,9 @@ export interface FileRouteTypes {
     | '/agendar/$slug'
     | '/profissional/agenda'
     | '/profissional/cadastro'
+    | '/profissional/financeiro'
     | '/profissional/'
+    | '/profissional/ficha/$patientId'
     | '/api/public/mercadopago/vinculo'
     | '/api/public/webhooks/hotmart'
     | '/api/public/webhooks/mercadopago'
@@ -340,7 +362,9 @@ export interface FileRouteTypes {
     | '/agendar/$slug'
     | '/profissional/agenda'
     | '/profissional/cadastro'
+    | '/profissional/financeiro'
     | '/profissional'
+    | '/profissional/ficha/$patientId'
     | '/api/public/mercadopago/vinculo'
     | '/api/public/webhooks/hotmart'
     | '/api/public/webhooks/mercadopago'
@@ -371,7 +395,9 @@ export interface FileRouteTypes {
     | '/_authenticated/agendar/$slug'
     | '/_authenticated/profissional/agenda'
     | '/_authenticated/profissional/cadastro'
+    | '/_authenticated/profissional/financeiro'
     | '/_authenticated/profissional/'
+    | '/_authenticated/profissional/ficha/$patientId'
     | '/api/public/mercadopago/vinculo'
     | '/api/public/webhooks/hotmart'
     | '/api/public/webhooks/mercadopago'
@@ -587,6 +613,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfissionalCadastroRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profissional/financeiro': {
+      id: '/_authenticated/profissional/financeiro'
+      path: '/profissional/financeiro'
+      fullPath: '/profissional/financeiro'
+      preLoaderRoute: typeof AuthenticatedProfissionalFinanceiroRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profissional/ficha/$patientId': {
+      id: '/_authenticated/profissional/ficha/$patientId'
+      path: '/profissional/ficha/$patientId'
+      fullPath: '/profissional/ficha/$patientId'
+      preLoaderRoute: typeof AuthenticatedProfissionalFichaPatientIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/mercadopago/vinculo': {
       id: '/api/public/mercadopago/vinculo'
       path: '/api/public/mercadopago/vinculo'
@@ -617,7 +657,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgendarSlugRoute: typeof AuthenticatedAgendarSlugRoute
   AuthenticatedProfissionalAgendaRoute: typeof AuthenticatedProfissionalAgendaRoute
   AuthenticatedProfissionalCadastroRoute: typeof AuthenticatedProfissionalCadastroRoute
+  AuthenticatedProfissionalFinanceiroRoute: typeof AuthenticatedProfissionalFinanceiroRoute
   AuthenticatedProfissionalIndexRoute: typeof AuthenticatedProfissionalIndexRoute
+  AuthenticatedProfissionalFichaPatientIdRoute: typeof AuthenticatedProfissionalFichaPatientIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -627,7 +669,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfissionalAgendaRoute: AuthenticatedProfissionalAgendaRoute,
   AuthenticatedProfissionalCadastroRoute:
     AuthenticatedProfissionalCadastroRoute,
+  AuthenticatedProfissionalFinanceiroRoute:
+    AuthenticatedProfissionalFinanceiroRoute,
   AuthenticatedProfissionalIndexRoute: AuthenticatedProfissionalIndexRoute,
+  AuthenticatedProfissionalFichaPatientIdRoute:
+    AuthenticatedProfissionalFichaPatientIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
