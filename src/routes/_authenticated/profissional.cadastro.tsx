@@ -15,6 +15,7 @@ import {
   iniciarVinculoMercadoPago,
   statusVinculoMercadoPago,
 } from "@/lib/mercadopago.functions";
+import { ProfessionalNav } from "@/components/professional-nav";
 
 
 export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
@@ -105,6 +106,7 @@ function CadastroProfissional() {
     experiencia_toc: "",
     experiencia_anos: "0",
     slot_minutos: "50",
+    valor: "200",
     graduacao: "",
     instituicao: "",
     cursos: "",
@@ -145,6 +147,7 @@ function CadastroProfissional() {
         experiencia_toc: p.experiencia_toc ?? "",
         experiencia_anos: String(p.experiencia_anos ?? 0),
         slot_minutos: String(p.slot_minutos ?? 50),
+        valor: String(Math.round((p.valor_centavos ?? 20000) / 100)),
         graduacao: p.graduacao ?? "",
         instituicao: p.instituicao ?? "",
         cursos: (p.cursos ?? []).join(", "),
@@ -185,12 +188,14 @@ function CadastroProfissional() {
     setErro(null);
     setAviso(null);
     try {
+      const { valor, ...restoForm } = form;
       const r = await salvar({
         data: {
-          ...form,
+          ...restoForm,
           profissao: form.profissao === "psiquiatra" ? "psiquiatra" : "psicologo",
           experiencia_anos: Number(form.experiencia_anos) || 0,
           slot_minutos: Number(form.slot_minutos) || 50,
+          valor_centavos: Math.round((Number(valor) || 0) * 100),
         },
       });
       if (!r.ok) {
@@ -253,13 +258,20 @@ function CadastroProfissional() {
   }
 
   return (
-    <div className="container-page py-12 lg:py-16">
-      <span className="section-label">Área do profissional</span>
-      <h1 className="mt-3 text-3xl sm:text-4xl">Meu cadastro</h1>
-      <p className="mt-4 max-w-2xl text-muted-foreground">
-        Estas informações formam o seu perfil público. Os documentos são usados apenas para
-        verificação e ficam visíveis somente para você e para a equipe da plataforma.
-      </p>
+    <div className="professional-workspace py-12 lg:py-16">
+    <div className="container-page">
+      <div className="professional-heading p-6 sm:p-8">
+        <span className="professional-label">Consultório digital</span>
+        <h1 className="mt-3 text-3xl sm:text-4xl">
+          {temCadastro ? "Atualizar meus dados" : "Meu cadastro profissional"}
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          {temCadastro
+            ? "Seus dados já estão salvos. Edite aqui apenas o que precisar alterar: perfil público, valor da consulta, documentos e dados de recebimento."
+            : "Estas informações formam o seu perfil público. Os documentos são usados apenas para verificação e ficam visíveis somente para você e para a equipe da plataforma."}
+        </p>
+      </div>
+      <ProfessionalNav ativo="/profissional/cadastro" />
 
       {dados.data?.profissional && (
         <div className="card-soft mt-6 p-5">
@@ -374,6 +386,19 @@ function CadastroProfissional() {
           value={form.experiencia_anos}
           onChange={(v) => setForm({ ...form, experiencia_anos: v })}
         />
+        <div>
+          <Campo
+            label="Valor da consulta (R$)"
+            type="number"
+            value={form.valor}
+            onChange={(v) => setForm({ ...form, valor: v })}
+            required
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Você define o valor. A plataforma retém 25% após a consulta realizada; a taxa de
+            agendamento paga pelo paciente é separada.
+          </p>
+        </div>
         <div>
           <label htmlFor="abordagem" className="section-label">
             Abordagem teórica principal
