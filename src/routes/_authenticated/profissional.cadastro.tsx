@@ -713,6 +713,7 @@ function CadastroProfissional() {
         </Link>
       </div>
     </div>
+    </div>
   );
 }
 
