@@ -360,7 +360,7 @@ function Admin() {
                       <Info rotulo="Formação" valor={p.formacao.join(", ")} />
                       <Info rotulo="Especializações" valor={p.especializacoes.join(", ")} />
                       <Info rotulo="Cursos relevantes" valor={p.cursos.join(", ")} />
-                      <Info rotulo="Áreas de atuação" valor={p.areas.join(", ")} />
+                      <Info rotulo="Subtipos" valor={p.areas.join(", ")} />
                       <Info rotulo="Idiomas" valor={p.idiomas.join(", ")} />
                       <Info rotulo="Apresentação" valor={p.apresentacao} />
                       <Info rotulo="Experiência com TOC" valor={p.experiencia_toc} />
@@ -833,7 +833,7 @@ function EdicaoProfissional({
             ["formacao", "Formação (vírgulas)"],
             ["especializacoes", "Especializações (vírgulas)"],
             ["cursos", "Cursos relevantes (vírgulas)"],
-            ["areas", "Áreas de atuação (vírgulas)"],
+            ["areas", "Subtipos (vírgulas)"],
             ["idiomas", "Idiomas (vírgulas)"],
             ["foto_url", "Endereço da foto"],
           ] as const

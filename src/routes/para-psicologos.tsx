@@ -16,6 +16,8 @@ export const Route = createFileRoute("/para-psicologos")({
         content:
           "Perfil verificado, agenda própria, checkout para o paciente e painel financeiro com repasses e comprovantes.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "/para-psicologos" },
     ],
     links: [{ rel: "canonical", href: "/para-psicologos" }],
@@ -29,7 +31,7 @@ const etapas = [
   "CRP",
   "Formação",
   "Abordagem",
-  "Áreas de atuação",
+  "Subtipos",
   "Documentos para validação",
   "Preço da sessão",
   "Disponibilidade",
@@ -100,7 +102,7 @@ function ParaPsicologos() {
             { t: "Consultas", d: "Próximas sessões, histórico, status e reagendamentos." },
             { t: "Videochamada", d: "Atendimento no navegador, sem gravação por padrão." },
             { t: "Financeiro", d: "Saldo, valores pendentes, repasses, taxas e comprovantes." },
-            { t: "Perfil", d: "Apresentação, abordagem, áreas de atuação e valores." },
+            { t: "Perfil", d: "Apresentação, abordagem, subtipos atendidos e valores." },
             {
               t: "Segurança",
               d: "Preferências, autenticação em duas etapas e sessões ativas.",

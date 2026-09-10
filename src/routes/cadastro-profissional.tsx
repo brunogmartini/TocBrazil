@@ -28,7 +28,7 @@ export const Route = createFileRoute("/cadastro-profissional")({
 
 const etapas = [
   { t: "Crie sua conta", d: "E-mail e senha ou Google. Leva menos de um minuto." },
-  { t: "Preencha seu cadastro", d: "Registro profissional, formação, áreas de atuação, experiência com TOC e valor da consulta." },
+  { t: "Preencha seu cadastro", d: "Registro profissional, formação, subtipos atendidos, experiência com TOC e valor da consulta." },
   { t: "Envie seus documentos", d: "Documento de identidade, comprovante de registro no conselho e diplomas/títulos." },
   { t: "Análise da equipe", d: "Verificamos registro e documentos. Se algo precisar de correção, avisamos na sua área." },
   { t: "Configure sua agenda", d: "Defina sua disponibilidade recorrente e bloqueie exceções direto no calendário." },

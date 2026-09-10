@@ -17,6 +17,8 @@ export const Route = createFileRoute("/entenda-o-toc")({
         content:
           "Conteúdo educativo sobre obsessões, compulsões, checagem e tratamento — sem diagnóstico e sem promessas.",
       },
+      { property: "og:type", content: "article" },
+      { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "/entenda-o-toc" },
     ],
     links: [{ rel: "canonical", href: "/entenda-o-toc" }],
@@ -40,6 +42,53 @@ const blocos = [
   {
     t: "Interferência",
     d: "O que costuma ser considerado clinicamente é o sofrimento envolvido e o quanto isso interfere na rotina da pessoa.",
+  },
+];
+
+const subtipos = [
+  {
+    t: "TOC de simetria",
+    d: "Pode envolver uma necessidade intensa de alinhamento, equilíbrio ou sensação de que algo está exatamente certo.",
+  },
+  {
+    t: "TOC de falsas memórias",
+    d: "Dúvidas persistentes sobre algo que pode ter acontecido levam a revisões mentais e buscas repetidas por confirmação.",
+  },
+  {
+    t: "TOC de orientação sexual",
+    d: "Obsessões e dúvidas indesejadas sobre orientação sexual podem provocar checagens, comparações e busca de certeza.",
+  },
+  {
+    t: "TOC de contaminação e limpeza",
+    d: "Medos de sujeira, germes ou contaminação podem estar associados a lavagens, limpezas e evitações repetitivas.",
+  },
+  {
+    t: "TOC religioso ou escrupulosidade",
+    d: "Preocupações excessivas com moralidade, culpa, pecado ou práticas religiosas podem alimentar rituais e pedidos de garantia.",
+  },
+  {
+    t: "TOC de relacionamento",
+    d: "Dúvidas recorrentes sobre sentimentos, compatibilidade ou a qualidade de um vínculo podem ocupar muito tempo e gerar checagens.",
+  },
+  {
+    t: "TOC puro",
+    d: "Expressão comum para quadros em que as compulsões são principalmente mentais, como ruminar, neutralizar ou revisar pensamentos.",
+  },
+  {
+    t: "TOC existencial",
+    d: "Questões sobre realidade, identidade, sentido da vida ou existência podem se tornar dúvidas repetitivas e angustiantes.",
+  },
+  {
+    t: "TOC de organização",
+    d: "A necessidade de organizar segundo regras rígidas pode gerar sofrimento quando objetos ou tarefas não ficam na ordem esperada.",
+  },
+  {
+    t: "TOC de dúvida e checagem",
+    d: "A incerteza sobre portas, aparelhos, mensagens ou ações pode levar a verificações repetidas que não encerram a dúvida.",
+  },
+  {
+    t: "TOC sexual",
+    d: "Pensamentos ou imagens sexuais intrusivos e indesejados podem causar medo, vergonha e tentativas constantes de obter certeza.",
   },
 ];
 
@@ -85,6 +134,28 @@ function EntendaOToc() {
             acontecem apenas mentalmente. Ter um pensamento intrusivo isolado é uma experiência
             comum e não caracteriza, por si só, um transtorno.
           </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="subtipos" className="container-page py-14 lg:py-20">
+        <div className="max-w-3xl">
+          <span className="section-label">Manifestações do TOC</span>
+          <h2 id="subtipos" className="mt-3 text-3xl leading-tight sm:text-4xl">
+            Conheça alguns subtipos do transtorno
+          </h2>
+          <p className="mt-5 text-base leading-relaxed text-muted-foreground">
+            O TOC pode se manifestar por temas diferentes, e uma mesma pessoa pode vivenciar mais
+            de um deles. Os nomes abaixo ajudam a descrever experiências frequentes, mas não
+            substituem uma avaliação individual feita por profissional qualificado.
+          </p>
+        </div>
+        <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {subtipos.map((subtipo) => (
+            <article key={subtipo.t} className="card-soft h-full p-6">
+              <h3 className="text-lg leading-snug">{subtipo.t}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{subtipo.d}</p>
+            </article>
+          ))}
         </div>
       </section>
 

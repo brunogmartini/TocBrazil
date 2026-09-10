@@ -15,6 +15,8 @@ export const Route = createFileRoute("/seja-parceiro")({
         content:
           "Faça parte de uma rede especializada em TOC: perfil verificado, agenda organizada e atendimento online sem links externos.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "/seja-parceiro" },
     ],
     links: [{ rel: "canonical", href: "/seja-parceiro" }],
@@ -52,7 +54,7 @@ const beneficios = [
 const etapas = [
   "Envie seus dados e sua documentação profissional.",
   "Passe pela verificação de registro no conselho.",
-  "Monte seu perfil com formação, abordagem e áreas de atuação.",
+  "Monte seu perfil com formação, abordagem e subtipos atendidos.",
   "Configure sua agenda e comece a receber agendamentos.",
 ];
 
