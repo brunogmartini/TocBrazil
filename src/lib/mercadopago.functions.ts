@@ -48,7 +48,7 @@ export const statusVinculoMercadoPago = createServerFn({ method: "GET" })
       vinculado: Boolean(prof?.mp_user_id),
       contaId: prof?.mp_user_id ?? null,
       vinculadoEm: prof?.mp_vinculado_em ?? null,
-      comissaoPercent: Number(prof?.comissao_percent ?? 30),
+      comissaoPercent: Number(prof?.comissao_percent ?? 20),
     };
   });
 

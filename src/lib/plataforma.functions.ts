@@ -109,7 +109,7 @@ export function mapearConfiguracoes(rows: { chave: string; valor: unknown }[] | 
   for (const row of rows ?? []) mapa[row.chave] = row.valor;
   const cfg: ConfiguracoesPlataforma = {
     taxaCentavos: Number(mapa["taxa_confirmacao_centavos"] ?? 5000),
-    comissaoPercent: Number(mapa["comissao_plataforma_percent"] ?? 25),
+    comissaoPercent: Number(mapa["comissao_plataforma_percent"] ?? 20),
     duracaoPadraoMinutos: Number(mapa["duracao_padrao_minutos"] ?? 50),
     cancelamentoHoras: Number(mapa["cancelamento_horas_minimas"] ?? 24),
     remarcacaoHoras: Number(mapa["remarcacao_horas_minimas"] ?? 24),

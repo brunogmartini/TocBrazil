@@ -34,7 +34,13 @@ type Filtro = "todos" | "agendada" | "a_receber" | "pago";
 
 function Financeiro() {
   const carregar = useServerFn(financeiroProfissional);
-  const dados = useQuery({ queryKey: ["financeiro-profissional"], queryFn: () => carregar() });
+  const dados = useQuery({
+    queryKey: ["financeiro-profissional"],
+    queryFn: () => carregar(),
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
+  });
   const [filtro, setFiltro] = useState<Filtro>("todos");
 
   if (dados.isLoading) {
@@ -53,7 +59,7 @@ function Financeiro() {
 
   const { lancamentos, resumo } = dados.data;
   const visiveis = lancamentos.filter((l) => filtro === "todos" || l.situacao === filtro);
-  const comissao = resumo?.comissaoPercent ?? 25;
+  const comissao = resumo?.comissaoPercent ?? 20;
 
   return (
     <div className="professional-workspace py-12 lg:py-16">

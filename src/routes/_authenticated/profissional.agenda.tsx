@@ -58,6 +58,9 @@ function PaginaAgenda() {
   const dados = useQuery({
     queryKey: ["agenda-profissional", de, ate],
     queryFn: () => carregar({ data: { de, ate } }),
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
   });
 
   const [consulta, setConsulta] = useState<ConsultaAgenda | null>(null);
@@ -86,9 +89,7 @@ function PaginaAgenda() {
 
   async function recarregar() {
     await queryClient.invalidateQueries({ queryKey: ["agenda-profissional"] });
-    setConsulta((atual) =>
-      atual ? (dados.data?.consultas.find((c) => c.id === atual.id) ?? null) : null,
-    );
+    setConsulta(null);
   }
 
   const prof = dados.data?.profissional;

@@ -27,8 +27,20 @@ function PainelProfissional() {
   const queryClient = useQueryClient();
   const carregar = useServerFn(minhaAgendaProfissional);
   const carregarFinanceiro = useServerFn(financeiroProfissional);
-  const dados = useQuery({ queryKey: ["agenda-profissional", "visao-geral"], queryFn: () => carregar() });
-  const financeiro = useQuery({ queryKey: ["financeiro-profissional"], queryFn: () => carregarFinanceiro() });
+  const dados = useQuery({
+    queryKey: ["agenda-profissional", "visao-geral"],
+    queryFn: () => carregar(),
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
+  });
+  const financeiro = useQuery({
+    queryKey: ["financeiro-profissional"],
+    queryFn: () => carregarFinanceiro(),
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
+  });
   const [selecionada, setSelecionada] = useState<ConsultaAgenda | null>(null);
 
   const prof = dados.data?.profissional ?? null;
@@ -142,7 +154,7 @@ function PainelProfissional() {
             <p className="professional-label">Já recebido</p>
             <p className="mt-2 font-display text-2xl">{moeda(resumo?.recebido ?? 0)}</p>
             <p className="mt-2 text-xs text-muted-foreground">
-              sua parte é {100 - (resumo?.comissaoPercent ?? 25)}% do valor da consulta
+              sua parte é {100 - (resumo?.comissaoPercent ?? 20)}% do valor da consulta
             </p>
           </div>
         </div>
