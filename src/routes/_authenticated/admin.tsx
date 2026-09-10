@@ -794,7 +794,7 @@ function EdicaoProfissional({
     apresentacao: profissional.apresentacao ?? "",
     experiencia_toc: profissional.experiencia_toc ?? "",
     experiencia_anos: String(profissional.experiencia_anos ?? 0),
-    comissao_percent: String(profissional.comissao_percent ?? 25),
+    comissao_percent: String(profissional.comissao_percent ?? 20),
     formacao: profissional.formacao.join(", "),
     especializacoes: profissional.especializacoes.join(", "),
     cursos: profissional.cursos.join(", "),

@@ -136,7 +136,7 @@ function Financeiro() {
                     <th className="px-5 py-3">Consulta</th>
                     <th className="px-5 py-3">Paciente</th>
                     <th className="px-5 py-3 text-right">Bruto</th>
-                    <th className="px-5 py-3 text-right">Plataforma ({comissao}%)</th>
+                    <th className="px-5 py-3 text-right">Plataforma</th>
                     <th className="px-5 py-3 text-right">Líquido</th>
                     <th className="px-5 py-3 text-right">Taxa agend.</th>
                     <th className="px-5 py-3">Status</th>
