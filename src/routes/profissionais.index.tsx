@@ -48,10 +48,10 @@ const SUBTIPOS_TOC = [
   "TOC de contaminação e limpeza",
   "TOC religioso/escrupulosidade",
   "TOC de relacionamento",
-  "TOC de pensamentos intrusivos",
-  "TOC de pensamentos mágicos",
-  "TOC de acumulação",
+  "TOC puro",
   "TOC existencial",
+  "TOC de organização",
+  "TOC de dúvida e checagem",
   "TOC sexual",
 ];
 
@@ -72,6 +72,7 @@ function Busca() {
       TODOS,
       ...new Set([
         ABORDAGEM_EPR,
+          "Terapia Cognitivo Comportamental",
         ...profissionais.map((p) => p.abordagem).filter((a): a is string => !!a),
       ]),
     ],

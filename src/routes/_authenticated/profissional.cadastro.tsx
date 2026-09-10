@@ -54,10 +54,10 @@ const SUBTIPOS_TOC = [
   "TOC de contaminação e limpeza",
   "TOC religioso/escrupulosidade",
   "TOC de relacionamento",
-  "TOC de pensamentos intrusivos",
-  "TOC de pensamentos mágicos",
-  "TOC de acumulação",
+  "TOC puro",
   "TOC existencial",
+  "TOC de organização",
+  "TOC de dúvida e checagem",
   "TOC sexual",
 ];
 
@@ -406,7 +406,7 @@ function CadastroProfissional() {
           />
           <datalist id="abordagens-sugeridas">
             <option value="Exposição e Prevenção de Resposta (EPR)" />
-            <option value="Terapia Cognitivo-Comportamental" />
+            <option value="Terapia Cognitivo Comportamental" />
             <option value="Terapia de Aceitação e Compromisso" />
             <option value="Terapia Comportamental" />
             <option value="Psicanálise" />

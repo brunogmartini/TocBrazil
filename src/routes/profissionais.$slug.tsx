@@ -118,7 +118,7 @@ function Perfil() {
               <p className="mt-3 text-sm text-muted-foreground">{p.experiencia_toc}</p>
             </section>
             <section className="card-soft p-6">
-              <h2 className="text-lg">Atendimento</h2>
+              <h2 className="text-lg">Subtipos e idiomas</h2>
               <ul className="mt-3 flex flex-wrap gap-2">
                 {p.areas.map((a) => (
                   <li key={a} className="pill">
