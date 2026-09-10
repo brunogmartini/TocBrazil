@@ -20,8 +20,13 @@
 ## Próximas etapas
 - [x] Diferenciar os acessos de entrar/criar conta e as áreas de paciente/profissional
 - [x] Revisar textos, menu do paciente, subtipos de TOC e chamadas repetidas
+- [x] Revisão dos 3 perfis: calendário do paciente, livro Hotmart (50%), taxa de R$ 50 +
+      comissão 25% só após consulta realizada, agenda visual do profissional (mês/semana/dia),
+      ficha sigilosa e anotações, financeiro/extrato, painel do gestor com abas, página
+      "Sou profissional" com login visível e recuperação de senha
+- [ ] Link definitivo da Hotmart (aguardando a TOC Brazil) — campo já existe em Configurações
 - [ ] Split automático do repasse ao profissional (exige adesão de cada profissional ao Mercado Pago)
 - [ ] Videochamada com sala própria (hoje usa sala segura gerada por consulta)
 - [ ] Envio real de e-mails/WhatsApp dos lembretes já gravados
-- [ ] Recibo/NFS-e, política de cancelamento e reembolso automatizada
+- [ ] Recibo/NFS-e e reembolso automatizado (prazo de cancelamento já configurável)
 - [ ] 2FA, logs de auditoria, retenção de dados e sitemap/analytics de funil

@@ -5,14 +5,20 @@ import { lovable } from "@/integrations/lovable/index";
 
 type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
 
+type BuscaAuth = {
+  redirect?: string | undefined;
+  modo: Modo;
+  perfil?: "profissional" | undefined;
+};
+
 export const Route = createFileRoute("/auth")({
   ssr: false,
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): BuscaAuth => ({
     redirect: typeof search["redirect"] === "string" ? (search["redirect"] as string) : undefined,
-    modo: (["cadastro", "recuperar", "nova-senha"].includes(String(search["modo"]))
+    modo: ["cadastro", "recuperar", "nova-senha"].includes(String(search["modo"]))
       ? (search["modo"] as Modo)
-      : "entrar") as Modo,
-    perfil: search["perfil"] === "profissional" ? ("profissional" as const) : undefined,
+      : "entrar",
+    ...(search["perfil"] === "profissional" ? { perfil: "profissional" as const } : {}),
   }),
   head: () => ({
     meta: [
