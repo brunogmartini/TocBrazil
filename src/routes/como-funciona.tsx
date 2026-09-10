@@ -26,7 +26,7 @@ export const Route = createFileRoute("/como-funciona")({
 const etapas = [
   {
     t: "Entenda sobre o transtorno",
-    d: "Textos didáticos e explicativos sobre TOC",
+    d: "Tenha acesso a conteúdos sobre TOC para entender mais sobre o transtorno.",
   },
   {
     t: "Encontre o profissional ideal",
@@ -78,9 +78,9 @@ function ComoFunciona() {
 
       <section className="border-y border-border bg-surface">
         <div className="container-page py-14 lg:py-20">
-          <ol className="grid gap-5 lg:grid-cols-4">
+          <ol className="grid items-stretch gap-5 lg:grid-cols-4">
             {etapas.map((e, i) => (
-              <li key={e.t} className="card-soft p-6">
+              <li key={e.t} className="card-soft h-full p-6">
                 <span className="step-index">{i + 1}</span>
                 <h2 className="mt-4 text-lg">{e.t}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{e.d}</p>

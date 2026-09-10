@@ -52,7 +52,7 @@ const beneficios = [
 const etapas = [
   "Envie seus dados e sua documentação profissional.",
   "Passe pela verificação de registro no conselho.",
-  "Monte seu perfil com formação, abordagem e áreas de atuação.",
+  "Monte seu perfil com formação, abordagem e subtipos atendidos.",
   "Configure sua agenda e comece a receber agendamentos.",
 ];
 

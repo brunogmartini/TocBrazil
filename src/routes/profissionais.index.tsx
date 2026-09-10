@@ -11,7 +11,7 @@ export const Route = createFileRoute("/profissionais/")({
       {
         name: "description",
         content:
-          "Compare perfis de psicólogos e psiquiatras por profissão, abordagem, área de atuação, idioma e experiência para atendimento online relacionado ao TOC.",
+          "Compare perfis de psicólogos e psiquiatras por profissão, abordagem, subtipo de TOC, idioma e experiência para atendimento online.",
       },
       { property: "og:title", content: "Encontre profissional com experiência em TOC" },
       {
@@ -42,23 +42,17 @@ export const LABEL_PROFISSAO: Record<string, string> = {
 };
 
 const SUBTIPOS_TOC = [
-  "Contaminação e limpeza",
-  "Dúvida e checagem",
-  "Simetria, ordem e exatidão",
-  "Pensamentos intrusivos de agressão",
-  "Pensamentos intrusivos sexuais",
-  "Pensamentos intrusivos religiosos ou escrupulosidade",
-  "TOC de relacionamento",
+  "TOC de simetria",
+  "TOC de falsas memórias",
   "TOC de orientação sexual",
-  "TOC somático ou sensório-motor",
+  "TOC de contaminação e limpeza",
+  "TOC religioso/escrupulosidade",
+  "TOC de relacionamento",
+  "TOC de pensamentos intrusivos",
+  "TOC de pensamentos mágicos",
+  "TOC de acumulação",
   "TOC existencial",
-  "Medo de perder o controle",
-  "Responsabilidade excessiva e medo de causar dano",
-  "Acumulação relacionada ao TOC",
-  "Rituais mentais e ruminação",
-  "Repetição, contagem e necessidade de completude",
-  "Busca de certeza e pedidos de garantia",
-  "TOC predominantemente obsessivo",
+  "TOC sexual",
 ];
 
 function Busca() {
@@ -84,7 +78,7 @@ function Busca() {
     [profissionais],
   );
   const idiomas = useMemo(
-    () => [TODOS, ...new Set(profissionais.flatMap((p) => p.idiomas))],
+    () => [TODOS, ...new Set(["Português", "Espanhol", "Inglês", ...profissionais.flatMap((p) => p.idiomas)])],
     [profissionais],
   );
 
@@ -138,7 +132,7 @@ function Busca() {
           onChange={setProfissao}
           options={[TODOS, "Psicólogo(a)", "Psiquiatra"]}
         />
-        <Select label="Área de atuação" value={area} onChange={setArea} options={areas} />
+        <Select label="Subtipos" value={area} onChange={setArea} options={areas} />
         <Select
           label="Abordagem teórica"
           value={abordagem}
@@ -161,7 +155,7 @@ function Busca() {
 
       <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {resultados.map((p) => (
-          <article key={p.slug} className="card-soft card-soft-hover flex flex-col p-6">
+          <article key={p.slug} className="card-soft card-soft-hover flex h-full flex-col p-6">
             <span className="pill self-start">{LABEL_PROFISSAO[p.profissao]}</span>
             <h2 className="mt-4 text-lg">{p.nome}</h2>
             <p className="mt-1 text-xs text-muted-foreground">

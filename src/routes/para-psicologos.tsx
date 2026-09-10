@@ -29,7 +29,7 @@ const etapas = [
   "CRP",
   "Formação",
   "Abordagem",
-  "Áreas de atuação",
+  "Subtipos",
   "Documentos para validação",
   "Preço da sessão",
   "Disponibilidade",
@@ -100,7 +100,7 @@ function ParaPsicologos() {
             { t: "Consultas", d: "Próximas sessões, histórico, status e reagendamentos." },
             { t: "Videochamada", d: "Atendimento no navegador, sem gravação por padrão." },
             { t: "Financeiro", d: "Saldo, valores pendentes, repasses, taxas e comprovantes." },
-            { t: "Perfil", d: "Apresentação, abordagem, áreas de atuação e valores." },
+            { t: "Perfil", d: "Apresentação, abordagem, subtipos atendidos e valores." },
             {
               t: "Segurança",
               d: "Preferências, autenticação em duas etapas e sessões ativas.",

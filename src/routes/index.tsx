@@ -44,7 +44,10 @@ export const Route = createFileRoute("/")({
 });
 
 const passos = [
-  { titulo: "Entenda sobre o transtorno", texto: "Textos didáticos e explicativos sobre TOC" },
+  {
+    titulo: "Entenda sobre o transtorno",
+    texto: "Tenha acesso a conteúdos sobre TOC para entender mais sobre o transtorno.",
+  },
   {
     titulo: "Encontre o profissional ideal",
     texto:
@@ -117,7 +120,7 @@ const acessoOnline = [
   },
   {
     t: "Curadoria de profissionais",
-    d: "Formação, abordagem e áreas de atuação são verificadas antes de qualquer perfil ser publicado.",
+    d: "Formação, abordagem e subtipos atendidos são verificados antes de qualquer perfil ser publicado.",
   },
   {
     t: "Jornada acompanhada",
@@ -125,7 +128,7 @@ const acessoOnline = [
   },
   {
     t: "Você escolhe o profissional",
-    d: "Compare formação, abordagem, áreas de atuação e idiomas antes de decidir com quem falar.",
+    d: "Compare formação, abordagem, subtipos atendidos e idiomas antes de decidir com quem falar.",
   },
   {
     t: "Atendimento por videochamada",
@@ -201,9 +204,9 @@ function Home() {
             estruturada de cuidado.
           </p>
 
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {pilares.map((p) => (
-              <article key={p.titulo} className="card-soft p-7">
+              <article key={p.titulo} className="card-soft h-full p-7">
                 <h3 className="font-display text-xl">{p.titulo}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.texto}</p>
               </article>
@@ -211,9 +214,9 @@ function Home() {
           </div>
 
           <h3 className="mt-14 font-display text-3xl">As etapas da sua jornada</h3>
-          <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <ol className="mt-6 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {passos.map((passo, i) => (
-              <li key={passo.titulo} className="card-soft card-soft-hover p-6">
+              <li key={passo.titulo} className="card-soft card-soft-hover h-full p-6">
                 <span className="step-index">{i + 1}</span>
                 <h4 className="mt-4 text-lg">{passo.titulo}</h4>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{passo.texto}</p>
@@ -231,7 +234,7 @@ function Home() {
             Psicólogos e psiquiatras com experiência na área.
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Cada profissional declara formação, abordagem, áreas de atuação e experiência e a
+            Cada profissional declara formação, abordagem, subtipos atendidos e experiência e a
             documentação é verificada antes da publicação do perfil. Você escolhe quem faz mais
             sentido para você.
           </p>

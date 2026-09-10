@@ -48,23 +48,17 @@ const TIPOS_DOCUMENTO = [
 ];
 
 const SUBTIPOS_TOC = [
-  "Contaminação e limpeza",
-  "Dúvida e checagem",
-  "Simetria, ordem e exatidão",
-  "Pensamentos intrusivos de agressão",
-  "Pensamentos intrusivos sexuais",
-  "Pensamentos intrusivos religiosos ou escrupulosidade",
-  "TOC de relacionamento",
+  "TOC de simetria",
+  "TOC de falsas memórias",
   "TOC de orientação sexual",
-  "TOC somático ou sensório-motor",
+  "TOC de contaminação e limpeza",
+  "TOC religioso/escrupulosidade",
+  "TOC de relacionamento",
+  "TOC de pensamentos intrusivos",
+  "TOC de pensamentos mágicos",
+  "TOC de acumulação",
   "TOC existencial",
-  "Medo de perder o controle",
-  "Responsabilidade excessiva e medo de causar dano",
-  "Acumulação relacionada ao TOC",
-  "Rituais mentais e ruminação",
-  "Repetição, contagem e necessidade de completude",
-  "Busca de certeza e pedidos de garantia",
-  "TOC predominantemente obsessivo",
+  "TOC sexual",
 ];
 
 const rotuloDoc: Record<string, string> = {
@@ -456,7 +450,7 @@ function CadastroProfissional() {
           className="sm:col-span-2"
         />
         <fieldset className="sm:col-span-2">
-          <legend className="section-label">Áreas de atuação em TOC</legend>
+          <legend className="section-label">Subtipos</legend>
           <p className="mt-2 text-sm text-muted-foreground">Selecione todos os subtipos que você atende.</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {SUBTIPOS_TOC.map((subtipo) => (
@@ -471,20 +465,23 @@ function CadastroProfissional() {
               </label>
             ))}
           </div>
-          <label htmlFor="outras-areas" className="section-label mt-5 block">Outras áreas, separadas por vírgula</label>
-          <input
-            id="outras-areas"
-            className="field-base mt-2"
-            value={form.areas}
-            onChange={(e) => setForm({ ...form, areas: e.target.value })}
-          />
         </fieldset>
-        <Campo
-          label="Idiomas (separe por vírgula)"
-          value={form.idiomas}
-          onChange={(v) => setForm({ ...form, idiomas: v })}
-          className="sm:col-span-2"
-        />
+        <div className="sm:col-span-2">
+          <label htmlFor="idiomas" className="section-label">Idiomas</label>
+          <input
+            id="idiomas"
+            list="idiomas-sugeridos"
+            className="field-base mt-2"
+            value={form.idiomas}
+            onChange={(e) => setForm({ ...form, idiomas: e.target.value })}
+            placeholder="Português, Espanhol, Inglês"
+          />
+          <datalist id="idiomas-sugeridos">
+            <option value="Português" />
+            <option value="Espanhol" />
+            <option value="Inglês" />
+          </datalist>
+        </div>
         <div className="sm:col-span-2">
           <label htmlFor="apresentacao" className="section-label">
             Apresentação para o paciente
