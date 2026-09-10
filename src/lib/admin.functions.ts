@@ -293,7 +293,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
         requer_correcao: Boolean(p.requer_correcao),
         etapa: calcularEtapa(p, docs, comAgenda.has(p.id)),
         valor_centavos: p.valor_centavos,
-        comissao_percent: Number(p.comissao_percent ?? 25),
+        comissao_percent: Number(p.comissao_percent ?? 20),
         consultas: stats?.total ?? 0,
         consultasRealizadas: stats?.realizadas ?? 0,
         telefone: p.telefone,
@@ -450,7 +450,7 @@ export const editarProfissionalAdmin = createServerFn({ method: "POST" })
         areas: lista(data.areas),
         idiomas: lista(data.idiomas),
         foto_url: texto(data.foto_url, 500),
-        comissao_percent: Math.min(Math.max(Number(data.comissao_percent ?? 25) || 25, 0), 100),
+        comissao_percent: Math.min(Math.max(Number(data.comissao_percent ?? 20) || 20, 0), 100),
         voltarParaAnalise: Boolean(data.voltarParaAnalise),
       };
     },
@@ -584,7 +584,7 @@ export const salvarConfiguracoes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: Partial<ConfiguracoesPlataforma>) => ({
     taxaCentavos: Math.max(0, Math.round(Number(data.taxaCentavos ?? 5000) || 0)),
-    comissaoPercent: Math.min(100, Math.max(0, Number(data.comissaoPercent ?? 25) || 0)),
+    comissaoPercent: Math.min(100, Math.max(0, Number(data.comissaoPercent ?? 20) || 0)),
     duracaoPadraoMinutos: Math.min(180, Math.max(15, Number(data.duracaoPadraoMinutos ?? 50) || 50)),
     cancelamentoHoras: Math.max(0, Number(data.cancelamentoHoras ?? 24) || 0),
     remarcacaoHoras: Math.max(0, Number(data.remarcacaoHoras ?? 24) || 0),

@@ -395,7 +395,7 @@ function CadastroProfissional() {
             required
           />
           <p className="mt-1 text-xs text-muted-foreground">
-            Você define o valor. A plataforma retém 25% após a consulta realizada; a taxa de
+            Você define o valor. A plataforma retém 20% após a consulta realizada; você recebe 80%. A taxa de
             agendamento paga pelo paciente é separada.
           </p>
         </div>

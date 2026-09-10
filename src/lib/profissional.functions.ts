@@ -706,7 +706,7 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
     const payoutPorConsulta = new Map((payouts ?? []).map((p) => [p.appointment_id, p]));
 
     const lancamentos: LancamentoFinanceiro[] = (consultas ?? []).map((c) => {
-      const comissao = Number(c.comissao_percent ?? 25);
+      const comissao = Number(c.comissao_percent ?? 20);
       const bruto = c.valor_consulta_centavos ?? 0;
       const plataforma = Math.round((bruto * comissao) / 100);
       const liquido = bruto - plataforma;
@@ -744,7 +744,7 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
       taxasAgendamento: lancamentos
         .filter((l) => l.situacao !== "aguardando_pagamento" && l.situacao !== "cancelada")
         .reduce((s, l) => s + l.taxaAgendamento, 0),
-      comissaoPercent: Number(prof.comissao_percent ?? 25),
+      comissaoPercent: Number(prof.comissao_percent ?? 20),
       consultasRealizadas: lancamentos.filter((l) => l.situacao === "a_receber" || l.situacao === "pago").length,
       consultasAgendadas: lancamentos.filter((l) => l.situacao === "agendada").length,
     };

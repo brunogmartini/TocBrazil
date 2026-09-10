@@ -74,6 +74,7 @@ const rotuloRepasse: Record<string, string> = {
 
 type Aba = "visao" | "pacientes" | "profissionais" | "consultas" | "financeiro" | "livro" | "configuracoes";
 type FiltroProf = "todos" | "pendente" | "aprovado" | "rejeitado" | "suspenso";
+type FiltroRepasse = "a_receber" | "historico" | "todos";
 
 function Admin() {
   const queryClient = useQueryClient();
@@ -90,11 +91,18 @@ function Admin() {
   const [aba, setAba] = useState<Aba>("visao");
   const [busca, setBusca] = useState("");
   const [filtroProf, setFiltroProf] = useState<FiltroProf>("pendente");
+  const [filtroRepasse, setFiltroRepasse] = useState<FiltroRepasse>("a_receber");
   const [aberto, setAberto] = useState<string | null>(null);
   const [observacao, setObservacao] = useState<Record<string, string>>({});
   const [aviso, setAviso] = useState<string | null>(null);
 
-  const painel = useQuery({ queryKey: ["painel-admin"], queryFn: () => carregar() });
+  const painel = useQuery({
+    queryKey: ["painel-admin"],
+    queryFn: () => carregar(),
+    refetchInterval: aba === "financeiro" ? 15_000 : false,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
+  });
   const atualizar = () => queryClient.invalidateQueries({ queryKey: ["painel-admin"] });
 
   if (painel.isError) {
@@ -127,6 +135,11 @@ function Admin() {
       (filtroProf === "todos" || p.status === filtroProf),
   );
   const repasses = (dados?.repasses ?? []).filter((r) => !filtro || r.profissional.toLowerCase().includes(filtro));
+  const repassesVisiveis = repasses.filter((r) => {
+    if (filtroRepasse === "a_receber") return r.status === "pendente" || r.status === "processando" || r.status === "falhou";
+    if (filtroRepasse === "historico") return r.status === "pago";
+    return true;
+  });
 
   async function aplicarStatus(
     p: ProfissionalAdmin,
@@ -145,7 +158,7 @@ function Admin() {
     ["pacientes", "Pacientes"],
     ["profissionais", `Profissionais${t?.pendentes ? ` (${t.pendentes})` : ""}`],
     ["consultas", "Consultas"],
-    ["financeiro", "Financeiro e repasses"],
+    ["financeiro", "Pagamentos aos profissionais"],
     ["livro", "Livro"],
     ["configuracoes", "Configurações"],
   ];
@@ -548,16 +561,39 @@ function Admin() {
               </div>
             ))}
           </div>
-          <h2 className="mt-10 text-xl">Repasses aos profissionais</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Um repasse é gerado automaticamente quando a consulta é marcada como realizada.
-          </p>
+          <div className="mt-10 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="text-xl">Pagamentos aos profissionais</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Um pagamento é gerado automaticamente quando a consulta é marcada como realizada.
+              </p>
+            </div>
+            <div className="flex gap-1 rounded-full bg-muted p-1 text-xs">
+              {(
+                [
+                  ["a_receber", "Valores a receber"],
+                  ["historico", "Histórico de pagamentos"],
+                  ["todos", "Todos"],
+                ] as const
+              ).map(([id, rotulo]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setFiltroRepasse(id)}
+                  className={`rounded-full px-3 py-1.5 ${filtroRepasse === id ? "bg-background font-semibold" : "text-muted-foreground"}`}
+                >
+                  {rotulo}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="card-soft mt-4 overflow-x-auto p-2">
-            <table className="w-full min-w-[56rem] text-sm">
+            <table className="w-full min-w-[64rem] text-sm">
               <thead className="text-left text-muted-foreground">
                 <tr>
                   <th className="p-3">Profissional</th>
                   <th className="p-3">Consulta</th>
+                  <th className="p-3">Pagamento previsto</th>
                   <th className="p-3">Bruto</th>
                   <th className="p-3">Plataforma</th>
                   <th className="p-3">Líquido</th>
@@ -566,10 +602,11 @@ function Admin() {
                 </tr>
               </thead>
               <tbody>
-                {repasses.map((r) => (
+                {repassesVisiveis.map((r) => (
                   <tr key={r.id} className="border-t border-border/60">
                     <td className="p-3 font-semibold">{r.profissional}</td>
                     <td className="p-3">{r.consultaInicio ? dataHoraBR(r.consultaInicio) : "—"}</td>
+                    <td className="p-3">{r.previstoPara ? dataBR(r.previstoPara) : "—"}</td>
                     <td className="p-3">{moeda(r.bruto)}</td>
                     <td className="p-3 text-muted-foreground">{moeda(r.plataforma)}</td>
                     <td className="p-3 font-semibold">{moeda(r.liquido)}</td>
@@ -592,8 +629,8 @@ function Admin() {
                     </td>
                   </tr>
                 ))}
-                {repasses.length === 0 && !painel.isLoading && (
-                  <tr><td colSpan={7} className="p-4 text-muted-foreground">Nenhum repasse gerado ainda.</td></tr>
+                {repassesVisiveis.length === 0 && !painel.isLoading && (
+                  <tr><td colSpan={8} className="p-4 text-muted-foreground">Nenhum pagamento neste filtro.</td></tr>
                 )}
               </tbody>
             </table>
@@ -757,7 +794,7 @@ function EdicaoProfissional({
     apresentacao: profissional.apresentacao ?? "",
     experiencia_toc: profissional.experiencia_toc ?? "",
     experiencia_anos: String(profissional.experiencia_anos ?? 0),
-    comissao_percent: String(profissional.comissao_percent ?? 25),
+    comissao_percent: String(profissional.comissao_percent ?? 20),
     formacao: profissional.formacao.join(", "),
     especializacoes: profissional.especializacoes.join(", "),
     cursos: profissional.cursos.join(", "),

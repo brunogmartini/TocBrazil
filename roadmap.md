@@ -16,10 +16,10 @@
 - [x] Avaliação do profissional pelo paciente (até 5 estrelas) exibida no perfil
 - [x] Calendário de consultas e link de videochamada na área do paciente
 - [x] Pagamento com Mercado Pago (Checkout Pro) + confirmação automática por webhook
-- [ ] Aba "Pagamentos aos profissionais" com valores a receber e histórico separado
-- [ ] Atualização automática da agenda e do financeiro profissional
-- [ ] Líquido profissional de 80% nas novas consultas e repasses
-- [ ] Validar links exclusivos de videochamada, calendário e anotações por consulta
+- [x] Aba "Pagamentos aos profissionais" com valores a receber e histórico separado
+- [x] Atualização automática da agenda e do financeiro profissional
+- [x] Líquido profissional de 80% nas novas consultas e repasses
+- [x] Validar links exclusivos de videochamada, calendário e anotações por consulta
 
 ## Próximas etapas
 - [x] Diferenciar os acessos de entrar/criar conta e as áreas de paciente/profissional

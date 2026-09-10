@@ -39,7 +39,7 @@ export function ConsultaDetalhe({
   const c = consulta;
   const futura = new Date(c.inicio).getTime() > Date.now();
   const podeAnotar = c.status === "confirmada" || c.status === "realizada";
-  const liquido = c.valor_consulta_centavos - Math.round((c.valor_consulta_centavos * 25) / 100);
+  const liquido = Math.round(c.valor_consulta_centavos * 0.8);
 
   async function mudarStatus(status: "realizada" | "nao_compareceu" | "cancelada") {
     if (status === "cancelada" && !window.confirm("Cancelar esta consulta?")) return;
@@ -81,7 +81,7 @@ export function ConsultaDetalhe({
         </dl>
 
         <div className="flex flex-wrap gap-3">
-          {c.video_url && c.status === "confirmada" && (
+          {c.video_url && (c.status === "confirmada" || c.status === "realizada") && (
             <a href={c.video_url} target="_blank" rel="noopener noreferrer" className="btn-base btn-primary">
               Entrar na videochamada
             </a>
