@@ -40,6 +40,7 @@ export function ConsultaDetalhe({
   const futura = new Date(c.inicio).getTime() > Date.now();
   const podeAnotar = c.status === "confirmada" || c.status === "realizada";
   const liquido = Math.round(c.valor_consulta_centavos * 0.8);
+  const restante = Math.max(0, c.valor_consulta_centavos - c.taxa_agendamento_centavos);
 
   async function mudarStatus(status: "realizada" | "nao_compareceu" | "cancelada") {
     if (status === "cancelada" && !window.confirm("Cancelar esta consulta?")) return;
@@ -60,7 +61,7 @@ export function ConsultaDetalhe({
           </span>
         </div>
 
-        <dl className="grid gap-3 rounded-xl bg-muted p-4 sm:grid-cols-3">
+        <dl className="grid gap-3 rounded-xl bg-muted p-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <dt className="text-xs text-muted-foreground">Valor da consulta</dt>
             <dd className="font-semibold">{moeda(c.valor_consulta_centavos)}</dd>
@@ -70,7 +71,7 @@ export function ConsultaDetalhe({
             <dd className="font-semibold">{moeda(c.valor_profissional_centavos || liquido)}</dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">Taxa de agendamento</dt>
+            <dt className="text-xs text-muted-foreground">Sinal incluído no total</dt>
             <dd className="font-semibold">
               {moeda(c.taxa_agendamento_centavos)}{" "}
               <span className="font-normal text-muted-foreground">
@@ -78,6 +79,10 @@ export function ConsultaDetalhe({
               </span>
             </dd>
           </div>
+           <div>
+             <dt className="text-xs text-muted-foreground">Restante no atendimento</dt>
+             <dd className="font-semibold">{moeda(restante)}</dd>
+           </div>
         </dl>
 
         <div className="flex flex-wrap gap-3">
@@ -99,7 +104,7 @@ export function ConsultaDetalhe({
 
         {c.status === "aguardando_pagamento" && (
           <p className="rounded-xl border border-border/60 p-3 text-xs text-muted-foreground">
-            O paciente ainda não pagou a taxa de agendamento. O horário fica reservado até a confirmação.
+            O paciente ainda não pagou o sinal incluído no valor da consulta. O horário fica reservado até a confirmação.
           </p>
         )}
 

@@ -19,7 +19,6 @@ const colunas = [
       { to: "/para-psiquiatras", label: "Sou psiquiatra" },
       { to: "/profissional", label: "Área do profissional" },
       { to: "/auth", label: "Entrar" },
-      { to: "/admin", label: "Gestão" },
     ],
   },
   {
@@ -85,7 +84,16 @@ export function SiteFooter() {
           medicamentos e não promete resultados. Conteúdo educativo não substitui avaliação
           profissional. O atendimento é de responsabilidade do profissional habilitado.
         </p>
-        <p className="mt-2">© {new Date().getFullYear()} TOC Brazil.</p>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+          <p>© {new Date().getFullYear()} TOC Brazil.</p>
+          <Link
+            to="/auth"
+            search={{ modo: "entrar" as const, perfil: "gestor" as const, redirect: "/admin" }}
+            className="underline underline-offset-4 hover:text-foreground"
+          >
+            Acesso do gestor
+          </Link>
+        </div>
       </div>
     </footer>
   );

@@ -487,10 +487,13 @@ export const minhaAgendaProfissional = createServerFn({ method: "GET" })
       ]);
 
     const ids = [...new Set((consultas ?? []).map((c) => c.patient_id))];
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: perfis } = ids.length
-      ? await supabase.from("profiles").select("id, nome, codigo_anonimo").in("id", ids)
+      ? await supabaseAdmin.from("profiles").select("id, nome, codigo_anonimo").in("id", ids)
       : { data: [] as { id: string; nome: string | null; codigo_anonimo: string | null }[] };
-    const perfilPorId = new Map((perfis ?? []).map((p) => [p.id, p]));
+    const perfilPorId = new Map(
+      (perfis ?? []).map((p) => [p.id, { ...p, nome: p.nome?.trim().split(/\s+/)[0] ?? null }]),
+    );
 
     const lista: ConsultaAgenda[] = (consultas ?? []).map((c) => ({
       ...c,
@@ -745,10 +748,13 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
     ]);
 
     const ids = [...new Set((consultas ?? []).map((c) => c.patient_id))];
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: perfis } = ids.length
-      ? await supabase.from("profiles").select("id, nome, codigo_anonimo").in("id", ids)
+      ? await supabaseAdmin.from("profiles").select("id, nome, codigo_anonimo").in("id", ids)
       : { data: [] as { id: string; nome: string | null; codigo_anonimo: string | null }[] };
-    const perfilPorId = new Map((perfis ?? []).map((p) => [p.id, p]));
+    const perfilPorId = new Map(
+      (perfis ?? []).map((p) => [p.id, { ...p, nome: p.nome?.trim().split(/\s+/)[0] ?? null }]),
+    );
     const payoutPorConsulta = new Map((payouts ?? []).map((p) => [p.appointment_id, p]));
 
     const lancamentos: LancamentoFinanceiro[] = (consultas ?? []).map((c) => {

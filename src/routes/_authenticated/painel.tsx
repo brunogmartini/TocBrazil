@@ -20,8 +20,10 @@ import { Modal } from "@/components/modal";
 import { iniciarPagamento } from "@/lib/pagamento.functions";
 import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 import { horaDe, rotuloDiaLongo, chaveDia } from "@/lib/agenda-tempo";
+import { exigirAreaPaciente } from "@/lib/role-access";
 
 export const Route = createFileRoute("/_authenticated/painel")({
+  beforeLoad: async ({ context }) => exigirAreaPaciente(context.user.id),
   head: () => ({
     meta: [
       { title: "Meu painel — TOC Brazil" },
@@ -156,21 +158,21 @@ function Painel() {
         </div>
       )}
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-[1.3fr_0.9fr]">
+       <div className="mt-10 grid items-start gap-8 lg:grid-cols-[1.3fr_0.9fr]">
         <div>
-          <section>
+           <section className="card-soft h-full p-6">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-xl">Calendário de consultas</h2>
               <span className="text-xs text-muted-foreground">Toque em uma consulta para ver os detalhes</span>
             </div>
-            <div className="mt-4">
+             <div className="mt-4">
               <CalendarioConsultas
                 itens={itensCalendario}
                 selecionado={selecionada}
                 onSelecionar={(item) => setSelecionada(item.id)}
               />
             </div>
-          </section>
+           </section>
 
           <section className="mt-12">
             <h2 className="text-xl">Próximas consultas</h2>
@@ -211,9 +213,13 @@ function Painel() {
                   {c.status === "aguardando_pagamento" && (
                     <div className="mt-3 rounded-xl bg-muted p-4 text-sm text-muted-foreground">
                       <p>
-                        Para confirmar a reserva, pague a taxa de agendamento de{" "}
+                        Para confirmar a reserva, pague o sinal de agendamento de{" "}
                         <strong className="text-foreground">{moeda(c.taxa_agendamento_centavos)}</strong>.
-                        O valor da consulta ({moeda(c.valor_consulta_centavos)}) é combinado com o profissional.
+                        Esse valor faz parte da consulta de {moeda(c.valor_consulta_centavos)}. Restará{" "}
+                        <strong className="text-foreground">
+                          {moeda(Math.max(0, c.valor_consulta_centavos - c.taxa_agendamento_centavos))}
+                        </strong>{" "}
+                        para pagar no atendimento.
                       </p>
                       <button
                         type="button"
@@ -225,7 +231,7 @@ function Painel() {
                           else setErroPagamento(r.erro);
                         }}
                       >
-                        Pagar taxa com Mercado Pago
+                        Pagar sinal com Mercado Pago
                       </button>
                       {erroPagamento && <p className="mt-3 text-destructive">{erroPagamento}</p>}
                     </div>
@@ -280,8 +286,8 @@ function Painel() {
           )}
         </div>
 
-        <aside className="space-y-8">
-          <section className="card-soft overflow-hidden p-6">
+         <aside className="space-y-8">
+           <section className="card-soft min-h-full overflow-hidden p-6 lg:min-h-[26rem]">
             <span className="section-label">Benefício exclusivo</span>
             <h2 className="mt-2 text-xl">{livro.data?.titulo ?? "Como Ser Feliz com TOC"}</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
@@ -380,14 +386,22 @@ function Painel() {
                 {horaDe(consultaSelecionada.fim)}
               </p>
             </div>
-            <dl className="grid grid-cols-2 gap-3 rounded-xl bg-muted p-4">
+             <dl className="grid gap-3 rounded-xl bg-muted p-4 sm:grid-cols-3">
               <div>
-                <dt className="text-xs text-muted-foreground">Taxa de agendamento</dt>
-                <dd className="font-semibold">{moeda(consultaSelecionada.taxa_agendamento_centavos)}</dd>
+                 <dt className="text-xs text-muted-foreground">Valor total da consulta</dt>
+                 <dd className="font-semibold">{moeda(consultaSelecionada.valor_consulta_centavos)}</dd>
               </div>
               <div>
-                <dt className="text-xs text-muted-foreground">Valor da consulta</dt>
-                <dd className="font-semibold">{moeda(consultaSelecionada.valor_consulta_centavos)}</dd>
+                 <dt className="text-xs text-muted-foreground">
+                   Sinal de agendamento {consultaSelecionada.payment_status === "aprovado" ? "já pago" : "a pagar"}
+                 </dt>
+                 <dd className="font-semibold">{moeda(consultaSelecionada.taxa_agendamento_centavos)}</dd>
+               </div>
+               <div>
+                 <dt className="text-xs text-muted-foreground">Restante no atendimento</dt>
+                 <dd className="font-semibold">
+                   {moeda(Math.max(0, consultaSelecionada.valor_consulta_centavos - consultaSelecionada.taxa_agendamento_centavos))}
+                 </dd>
               </div>
             </dl>
             {consultaSelecionada.video_url && consultaSelecionada.status === "confirmada" && (
@@ -402,7 +416,7 @@ function Painel() {
             )}
             {consultaSelecionada.status === "aguardando_pagamento" && (
               <p className="text-xs text-muted-foreground">
-                O link da videochamada é liberado assim que a taxa de agendamento for confirmada.
+                 O link da videochamada é liberado assim que o sinal de agendamento for confirmado.
               </p>
             )}
           </div>

@@ -5,8 +5,10 @@ import { useState } from "react";
 import { financeiroProfissional, type LancamentoFinanceiro } from "@/lib/profissional.functions";
 import { ProfessionalNav } from "@/components/professional-nav";
 import { dataBR, horaBR, moeda } from "@/lib/video-sala";
+import { exigirAreaProfissional } from "@/lib/role-access";
 
 export const Route = createFileRoute("/_authenticated/profissional/financeiro")({
+  beforeLoad: async ({ context }) => exigirAreaProfissional(context.user.id),
   head: () => ({
     meta: [
       { title: "Financeiro — TOC Brazil" },
@@ -69,9 +71,8 @@ function Financeiro() {
           <h1 className="mt-3 text-3xl sm:text-4xl">Financeiro</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
             O valor da consulta só passa a ser devido a você depois que o atendimento é realizado. A
-            plataforma retém {comissao}% e você recebe {100 - comissao}%. A taxa de agendamento de{" "}
-            {moeda(lancamentos[0]?.taxaAgendamento ?? 5000)} paga pelo paciente é receita de intermediação
-            da plataforma e aparece separadamente.
+             plataforma retém {comissao}% e você recebe {100 - comissao}%. O sinal pago no agendamento
+             faz parte do valor total da consulta e é abatido do saldo devido pelo paciente.
           </p>
         </div>
 
@@ -96,9 +97,9 @@ function Financeiro() {
             <p className="mt-2 text-xs text-muted-foreground">repasses já pagos pela plataforma</p>
           </div>
           <div className="professional-metric p-6">
-            <p className="professional-label">Taxas de agendamento</p>
+             <p className="professional-label">Sinais antecipados</p>
             <p className="mt-2 font-display text-2xl">{moeda(resumo?.taxasAgendamento ?? 0)}</p>
-            <p className="mt-2 text-xs text-muted-foreground">pagas pelos pacientes à plataforma</p>
+             <p className="mt-2 text-xs text-muted-foreground">incluídos no valor total das consultas</p>
           </div>
         </div>
 
@@ -138,7 +139,7 @@ function Financeiro() {
                     <th className="px-5 py-3 text-right">Bruto</th>
                     <th className="px-5 py-3 text-right">Plataforma</th>
                     <th className="px-5 py-3 text-right">Líquido</th>
-                    <th className="px-5 py-3 text-right">Taxa agend.</th>
+                     <th className="px-5 py-3 text-right">Sinal incluído</th>
                     <th className="px-5 py-3">Status</th>
                   </tr>
                 </thead>

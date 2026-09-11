@@ -7,8 +7,10 @@ import { ConsultaDetalhe } from "@/components/consulta-detalhe";
 import { EtapasCadastro, ProfessionalNav } from "@/components/professional-nav";
 import { chaveDia, hoje, horaDe, rotuloDiaLongo } from "@/lib/agenda-tempo";
 import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
+import { exigirAreaProfissional } from "@/lib/role-access";
 
 export const Route = createFileRoute("/_authenticated/profissional/")({
+  beforeLoad: async ({ context }) => exigirAreaProfissional(context.user.id, true),
   head: () => ({
     meta: [
       { title: "Consultório digital — TOC Brazil" },

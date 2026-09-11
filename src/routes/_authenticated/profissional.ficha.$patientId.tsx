@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 import { adicionarAnotacao, fichaPaciente, salvarFichaPaciente } from "@/lib/profissional.functions";
 import { ProfessionalNav } from "@/components/professional-nav";
 import { dataBR, dataHoraBR, rotuloStatusConsulta } from "@/lib/video-sala";
+import { exigirAreaProfissional } from "@/lib/role-access";
 
 export const Route = createFileRoute("/_authenticated/profissional/ficha/$patientId")({
+  beforeLoad: async ({ context }) => exigirAreaProfissional(context.user.id),
   head: () => ({
     meta: [
       { title: "Ficha do paciente — TOC Brazil" },
@@ -22,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/profissional/ficha/$patien
 });
 
 const CAMPOS = [
-  { chave: "informacoes_relevantes", rotulo: "Informações relevantes", dica: "Contexto, rede de apoio, medicações em uso, contatos de emergência." },
+  { chave: "informacoes_relevantes", rotulo: "Informações relevantes e medicações", dica: "Contexto clínico, rede de apoio e medicações em uso. Não registre contatos externos." },
   { chave: "diagnostico", rotulo: "Diagnóstico / hipótese diagnóstica", dica: "Subtipos de TOC, comorbidades, instrumentos aplicados (Y-BOCS etc.)." },
   { chave: "historico", rotulo: "Histórico", dica: "Início dos sintomas, tratamentos anteriores, internações." },
   { chave: "observacoes", rotulo: "Observações", dica: "Pontos de atenção para o acompanhamento." },
@@ -104,10 +106,9 @@ function Ficha() {
             <span className="professional-label">Ficha sigilosa</span>
             <h1 className="mt-3 text-3xl sm:text-4xl">{paciente.nome ?? "Paciente"}</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              {paciente.codigo_anonimo && <>Código {paciente.codigo_anonimo} · </>}
-              {idade !== null && <>{idade} anos · </>}
-              {paciente.email}
-              {paciente.telefone && <> · {paciente.telefone}</>}
+               {paciente.codigo_anonimo && <>Código {paciente.codigo_anonimo}</>}
+               {paciente.codigo_anonimo && idade !== null && <> · </>}
+               {idade !== null && <>{idade} anos</>}
             </p>
           </div>
           <Link to="/profissional/agenda" className="btn-base btn-ghost">
