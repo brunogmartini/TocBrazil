@@ -126,7 +126,7 @@ function Home() {
         <div className="container-page grid items-center gap-12 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
           <div className="rise-in">
             <span className="pill">Plataforma especializada em TOC</span>
-            <h1 className="mt-6 text-[2.3rem] leading-[1.12] sm:text-[2.7rem] lg:text-[2.55rem] xl:text-[3rem]">
+            <h1 className="heading-hero mt-6">
               Conectando você aos melhores profissionais com experiência em TOC
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
