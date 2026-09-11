@@ -27,7 +27,7 @@ export const Route = createFileRoute("/profissionais/")({
   }),
   errorComponent: () => (
     <div className="container-page py-20">
-      <h1 className="text-3xl">Não conseguimos carregar os profissionais</h1>
+      <h1 className="heading-page">Não conseguimos carregar os profissionais</h1>
       <p className="mt-4 text-muted-foreground">Atualize a página em alguns instantes.</p>
     </div>
   ),
@@ -113,7 +113,7 @@ function Busca() {
   return (
     <div className="container-page py-12 lg:py-16">
       <span className="section-label">Profissionais</span>
-      <h1 className="mt-3 text-3xl sm:text-4xl">Encontre profissional com experiência em TOC</h1>
+      <h1 className="heading-page mt-3">Encontre profissional com experiência em TOC</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
         As informações são declaradas pelos profissionais e a documentação é verificada pela
         plataforma. A ordenação é neutra: não indicamos que um profissional é melhor do que outro.

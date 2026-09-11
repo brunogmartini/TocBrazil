@@ -82,7 +82,7 @@ function CadastroProfissional() {
   return (
     <div className="container-page py-12 lg:py-16">
       <span className="section-label">Para profissionais</span>
-      <h1 className="mt-3 text-3xl sm:text-4xl">Sou profissional</h1>
+      <h1 className="heading-page mt-3">Sou profissional</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
         Psicólogos e psiquiatras com experiência em TOC. Se você ainda não tem cadastro, comece pelo
         lado esquerdo. Se já é cadastrado, entre pelo lado direito.
@@ -91,7 +91,7 @@ function CadastroProfissional() {
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
         <section className="card-soft p-8">
           <span className="section-label">Profissional novo</span>
-          <h2 className="mt-2 text-2xl">Quero me cadastrar como profissional</h2>
+          <h2 className="heading-section mt-2">Quero me cadastrar como profissional</h2>
           <ol className="mt-6 space-y-4">
             {etapas.map((e, i) => (
               <li key={e.t} className="flex gap-4">
@@ -104,7 +104,7 @@ function CadastroProfissional() {
             ))}
           </ol>
 
-          <h3 className="mt-8 text-base font-semibold">Documentos e títulos necessários</h3>
+          <h3 className="heading-subsection mt-8">Documentos e títulos necessários</h3>
           <ul className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
             {documentos.map((d) => (
               <li key={d} className="rounded-xl bg-muted px-4 py-3">
@@ -137,7 +137,7 @@ function CadastroProfissional() {
 
         <aside className="professional-login card-soft self-start p-8 lg:sticky lg:top-24">
           <span className="professional-label">Profissional cadastrado</span>
-          <h2 className="mt-2 text-2xl">Já sou profissional cadastrado</h2>
+          <h2 className="heading-section mt-2">Já sou profissional cadastrado</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Entre para acessar seu consultório digital: agenda, consultas, financeiro e cadastro.
           </p>
@@ -189,7 +189,7 @@ function CadastroProfissional() {
       </div>
 
       <section className="mt-14">
-        <h2 className="text-xl">Etapas do seu cadastro</h2>
+        <h2 className="heading-section">Etapas do seu cadastro</h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Você acompanha em que etapa está dentro da sua área. A equipe da plataforma valida cada etapa
           e o perfil só fica público depois que todos os requisitos forem aprovados.

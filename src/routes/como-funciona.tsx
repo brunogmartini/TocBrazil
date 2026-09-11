@@ -68,7 +68,7 @@ function ComoFunciona() {
     <>
       <section className="container-page py-14 lg:py-20">
         <span className="section-label">Nossa metodologia</span>
-        <h1 className="mt-4 text-3xl leading-tight sm:text-5xl">Nossa metodologia</h1>
+        <h1 className="heading-page mt-4">Nossa metodologia</h1>
         <p className="mt-6 max-w-3xl text-lg leading-relaxed text-muted-foreground">
           Não somos apenas uma plataforma de consultas online. Somos uma plataforma especializada em
           TOC, que reúne conhecimento, metodologia e profissionais selecionados em uma jornada
@@ -83,7 +83,7 @@ function ComoFunciona() {
             {etapas.map((e, i) => (
               <li key={e.t} className="card-soft h-full p-6">
                 <span className="step-index">{i + 1}</span>
-                <h2 className="mt-4 text-lg">{e.t}</h2>
+                <h2 className="heading-card mt-4">{e.t}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{e.d}</p>
               </li>
             ))}
@@ -98,13 +98,13 @@ function ComoFunciona() {
       </section>
 
       <section aria-labelledby="duvidas" className="container-page py-14 lg:py-20">
-        <h2 id="duvidas" className="text-2xl sm:text-3xl">
+        <h2 id="duvidas" className="heading-section">
           Dúvidas frequentes
         </h2>
         <dl className="mt-8 grid gap-5 md:grid-cols-2">
           {perguntas.map((p) => (
             <div key={p.q} className="card-soft p-6">
-              <dt className="text-lg">{p.q}</dt>
+              <dt className="heading-subsection">{p.q}</dt>
               <dd className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.a}</dd>
             </div>
           ))}
