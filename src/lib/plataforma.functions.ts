@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import { gerarSalaVideo } from "@/lib/video-sala";
+import { areaDosPapeis, type Papel } from "@/lib/areas";
 
 export type ProfissionalPublico = {
   id: string;
@@ -134,6 +135,44 @@ export const configuracoesAutenticadas = createServerFn({ method: "GET" })
 
 /* ---------- área autenticada ---------- */
 
+/**
+ * Papéis reais da conta e a área a que ela pertence.
+ * Uma conta recém-criada ainda não tem papel: aqui ele é fixado uma única vez,
+ * a partir da intenção declarada no cadastro ("Sou paciente" / "Sou profissional").
+ * Depois disso o papel nunca muda por escolha do usuário — só o gestor altera.
+ */
+export const meusPapeis = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data?: { perfil?: string }) => ({
+    perfil: data?.perfil === "profissional" ? ("profissional" as const) : undefined,
+  }))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId, claims } = context;
+    const { data: linhas } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    let papeis = (linhas ?? []).map((p) => p.role as Papel);
+
+    if (papeis.length === 0) {
+      const metadados = (claims as { user_metadata?: { perfil?: string } }).user_metadata;
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: cadastroProfissional } = await supabaseAdmin
+        .from("professionals")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+      const papel: Papel =
+        cadastroProfissional || data.perfil === "profissional" || metadados?.perfil === "profissional"
+          ? "profissional"
+          : "paciente";
+      const { error } = await supabaseAdmin
+        .from("user_roles")
+        .upsert({ user_id: userId, role: papel }, { onConflict: "user_id,role", ignoreDuplicates: true });
+      if (error) throw new Error(error.message);
+      papeis = [papel];
+    }
+
+    return { papeis, area: areaDosPapeis(papeis) };
+  });
+
 export const meuContexto = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -167,11 +206,6 @@ export const salvarPerfil = createServerFn({ method: "POST" })
       data_nascimento: data.data_nascimento,
     });
     if (error) throw new Error(error.message);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("user_roles").upsert(
-      { user_id: userId, role: "paciente" },
-      { onConflict: "user_id,role", ignoreDuplicates: true },
-    );
     return { ok: true };
   });
 

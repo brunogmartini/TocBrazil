@@ -10,7 +10,7 @@ import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 import { exigirAreaProfissional } from "@/lib/role-access";
 
 export const Route = createFileRoute("/_authenticated/profissional/")({
-  beforeLoad: async ({ context }) => exigirAreaProfissional(context.user.id, true),
+  beforeLoad: () => exigirAreaProfissional(),
   head: () => ({
     meta: [
       { title: "Consultório digital — TOC Brazil" },
@@ -93,8 +93,13 @@ function PainelProfissional() {
           <div>
             <span className="professional-label">Consultório digital</span>
             <h1 className="mt-3 text-3xl sm:text-4xl">{prof.nome}</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {etapa.titulo} · consultas de {prof.slot_minutos} min · {moeda(prof.valor_centavos ?? 0)} por consulta
+            <p className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              <span className={etapa.chave === "publicado" || etapa.chave === "aprovado" ? "badge-aprovado" : "pill"}>
+                {etapa.titulo}
+              </span>
+              <span>
+                consultas de {prof.slot_minutos} min · {moeda(prof.valor_centavos ?? 0)} por consulta
+              </span>
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

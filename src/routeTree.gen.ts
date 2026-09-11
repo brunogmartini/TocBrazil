@@ -27,6 +27,7 @@ import { Route as TermosRouteImport } from './routes/termos'
 import { Route as TocRouteImport } from './routes/toc'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
+import { Route as AuthenticatedProfissionalRouteImport } from './routes/_authenticated/profissional'
 import { Route as ConteudosIndexRouteImport } from './routes/conteudos.index'
 import { Route as ConteudosSlugRouteImport } from './routes/conteudos.$slug'
 import { Route as ProfissionaisIndexRouteImport } from './routes/profissionais.index'
@@ -130,6 +131,12 @@ const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
   path: '/painel',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProfissionalRoute =
+  AuthenticatedProfissionalRouteImport.update({
+    id: '/profissional',
+    path: '/profissional',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ConteudosIndexRoute = ConteudosIndexRouteImport.update({
   id: '/conteudos/',
   path: '/conteudos/',
@@ -158,33 +165,33 @@ const AuthenticatedAgendarSlugRoute =
   } as any)
 const AuthenticatedProfissionalIndexRoute =
   AuthenticatedProfissionalIndexRouteImport.update({
-    id: '/profissional/',
-    path: '/profissional/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedProfissionalRoute,
   } as any)
 const AuthenticatedProfissionalAgendaRoute =
   AuthenticatedProfissionalAgendaRouteImport.update({
-    id: '/profissional/agenda',
-    path: '/profissional/agenda',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/agenda',
+    path: '/agenda',
+    getParentRoute: () => AuthenticatedProfissionalRoute,
   } as any)
 const AuthenticatedProfissionalCadastroRoute =
   AuthenticatedProfissionalCadastroRouteImport.update({
-    id: '/profissional/cadastro',
-    path: '/profissional/cadastro',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/cadastro',
+    path: '/cadastro',
+    getParentRoute: () => AuthenticatedProfissionalRoute,
   } as any)
 const AuthenticatedProfissionalFinanceiroRoute =
   AuthenticatedProfissionalFinanceiroRouteImport.update({
-    id: '/profissional/financeiro',
-    path: '/profissional/financeiro',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/financeiro',
+    path: '/financeiro',
+    getParentRoute: () => AuthenticatedProfissionalRoute,
   } as any)
 const AuthenticatedProfissionalFichaPatientIdRoute =
   AuthenticatedProfissionalFichaPatientIdRouteImport.update({
-    id: '/profissional/ficha/$patientId',
-    path: '/profissional/ficha/$patientId',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/ficha/$patientId',
+    path: '/ficha/$patientId',
+    getParentRoute: () => AuthenticatedProfissionalRoute,
   } as any)
 const ApiPublicMercadopagoVinculoRoute =
   ApiPublicMercadopagoVinculoRouteImport.update({
@@ -223,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/toc': typeof TocRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/painel': typeof AuthenticatedPainelRoute
+  '/profissional': typeof AuthenticatedProfissionalRouteWithChildren
   '/conteudos/$slug': typeof ConteudosSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
   '/conteudos/': typeof ConteudosIndexRoute
@@ -289,6 +297,7 @@ export interface FileRoutesById {
   '/toc': typeof TocRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
+  '/_authenticated/profissional': typeof AuthenticatedProfissionalRouteWithChildren
   '/conteudos/$slug': typeof ConteudosSlugRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
   '/conteudos/': typeof ConteudosIndexRoute
@@ -323,6 +332,7 @@ export interface FileRouteTypes {
     | '/toc'
     | '/admin'
     | '/painel'
+    | '/profissional'
     | '/conteudos/$slug'
     | '/profissionais/$slug'
     | '/conteudos/'
@@ -388,6 +398,7 @@ export interface FileRouteTypes {
     | '/toc'
     | '/_authenticated/admin'
     | '/_authenticated/painel'
+    | '/_authenticated/profissional'
     | '/conteudos/$slug'
     | '/profissionais/$slug'
     | '/conteudos/'
@@ -557,6 +568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profissional': {
+      id: '/_authenticated/profissional'
+      path: '/profissional'
+      fullPath: '/profissional'
+      preLoaderRoute: typeof AuthenticatedProfissionalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/conteudos/': {
       id: '/conteudos/'
       path: '/conteudos'
@@ -594,38 +612,38 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/profissional/': {
       id: '/_authenticated/profissional/'
-      path: '/profissional'
+      path: '/'
       fullPath: '/profissional/'
       preLoaderRoute: typeof AuthenticatedProfissionalIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedProfissionalRoute
     }
     '/_authenticated/profissional/agenda': {
       id: '/_authenticated/profissional/agenda'
-      path: '/profissional/agenda'
+      path: '/agenda'
       fullPath: '/profissional/agenda'
       preLoaderRoute: typeof AuthenticatedProfissionalAgendaRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedProfissionalRoute
     }
     '/_authenticated/profissional/cadastro': {
       id: '/_authenticated/profissional/cadastro'
-      path: '/profissional/cadastro'
+      path: '/cadastro'
       fullPath: '/profissional/cadastro'
       preLoaderRoute: typeof AuthenticatedProfissionalCadastroRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedProfissionalRoute
     }
     '/_authenticated/profissional/financeiro': {
       id: '/_authenticated/profissional/financeiro'
-      path: '/profissional/financeiro'
+      path: '/financeiro'
       fullPath: '/profissional/financeiro'
       preLoaderRoute: typeof AuthenticatedProfissionalFinanceiroRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedProfissionalRoute
     }
     '/_authenticated/profissional/ficha/$patientId': {
       id: '/_authenticated/profissional/ficha/$patientId'
-      path: '/profissional/ficha/$patientId'
+      path: '/ficha/$patientId'
       fullPath: '/profissional/ficha/$patientId'
       preLoaderRoute: typeof AuthenticatedProfissionalFichaPatientIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedProfissionalRoute
     }
     '/api/public/mercadopago/vinculo': {
       id: '/api/public/mercadopago/vinculo'
@@ -651,10 +669,7 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
-  AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
-  AuthenticatedAgendarSlugRoute: typeof AuthenticatedAgendarSlugRoute
+interface AuthenticatedProfissionalRouteChildren {
   AuthenticatedProfissionalAgendaRoute: typeof AuthenticatedProfissionalAgendaRoute
   AuthenticatedProfissionalCadastroRoute: typeof AuthenticatedProfissionalCadastroRoute
   AuthenticatedProfissionalFinanceiroRoute: typeof AuthenticatedProfissionalFinanceiroRoute
@@ -662,18 +677,35 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfissionalFichaPatientIdRoute: typeof AuthenticatedProfissionalFichaPatientIdRoute
 }
 
+const AuthenticatedProfissionalRouteChildren: AuthenticatedProfissionalRouteChildren =
+  {
+    AuthenticatedProfissionalAgendaRoute: AuthenticatedProfissionalAgendaRoute,
+    AuthenticatedProfissionalCadastroRoute:
+      AuthenticatedProfissionalCadastroRoute,
+    AuthenticatedProfissionalFinanceiroRoute:
+      AuthenticatedProfissionalFinanceiroRoute,
+    AuthenticatedProfissionalIndexRoute: AuthenticatedProfissionalIndexRoute,
+    AuthenticatedProfissionalFichaPatientIdRoute:
+      AuthenticatedProfissionalFichaPatientIdRoute,
+  }
+
+const AuthenticatedProfissionalRouteWithChildren =
+  AuthenticatedProfissionalRoute._addFileChildren(
+    AuthenticatedProfissionalRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
+  AuthenticatedProfissionalRoute: typeof AuthenticatedProfissionalRouteWithChildren
+  AuthenticatedAgendarSlugRoute: typeof AuthenticatedAgendarSlugRoute
+}
+
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedPainelRoute: AuthenticatedPainelRoute,
+  AuthenticatedProfissionalRoute: AuthenticatedProfissionalRouteWithChildren,
   AuthenticatedAgendarSlugRoute: AuthenticatedAgendarSlugRoute,
-  AuthenticatedProfissionalAgendaRoute: AuthenticatedProfissionalAgendaRoute,
-  AuthenticatedProfissionalCadastroRoute:
-    AuthenticatedProfissionalCadastroRoute,
-  AuthenticatedProfissionalFinanceiroRoute:
-    AuthenticatedProfissionalFinanceiroRoute,
-  AuthenticatedProfissionalIndexRoute: AuthenticatedProfissionalIndexRoute,
-  AuthenticatedProfissionalFichaPatientIdRoute:
-    AuthenticatedProfissionalFichaPatientIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

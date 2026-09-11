@@ -8,7 +8,7 @@ import { dataBR, dataHoraBR, rotuloStatusConsulta } from "@/lib/video-sala";
 import { exigirAreaProfissional } from "@/lib/role-access";
 
 export const Route = createFileRoute("/_authenticated/profissional/ficha/$patientId")({
-  beforeLoad: async ({ context }) => exigirAreaProfissional(context.user.id),
+  beforeLoad: () => exigirAreaProfissional(),
   head: () => ({
     meta: [
       { title: "Ficha do paciente — TOC Brazil" },

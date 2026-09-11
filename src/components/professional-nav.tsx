@@ -7,11 +7,12 @@ const ITENS = [
   { to: "/profissional/cadastro", rotulo: "Atualizar meus dados" },
 ] as const;
 
+/** Navegação compacta para telas menores; no desktop a barra lateral da área assume esse papel. */
 export function ProfessionalNav({ ativo }: { ativo: (typeof ITENS)[number]["to"] }) {
   return (
     <nav
-      aria-label="Área do profissional"
-      className="professional-nav mt-5 flex gap-2 overflow-x-auto p-2"
+      aria-label="Área do profissional (compacta)"
+      className="professional-nav mt-5 flex gap-2 overflow-x-auto p-2 lg:hidden"
     >
       {ITENS.map((item) =>
         item.to === ativo ? (
@@ -54,7 +55,7 @@ export function EtapasCadastro({
           <li key={p} className="flex flex-col gap-2">
             <span
               className={`h-1.5 rounded-full ${
-                feito ? "bg-professional" : atual ? (problema ? "bg-destructive" : "bg-primary") : "bg-muted"
+                feito ? "bg-professional-accent" : atual ? (problema ? "bg-destructive" : "bg-professional") : "bg-muted"
               }`}
             />
             {!compacto && (

@@ -11,8 +11,11 @@ import {
 import { iniciarPagamento } from "@/lib/pagamento.functions";
 import { track } from "@/lib/analytics";
 import { moeda } from "@/lib/video-sala";
+import { exigirAreaPaciente } from "@/lib/role-access";
 
 export const Route = createFileRoute("/_authenticated/agendar/$slug")({
+  // Só pacientes agendam consultas.
+  beforeLoad: () => exigirAreaPaciente(),
   head: () => ({
     meta: [
       { title: "Agendar consulta — TOC Brazil" },

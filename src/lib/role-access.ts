@@ -1,30 +1,43 @@
 import { redirect } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { meusPapeis } from "@/lib/plataforma.functions";
+import { INICIO_DA_AREA, type Area } from "@/lib/areas";
 
-type Papel = "paciente" | "profissional" | "admin";
+export const CHAVE_PERFIL_PRETENDIDO = "toc-perfil-pretendido";
 
-async function papeisDoUsuario(userId: string): Promise<Papel[]> {
-  const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-  return (data ?? []).map((item) => item.role as Papel);
+function perfilPretendidoGuardado(): "profissional" | undefined {
+  if (typeof window === "undefined") return undefined;
+  const valor = window.sessionStorage.getItem(CHAVE_PERFIL_PRETENDIDO);
+  return valor === "profissional" ? "profissional" : undefined;
 }
 
-export async function exigirAreaPaciente(userId: string) {
-  const papeis = await papeisDoUsuario(userId);
-  if (papeis.includes("admin")) throw redirect({ to: "/admin" });
-  if (papeis.includes("profissional")) throw redirect({ to: "/profissional" });
+export function guardarPerfilPretendido(perfil: "paciente" | "profissional" | "gestor") {
+  if (typeof window === "undefined") return;
+  if (perfil === "profissional") window.sessionStorage.setItem(CHAVE_PERFIL_PRETENDIDO, perfil);
+  else window.sessionStorage.removeItem(CHAVE_PERFIL_PRETENDIDO);
 }
 
-export async function exigirAreaProfissional(userId: string, permitirSemPapel = false) {
-  const papeis = await papeisDoUsuario(userId);
-  if (papeis.includes("admin")) throw redirect({ to: "/admin" });
-  if (!papeis.includes("profissional") && !(permitirSemPapel && papeis.length === 0)) {
-    throw redirect({ to: "/painel" });
-  }
+/**
+ * Descobre (e, na primeira vez, fixa) a área da conta autenticada.
+ * A resposta vem do servidor com base nos papéis reais em `user_roles`.
+ */
+export async function minhaArea(perfilPretendido?: "profissional"): Promise<Area> {
+  const perfil = perfilPretendido ?? perfilPretendidoGuardado();
+  const resultado = await meusPapeis({ data: perfil ? { perfil } : {} });
+  if (typeof window !== "undefined") window.sessionStorage.removeItem(CHAVE_PERFIL_PRETENDIDO);
+  return resultado.area;
 }
 
-export async function destinoDaMinhaArea(userId: string) {
-  const papeis = await papeisDoUsuario(userId);
-  if (papeis.includes("admin")) return "/admin" as const;
-  if (papeis.includes("profissional")) return "/profissional" as const;
-  return "/painel" as const;
+/** Bloqueia a rota se a conta não pertencer à área exigida, levando-a para a área correta. */
+export async function exigirArea(area: Area) {
+  const atual = await minhaArea();
+  if (atual !== area) throw redirect({ to: INICIO_DA_AREA[atual], replace: true });
+  return atual;
+}
+
+export const exigirAreaPaciente = () => exigirArea("paciente");
+export const exigirAreaProfissional = () => exigirArea("profissional");
+export const exigirAreaGestor = () => exigirArea("gestor");
+
+export async function destinoDaMinhaArea() {
+  return INICIO_DA_AREA[await minhaArea()];
 }
