@@ -147,6 +147,12 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
+    const { data: papeis } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    const listaPapeis = (papeis ?? []).map((p) => p.role as string);
+    if ((listaPapeis.includes("paciente") || listaPapeis.includes("admin")) && !listaPapeis.includes("profissional")) {
+      return { ok: false as const, erro: "Esta conta não possui acesso profissional." };
+    }
+
     const { data: existente } = await supabase
       .from("professionals")
       .select("id, slug, status")

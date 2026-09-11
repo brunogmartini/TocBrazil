@@ -93,7 +93,7 @@ function Auth() {
     try {
       if (modo === "recuperar") {
         const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-          redirectTo: `${window.location.origin}/auth?modo=nova-senha${profissional ? "&perfil=profissional" : ""}`,
+            redirectTo: `${window.location.origin}/auth?modo=nova-senha${profissional ? "&perfil=profissional" : gestor ? "&perfil=gestor" : ""}`,
         });
         if (error) throw error;
         setAviso("Se este e-mail tiver conta, você receberá um link para criar uma nova senha.");

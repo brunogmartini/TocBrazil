@@ -376,6 +376,19 @@
   box-shadow: var(--shadow-soft);
 }
 
+@utility professional-login {
+  background-color: color-mix(in oklab, var(--color-professional) 12%, var(--color-card));
+  color: var(--color-foreground);
+  border-color: var(--color-professional-border);
+  & .btn-primary {
+    background-color: var(--color-professional);
+    color: var(--color-professional-foreground);
+  }
+  & .btn-primary:hover {
+    background-color: oklch(from var(--color-professional) calc(l - 0.05) c h);
+  }
+}
+
 /* ---- agenda visual ---- */
 @utility agenda-livre {
   background-color: color-mix(in oklab, var(--color-primary) 12%, transparent);

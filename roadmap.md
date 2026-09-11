@@ -21,6 +21,10 @@
 - [x] Líquido profissional de 80% nas novas consultas e repasses
 - [x] Validar links exclusivos de videochamada, calendário e anotações por consulta
 - [x] Atualizar subtipos de TOC, idiomas, abordagem TCC, conteúdo educativo e paleta azul
+- [x] Separar permissões de paciente, profissional e gestor, sem expor contatos do paciente
+- [x] Tratar o sinal de agendamento como parte do valor total da consulta
+- [x] Alinhar calendário e benefício do paciente e revisar contraste da área profissional
+- [x] Adicionar acesso discreto e protegido para a gestão
 
 ## Próximas etapas
 - [x] Diferenciar os acessos de entrar/criar conta e as áreas de paciente/profissional

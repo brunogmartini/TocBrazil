@@ -266,6 +266,22 @@ function Painel() {
                         </span>
                         <span className="text-muted-foreground">{rotuloStatusConsulta[c.status] ?? c.status}</span>
                       </div>
+                       <dl className="mt-3 grid gap-2 rounded-xl bg-muted p-3 sm:grid-cols-3">
+                         <div>
+                           <dt className="text-xs text-muted-foreground">Valor total</dt>
+                           <dd className="font-semibold">{moeda(c.valor_consulta_centavos)}</dd>
+                         </div>
+                         <div>
+                           <dt className="text-xs text-muted-foreground">Sinal incluído</dt>
+                           <dd className="font-semibold">{moeda(c.taxa_agendamento_centavos)}</dd>
+                         </div>
+                         <div>
+                           <dt className="text-xs text-muted-foreground">Restante</dt>
+                           <dd className="font-semibold">
+                             {moeda(Math.max(0, c.valor_consulta_centavos - c.taxa_agendamento_centavos))}
+                           </dd>
+                         </div>
+                       </dl>
                       {c.status === "realizada" && (
                         <FormularioAvaliacao
                           consultaId={c.id}
