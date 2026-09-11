@@ -111,7 +111,7 @@
   --sidebar-border: oklch(0.85 0.015 85 / 55%);
   --sidebar-ring: oklch(0.53 0.07 220);
   --professional: oklch(0.46 0.075 225);
-  --professional-foreground: oklch(0.28 0.04 220);
+  --professional-foreground: oklch(0.99 0.004 220);
   --professional-surface: oklch(0.94 0.022 210);
   --professional-border: oklch(0.55 0.075 225 / 24%);
 }
@@ -324,7 +324,7 @@
 
 @utility professional-workspace {
   background-color: var(--color-professional-surface);
-  color: var(--color-professional-foreground);
+  color: var(--color-foreground);
   min-height: 100%;
 }
 
