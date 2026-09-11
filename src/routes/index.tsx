@@ -113,32 +113,6 @@ const identificacao = [
   },
 ];
 
-const acessoOnline = [
-  {
-    t: "Especialização primeiro",
-    d: "O que sustenta o cuidado é a experiência do profissional com TOC, não o formato do atendimento.",
-  },
-  {
-    t: "Curadoria de profissionais",
-    d: "Formação, abordagem e subtipos atendidos são verificados antes de qualquer perfil ser publicado.",
-  },
-  {
-    t: "Jornada acompanhada",
-    d: "Conteúdo especializado, escolha do profissional, agendamento e atendimento em um só lugar.",
-  },
-  {
-    t: "Você escolhe o profissional",
-    d: "Compare formação, abordagem, subtipos atendidos e idiomas antes de decidir com quem falar.",
-  },
-  {
-    t: "Atendimento por videochamada",
-    d: "A consulta acontece no navegador, sem instalar aplicativo e sem gravação por padrão.",
-  },
-  {
-    t: "Continuidade sem travas",
-    d: "Se não houver identificação, você pode escolher outro profissional a qualquer momento.",
-  },
-];
 
 function Home() {
   useEffect(() => {
@@ -391,27 +365,6 @@ function Home() {
               </Link>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Consulta online como forma de acesso */}
-      <section aria-labelledby="online" className="container-page py-16 lg:py-24">
-        <span className="section-label">Acesso ao cuidado</span>
-        <h2 id="online" className="mt-3 max-w-2xl text-3xl sm:text-4xl">
-          Cuidado especializado em TOC, onde você estiver.
-        </h2>
-        <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-          Tenha acesso a profissionais selecionados e especializados em TOC, dentro de uma jornada
-          estruturada pela nossa metodologia. A consulta online torna esse cuidado mais acessível,
-          sem abrir mão da especialização, da curadoria e da qualidade da experiência.
-        </p>
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {acessoOnline.map((b) => (
-            <article key={b.t} className="card-soft card-soft-hover p-6">
-              <h3 className="text-lg">{b.t}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{b.d}</p>
-            </article>
-          ))}
         </div>
       </section>
 
