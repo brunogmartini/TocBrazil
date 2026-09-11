@@ -8,7 +8,7 @@ type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
 type BuscaAuth = {
   redirect?: string | undefined;
   modo: Modo;
-  perfil?: "profissional" | undefined;
+  perfil?: "profissional" | "gestor" | undefined;
 };
 
 export const Route = createFileRoute("/auth")({
@@ -18,7 +18,9 @@ export const Route = createFileRoute("/auth")({
     modo: ["cadastro", "recuperar", "nova-senha"].includes(String(search["modo"]))
       ? (search["modo"] as Modo)
       : "entrar",
-    ...(search["perfil"] === "profissional" ? { perfil: "profissional" as const } : {}),
+    ...(["profissional", "gestor"].includes(String(search["perfil"]))
+      ? { perfil: search["perfil"] as "profissional" | "gestor" }
+      : {}),
   }),
   head: () => ({
     meta: [
@@ -58,7 +60,8 @@ function Auth() {
   const [carregando, setCarregando] = useState(false);
 
   const profissional = search.perfil === "profissional";
-  const destino = destinoSeguro(search.redirect ?? (profissional ? "/profissional" : undefined));
+  const gestor = search.perfil === "gestor";
+  const destino = destinoSeguro(search.redirect ?? (profissional ? "/profissional" : gestor ? "/admin" : undefined));
 
   useEffect(() => {
     setModo(search.modo);
@@ -90,7 +93,7 @@ function Auth() {
     try {
       if (modo === "recuperar") {
         const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-          redirectTo: `${window.location.origin}/auth?modo=nova-senha${profissional ? "&perfil=profissional" : ""}`,
+            redirectTo: `${window.location.origin}/auth?modo=nova-senha${profissional ? "&perfil=profissional" : gestor ? "&perfil=gestor" : ""}`,
         });
         if (error) throw error;
         setAviso("Se este e-mail tiver conta, você receberá um link para criar uma nova senha.");
@@ -160,17 +163,17 @@ function Auth() {
   const titulo =
     modo === "cadastro"
       ? profissional ? "Crie sua conta profissional" : "Crie sua conta"
-      : modo === "recuperar"
+       : modo === "recuperar"
         ? "Recuperar acesso"
         : modo === "nova-senha"
           ? "Defina uma nova senha"
-          : profissional ? "Acesso do profissional" : "Entrar na plataforma";
+           : profissional ? "Acesso do profissional" : gestor ? "Acesso do gestor" : "Entrar na plataforma";
 
   return (
     <div className="container-page grid gap-10 py-14 lg:grid-cols-[1fr_0.9fr] lg:py-20">
       <div className="max-w-lg">
         <span className="section-label">
-          {profissional ? "Área do profissional" : modo === "cadastro" ? "Criar conta de paciente" : "Acesso do paciente"}
+           {profissional ? "Área do profissional" : gestor ? "Área da gestão" : modo === "cadastro" ? "Criar conta de paciente" : "Acesso do paciente"}
         </span>
         <h1 className="mt-3 text-3xl sm:text-4xl">{titulo}</h1>
         <p className="mt-4 text-muted-foreground">
@@ -178,20 +181,22 @@ function Auth() {
             ? "Informe o e-mail da sua conta. Enviaremos um link para você criar uma nova senha."
             : modo === "nova-senha"
               ? "Escolha uma senha nova com pelo menos 8 caracteres."
-              : profissional
+               : profissional
                 ? "Entre para acessar seu consultório digital: agenda, consultas, financeiro e cadastro."
+                 : gestor
+                   ? "Entre com uma conta autorizada para acessar a gestão da plataforma."
                 : modo === "cadastro"
                   ? "Cadastre-se para ver os horários disponíveis, os valores e agendar com o profissional que escolher."
                   : "Entre para acessar suas consultas, lembretes e dados de cadastro."}
         </p>
-        {!profissional && (
+         {!profissional && !gestor && (
           <ul className="mt-8 space-y-3 text-sm text-muted-foreground">
             <li className="card-soft p-4">Agenda real dos profissionais, com confirmação imediata.</li>
             <li className="card-soft p-4">Histórico de consultas, lembretes e recibos em um só lugar.</li>
             <li className="card-soft p-4">Seus dados de saúde ficam visíveis apenas para você e para o profissional que atende você.</li>
           </ul>
         )}
-        {profissional && (
+         {profissional && (
           <p className="mt-8 text-sm text-muted-foreground">
             Ainda não tem cadastro?{" "}
             <Link to="/cadastro-profissional" className="underline underline-offset-4">

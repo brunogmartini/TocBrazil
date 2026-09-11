@@ -147,6 +147,12 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
+    const { data: papeis } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    const listaPapeis = (papeis ?? []).map((p) => p.role as string);
+    if ((listaPapeis.includes("paciente") || listaPapeis.includes("admin")) && !listaPapeis.includes("profissional")) {
+      return { ok: false as const, erro: "Esta conta não possui acesso profissional." };
+    }
+
     const { data: existente } = await supabase
       .from("professionals")
       .select("id, slug, status")
@@ -174,7 +180,8 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       .single();
     if (error) return { ok: false as const, erro: "Não foi possível criar seu cadastro agora." };
 
-    await supabase.from("user_roles").upsert(
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("user_roles").upsert(
       { user_id: userId, role: "profissional" },
       { onConflict: "user_id,role", ignoreDuplicates: true },
     );
@@ -486,10 +493,13 @@ export const minhaAgendaProfissional = createServerFn({ method: "GET" })
       ]);
 
     const ids = [...new Set((consultas ?? []).map((c) => c.patient_id))];
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: perfis } = ids.length
-      ? await supabase.from("profiles").select("id, nome, codigo_anonimo").in("id", ids)
+      ? await supabaseAdmin.from("profiles").select("id, nome, codigo_anonimo").in("id", ids)
       : { data: [] as { id: string; nome: string | null; codigo_anonimo: string | null }[] };
-    const perfilPorId = new Map((perfis ?? []).map((p) => [p.id, p]));
+    const perfilPorId = new Map(
+      (perfis ?? []).map((p) => [p.id, { ...p, nome: p.nome?.trim().split(/\s+/)[0] ?? null }]),
+    );
 
     const lista: ConsultaAgenda[] = (consultas ?? []).map((c) => ({
       ...c,
@@ -513,14 +523,24 @@ export const marcarConsultaRealizada = createServerFn({ method: "POST" })
     status: data.status,
   }))
   .handler(async ({ data, context }) => {
+    const { supabase, prof } = await profissionalDoUsuario(context);
+    if (!prof) return { ok: false as const, erro: "Acesso exclusivo para profissionais." };
     const extra =
       data.status === "cancelada"
         ? { cancelada_em: new Date().toISOString(), cancelada_por: "profissional" }
         : {};
-    const { error } = await context.supabase
+    const { data: consulta } = await supabase
+      .from("appointments")
+      .select("id")
+      .eq("id", data.id)
+      .eq("professional_id", prof.id)
+      .maybeSingle();
+    if (!consulta) return { ok: false as const, erro: "Consulta não encontrada." };
+    const { error } = await supabase
       .from("appointments")
       .update({ status: data.status, ...extra })
-      .eq("id", data.id);
+      .eq("id", data.id)
+      .eq("professional_id", prof.id);
     if (error) return { ok: false as const, erro: "Não foi possível atualizar a consulta." };
     return { ok: true as const };
   });
@@ -534,11 +554,25 @@ export const fichaPaciente = createServerFn({ method: "GET" })
     const { supabase, prof } = await profissionalDoUsuario(context);
     if (!prof) return { ok: false as const, erro: "Cadastro profissional não encontrado." };
 
+    const { data: vinculo } = await supabase
+      .from("appointments")
+      .select("id")
+      .eq("patient_id", data.patientId)
+      .eq("professional_id", prof.id)
+      .in("status", ["confirmada", "realizada", "nao_compareceu", "remarcada"])
+      .limit(1)
+      .maybeSingle();
+    if (!vinculo) {
+      return { ok: false as const, erro: "Você só pode acessar pacientes vinculados ao seu atendimento." };
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
     const [{ data: perfil }, { data: ficha }, { data: consultas }, { data: anotacoes }] =
       await Promise.all([
-        supabase
+        supabaseAdmin
           .from("profiles")
-          .select("id, nome, email, telefone, data_nascimento, codigo_anonimo, created_at")
+          .select("id, nome, data_nascimento, codigo_anonimo, created_at")
           .eq("id", data.patientId)
           .maybeSingle(),
         supabase
@@ -569,7 +603,7 @@ export const fichaPaciente = createServerFn({ method: "GET" })
     }
     return {
       ok: true as const,
-      paciente: perfil,
+      paciente: { ...perfil, nome: perfil.nome?.trim().split(/\s+/)[0] ?? null },
       ficha: ficha ?? null,
       consultas: consultas ?? [],
       anotacoes: anotacoes ?? [],
@@ -602,6 +636,15 @@ export const salvarFichaPaciente = createServerFn({ method: "POST" })
     const { supabase, prof } = await profissionalDoUsuario(context);
     if (!prof) return { ok: false as const, erro: "Cadastro profissional não encontrado." };
     const { patientId, ...campos } = data;
+    const { data: vinculo } = await supabase
+      .from("appointments")
+      .select("id")
+      .eq("patient_id", patientId)
+      .eq("professional_id", prof.id)
+      .in("status", ["confirmada", "realizada", "nao_compareceu", "remarcada"])
+      .limit(1)
+      .maybeSingle();
+    if (!vinculo) return { ok: false as const, erro: "Paciente não vinculado ao seu atendimento." };
     const { error } = await supabase
       .from("patient_clinical_records")
       .upsert(
@@ -626,10 +669,11 @@ export const adicionarAnotacao = createServerFn({ method: "POST" })
     if (!prof) return { ok: false as const, erro: "Cadastro profissional não encontrado." };
     const { data: consulta } = await supabase
       .from("appointments")
-      .select("id, patient_id, professional_id")
+      .select("id, patient_id, professional_id, status")
       .eq("id", data.appointmentId)
+      .eq("professional_id", prof.id)
       .maybeSingle();
-    if (!consulta || consulta.professional_id !== prof.id) {
+    if (!consulta || !["confirmada", "realizada"].includes(consulta.status)) {
       return { ok: false as const, erro: "Consulta não encontrada." };
     }
     const { error } = await supabase.from("appointment_notes").insert({
@@ -648,10 +692,21 @@ export const anotacoesDaConsulta = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { appointmentId: string }) => ({ appointmentId: String(data.appointmentId) }))
   .handler(async ({ data, context }) => {
-    const { data: rows } = await context.supabase
+    const { supabase, prof } = await profissionalDoUsuario(context);
+    if (!prof) return { anotacoes: [] };
+    const { data: consulta } = await supabase
+      .from("appointments")
+      .select("id")
+      .eq("id", data.appointmentId)
+      .eq("professional_id", prof.id)
+      .in("status", ["confirmada", "realizada"])
+      .maybeSingle();
+    if (!consulta) return { anotacoes: [] };
+    const { data: rows } = await supabase
       .from("appointment_notes")
       .select("id, conteudo, created_at")
       .eq("appointment_id", data.appointmentId)
+      .eq("professional_id", prof.id)
       .order("created_at", { ascending: false });
     return { anotacoes: rows ?? [] };
   });
@@ -699,10 +754,13 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
     ]);
 
     const ids = [...new Set((consultas ?? []).map((c) => c.patient_id))];
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: perfis } = ids.length
-      ? await supabase.from("profiles").select("id, nome, codigo_anonimo").in("id", ids)
+      ? await supabaseAdmin.from("profiles").select("id, nome, codigo_anonimo").in("id", ids)
       : { data: [] as { id: string; nome: string | null; codigo_anonimo: string | null }[] };
-    const perfilPorId = new Map((perfis ?? []).map((p) => [p.id, p]));
+    const perfilPorId = new Map(
+      (perfis ?? []).map((p) => [p.id, { ...p, nome: p.nome?.trim().split(/\s+/)[0] ?? null }]),
+    );
     const payoutPorConsulta = new Map((payouts ?? []).map((p) => [p.appointment_id, p]));
 
     const lancamentos: LancamentoFinanceiro[] = (consultas ?? []).map((c) => {

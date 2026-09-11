@@ -135,7 +135,7 @@ function CadastroProfissional() {
           </p>
         </section>
 
-        <aside className="professional-workspace card-soft self-start p-8 lg:sticky lg:top-24">
+        <aside className="professional-login card-soft self-start p-8 lg:sticky lg:top-24">
           <span className="professional-label">Profissional cadastrado</span>
           <h2 className="mt-2 text-2xl">Já sou profissional cadastrado</h2>
           <p className="mt-2 text-sm text-muted-foreground">

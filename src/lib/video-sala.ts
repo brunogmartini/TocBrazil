@@ -32,6 +32,10 @@ export function moeda(centavos: number) {
   return (centavos / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+export function saldoConsulta(valorTotalCentavos: number, taxaAgendamentoCentavos: number) {
+  return Math.max(0, valorTotalCentavos - taxaAgendamentoCentavos);
+}
+
 export const TZ = "America/Sao_Paulo";
 
 export function dataHoraBR(iso: string, opts?: Intl.DateTimeFormatOptions) {

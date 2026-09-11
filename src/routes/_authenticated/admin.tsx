@@ -749,7 +749,7 @@ function FormularioConfiguracoes({
       }}
     >
       <h2 className="text-xl sm:col-span-2">Regras financeiras</h2>
-      {num("taxaCentavos", "Taxa de agendamento (R$)", "Paga pelo paciente ao reservar. Receita da plataforma.", 100)}
+       {num("taxaCentavos", "Sinal de agendamento (R$)", "Pago ao reservar e abatido do valor total da consulta.", 100)}
       {num("comissaoPercent", "Comissão da plataforma (%)", "Retida sobre o valor da consulta após a realização.")}
       {num("duracaoPadraoMinutos", "Duração padrão (minutos)", "Usada quando o profissional não define outra.")}
       {num("cancelamentoHoras", "Cancelamento sem custo até (horas antes)", "Prazo para o paciente cancelar com direito a estorno da taxa.")}

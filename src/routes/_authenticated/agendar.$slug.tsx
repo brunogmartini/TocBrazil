@@ -85,6 +85,7 @@ function Agendar() {
 
   const p = prof.data?.profissional;
   const taxa = config.data?.taxaCentavos ?? 5000;
+  const restante = Math.max(0, (p?.valor_centavos ?? 0) - taxa);
   const horasCancelamento = config.data?.cancelamentoHoras ?? 24;
 
   if (prof.isLoading) {
@@ -206,9 +207,13 @@ function Agendar() {
                 <dd>{moeda(p.valor_centavos)}</dd>
               </div>
               <div className="flex justify-between text-base">
-                <dt>Taxa de agendamento (agora)</dt>
+                 <dt>Sinal de agendamento (agora)</dt>
                 <dd className="font-semibold">{moeda(taxa)}</dd>
               </div>
+               <div className="flex justify-between text-sm">
+                 <dt className="text-muted-foreground">Restante no atendimento</dt>
+                 <dd>{moeda(restante)}</dd>
+               </div>
             </dl>
 
             <button
@@ -217,13 +222,12 @@ function Agendar() {
               onClick={confirmar}
               className="btn-base btn-primary mt-6 w-full disabled:opacity-50"
             >
-              {enviando ? "Reservando…" : selecionado ? "Reservar e pagar a taxa" : "Escolha um horário"}
+               {enviando ? "Reservando…" : selecionado ? "Reservar e pagar o sinal" : "Escolha um horário"}
             </button>
             {erro && <p className="mt-3 text-sm text-destructive">{erro}</p>}
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-              A taxa de agendamento de {moeda(taxa)} confirma sua reserva e é paga agora pelo Mercado
-              Pago. O valor da consulta ({moeda(p.valor_centavos)}) é definido pelo profissional e
-              só é devido após a realização do atendimento.
+               O sinal de {moeda(taxa)} confirma sua reserva e faz parte do valor total da consulta de{" "}
+               {moeda(p.valor_centavos)}. Após o abatimento, restarão {moeda(restante)} para pagar no atendimento.
             </p>
             <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
               Cancelamento com estorno da taxa até {horasCancelamento} horas antes do horário marcado.

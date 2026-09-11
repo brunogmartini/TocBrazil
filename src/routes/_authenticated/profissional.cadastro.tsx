@@ -16,9 +16,11 @@ import {
   statusVinculoMercadoPago,
 } from "@/lib/mercadopago.functions";
 import { ProfessionalNav } from "@/components/professional-nav";
+import { exigirAreaProfissional } from "@/lib/role-access";
 
 
 export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
+  beforeLoad: async ({ context }) => exigirAreaProfissional(context.user.id, true),
   head: () => ({
     meta: [
       { title: "Meu cadastro profissional — TOC Brazil" },
@@ -389,8 +391,8 @@ function CadastroProfissional() {
             required
           />
           <p className="mt-1 text-xs text-muted-foreground">
-            Você define o valor. A plataforma retém 20% após a consulta realizada; você recebe 80%. A taxa de
-            agendamento paga pelo paciente é separada.
+             Você define o valor total. O sinal pago no agendamento é abatido desse total; após a consulta,
+             a plataforma retém 20% e você recebe 80%.
           </p>
         </div>
         <div>

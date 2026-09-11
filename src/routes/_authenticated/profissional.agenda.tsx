@@ -23,8 +23,10 @@ import {
   somarMeses,
 } from "@/lib/agenda-tempo";
 import { dataHoraBR } from "@/lib/video-sala";
+import { exigirAreaProfissional } from "@/lib/role-access";
 
 export const Route = createFileRoute("/_authenticated/profissional/agenda")({
+  beforeLoad: async ({ context }) => exigirAreaProfissional(context.user.id),
   head: () => ({
     meta: [
       { title: "Minha agenda — TOC Brazil" },

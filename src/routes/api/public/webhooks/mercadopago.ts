@@ -91,8 +91,7 @@ async function processar(request: Request) {
     { onConflict: "provider_ref" },
   );
 
-  // A taxa de agendamento é receita da plataforma. O repasse ao profissional
-  // só nasce quando a consulta é marcada como realizada (gatilho no banco).
+  // O sinal confirma a reserva e é abatido do valor total da consulta.
   if (status === "aprovado") {
     await supabaseAdmin.from("notifications").insert({
       user_id: consulta.patient_id,
@@ -100,7 +99,7 @@ async function processar(request: Request) {
       tipo: "pagamento_aprovado",
       canal: "email",
       titulo: "Consulta confirmada",
-      corpo: "Recebemos a taxa de agendamento. O link da videochamada já está na sua área.",
+      corpo: "Recebemos o sinal de agendamento. Ele será abatido do valor total da consulta, e o link da videochamada já está na sua área.",
     });
   }
 

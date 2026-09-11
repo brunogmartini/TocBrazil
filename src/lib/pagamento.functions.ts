@@ -2,11 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /**
- * Checkout Mercado Pago (Checkout Pro) da TAXA DE AGENDAMENTO.
- * A consulta nasce como "aguardando_pagamento"; o paciente paga apenas a taxa
- * de intermediação (receita integral da plataforma). O valor da consulta é
- * definido pelo profissional e só vira repasse após a consulta ser realizada,
- * por isso não há split neste pagamento.
+ * Checkout Mercado Pago (Checkout Pro) do sinal de agendamento.
+ * O sinal confirma a reserva e é abatido do valor total da consulta.
  */
 export const iniciarPagamento = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -57,8 +54,8 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
         items: [
           {
             id: consulta.id,
-            title: `Taxa de agendamento — consulta com ${prof?.nome ?? "profissional"} em ${quando}`,
-            description: `Reserva de consulta online de ${consulta.duracao_minutos ?? 50} minutos na TOC Brazil`,
+            title: `Sinal da consulta com ${prof?.nome ?? "profissional"} em ${quando}`,
+            description: `Adiantamento incluído no valor da consulta online de ${consulta.duracao_minutos ?? 50} minutos`,
             quantity: 1,
             currency_id: "BRL",
             unit_price: taxa / 100,

@@ -162,7 +162,8 @@ export const salvarPerfil = createServerFn({ method: "POST" })
       data_nascimento: data.data_nascimento,
     });
     if (error) throw new Error(error.message);
-    await supabase.from("user_roles").upsert(
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("user_roles").upsert(
       { user_id: userId, role: "paciente" },
       { onConflict: "user_id,role", ignoreDuplicates: true },
     );
@@ -231,8 +232,8 @@ export const criarAgendamento = createServerFn({ method: "POST" })
     const { data: cfgRows } = await supabase.from("platform_settings").select("chave, valor");
     const cfg = mapearConfiguracoes(cfgRows);
 
-    // Taxa de agendamento (plataforma) cobrada agora; valor da consulta só
-    // vira crédito do profissional depois que a consulta for realizada.
+    // O sinal de agendamento é cobrado agora e abatido do valor total da
+    // consulta. O saldo restante é devido no atendimento.
     const taxa = cfg.taxaCentavos;
     const valorConsulta = Number(prof.valor_centavos ?? 0);
     const comissao = cfg.comissaoPercent;
@@ -286,7 +287,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
         tipo: "reserva_criada",
         canal: "email",
         titulo: "Reserva registrada",
-        corpo: `Seu horário com ${prof.nome} em ${quando} está reservado e aguarda a confirmação do pagamento da taxa de agendamento.`,
+        corpo: `Seu horário com ${prof.nome} em ${quando} está reservado e aguarda a confirmação do sinal de agendamento, que será abatido do valor total da consulta.`,
       },
       {
         user_id: userId,
@@ -363,7 +364,8 @@ export const meuLivro = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const [{ data: compra }, { data: cfgRows }] = await Promise.all([
+    const [{ data: papeis }, { data: compra }, { data: cfgRows }] = await Promise.all([
+      supabase.from("user_roles").select("role").eq("user_id", userId),
       supabase
         .from("livro_compras")
         .select("status, clicado_em, comprado_em")
@@ -371,6 +373,10 @@ export const meuLivro = createServerFn({ method: "GET" })
         .maybeSingle(),
       supabase.from("platform_settings").select("chave, valor"),
     ]);
+    const listaPapeis = (papeis ?? []).map((p) => p.role as string);
+    if (!listaPapeis.includes("paciente") || listaPapeis.includes("profissional") || listaPapeis.includes("admin")) {
+      throw new Error("Benefício exclusivo para pacientes.");
+    }
     const cfg = mapearConfiguracoes(cfgRows);
     return {
       status: (compra?.status ?? "nao_comprado") as
@@ -390,6 +396,11 @@ export const registrarInteresseLivro = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId, claims } = context;
+    const { data: papeis } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    const listaPapeis = (papeis ?? []).map((p) => p.role as string);
+    if (!listaPapeis.includes("paciente") || listaPapeis.includes("profissional") || listaPapeis.includes("admin")) {
+      return { ok: false as const, erro: "Benefício exclusivo para pacientes." };
+    }
     const email = (claims as { email?: string }).email ?? null;
     const { data: atual } = await supabase
       .from("livro_compras")
