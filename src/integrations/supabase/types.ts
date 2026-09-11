@@ -908,7 +908,38 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      avaliacoes_publicas: {
+        Row: {
+          comentario: string | null
+          created_at: string | null
+          id: string | null
+          nota: number | null
+          professional_id: string | null
+        }
+        Insert: {
+          comentario?: string | null
+          created_at?: string | null
+          id?: string | null
+          nota?: number | null
+          professional_id?: string | null
+        }
+        Update: {
+          comentario?: string | null
+          created_at?: string | null
+          id?: string | null
+          nota?: number | null
+          professional_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       avaliacoes_resumo: {
