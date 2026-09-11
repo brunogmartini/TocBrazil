@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import {
-  configuracoesPlataforma,
+  configuracoesAutenticadas,
   criarAgendamento,
   listarHorariosLivres,
   obterProfissional,
@@ -55,7 +55,7 @@ function Agendar() {
   const queryClient = useQueryClient();
   const buscarProfissional = useServerFn(obterProfissional);
   const buscarHorarios = useServerFn(listarHorariosLivres);
-  const buscarConfig = useServerFn(configuracoesPlataforma);
+  const buscarConfig = useServerFn(configuracoesAutenticadas);
   const agendar = useServerFn(criarAgendamento);
   const pagar = useServerFn(iniciarPagamento);
 

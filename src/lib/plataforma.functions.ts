@@ -123,9 +123,18 @@ export function mapearConfiguracoes(rows: { chave: string; valor: unknown }[] | 
 }
 
 export const configuracoesPlataforma = createServerFn({ method: "GET" }).handler(async () => {
-  const { data } = await clientePublico().from("platform_settings").select("chave, valor");
-  return mapearConfiguracoes(data);
+  throw new Error("Autenticação necessária.");
 });
+
+async function carregarConfiguracoesPrivadas() {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin.from("platform_settings").select("chave, valor");
+  return mapearConfiguracoes(data);
+}
+
+export const configuracoesAutenticadas = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async () => carregarConfiguracoesPrivadas());
 
 /* ---------- área autenticada ---------- */
 
@@ -229,8 +238,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
       return { ok: false as const, erro: "Este horário acabou de ser reservado. Escolha outro." };
     }
 
-    const { data: cfgRows } = await supabase.from("platform_settings").select("chave, valor");
-    const cfg = mapearConfiguracoes(cfgRows);
+    const cfg = await carregarConfiguracoesPrivadas();
 
     // O sinal de agendamento é cobrado agora e abatido do valor total da
     // consulta. O saldo restante é devido no atendimento.
@@ -328,8 +336,7 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
     if (consulta.status === "realizada" || consulta.status === "cancelada") {
       return { ok: false as const, erro: "Esta consulta não pode mais ser cancelada." };
     }
-    const { data: cfgRows } = await supabase.from("platform_settings").select("chave, valor");
-    const cfg = mapearConfiguracoes(cfgRows);
+    const cfg = await carregarConfiguracoesPrivadas();
     const horasAntes = (new Date(consulta.inicio).getTime() - Date.now()) / 3600_000;
     const dentroDoPrazo = horasAntes >= cfg.cancelamentoHoras;
 
@@ -364,20 +371,19 @@ export const meuLivro = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const [{ data: papeis }, { data: compra }, { data: cfgRows }] = await Promise.all([
+    const [{ data: papeis }, { data: compra }, cfg] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", userId),
       supabase
         .from("livro_compras")
         .select("status, clicado_em, comprado_em")
         .eq("user_id", userId)
         .maybeSingle(),
-      supabase.from("platform_settings").select("chave, valor"),
+      carregarConfiguracoesPrivadas(),
     ]);
     const listaPapeis = (papeis ?? []).map((p) => p.role as string);
     if (!listaPapeis.includes("paciente") || listaPapeis.includes("profissional") || listaPapeis.includes("admin")) {
       throw new Error("Benefício exclusivo para pacientes.");
     }
-    const cfg = mapearConfiguracoes(cfgRows);
     return {
       status: (compra?.status ?? "nao_comprado") as
         | "nao_comprado"
@@ -452,7 +458,7 @@ export const avaliacoesDoProfissional = createServerFn({ method: "GET" })
     const cliente = clientePublico();
     const [{ data: rows }, { data: resumo }] = await Promise.all([
       cliente
-        .from("avaliacoes")
+        .from("avaliacoes_publicas")
         .select("id, nota, comentario, created_at")
         .eq("professional_id", data.professionalId)
         .eq("publica", true)
