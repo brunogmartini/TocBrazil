@@ -49,8 +49,8 @@ export function SiteFooter() {
             <img
               src={logo}
               alt="TOC Brazil — Plataforma de Apoio Especializado"
-              width={1144}
-              height={376}
+              width={1363}
+              height={273}
               loading="lazy"
               className="h-14 w-auto"
             />

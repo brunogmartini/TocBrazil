@@ -68,8 +68,8 @@ export function SiteHeader() {
           <img
             src={logo}
             alt="TOC Brazil — Plataforma de Apoio Especializado"
-            width={1144}
-            height={376}
+            width={1363}
+            height={273}
             className="h-10 w-auto"
           />
         </Link>
