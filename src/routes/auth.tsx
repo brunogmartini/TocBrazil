@@ -208,7 +208,7 @@ function Auth() {
       <div className="container-page py-14 lg:py-20">
         <div className="card-soft mx-auto max-w-lg p-7 sm:p-8" role="status">
           <span className="section-label">Conta conectada</span>
-          <h1 className="mt-3 text-2xl sm:text-3xl">Você já está conectado como {rotuloAtual}</h1>
+          <h1 className="heading-page mt-3">Você já está conectado como {rotuloAtual}</h1>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
             {conflito.email ? <>A conta <strong className="text-foreground">{conflito.email}</strong> pertence à área do {rotuloAtual}. </> : null}
             Esta página é o acesso do {rotuloPagina}. Cada conta pertence a uma única área; para usar a plataforma como{" "}
@@ -242,7 +242,7 @@ function Auth() {
         <span className="section-label">
            {profissional ? "Área do profissional" : gestor ? "Área da gestão" : modo === "cadastro" ? "Criar conta de paciente" : "Acesso do paciente"}
         </span>
-        <h1 className="mt-3 text-3xl sm:text-4xl">{titulo}</h1>
+        <h1 className="heading-page mt-3">{titulo}</h1>
         <p className="mt-4 text-muted-foreground">
           {modo === "recuperar"
             ? "Informe o e-mail da sua conta. Enviaremos um link para você criar uma nova senha."

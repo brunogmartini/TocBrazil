@@ -40,7 +40,7 @@ function Cookies() {
   return (
     <div className="container-page py-12 lg:py-16">
       <span className="section-label">Institucional</span>
-      <h1 className="mt-3 text-3xl sm:text-4xl">Política de Cookies</h1>
+      <h1 className="heading-page mt-3">Política de Cookies</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
         Utilizamos cookies e tecnologias equivalentes para operar a plataforma com segurança,
         lembrar preferências e entender, de forma agregada, como as pessoas chegam até aqui.
@@ -49,14 +49,14 @@ function Cookies() {
       <div className="mt-10 grid max-w-3xl gap-5">
         {tipos.map((t) => (
           <section key={t.t} className="card-soft p-6">
-            <h2 className="text-lg">{t.t}</h2>
+            <h2 className="heading-subsection">{t.t}</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t.d}</p>
           </section>
         ))}
       </div>
 
       <div className="card-soft mt-10 max-w-3xl p-6">
-        <h2 className="text-lg">Gerenciar preferências</h2>
+        <h2 className="heading-subsection">Gerenciar preferências</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           Nesta versão não utilizamos cookies de publicidade nem compartilhamos dados com redes de
           anúncios. O painel de gestão de preferências será disponibilizado junto da autenticação,

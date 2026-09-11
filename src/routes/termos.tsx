@@ -70,7 +70,7 @@ function Termos() {
   return (
     <div className="container-page py-12 lg:py-16">
       <span className="section-label">Institucional</span>
-      <h1 className="mt-3 text-3xl sm:text-4xl">Termos de Uso</h1>
+      <h1 className="heading-page mt-3">Termos de Uso</h1>
       <p className="mt-4 max-w-2xl text-sm text-muted-foreground">
         Este documento descreve as condições de uso da TOC Brazil. Ele será revisado por assessoria
         jurídica antes do lançamento comercial.
@@ -79,7 +79,7 @@ function Termos() {
       <div className="mt-10 max-w-3xl space-y-8">
         {secoes.map((s) => (
           <section key={s.t}>
-            <h2 className="text-xl">{s.t}</h2>
+            <h2 className="heading-subsection">{s.t}</h2>
             {s.p.map((par) => (
               <p key={par.slice(0, 24)} className="mt-3 leading-relaxed text-muted-foreground">
                 {par}
