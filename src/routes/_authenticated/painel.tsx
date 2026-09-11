@@ -158,7 +158,7 @@ function Painel() {
         </div>
       )}
 
-       <div className="mt-10 grid items-start gap-8 lg:grid-cols-[1.3fr_0.9fr]">
+       <div className="mt-10 grid items-stretch gap-8 lg:grid-cols-[1.3fr_0.9fr]">
         <div>
            <section className="card-soft h-full p-6">
             <div className="flex items-center justify-between gap-3">
@@ -302,8 +302,8 @@ function Painel() {
           )}
         </div>
 
-         <aside className="space-y-8">
-           <section className="card-soft min-h-full overflow-hidden p-6 lg:min-h-[26rem]">
+         <aside className="flex h-full flex-col gap-8">
+           <section className="card-soft flex-1 overflow-hidden p-6">
             <span className="section-label">Benefício exclusivo</span>
             <h2 className="mt-2 text-xl">{livro.data?.titulo ?? "Como Ser Feliz com TOC"}</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">

@@ -114,7 +114,7 @@ function Agendar() {
         await queryClient.invalidateQueries({ queryKey: ["horarios", slug] });
         return;
       }
-      // Vai direto para o pagamento da taxa de agendamento.
+      // Vai direto para o pagamento do sinal incluído no valor da consulta.
       const pg = await pagar({ data: { consultaId: r.consultaId, origem: window.location.origin } });
       if (pg.ok) {
         window.location.href = pg.link;

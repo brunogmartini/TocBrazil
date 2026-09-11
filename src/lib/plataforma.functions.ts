@@ -351,9 +351,9 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
       titulo: "Consulta cancelada",
       corpo: dentroDoPrazo
         ? cfg.reembolsoTaxaNoPrazo
-          ? "Cancelamento dentro do prazo. A taxa de agendamento será estornada pela nossa equipe."
+          ? "Cancelamento dentro do prazo. O sinal de agendamento será estornado pela nossa equipe."
           : "Cancelamento registrado dentro do prazo."
-        : `Cancelamento fora do prazo de ${cfg.cancelamentoHoras}h. A taxa de agendamento não é reembolsável.`,
+        : `Cancelamento fora do prazo de ${cfg.cancelamentoHoras}h. O sinal de agendamento não é reembolsável.`,
     });
     return { ok: true as const, dentroDoPrazo };
   });

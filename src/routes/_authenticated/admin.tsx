@@ -752,7 +752,7 @@ function FormularioConfiguracoes({
        {num("taxaCentavos", "Sinal de agendamento (R$)", "Pago ao reservar e abatido do valor total da consulta.", 100)}
       {num("comissaoPercent", "Comissão da plataforma (%)", "Retida sobre o valor da consulta após a realização.")}
       {num("duracaoPadraoMinutos", "Duração padrão (minutos)", "Usada quando o profissional não define outra.")}
-      {num("cancelamentoHoras", "Cancelamento sem custo até (horas antes)", "Prazo para o paciente cancelar com direito a estorno da taxa.")}
+      {num("cancelamentoHoras", "Cancelamento sem custo até (horas antes)", "Prazo para o paciente cancelar com direito a estorno do sinal.")}
       {num("remarcacaoHoras", "Remarcação até (horas antes)", "Prazo mínimo para remarcar.")}
       <label className="flex items-center gap-2 text-sm">
         <input
@@ -760,7 +760,7 @@ function FormularioConfiguracoes({
           checked={cfg.reembolsoTaxaNoPrazo}
           onChange={(e) => setCfg({ ...cfg, reembolsoTaxaNoPrazo: e.target.checked })}
         />
-        Estornar a taxa quando o cancelamento é feito dentro do prazo
+        Estornar o sinal quando o cancelamento é feito dentro do prazo
       </label>
 
       <h2 className="mt-4 text-xl sm:col-span-2">Livro “Como Ser Feliz com TOC”</h2>
