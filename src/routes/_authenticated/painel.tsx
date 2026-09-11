@@ -23,7 +23,8 @@ import { horaDe, rotuloDiaLongo, chaveDia } from "@/lib/agenda-tempo";
 import { exigirAreaPaciente } from "@/lib/role-access";
 
 export const Route = createFileRoute("/_authenticated/painel")({
-  beforeLoad: async ({ context }) => exigirAreaPaciente(context.user.id),
+  // Área exclusiva do paciente: profissionais e gestores são levados à sua própria área.
+  beforeLoad: () => exigirAreaPaciente(),
   head: () => ({
     meta: [
       { title: "Meu painel — TOC Brazil" },
@@ -104,7 +105,6 @@ function Painel() {
     }));
   const consultaSelecionada = lista.find((c) => c.id === selecionada) ?? null;
 
-  const papeis = contexto.data?.papeis ?? [];
 
   return (
     <div className="container-page py-12 lg:py-16">
@@ -119,16 +119,6 @@ function Painel() {
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          {papeis.includes("admin") && (
-            <Link to="/admin" className="btn-base btn-ghost">
-              Painel do gestor
-            </Link>
-          )}
-          {papeis.includes("profissional") && (
-            <Link to="/profissional" className="btn-base btn-ghost">
-              Consultório digital
-            </Link>
-          )}
           <Link to="/profissionais" className="btn-base btn-primary">
             Agendar consulta
           </Link>

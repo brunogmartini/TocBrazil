@@ -147,9 +147,10 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
+    // Somente contas da área profissional podem criar ou editar um cadastro.
     const { data: papeis } = await supabase.from("user_roles").select("role").eq("user_id", userId);
     const listaPapeis = (papeis ?? []).map((p) => p.role as string);
-    if ((listaPapeis.includes("paciente") || listaPapeis.includes("admin")) && !listaPapeis.includes("profissional")) {
+    if (!listaPapeis.includes("profissional")) {
       return { ok: false as const, erro: "Esta conta não possui acesso profissional." };
     }
 
@@ -179,12 +180,6 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       .select("id, slug")
       .single();
     if (error) return { ok: false as const, erro: "Não foi possível criar seu cadastro agora." };
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("user_roles").upsert(
-      { user_id: userId, role: "profissional" },
-      { onConflict: "user_id,role", ignoreDuplicates: true },
-    );
 
     return { ok: true as const, id: criado.id, slug: criado.slug };
   });

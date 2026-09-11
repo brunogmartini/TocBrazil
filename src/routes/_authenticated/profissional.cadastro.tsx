@@ -20,7 +20,7 @@ import { exigirAreaProfissional } from "@/lib/role-access";
 
 
 export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
-  beforeLoad: async ({ context }) => exigirAreaProfissional(context.user.id, true),
+  beforeLoad: () => exigirAreaProfissional(),
   head: () => ({
     meta: [
       { title: "Meu cadastro profissional — TOC Brazil" },

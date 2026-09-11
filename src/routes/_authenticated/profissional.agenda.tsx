@@ -26,7 +26,7 @@ import { dataHoraBR } from "@/lib/video-sala";
 import { exigirAreaProfissional } from "@/lib/role-access";
 
 export const Route = createFileRoute("/_authenticated/profissional/agenda")({
-  beforeLoad: async ({ context }) => exigirAreaProfissional(context.user.id),
+  beforeLoad: () => exigirAreaProfissional(),
   head: () => ({
     meta: [
       { title: "Minha agenda — TOC Brazil" },

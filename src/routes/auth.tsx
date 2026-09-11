@@ -1,7 +1,10 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import type { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { areaDoCaminho, destinoDaArea, INICIO_DA_AREA, ROTULO_DA_AREA, type Area } from "@/lib/areas";
+import { guardarPerfilPretendido, minhaArea } from "@/lib/role-access";
 
 type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
 
@@ -43,11 +46,6 @@ export const Route = createFileRoute("/auth")({
   component: Auth,
 });
 
-function destinoSeguro(valor?: string) {
-  if (!valor) return "/painel";
-  return valor.startsWith("/") && !valor.startsWith("//") ? valor : "/painel";
-}
-
 function Auth() {
   const search = useSearch({ from: "/auth" });
   const navigate = useNavigate();
@@ -58,10 +56,18 @@ function Auth() {
   const [erro, setErro] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(false);
+  const [conflito, setConflito] = useState<{ area: Area; email: string | null } | null>(null);
 
   const profissional = search.perfil === "profissional";
   const gestor = search.perfil === "gestor";
-  const destino = destinoSeguro(search.redirect ?? (profissional ? "/profissional" : gestor ? "/admin" : undefined));
+  // Área que esta página representa: vem do botão clicado ("Sou paciente" / "Sou profissional" / gestor)
+  // ou da página protegida que pediu login.
+  const areaPretendida: Area = profissional
+    ? "profissional"
+    : gestor
+      ? "gestor"
+      : (areaDoCaminho(search.redirect) ?? "paciente");
+  const inicioPretendido = INICIO_DA_AREA[areaPretendida];
 
   useEffect(() => {
     setModo(search.modo);
@@ -70,6 +76,23 @@ function Auth() {
   }, [search.modo]);
 
   useEffect(() => {
+    let cancelado = false;
+
+    // Com sessão ativa, descobre a área real da conta no servidor e só então encaminha.
+    async function encaminhar(session: Session) {
+      try {
+        const area = await minhaArea(areaPretendida === "profissional" ? "profissional" : undefined);
+        if (cancelado) return;
+        if (area !== areaPretendida) {
+          setConflito({ area, email: session.user.email ?? null });
+          return;
+        }
+        navigate({ to: destinoDaArea(area, search.redirect), replace: true });
+      } catch {
+        if (!cancelado) setErro("Não foi possível identificar sua área de acesso. Tente novamente.");
+      }
+    }
+
     // Link de redefinição de senha: o Supabase devolve o usuário logado com evento PASSWORD_RECOVERY.
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY") {
@@ -78,12 +101,26 @@ function Auth() {
       }
       if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
         if (modo === "nova-senha" || window.location.hash.includes("type=recovery")) return;
-        navigate({ to: destino, replace: true });
+        void encaminhar(session);
       }
     });
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      cancelado = true;
+      sub.subscription.unsubscribe();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [destino, navigate]);
+  }, [areaPretendida, search.redirect, navigate]);
+
+  async function sairDaContaAtual() {
+    setCarregando(true);
+    try {
+      await supabase.auth.signOut();
+      setConflito(null);
+      setAviso(null);
+    } finally {
+      setCarregando(false);
+    }
+  }
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -107,7 +144,7 @@ function Auth() {
         const { error } = await supabase.auth.updateUser({ password: senha });
         if (error) throw error;
         setAviso("Senha atualizada. Entrando…");
-        navigate({ to: destino, replace: true });
+        navigate({ to: inicioPretendido, replace: true });
         return;
       }
       if (modo === "cadastro") {
@@ -115,12 +152,15 @@ function Auth() {
           setErro("Informe seu nome.");
           return;
         }
+        // A intenção declarada aqui fixa a área da conta (paciente ou profissional) no primeiro acesso.
+        const perfilConta = areaPretendida === "profissional" ? "profissional" : "paciente";
+        guardarPerfilPretendido(perfilConta);
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password: senha,
           options: {
-            emailRedirectTo: window.location.origin + destino,
-            data: { nome: nome.trim() },
+            emailRedirectTo: window.location.origin + inicioPretendido,
+            data: { nome: nome.trim(), perfil: perfilConta },
           },
         });
         if (error) throw error;
@@ -151,6 +191,7 @@ function Auth() {
 
   async function entrarComGoogle() {
     setErro(null);
+    guardarPerfilPretendido(areaPretendida);
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
     });
@@ -158,6 +199,32 @@ function Auth() {
       setErro("Não foi possível entrar com o Google agora.");
       return;
     }
+  }
+
+  if (conflito) {
+    const rotuloAtual = ROTULO_DA_AREA[conflito.area];
+    const rotuloPagina = ROTULO_DA_AREA[areaPretendida];
+    return (
+      <div className="container-page py-14 lg:py-20">
+        <div className="card-soft mx-auto max-w-lg p-7 sm:p-8" role="status">
+          <span className="section-label">Conta conectada</span>
+          <h1 className="mt-3 text-2xl sm:text-3xl">Você já está conectado como {rotuloAtual}</h1>
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+            {conflito.email ? <>A conta <strong className="text-foreground">{conflito.email}</strong> pertence à área do {rotuloAtual}. </> : null}
+            Esta página é o acesso do {rotuloPagina}. Cada conta pertence a uma única área; para usar a plataforma como{" "}
+            {rotuloPagina}, saia e entre (ou crie uma conta) com outro e-mail.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Link to={INICIO_DA_AREA[conflito.area]} className="btn-base btn-primary">
+              Ir para a minha área
+            </Link>
+            <button type="button" onClick={sairDaContaAtual} disabled={carregando} className="btn-base btn-ghost disabled:opacity-60">
+              Sair desta conta
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const titulo =

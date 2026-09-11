@@ -1,7 +1,9 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import logoAsset from "@/assets/toc-brazil-logo.jpg.asset.json";
+import logo from "@/assets/toc-brazil-logo.png";
+import { INICIO_DA_AREA } from "@/lib/areas";
+import { CHAVE_PERFIL_PRETENDIDO, minhaArea } from "@/lib/role-access";
 
 const nav = [
   { to: "/como-funciona", label: "Nossa metodologia" },
@@ -9,12 +11,15 @@ const nav = [
   { to: "/profissionais", label: "Ver profissionais" },
 ] as const;
 
+type Inicio = (typeof INICIO_DA_AREA)[keyof typeof INICIO_DA_AREA];
+
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [participar, setParticipar] = useState(false);
   const [participarMobile, setParticiparMobile] = useState(false);
-  const [logado, setLogado] = useState(false);
+  const [minhaAreaTo, setMinhaAreaTo] = useState<Inicio | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!participar) return;
@@ -26,23 +31,46 @@ export function SiteHeader() {
   }, [participar]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setLogado(!!data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      setLogado(!!session);
+    let ativo = true;
+    // "Minha área" aponta para a área real da conta (paciente, profissional ou gestor).
+    async function resolver(evento?: string) {
+      const intencaoPendente = !!window.sessionStorage.getItem(CHAVE_PERFIL_PRETENDIDO);
+      const area = await minhaArea().catch(() => null);
+      if (!ativo) return;
+      setMinhaAreaTo(area ? INICIO_DA_AREA[area] : "/painel");
+      // Login social recém-concluído a partir de um botão de acesso: leva direto para a área.
+      if (evento === "SIGNED_IN" && intencaoPendente && area) {
+        navigate({ to: INICIO_DA_AREA[area] });
+      }
+    }
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) void resolver();
     });
-    return () => sub.subscription.unsubscribe();
-  }, []);
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        setMinhaAreaTo(null);
+        return;
+      }
+      if (event === "SIGNED_IN" || event === "USER_UPDATED") void resolver(event);
+    });
+    return () => {
+      ativo = false;
+      sub.subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  const logado = minhaAreaTo !== null;
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-xl">
       <div className="container-page flex h-16 items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2.5" aria-label="TOC Brazil — página inicial">
           <img
-            src={logoAsset.url}
+            src={logo}
             alt="TOC Brazil — Plataforma de Apoio Especializado"
-            width={1251}
-            height={541}
-            className="h-11 w-auto rounded-sm"
+            width={900}
+            height={374}
+            className="h-10 w-auto"
           />
         </Link>
 
@@ -59,7 +87,7 @@ export function SiteHeader() {
           ))}
           {logado && (
             <Link
-              to="/painel"
+              to={minhaAreaTo ?? "/painel"}
               className="rounded-full px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               Minha área
@@ -137,7 +165,7 @@ export function SiteHeader() {
 
             {logado && (
               <Link
-                to="/painel"
+                to={minhaAreaTo ?? "/painel"}
                 onClick={() => setOpen(false)}
                 className="rounded-xl px-2 py-3 text-sm font-medium text-foreground"
               >

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import logoAsset from "@/assets/toc-brazil-logo.jpg.asset.json";
+import logo from "@/assets/toc-brazil-logo.png";
 
 const colunas = [
   {
@@ -47,12 +47,12 @@ export function SiteFooter() {
         <div className="lg:col-span-1">
           <div className="flex items-center gap-2.5">
             <img
-              src={logoAsset.url}
+              src={logo}
               alt="TOC Brazil — Plataforma de Apoio Especializado"
-              width={1251}
-              height={541}
+              width={900}
+              height={374}
               loading="lazy"
-              className="h-16 w-auto rounded-sm"
+              className="h-14 w-auto"
             />
           </div>
           <p className="mt-4 font-display text-base">Plataforma especializada em TOC.</p>

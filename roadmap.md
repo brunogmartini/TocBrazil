@@ -26,6 +26,10 @@
 - [x] Alinhar calendário e benefício do paciente e revisar contraste da área profissional
 - [x] Adicionar acesso discreto e protegido para a gestão
 
+- [x] Três áreas isoladas (paciente / profissional / gestor) com papel fixado no primeiro acesso,
+      bloqueio de URL cruzada, aviso de conta conectada em outra área, visual navy da área
+      profissional e logo com fundo transparente
+
 ## Próximas etapas
 - [x] Diferenciar os acessos de entrar/criar conta e as áreas de paciente/profissional
 - [x] Revisar textos, menu do paciente, subtipos de TOC e chamadas repetidas
