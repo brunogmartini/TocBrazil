@@ -331,6 +331,13 @@
   background-color: var(--color-professional-surface);
   color: var(--color-foreground);
   min-height: 100%;
+  & .btn-primary {
+    background-color: var(--color-professional);
+    color: var(--color-professional-foreground);
+  }
+  & .btn-primary:hover {
+    background-color: oklch(from var(--color-professional) calc(l + 0.06) c h);
+  }
 }
 
 @utility professional-heading {
