@@ -1,0 +1,1 @@
+ALTER VIEW public.avaliacoes_publicas SET (security_invoker = true);
