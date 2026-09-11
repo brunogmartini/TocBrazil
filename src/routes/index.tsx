@@ -169,7 +169,7 @@ function Home() {
       <section aria-labelledby="metodologia" className="border-y border-border bg-surface">
         <div className="container-page py-16 lg:py-24">
           <span className="section-label">Diferencial</span>
-          <h2 id="metodologia" className="mt-3 max-w-3xl text-4xl sm:text-5xl">
+          <h2 id="metodologia" className="heading-section mt-3 max-w-3xl">
             Nossa metodologia
           </h2>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
@@ -181,18 +181,18 @@ function Home() {
           <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {pilares.map((p) => (
               <article key={p.titulo} className="card-soft h-full p-7">
-                <h3 className="font-display text-xl">{p.titulo}</h3>
+                <h3 className="heading-subsection">{p.titulo}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.texto}</p>
               </article>
             ))}
           </div>
 
-          <h3 className="mt-14 font-display text-3xl">As etapas da sua jornada</h3>
+          <h3 className="heading-section mt-14">As etapas da sua jornada</h3>
           <ol className="mt-6 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {passos.map((passo, i) => (
               <li key={passo.titulo} className="card-soft card-soft-hover h-full p-6">
                 <span className="step-index">{i + 1}</span>
-                <h4 className="mt-4 text-lg">{passo.titulo}</h4>
+                <h4 className="heading-card mt-4">{passo.titulo}</h4>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{passo.texto}</p>
               </li>
             ))}
@@ -204,7 +204,7 @@ function Home() {
       <section aria-labelledby="profissionais" className="container-page py-16 lg:py-24">
         <div className="max-w-2xl">
           <span className="section-label">Profissionais</span>
-          <h2 id="profissionais" className="mt-3 text-3xl sm:text-4xl">
+          <h2 id="profissionais" className="heading-section mt-3">
             Psicólogos e psiquiatras com experiência na área.
           </h2>
           <p className="mt-4 text-muted-foreground">
@@ -232,9 +232,9 @@ function Home() {
         <div className="container-page py-16 lg:py-20">
           <div className="max-w-2xl">
             <span className="section-label">Identificação</span>
-            <h2 id="identificacao" className="mt-3 text-3xl sm:text-4xl">
-              Talvez você já reconheça alguma destas situações.
-            </h2>
+          <h2 id="identificacao" className="heading-section mt-3">
+            Talvez você já reconheça alguma destas situações.
+          </h2>
             <p className="mt-4 text-muted-foreground">
               Nem todo profissional tem experiência com TOC - e explicar tudo novamente, cansa.
               Aqui, os profissionais já atuam nessa área.
@@ -244,7 +244,7 @@ function Home() {
           <ul className="mt-10 grid gap-5 md:grid-cols-3">
             {identificacao.map((item) => (
               <li key={item.t} className="card-soft p-6">
-                <h3 className="text-lg">{item.t}</h3>
+                <h3 className="heading-subsection">{item.t}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.d}</p>
               </li>
             ))}
@@ -267,7 +267,7 @@ function Home() {
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div>
               <span className="section-label">Diagnóstico</span>
-              <h2 id="duvida-toc" className="mt-3 text-3xl leading-tight sm:text-5xl">
+              <h2 id="duvida-toc" className="heading-section mt-3">
                 Dúvida se você tem TOC?
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
@@ -311,7 +311,7 @@ function Home() {
       <section aria-labelledby="acolhimento" className="container-page pb-4 lg:pb-8">
         <div className="card-soft mx-auto max-w-3xl p-8 text-center sm:p-12">
           <span className="section-label">Acolhimento</span>
-          <h2 id="acolhimento" className="mt-4 text-3xl sm:text-4xl">
+          <h2 id="acolhimento" className="heading-section mt-4">
             Você não precisa enfrentar tudo isso sozinho.
           </h2>
           <p className="mt-6 text-base leading-relaxed text-muted-foreground">
@@ -340,7 +340,7 @@ function Home() {
           <p className="text-xs uppercase tracking-[0.14em] text-primary-foreground/70">
             Nossa ideia central
           </p>
-          <h2 id="conceito" className="mt-4 max-w-3xl text-4xl leading-tight sm:text-5xl">
+          <h2 id="conceito" className="heading-section mt-4 max-w-3xl">
             Do entendimento ao cuidado.
           </h2>
           <div className="mt-10 grid gap-8 lg:grid-cols-2">
@@ -373,9 +373,9 @@ function Home() {
         <div className="container-page grid gap-10 py-16 lg:grid-cols-2 lg:py-24">
           <div>
             <span className="section-label">Segurança e privacidade</span>
-            <h2 id="seguranca" className="mt-3 text-3xl sm:text-4xl">
-              Dados de saúde exigem cuidado redobrado.
-            </h2>
+          <h2 id="seguranca" className="heading-section mt-3">
+            Dados de saúde exigem cuidado redobrado.
+          </h2>
             <Link to="/seguranca" className="btn-base btn-ghost mt-8">
               Como protegemos seus dados
             </Link>
@@ -404,7 +404,7 @@ function Home() {
       {/* CTA final */}
       <section aria-labelledby="cta-final" className="container-page py-20 lg:py-28">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 id="cta-final" className="text-4xl leading-tight sm:text-6xl">
+          <h2 id="cta-final" className="heading-hero">
             Seu tratamento assertivo começa aqui.
           </h2>
 
