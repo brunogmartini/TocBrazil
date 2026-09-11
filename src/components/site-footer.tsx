@@ -19,6 +19,7 @@ const colunas = [
       { to: "/para-psiquiatras", label: "Sou psiquiatra" },
       { to: "/profissional", label: "Área do profissional" },
       { to: "/auth", label: "Entrar" },
+      { to: "/admin", label: "Gestão" },
     ],
   },
   {

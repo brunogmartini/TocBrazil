@@ -1,3 +1,5 @@
+import { supabase } from "@/integrations/supabase/client";
+import { redirect } from "@tanstack/react-router";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -19,6 +21,16 @@ import { EtapasCadastro } from "@/components/professional-nav";
 import { dataBR, dataHoraBR, moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  beforeLoad: async ({ context }) => {
+    const { user } = context as { user: any };
+    const { data } = await supabase.rpc("has_role", {
+      _user_id: user.id,
+      _role: "admin",
+    });
+    if (!data) {
+      throw redirect({ to: "/painel" });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Painel do gestor — TOC Brazil" },
