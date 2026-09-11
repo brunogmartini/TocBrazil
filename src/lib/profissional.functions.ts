@@ -50,7 +50,10 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId, claims } = context;
-    const { data: profissional } = await supabase
+    // Telefone e e-mail de contato não são legíveis pelo cliente do usuário; a leitura do
+    // próprio cadastro é feita no servidor e sempre restrita ao user_id autenticado.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profissional } = await supabaseAdmin
       .from("professionals")
       .select("*")
       .eq("user_id", userId)

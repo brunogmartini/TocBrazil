@@ -180,7 +180,14 @@ export const meuContexto = createServerFn({ method: "GET" })
     const [{ data: perfil }, { data: papeis }, { data: profissional }] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", userId),
-      supabase.from("professionals").select("*").eq("user_id", userId).maybeSingle(),
+      // Sem telefone/e-mail de contato: contatos só são lidos na tela de cadastro do próprio profissional.
+      supabase
+        .from("professionals")
+        .select(
+          "id, user_id, slug, nome, profissao, registro, uf, cidade, foto_url, abordagem, apresentacao, experiencia_toc, experiencia_anos, formacao, especializacoes, areas, idiomas, genero, status, comissao_percent, slot_minutos, valor_centavos, destaque, graduacao, instituicao, cursos, observacao_admin, requer_correcao, created_at, updated_at",
+        )
+        .eq("user_id", userId)
+        .maybeSingle(),
     ]);
     return {
       perfil: perfil ?? null,
