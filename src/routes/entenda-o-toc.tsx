@@ -101,7 +101,7 @@ function EntendaOToc() {
     <>
       <section className="container-page py-14 lg:py-20">
         <span className="section-label">Conteúdo educativo</span>
-        <h1 className="mt-4 max-w-3xl text-3xl leading-tight sm:text-5xl">
+        <h1 className="heading-page mt-4 max-w-3xl">
           Entendendo o transtorno
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
@@ -118,13 +118,13 @@ function EntendaOToc() {
 
       <section aria-labelledby="fundamentos" className="border-y border-border bg-surface">
         <div className="container-page py-14 lg:py-20">
-          <h2 id="fundamentos" className="text-2xl sm:text-3xl">
+          <h2 id="fundamentos" className="heading-section">
             Como o TOC costuma ser descrito
           </h2>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {blocos.map((b) => (
               <article key={b.t} className="card-soft p-6">
-                <h3 className="text-lg">{b.t}</h3>
+                <h3 className="heading-subsection">{b.t}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{b.d}</p>
               </article>
             ))}
@@ -140,7 +140,7 @@ function EntendaOToc() {
       <section aria-labelledby="subtipos" className="container-page py-14 lg:py-20">
         <div className="max-w-3xl">
           <span className="section-label">Manifestações do TOC</span>
-          <h2 id="subtipos" className="mt-3 text-3xl leading-tight sm:text-4xl">
+          <h2 id="subtipos" className="heading-section mt-3">
             Conheça alguns subtipos do transtorno
           </h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground">
@@ -152,7 +152,7 @@ function EntendaOToc() {
         <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {subtipos.map((subtipo) => (
             <article key={subtipo.t} className="card-soft h-full p-6">
-              <h3 className="text-lg leading-snug">{subtipo.t}</h3>
+              <h3 className="heading-subsection">{subtipo.t}</h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{subtipo.d}</p>
             </article>
           ))}
@@ -161,7 +161,7 @@ function EntendaOToc() {
 
       <section className="border-t border-border bg-surface">
         <div className="container-page py-14 text-center lg:py-20">
-          <h2 className="mx-auto max-w-2xl text-3xl sm:text-4xl">
+          <h2 className="heading-section mx-auto max-w-2xl">
             Quando fizer sentido para você, o próximo passo está aqui.
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-muted-foreground">

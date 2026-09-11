@@ -46,7 +46,7 @@ function ParaPsicologos() {
       <section className="container-page grid items-center gap-10 py-14 lg:grid-cols-2 lg:py-20">
         <div className="rise-in">
           <span className="pill">Para profissionais</span>
-          <h1 className="mt-6 text-3xl leading-tight sm:text-5xl">
+          <h1 className="heading-page mt-6">
             Você cuida do paciente. Nós cuidamos do resto.
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
@@ -75,7 +75,7 @@ function ParaPsicologos() {
 
       <section className="border-y border-border bg-surface">
         <div className="container-page py-14 lg:py-20">
-          <h2 className="text-2xl sm:text-3xl">Como funciona o cadastro</h2>
+          <h2 className="heading-section">Como funciona o cadastro</h2>
           <p className="mt-3 max-w-2xl text-muted-foreground">
             Seu perfil fica público apenas após a verificação dos requisitos definidos pela
             plataforma. Os status possíveis são: cadastro incompleto, em análise, aprovado,
@@ -95,7 +95,7 @@ function ParaPsicologos() {
       </section>
 
       <section className="container-page py-14 lg:py-20">
-        <h2 className="text-2xl sm:text-3xl">O que você administra no painel</h2>
+        <h2 className="heading-section">O que você administra no painel</h2>
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {[
             { t: "Agenda", d: "Dias, horários, recorrências, bloqueios, duração e intervalos." },
@@ -109,7 +109,7 @@ function ParaPsicologos() {
             },
           ].map((i) => (
             <article key={i.t} className="card-soft card-soft-hover p-6">
-              <h3 className="text-lg">{i.t}</h3>
+              <h3 className="heading-subsection">{i.t}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{i.d}</p>
             </article>
           ))}

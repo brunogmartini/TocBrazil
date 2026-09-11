@@ -63,7 +63,7 @@ function SejaParceiro() {
     <>
       <section className="container-page py-14 lg:py-20">
         <span className="section-label">Para profissionais</span>
-        <h1 className="mt-4 max-w-3xl text-3xl leading-tight sm:text-5xl">
+        <h1 className="heading-page mt-4 max-w-3xl">
           Você cuida do paciente. Nós cuidamos do resto.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
@@ -83,13 +83,13 @@ function SejaParceiro() {
 
       <section aria-labelledby="beneficios" className="border-y border-border bg-surface">
         <div className="container-page py-14 lg:py-20">
-          <h2 id="beneficios" className="text-2xl sm:text-3xl">
+          <h2 id="beneficios" className="heading-section">
             O que você encontra aqui
           </h2>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {beneficios.map((b) => (
               <article key={b.t} className="card-soft card-soft-hover p-6">
-                <h3 className="text-lg">{b.t}</h3>
+                <h3 className="heading-subsection">{b.t}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{b.d}</p>
               </article>
             ))}
@@ -98,7 +98,7 @@ function SejaParceiro() {
       </section>
 
       <section aria-labelledby="etapas" className="container-page py-14 lg:py-20">
-        <h2 id="etapas" className="text-2xl sm:text-3xl">
+        <h2 id="etapas" className="heading-section">
           Como entrar na plataforma
         </h2>
         <ol className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4">

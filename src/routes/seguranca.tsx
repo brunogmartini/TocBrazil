@@ -37,7 +37,7 @@ function Seguranca() {
   return (
     <div className="container-page py-12 lg:py-16">
       <span className="section-label">Confiança</span>
-      <h1 className="mt-3 text-3xl sm:text-4xl">Como protegemos seus dados</h1>
+      <h1 className="heading-page mt-3">Como protegemos seus dados</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
         Tratar informações de saúde mental exige cuidado redobrado. Estas são as práticas que
         orientam a construção da plataforma.
@@ -46,14 +46,14 @@ function Seguranca() {
       <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {praticas.map((p) => (
           <article key={p.t} className="card-soft p-6">
-            <h2 className="text-lg">{p.t}</h2>
+            <h2 className="heading-subsection">{p.t}</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.d}</p>
           </article>
         ))}
       </div>
 
       <div className="card-soft mt-10 max-w-3xl p-6">
-        <h2 className="text-lg">Limites da plataforma</h2>
+        <h2 className="heading-subsection">Limites da plataforma</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           A TOC Brazil não realiza diagnósticos, não prescreve medicamentos e não promete resultados.
           Também não somos um serviço de emergência: em situação de risco imediato, procure
