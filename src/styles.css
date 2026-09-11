@@ -74,28 +74,28 @@
 :root {
   --radius: 0.875rem;
 
-  --background: oklch(0.865 0.022 85);
+  --background: oklch(0.995 0 0);
   --foreground: oklch(0.29 0.035 215);
-  --surface: oklch(0.825 0.025 85);
+  --surface: oklch(0.985 0.005 85);
   --surface-foreground: oklch(0.32 0.035 210);
-  --card: oklch(0.94 0.012 85);
+  --card: oklch(1 0 0);
   --card-foreground: oklch(0.29 0.035 215);
-  --popover: oklch(0.94 0.012 85);
+  --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.29 0.035 215);
 
   --primary: oklch(0.5 0.075 220);
   --primary-foreground: oklch(0.99 0.004 210);
   --secondary: oklch(0.68 0.06 165);
   --secondary-foreground: oklch(0.26 0.04 210);
-  --muted: oklch(0.805 0.02 85);
-  --muted-foreground: oklch(0.38 0.03 210);
+  --muted: oklch(0.94 0.015 85);
+  --muted-foreground: oklch(0.45 0.03 210);
   --accent: oklch(0.8 0.04 170);
   --accent-foreground: oklch(0.26 0.05 215);
 
   --destructive: oklch(0.6 0.16 25);
   --destructive-foreground: oklch(0.98 0.006 95);
-  --border: oklch(0.7 0.02 85 / 60%);
-  --input: oklch(0.66 0.02 85 / 60%);
+  --border: oklch(0.85 0.015 85 / 60%);
+  --input: oklch(0.82 0.015 85 / 60%);
   --ring: oklch(0.5 0.075 220);
 
   --chart-1: oklch(0.715 0.128 176);
@@ -104,13 +104,13 @@
   --chart-4: oklch(0.5 0.09 215);
   --chart-5: oklch(0.86 0.06 180);
 
-  --sidebar: oklch(0.91 0.015 85);
+  --sidebar: oklch(0.985 0.005 85);
   --sidebar-foreground: oklch(0.32 0.035 210);
   --sidebar-primary: oklch(0.5 0.075 220);
   --sidebar-primary-foreground: oklch(0.99 0.004 210);
   --sidebar-accent: oklch(0.81 0.04 165);
   --sidebar-accent-foreground: oklch(0.3 0.04 210);
-  --sidebar-border: oklch(0.7 0.02 85 / 60%);
+  --sidebar-border: oklch(0.85 0.015 85 / 60%);
   --sidebar-ring: oklch(0.5 0.075 220);
   /* Área do profissional — mesma linguagem do "Status Aprovado": navy profundo + verde de aprovação sobre fundo neutro. */
   --professional: oklch(0.25 0.1 268);
