@@ -122,10 +122,6 @@ export function mapearConfiguracoes(rows: { chave: string; valor: unknown }[] | 
   return cfg;
 }
 
-export const configuracoesPlataforma = createServerFn({ method: "GET" }).handler(async () => {
-  throw new Error("Autenticação necessária.");
-});
-
 async function carregarConfiguracoesPrivadas() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin.from("platform_settings").select("chave, valor");
@@ -461,7 +457,6 @@ export const avaliacoesDoProfissional = createServerFn({ method: "GET" })
         .from("avaliacoes_publicas")
         .select("id, nota, comentario, created_at")
         .eq("professional_id", data.professionalId)
-        .eq("publica", true)
         .order("created_at", { ascending: false })
         .limit(20),
       cliente.rpc("avaliacoes_resumo", { _professional_id: data.professionalId }),
