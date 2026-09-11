@@ -40,7 +40,7 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
       dateStyle: "short",
       timeStyle: "short",
     });
-    const base = data.origem.startsWith("http") ? data.origem.replace(/\/$/, "") : "";
+    const base = baseSegura(data.origem);
 
     const resposta = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",
