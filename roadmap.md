@@ -25,6 +25,7 @@
 - [x] Tratar o sinal de agendamento como parte do valor total da consulta
 - [x] Alinhar calendário e benefício do paciente e revisar contraste da área profissional
 - [x] Adicionar acesso discreto e protegido para a gestão
+- [x] Simplificar filtros de profissionais, incluir Psicanálise e ampliar dúvidas frequentes
 
 - [x] Três áreas isoladas (paciente / profissional / gestor) com papel fixado no primeiro acesso,
       bloqueio de URL cruzada, aviso de conta conectada em outra área, visual navy da área
