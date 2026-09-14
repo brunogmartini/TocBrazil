@@ -6,7 +6,7 @@ import { exigirAreaProfissional } from "@/lib/role-access";
 /**
  * Casca da área do profissional (consultório digital).
  * Garante o acesso exclusivo de profissionais e envolve todas as páginas
- * com a barra lateral navy — a mesma linguagem do "Status Aprovado".
+ * com a barra lateral verde profunda — a mesma linguagem do "Status Aprovado".
  */
 export const Route = createFileRoute("/_authenticated/profissional")({
   beforeLoad: () => exigirAreaProfissional(),

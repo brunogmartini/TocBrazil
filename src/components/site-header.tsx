@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/toc-brazil-logo.png";
+import logoAsset from "@/assets/toc-brazil-logo.png.asset.json";
 import { INICIO_DA_AREA } from "@/lib/areas";
 import { CHAVE_PERFIL_PRETENDIDO, minhaArea } from "@/lib/role-access";
 
@@ -66,11 +66,11 @@ export function SiteHeader() {
       <div className="container-page flex h-16 items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2.5" aria-label="TOC Brazil — página inicial">
           <img
-            src={logo}
+            src={logoAsset.url}
             alt="TOC Brazil — Plataforma de Apoio Especializado"
-            width={1363}
-            height={273}
-            className="h-10 w-auto"
+            width={1291}
+            height={554}
+            className="h-11 w-auto"
           />
         </Link>
 
