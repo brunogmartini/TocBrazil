@@ -31,7 +31,7 @@
       profissional e logo com fundo transparente
 
 ## Próximas etapas
-- [ ] Conectar `tocbrazil.com.br` ao projeto e orientar a configuração do domínio
+- [ ] Conectar `tocbrazil.com.br` ao projeto e orientar a configuração do domínio (card cancelado pelo usuário; instruções manuais fornecidas)
 - [x] Aplicar a nova logo enviada, atualizar o favicon e substituir os azuis por uma paleta verde moderna e discreta
 - [x] Diferenciar os acessos de entrar/criar conta e as áreas de paciente/profissional
 - [x] Revisar textos, menu do paciente, subtipos de TOC e chamadas repetidas
