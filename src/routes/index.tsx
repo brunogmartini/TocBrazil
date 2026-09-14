@@ -234,8 +234,8 @@ function Home() {
             Talvez você já reconheça alguma destas situações.
           </h2>
             <p className="mt-4 text-muted-foreground">
-              Nem todo profissional tem experiência com TOC - e explicar tudo novamente, cansa.
-              Aqui, os profissionais já atuam nessa área.
+              Nem todo profissional tem experiência em TOC e isso faz diferença. Aqui, os
+              profissionais já atuam nessa área.
             </p>
           </div>
 

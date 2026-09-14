@@ -41,38 +41,20 @@ export const LABEL_PROFISSAO: Record<string, string> = {
   psiquiatra: "Psiquiatra",
 };
 
-const SUBTIPOS_TOC = [
-  "TOC de simetria",
-  "TOC de falsas memórias",
-  "TOC de orientação sexual",
-  "TOC de contaminação e limpeza",
-  "TOC religioso/escrupulosidade",
-  "TOC de relacionamento",
-  "TOC puro",
-  "TOC existencial",
-  "TOC de organização",
-  "TOC de dúvida e checagem",
-  "TOC sexual",
-];
-
 function Busca() {
   const { profissionais } = Route.useLoaderData();
   const [profissao, setProfissao] = useState(TODOS);
-  const [area, setArea] = useState(TODOS);
   const [abordagem, setAbordagem] = useState(TODOS);
   const [idioma, setIdioma] = useState(TODOS);
   const [genero, setGenero] = useState(TODOS);
 
-  const areas = useMemo(
-    () => [TODOS, ...SUBTIPOS_TOC],
-    [],
-  );
   const abordagens = useMemo(
     () => [
       TODOS,
       ...new Set([
         ABORDAGEM_EPR,
-          "Terapia Cognitivo Comportamental",
+        "Terapia Cognitivo Comportamental",
+        "Psicanálise",
         ...profissionais.map((p) => p.abordagem).filter((a): a is string => !!a),
       ]),
     ],
@@ -89,25 +71,23 @@ function Busca() {
         .filter(
           (p) =>
             (profissao === TODOS || LABEL_PROFISSAO[p.profissao] === profissao) &&
-            (area === TODOS || p.areas.includes(area)) &&
             (abordagem === TODOS || p.abordagem === abordagem) &&
             (idioma === TODOS || p.idiomas.includes(idioma)) &&
             (genero === TODOS || p.genero === genero.toLowerCase()),
         )
         .sort((a, b) => a.nome.localeCompare(b.nome)),
-    [profissionais, profissao, area, abordagem, idioma, genero],
+    [profissionais, profissao, abordagem, idioma, genero],
   );
 
   useEffect(() => {
     track("professional_search", {
       profissao,
-      area,
       abordagem,
       idioma,
       genero,
       resultados: resultados.length,
     });
-  }, [profissao, area, abordagem, idioma, genero, resultados.length]);
+  }, [profissao, abordagem, idioma, genero, resultados.length]);
 
 
   return (
@@ -124,7 +104,7 @@ function Busca() {
 
 
       <form
-        className="card-soft mt-8 grid gap-5 p-6 md:grid-cols-2 lg:grid-cols-3"
+        className="card-soft mt-8 grid gap-5 p-6 md:grid-cols-2 lg:grid-cols-4"
         onSubmit={(e) => e.preventDefault()}
       >
         <Select
@@ -133,7 +113,6 @@ function Busca() {
           onChange={setProfissao}
           options={[TODOS, "Psicólogo(a)", "Psiquiatra"]}
         />
-        <Select label="Subtipos" value={area} onChange={setArea} options={areas} />
         <Select
           label="Abordagem teórica"
           value={abordagem}

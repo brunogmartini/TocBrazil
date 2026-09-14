@@ -61,6 +61,22 @@ const perguntas = [
     q: "Preciso de psicólogo ou de psiquiatra?",
     a: "Essa definição depende de avaliação profissional. Você pode começar por qualquer um dos dois; muitas pessoas fazem acompanhamento com ambos.",
   },
+  {
+    q: "Como escolho um profissional?",
+    a: "Você pode comparar profissão, abordagem teórica, idioma e outras informações apresentadas em cada perfil antes de agendar.",
+  },
+  {
+    q: "Como funciona a consulta online?",
+    a: "No horário agendado, paciente e profissional acessam o link exclusivo da videochamada pelas suas respectivas áreas na plataforma.",
+  },
+  {
+    q: "Meus dados e informações são protegidos?",
+    a: "Sim. Cada área possui acesso próprio, e informações clínicas ficam disponíveis somente para o paciente e o profissional responsável pelo atendimento.",
+  },
+  {
+    q: "Como funciona o pagamento da consulta?",
+    a: "O valor e as condições são apresentados durante o agendamento. O sinal pago para confirmar o horário é abatido do valor total da consulta.",
+  },
 ];
 
 function ComoFunciona() {
