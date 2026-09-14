@@ -6,7 +6,7 @@
 
 /*
  * Design system — plataforma de psicologia online.
- * Fundo branco, identidade azul-petróleo + verde-sálvia.
+ * Fundo branco, identidade verde profunda + verde-lima discreto.
  * Tipografia Poppins SemiBold (títulos) + Open Sans (texto).
  */
 
@@ -64,8 +64,8 @@
   --color-professional-accent: var(--professional-accent);
   --color-professional-accent-foreground: var(--professional-accent-foreground);
 
-  --shadow-soft: 0 1px 2px oklch(0.25 0.025 220 / 0.06), 0 14px 34px -14px oklch(0.25 0.025 220 / 0.14);
-  --shadow-lift: 0 2px 6px oklch(0.25 0.025 220 / 0.08), 0 26px 52px -22px oklch(0.25 0.025 220 / 0.2);
+  --shadow-soft: 0 1px 2px oklch(0.25 0.025 155 / 0.06), 0 14px 34px -14px oklch(0.25 0.025 155 / 0.14);
+  --shadow-lift: 0 2px 6px oklch(0.25 0.025 155 / 0.08), 0 26px 52px -22px oklch(0.25 0.025 155 / 0.2);
 
 
   --ease-calm: cubic-bezier(0.22, 1, 0.36, 1);
@@ -75,50 +75,50 @@
   --radius: 0.875rem;
 
   --background: oklch(1 0 0);
-  --foreground: oklch(0.28 0.04 220);
-  --surface: oklch(0.985 0.005 85);
-  --surface-foreground: oklch(0.32 0.035 210);
+  --foreground: oklch(0.25 0.035 155);
+  --surface: oklch(0.985 0.008 145);
+  --surface-foreground: oklch(0.3 0.035 155);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.28 0.04 220);
+  --card-foreground: oklch(0.25 0.035 155);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.28 0.04 220);
+  --popover-foreground: oklch(0.25 0.035 155);
 
-  --primary: oklch(0.46 0.08 215);
-  --primary-foreground: oklch(0.99 0.004 210);
-  --secondary: oklch(0.72 0.06 165);
-  --secondary-foreground: oklch(0.26 0.04 210);
-  --muted: oklch(0.92 0.012 210);
-  --muted-foreground: oklch(0.48 0.025 210);
-  --accent: oklch(0.88 0.045 170);
-  --accent-foreground: oklch(0.26 0.05 215);
+  --primary: oklch(0.52 0.155 150);
+  --primary-foreground: oklch(0.99 0.004 145);
+  --secondary: oklch(0.7 0.12 125);
+  --secondary-foreground: oklch(0.24 0.055 150);
+  --muted: oklch(0.94 0.012 145);
+  --muted-foreground: oklch(0.47 0.028 155);
+  --accent: oklch(0.9 0.05 145);
+  --accent-foreground: oklch(0.25 0.065 150);
 
   --destructive: oklch(0.58 0.16 25);
   --destructive-foreground: oklch(0.98 0.006 95);
-  --border: oklch(0.85 0.015 210 / 55%);
-  --input: oklch(0.82 0.015 210 / 55%);
-  --ring: oklch(0.46 0.08 215);
+  --border: oklch(0.84 0.018 145 / 58%);
+  --input: oklch(0.8 0.02 145 / 58%);
+  --ring: oklch(0.52 0.155 150);
 
-  --chart-1: oklch(0.715 0.128 176);
-  --chart-2: oklch(0.62 0.1 205);
-  --chart-3: oklch(0.8 0.09 165);
-  --chart-4: oklch(0.5 0.09 215);
-  --chart-5: oklch(0.86 0.06 180);
+  --chart-1: oklch(0.56 0.15 150);
+  --chart-2: oklch(0.7 0.12 125);
+  --chart-3: oklch(0.74 0.09 165);
+  --chart-4: oklch(0.42 0.09 155);
+  --chart-5: oklch(0.84 0.07 140);
 
-  --sidebar: oklch(0.985 0.005 85);
-  --sidebar-foreground: oklch(0.32 0.035 210);
-  --sidebar-primary: oklch(0.46 0.08 215);
-  --sidebar-primary-foreground: oklch(0.99 0.004 210);
-  --sidebar-accent: oklch(0.88 0.045 170);
-  --sidebar-accent-foreground: oklch(0.26 0.05 215);
-  --sidebar-border: oklch(0.85 0.015 210 / 55%);
-  --sidebar-ring: oklch(0.46 0.08 215);
-  /* Área do profissional — mesma linguagem do "Status Aprovado": navy profundo + verde de aprovação sobre fundo branco. */
-  --professional: oklch(0.24 0.09 265);
-  --professional-foreground: oklch(0.985 0.004 250);
+  --sidebar: oklch(0.985 0.008 145);
+  --sidebar-foreground: oklch(0.3 0.035 155);
+  --sidebar-primary: oklch(0.52 0.155 150);
+  --sidebar-primary-foreground: oklch(0.99 0.004 145);
+  --sidebar-accent: oklch(0.9 0.05 145);
+  --sidebar-accent-foreground: oklch(0.25 0.065 150);
+  --sidebar-border: oklch(0.84 0.018 145 / 58%);
+  --sidebar-ring: oklch(0.52 0.155 150);
+  /* Área do profissional — verde profundo com acento de aprovação sobre fundo branco. */
+  --professional: oklch(0.28 0.075 155);
+  --professional-foreground: oklch(0.985 0.006 145);
   --professional-surface: var(--background);
-  --professional-border: oklch(0.24 0.09 265 / 14%);
-  --professional-accent: oklch(0.78 0.18 145);
-  --professional-accent-foreground: oklch(0.22 0.08 268);
+  --professional-border: oklch(0.28 0.075 155 / 16%);
+  --professional-accent: oklch(0.72 0.15 130);
+  --professional-accent-foreground: oklch(0.22 0.065 155);
 }
 
 
@@ -462,7 +462,7 @@
   box-shadow: var(--shadow-soft);
 }
 
-/* Barra lateral navy da área do profissional */
+/* Barra lateral verde profunda da área do profissional */
 @utility professional-sidebar {
   background-color: var(--color-professional);
   color: var(--color-professional-foreground);
