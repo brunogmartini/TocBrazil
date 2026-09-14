@@ -70,7 +70,7 @@ export function SiteHeader() {
             alt="TOC Brazil — Plataforma de Apoio Especializado"
             width={1291}
             height={554}
-            className="h-11 w-auto"
+            className="h-14 w-auto"
           />
         </Link>
 

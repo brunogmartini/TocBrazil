@@ -52,7 +52,7 @@ export function SiteFooter() {
               width={1291}
               height={554}
               loading="lazy"
-              className="h-16 w-auto"
+              className="h-[3.25rem] w-auto"
             />
           </div>
           <p className="mt-4 font-display text-base">Plataforma especializada em TOC.</p>
