@@ -173,9 +173,9 @@ function Home() {
             Nossa metodologia
           </h2>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-            Não somos apenas uma plataforma de consultas online. Somos uma plataforma especializada
-            em TOC, que reúne conhecimento, metodologia e profissionais selecionados em uma jornada
-            estruturada de cuidado.
+            Não somos apenas uma plataforma de consultas online. Somos a primeira plataforma 100%
+            especializada em TOC, que reúne profissionais com experiência cujos tratamentos são
+            baseados em evidências científicas, através de uma jornada de cuidado e zelo.
           </p>
 
           <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -208,9 +208,7 @@ function Home() {
             Psicólogos e psiquiatras com experiência na área.
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Cada profissional declara formação, abordagem, subtipos atendidos e experiência e a
-            documentação é verificada antes da publicação do perfil. Você escolhe quem faz mais
-            sentido para você.
+            Aqui estão reunidos diversos profissionais da saúde mental com experiência em TOC.
           </p>
         </div>
         <div className="mt-9 flex flex-col gap-3 sm:flex-row">
