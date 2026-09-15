@@ -99,6 +99,13 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
           .select("*")
           .eq("professional_id", profissional.id)
           .maybeSingle(),
+        supabase
+          .from("contratos_profissionais")
+          .select("id, versao, nome_assinatura, aceito_em")
+          .eq("professional_id", profissional.id)
+          .order("aceito_em", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
       ]);
 
     return {
@@ -107,6 +114,7 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       regras: regras ?? [],
       bloqueios: bloqueios ?? [],
       repasse: repasse ?? null,
+      contrato: contrato ?? null,
       email: (claims as { email?: string }).email ?? null,
     };
   });
