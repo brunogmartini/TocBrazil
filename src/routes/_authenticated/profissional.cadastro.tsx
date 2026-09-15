@@ -16,8 +16,6 @@ import {
   statusVinculoMercadoPago,
 } from "@/lib/mercadopago.functions";
 import { ProfessionalNav } from "@/components/professional-nav";
-import { ContratoProfissionalCard } from "@/components/contrato-profissional-card";
-import { VERSAO_CONTRATO } from "@/lib/contrato-profissional";
 import { exigirAreaProfissional } from "@/lib/role-access";
 import { moeda } from "@/lib/video-sala";
 
@@ -244,7 +242,6 @@ function CadastroProfissional() {
 
   const temCadastro = Boolean(dados.data?.profissional);
   const documentos = dados.data?.documentos ?? [];
-  const contratoAssinado = dados.data?.contrato?.versao === VERSAO_CONTRATO;
   const areasSelecionadas = form.areas
     .split(",")
     .map((area) => area.trim())
