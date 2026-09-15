@@ -80,6 +80,18 @@ export function ContratoProfissionalCard({
           </p>
         )}
 
+        <p className="mt-4 text-sm">
+          <a
+            href="/contrato-profissional-tocbrazil.pdf"
+            target="_blank"
+            rel="noreferrer"
+            download
+            className="underline underline-offset-4"
+          >
+            Baixar o contrato em PDF (versão {VERSAO_CONTRATO})
+          </a>
+        </p>
+
         {(!assinadoAtual || aberto) && (
           <div className="mt-6 max-h-96 overflow-y-auto rounded-lg border border-border bg-background p-5 text-sm leading-relaxed">
             <h3 className="heading-card">{TITULO_CONTRATO}</h3>
