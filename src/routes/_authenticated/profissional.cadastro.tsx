@@ -143,7 +143,7 @@ function CadastroProfissional() {
         experiencia_toc: p.experiencia_toc ?? "",
         experiencia_anos: String(p.experiencia_anos ?? 0),
         slot_minutos: String(p.slot_minutos ?? 50),
-        valor: String(Math.round((p.valor_centavos ?? 20000) / 100)),
+        valor: String(Math.round((p.valor_centavos ?? 24000) / 1.2 / 100)),
         graduacao: p.graduacao ?? "",
         instituicao: p.instituicao ?? "",
         cursos: (p.cursos ?? []).join(", "),
