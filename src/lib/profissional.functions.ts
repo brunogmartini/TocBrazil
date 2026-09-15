@@ -325,12 +325,77 @@ export const registrarDocumento = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .maybeSingle();
     if (!prof) return { ok: false as const, erro: "Complete seu cadastro primeiro." };
+
+    const { VERSAO_CONTRATO } = await import("@/lib/contrato-profissional");
+    const { data: contrato } = await supabase
+      .from("contratos_profissionais")
+      .select("id")
+      .eq("professional_id", prof.id)
+      .eq("versao", VERSAO_CONTRATO)
+      .maybeSingle();
+    if (!contrato) {
+      return {
+        ok: false as const,
+        erro: "Assine o contrato do profissional antes de enviar documentos.",
+      };
+    }
+
     const { error } = await supabase
       .from("professional_documents")
       .insert({ professional_id: prof.id, ...data });
     if (error) return { ok: false as const, erro: "Não foi possível registrar o documento." };
     return { ok: true as const };
   });
+
+export const assinarContratoProfissional = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { nome_assinatura: string; documento: string }) => {
+    const nome = String(data.nome_assinatura ?? "").trim().slice(0, 120);
+    if (nome.split(/\s+/).filter(Boolean).length < 2) {
+      throw new Error("Digite seu nome completo para assinar.");
+    }
+    const documento = String(data.documento ?? "").replace(/\D/g, "").slice(0, 20);
+    if (documento.length < 11) throw new Error("Informe um CPF válido (11 dígitos).");
+    return { nome_assinatura: nome, documento };
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: prof } = await supabase
+      .from("professionals")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!prof) return { ok: false as const, erro: "Complete seu cadastro primeiro." };
+
+    const { VERSAO_CONTRATO } = await import("@/lib/contrato-profissional");
+    const { getRequest } = await import("@tanstack/react-start/server");
+    let aceite_ip: string | null = null;
+    let user_agent: string | null = null;
+    try {
+      const req = getRequest();
+      aceite_ip =
+        req.headers.get("cf-connecting-ip") ??
+        req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+        null;
+      user_agent = req.headers.get("user-agent")?.slice(0, 400) ?? null;
+    } catch {
+      /* sem contexto de requisição */
+    }
+
+    const { error } = await supabase.from("contratos_profissionais").insert({
+      professional_id: prof.id,
+      versao: VERSAO_CONTRATO,
+      nome_assinatura: data.nome_assinatura,
+      documento: data.documento,
+      aceite_ip,
+      user_agent,
+    });
+    if (error && !error.message.includes("duplicate")) {
+      return { ok: false as const, erro: "Não foi possível registrar sua assinatura." };
+    }
+    return { ok: true as const };
+  });
+
 
 export const removerDocumento = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
