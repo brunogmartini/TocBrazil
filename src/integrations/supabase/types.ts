@@ -266,6 +266,53 @@ export type Database = {
           },
         ]
       }
+      contratos_profissionais: {
+        Row: {
+          aceite_ip: string | null
+          aceito_em: string
+          created_at: string
+          documento: string
+          id: string
+          nome_assinatura: string
+          professional_id: string
+          updated_at: string
+          user_agent: string | null
+          versao: string
+        }
+        Insert: {
+          aceite_ip?: string | null
+          aceito_em?: string
+          created_at?: string
+          documento: string
+          id?: string
+          nome_assinatura: string
+          professional_id: string
+          updated_at?: string
+          user_agent?: string | null
+          versao: string
+        }
+        Update: {
+          aceite_ip?: string | null
+          aceito_em?: string
+          created_at?: string
+          documento?: string
+          id?: string
+          nome_assinatura?: string
+          professional_id?: string
+          updated_at?: string
+          user_agent?: string | null
+          versao?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contratos_profissionais_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       livro_compras: {
         Row: {
           clicado_em: string | null
