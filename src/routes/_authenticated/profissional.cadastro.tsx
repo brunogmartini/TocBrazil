@@ -16,8 +16,6 @@ import {
   statusVinculoMercadoPago,
 } from "@/lib/mercadopago.functions";
 import { ProfessionalNav } from "@/components/professional-nav";
-import { ContratoProfissionalCard } from "@/components/contrato-profissional-card";
-import { VERSAO_CONTRATO } from "@/lib/contrato-profissional";
 import { exigirAreaProfissional } from "@/lib/role-access";
 import { moeda } from "@/lib/video-sala";
 
@@ -244,7 +242,6 @@ function CadastroProfissional() {
 
   const temCadastro = Boolean(dados.data?.profissional);
   const documentos = dados.data?.documentos ?? [];
-  const contratoAssinado = dados.data?.contrato?.versao === VERSAO_CONTRATO;
   const areasSelecionadas = form.areas
     .split(",")
     .map((area) => area.trim())
@@ -517,18 +514,11 @@ function CadastroProfissional() {
           Salvar cadastro
         </button>
       </form>
-
-      <ContratoProfissionalCard contrato={dados.data?.contrato ?? null} habilitado={temCadastro} />
-
       <section className="mt-12">
         <h2 className="text-2xl">Documentos para verificação</h2>
         {!temCadastro ? (
           <p className="mt-4 text-sm text-muted-foreground">
             Salve seu cadastro acima para liberar o envio de documentos.
-          </p>
-        ) : !contratoAssinado ? (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Assine o contrato acima para liberar o envio de documentos.
           </p>
         ) : (
           <div className="card-soft mt-5 p-7">
