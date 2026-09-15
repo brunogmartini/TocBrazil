@@ -244,6 +244,7 @@ function CadastroProfissional() {
 
   const temCadastro = Boolean(dados.data?.profissional);
   const documentos = dados.data?.documentos ?? [];
+  const contratoAssinado = dados.data?.contrato?.versao === VERSAO_CONTRATO;
   const areasSelecionadas = form.areas
     .split(",")
     .map((area) => area.trim())
