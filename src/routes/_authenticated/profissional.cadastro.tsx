@@ -16,6 +16,8 @@ import {
   statusVinculoMercadoPago,
 } from "@/lib/mercadopago.functions";
 import { ProfessionalNav } from "@/components/professional-nav";
+import { ContratoProfissionalCard } from "@/components/contrato-profissional-card";
+import { VERSAO_CONTRATO } from "@/lib/contrato-profissional";
 import { exigirAreaProfissional } from "@/lib/role-access";
 import { moeda } from "@/lib/video-sala";
 
