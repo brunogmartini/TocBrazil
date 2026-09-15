@@ -17,6 +17,7 @@ import {
 } from "@/lib/mercadopago.functions";
 import { ProfessionalNav } from "@/components/professional-nav";
 import { exigirAreaProfissional } from "@/lib/role-access";
+import { moeda } from "@/lib/video-sala";
 
 
 export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
