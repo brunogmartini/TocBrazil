@@ -66,6 +66,7 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
         regras: [],
         bloqueios: [],
         repasse: null,
+        contrato: null,
         email: (claims as { email?: string }).email ?? null,
       };
     }
