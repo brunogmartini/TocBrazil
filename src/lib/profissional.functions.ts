@@ -326,19 +326,7 @@ export const registrarDocumento = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!prof) return { ok: false as const, erro: "Complete seu cadastro primeiro." };
 
-    const { VERSAO_CONTRATO } = await import("@/lib/contrato-profissional");
-    const { data: contrato } = await supabase
-      .from("contratos_profissionais")
-      .select("id")
-      .eq("professional_id", prof.id)
-      .eq("versao", VERSAO_CONTRATO)
-      .maybeSingle();
-    if (!contrato) {
-      return {
-        ok: false as const,
-        erro: "Assine o contrato do profissional antes de enviar documentos.",
-      };
-    }
+    // Contrato: etapa final do cadastro, será adicionado à plataforma mais adiante.
 
     const { error } = await supabase
       .from("professional_documents")

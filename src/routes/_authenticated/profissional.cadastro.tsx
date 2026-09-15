@@ -514,18 +514,11 @@ function CadastroProfissional() {
           Salvar cadastro
         </button>
       </form>
-
-      <ContratoProfissionalCard contrato={dados.data?.contrato ?? null} habilitado={temCadastro} />
-
       <section className="mt-12">
         <h2 className="text-2xl">Documentos para verificação</h2>
         {!temCadastro ? (
           <p className="mt-4 text-sm text-muted-foreground">
             Salve seu cadastro acima para liberar o envio de documentos.
-          </p>
-        ) : !contratoAssinado ? (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Assine o contrato acima para liberar o envio de documentos.
           </p>
         ) : (
           <div className="card-soft mt-5 p-7">
