@@ -17,6 +17,7 @@ import {
 } from "@/lib/mercadopago.functions";
 import { ProfessionalNav } from "@/components/professional-nav";
 import { exigirAreaProfissional } from "@/lib/role-access";
+import { moeda } from "@/lib/video-sala";
 
 
 export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
@@ -143,7 +144,7 @@ function CadastroProfissional() {
         experiencia_toc: p.experiencia_toc ?? "",
         experiencia_anos: String(p.experiencia_anos ?? 0),
         slot_minutos: String(p.slot_minutos ?? 50),
-        valor: String(Math.round((p.valor_centavos ?? 20000) / 100)),
+        valor: String(Math.round((p.valor_centavos ?? 24000) / 1.2 / 100)),
         graduacao: p.graduacao ?? "",
         instituicao: p.instituicao ?? "",
         cursos: (p.cursos ?? []).join(", "),
@@ -384,15 +385,16 @@ function CadastroProfissional() {
         />
         <div>
           <Campo
-            label="Valor da consulta (R$)"
+            label="Valor que você quer receber por consulta (R$)"
             type="number"
             value={form.valor}
             onChange={(v) => setForm({ ...form, valor: v })}
             required
           />
           <p className="mt-1 text-xs text-muted-foreground">
-             Você define o valor total. O sinal pago no agendamento é abatido desse total; após a consulta,
-             a plataforma retém 20% e você recebe 80%.
+            Sobre esse valor aplicamos 20% da plataforma: sua sessão será exibida no site por{" "}
+            <strong>{moeda(Math.round((Number(form.valor) || 0) * 1.2 * 100))}</strong>. O sinal
+            pago no agendamento é abatido desse total.
           </p>
         </div>
         <div>

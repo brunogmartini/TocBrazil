@@ -133,8 +133,9 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       slot_minutos: [30, 40, 50, 60].includes(Number(data.slot_minutos))
         ? Number(data.slot_minutos)
         : 50,
+      // O profissional declara quanto quer receber; o site exibe +20% da plataforma.
       valor_centavos: Math.min(
-        Math.max(Math.round(Number(data.valor_centavos ?? 0) || 0), 0),
+        Math.max(Math.round(Number(data.valor_centavos ?? 0) * 1.2 || 0), 0),
         500000,
       ),
       graduacao: String(data.graduacao ?? "").trim().slice(0, 160) || null,
