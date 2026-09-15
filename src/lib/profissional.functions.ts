@@ -70,8 +70,13 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       };
     }
 
-    const [{ data: documentos }, { data: regras }, { data: bloqueios }, { data: repasse }] =
-      await Promise.all([
+    const [
+      { data: documentos },
+      { data: regras },
+      { data: bloqueios },
+      { data: repasse },
+      { data: contrato },
+    ] = await Promise.all([
         supabase
           .from("professional_documents")
           .select("id, tipo, nome_arquivo, caminho, status, observacao_admin, created_at")
