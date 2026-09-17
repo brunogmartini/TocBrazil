@@ -161,7 +161,8 @@ function PainelProfissional() {
             <p className="professional-label">Já recebido</p>
             <p className="mt-2 font-display text-2xl">{moeda(resumo?.recebido ?? 0)}</p>
             <p className="mt-2 text-xs text-muted-foreground">
-              sua parte é {100 - (resumo?.comissaoPercent ?? 20)}% do valor da consulta
+              você recebe o preço integral e paga {moeda(resumo?.taxaFixaCentavos ?? 0)} de taxa fixa
+              por consulta realizada
             </p>
           </div>
         </div>

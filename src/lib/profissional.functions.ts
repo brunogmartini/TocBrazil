@@ -36,6 +36,10 @@ export type CadastroProfissionalEntrada = {
   experiencia_anos?: number;
   slot_minutos?: number;
   valor_centavos?: number;
+  rqe?: string;
+  ferramenta_provedor?: string;
+  ferramenta_url_sala?: string;
+  ferramenta_instrucoes?: string;
   graduacao?: string;
   instituicao?: string;
   cursos?: string[] | string;
@@ -147,11 +151,9 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       slot_minutos: [30, 40, 50, 60].includes(Number(data.slot_minutos))
         ? Number(data.slot_minutos)
         : 50,
-      // O profissional declara quanto quer receber; o site exibe +20% da plataforma.
-      valor_centavos: Math.min(
-        Math.max(Math.round(Number(data.valor_centavos ?? 0) * 1.2 || 0), 0),
-        500000,
-      ),
+      // O profissional define o preço da consulta. A plataforma exibe exatamente
+      // esse valor ao paciente: nenhuma margem é somada.
+      valor_centavos: Math.min(Math.max(Math.round(Number(data.valor_centavos ?? 0) || 0), 0), 500000),
       graduacao: String(data.graduacao ?? "").trim().slice(0, 160) || null,
       instituicao: String(data.instituicao ?? "").trim().slice(0, 160) || null,
       cursos: lista(data.cursos),
@@ -160,6 +162,10 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
 
       areas: lista(data.areas),
       idiomas: lista(data.idiomas),
+      rqe: String(data.rqe ?? "").trim().slice(0, 40) || null,
+      ferramenta_provedor: String(data.ferramenta_provedor ?? "").trim().slice(0, 80) || null,
+      ferramenta_url_sala: String(data.ferramenta_url_sala ?? "").trim().slice(0, 500) || null,
+      ferramenta_instrucoes: String(data.ferramenta_instrucoes ?? "").trim().slice(0, 1000) || null,
     };
   })
   .handler(async ({ data, context }) => {
@@ -482,6 +488,8 @@ export type ConsultaAgenda = {
   taxa_agendamento_centavos: number;
   valor_profissional_centavos: number;
   valor_plataforma_centavos: number;
+  taxa_plataforma_centavos: number;
+  link_acesso: string | null;
   video_url: string | null;
   patient_id: string;
   paciente: string;
@@ -534,7 +542,7 @@ export const minhaAgendaProfissional = createServerFn({ method: "GET" })
         supabase
           .from("appointments")
           .select(
-            "id, inicio, fim, status, payment_status, duracao_minutos, valor_consulta_centavos, taxa_agendamento_centavos, valor_profissional_centavos, valor_plataforma_centavos, video_url, patient_id",
+            "id, inicio, fim, status, payment_status, duracao_minutos, valor_consulta_centavos, taxa_agendamento_centavos, valor_profissional_centavos, valor_plataforma_centavos, taxa_plataforma_centavos, link_acesso, video_url, patient_id",
           )
           .eq("professional_id", prof.id)
           .gte("inicio", de.toISOString())
@@ -611,171 +619,8 @@ export const marcarConsultaRealizada = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
-/* ---------- ficha sigilosa e anotações ---------- */
-
-export const fichaPaciente = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data: { patientId: string }) => ({ patientId: String(data.patientId) }))
-  .handler(async ({ data, context }) => {
-    const { supabase, prof } = await profissionalDoUsuario(context);
-    if (!prof) return { ok: false as const, erro: "Cadastro profissional não encontrado." };
-
-    const { data: vinculo } = await supabase
-      .from("appointments")
-      .select("id")
-      .eq("patient_id", data.patientId)
-      .eq("professional_id", prof.id)
-      .in("status", ["confirmada", "realizada", "nao_compareceu", "remarcada"])
-      .limit(1)
-      .maybeSingle();
-    if (!vinculo) {
-      return { ok: false as const, erro: "Você só pode acessar pacientes vinculados ao seu atendimento." };
-    }
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const [{ data: perfil }, { data: ficha }, { data: consultas }, { data: anotacoes }] =
-      await Promise.all([
-        supabaseAdmin
-          .from("profiles")
-          .select("id, nome, data_nascimento, codigo_anonimo, created_at")
-          .eq("id", data.patientId)
-          .maybeSingle(),
-        supabase
-          .from("patient_clinical_records")
-          .select("*")
-          .eq("patient_id", data.patientId)
-          .eq("professional_id", prof.id)
-          .maybeSingle(),
-        supabase
-          .from("appointments")
-          .select("id, inicio, fim, status, duracao_minutos, video_url")
-          .eq("patient_id", data.patientId)
-          .eq("professional_id", prof.id)
-          .order("inicio", { ascending: false }),
-        supabase
-          .from("appointment_notes")
-          .select("id, appointment_id, conteudo, created_at, updated_at")
-          .eq("patient_id", data.patientId)
-          .eq("professional_id", prof.id)
-          .order("created_at", { ascending: false }),
-      ]);
-
-    if (!perfil) {
-      return {
-        ok: false as const,
-        erro: "Você só pode acessar a ficha de pacientes com consulta confirmada com você.",
-      };
-    }
-    return {
-      ok: true as const,
-      paciente: { ...perfil, nome: perfil.nome?.trim().split(/\s+/)[0] ?? null },
-      ficha: ficha ?? null,
-      consultas: consultas ?? [],
-      anotacoes: anotacoes ?? [],
-    };
-  });
-
-export const salvarFichaPaciente = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (data: {
-      patientId: string;
-      informacoes_relevantes?: string;
-      diagnostico?: string;
-      historico?: string;
-      observacoes?: string;
-      evolucao?: string;
-    }) => {
-      const t = (v: unknown) => String(v ?? "").trim().slice(0, 8000) || null;
-      return {
-        patientId: String(data.patientId),
-        informacoes_relevantes: t(data.informacoes_relevantes),
-        diagnostico: t(data.diagnostico),
-        historico: t(data.historico),
-        observacoes: t(data.observacoes),
-        evolucao: t(data.evolucao),
-      };
-    },
-  )
-  .handler(async ({ data, context }) => {
-    const { supabase, prof } = await profissionalDoUsuario(context);
-    if (!prof) return { ok: false as const, erro: "Cadastro profissional não encontrado." };
-    const { patientId, ...campos } = data;
-    const { data: vinculo } = await supabase
-      .from("appointments")
-      .select("id")
-      .eq("patient_id", patientId)
-      .eq("professional_id", prof.id)
-      .in("status", ["confirmada", "realizada", "nao_compareceu", "remarcada"])
-      .limit(1)
-      .maybeSingle();
-    if (!vinculo) return { ok: false as const, erro: "Paciente não vinculado ao seu atendimento." };
-    const { error } = await supabase
-      .from("patient_clinical_records")
-      .upsert(
-        { patient_id: patientId, professional_id: prof.id, ...campos },
-        { onConflict: "patient_id,professional_id" },
-      );
-    if (error) {
-      return { ok: false as const, erro: "Não foi possível salvar. Verifique se há consulta confirmada com este paciente." };
-    }
-    return { ok: true as const };
-  });
-
-export const adicionarAnotacao = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data: { appointmentId: string; conteudo: string }) => ({
-    appointmentId: String(data.appointmentId),
-    conteudo: String(data.conteudo ?? "").trim().slice(0, 8000),
-  }))
-  .handler(async ({ data, context }) => {
-    if (!data.conteudo) return { ok: false as const, erro: "Escreva a anotação." };
-    const { supabase, prof } = await profissionalDoUsuario(context);
-    if (!prof) return { ok: false as const, erro: "Cadastro profissional não encontrado." };
-    const { data: consulta } = await supabase
-      .from("appointments")
-      .select("id, patient_id, professional_id, status")
-      .eq("id", data.appointmentId)
-      .eq("professional_id", prof.id)
-      .maybeSingle();
-    if (!consulta || !["confirmada", "realizada"].includes(consulta.status)) {
-      return { ok: false as const, erro: "Consulta não encontrada." };
-    }
-    const { error } = await supabase.from("appointment_notes").insert({
-      appointment_id: consulta.id,
-      professional_id: prof.id,
-      patient_id: consulta.patient_id,
-      conteudo: data.conteudo,
-    });
-    if (error) {
-      return { ok: false as const, erro: "Anotações só podem ser feitas em consultas confirmadas ou realizadas." };
-    }
-    return { ok: true as const };
-  });
-
-export const anotacoesDaConsulta = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data: { appointmentId: string }) => ({ appointmentId: String(data.appointmentId) }))
-  .handler(async ({ data, context }) => {
-    const { supabase, prof } = await profissionalDoUsuario(context);
-    if (!prof) return { anotacoes: [] };
-    const { data: consulta } = await supabase
-      .from("appointments")
-      .select("id")
-      .eq("id", data.appointmentId)
-      .eq("professional_id", prof.id)
-      .in("status", ["confirmada", "realizada"])
-      .maybeSingle();
-    if (!consulta) return { anotacoes: [] };
-    const { data: rows } = await supabase
-      .from("appointment_notes")
-      .select("id, conteudo, created_at")
-      .eq("appointment_id", data.appointmentId)
-      .eq("professional_id", prof.id)
-      .order("created_at", { ascending: false });
-    return { anotacoes: rows ?? [] };
-  });
+/* A plataforma é de tecnologia: não guarda prontuário, anotação clínica nem
+   qualquer dado de saúde do paciente. */
 
 /* ---------- financeiro ---------- */
 
@@ -789,7 +634,7 @@ export type LancamentoFinanceiro = {
   taxaAgendamento: number;
   plataforma: number;
   liquido: number;
-  comissaoPercent: number;
+  taxaFixaCentavos: number;
   situacao: "agendada" | "a_receber" | "pago" | "cancelada" | "nao_compareceu" | "aguardando_pagamento";
   pagoEm: string | null;
   previstoPara: string | null;
@@ -804,11 +649,14 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
     const { concluirConsultasVencidas } = await import("@/lib/plataforma.functions");
     await concluirConsultasVencidas();
 
+    const { configuracoesPlataformaServidor } = await import("@/lib/plataforma.functions");
+    const cfg = await configuracoesPlataformaServidor();
+
     const [{ data: consultas }, { data: payouts }] = await Promise.all([
       supabase
         .from("appointments")
         .select(
-          "id, inicio, status, payment_status, patient_id, valor_consulta_centavos, taxa_agendamento_centavos, valor_plataforma_centavos, valor_profissional_centavos, comissao_percent",
+          "id, inicio, status, payment_status, patient_id, valor_consulta_centavos, taxa_plataforma_centavos, valor_plataforma_centavos, valor_profissional_centavos",
         )
         .eq("professional_id", prof.id)
         .order("inicio", { ascending: false })
@@ -830,10 +678,10 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
     const payoutPorConsulta = new Map((payouts ?? []).map((p) => [p.appointment_id, p]));
 
     const lancamentos: LancamentoFinanceiro[] = (consultas ?? []).map((c) => {
-      const comissao = Number(c.comissao_percent ?? 20);
+      // Taxa da plataforma: valor fixo em reais por consulta, igual para todos.
       const bruto = c.valor_consulta_centavos ?? 0;
-      const plataforma = Math.round((bruto * comissao) / 100);
-      const liquido = bruto - plataforma;
+      const plataforma = c.taxa_plataforma_centavos ?? cfg.taxaPorConsultaCentavos;
+      const liquido = bruto;
       const payout = payoutPorConsulta.get(c.id);
       let situacao: LancamentoFinanceiro["situacao"] = "agendada";
       if (c.status === "aguardando_pagamento") situacao = "aguardando_pagamento";
@@ -848,10 +696,10 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
         paciente: rotulo.paciente,
         codigo: rotulo.codigo,
         bruto,
-        taxaAgendamento: c.taxa_agendamento_centavos ?? 0,
+        taxaAgendamento: plataforma,
         plataforma,
         liquido,
-        comissaoPercent: comissao,
+        taxaFixaCentavos: plataforma,
         situacao,
         pagoEm: payout?.pago_em ?? null,
         previstoPara: payout?.previsto_para ?? null,
@@ -860,15 +708,15 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
 
     const soma = (f: (l: LancamentoFinanceiro) => boolean) =>
       lancamentos.filter(f).reduce((s, l) => s + l.liquido, 0);
+    const contabiliza = (l: LancamentoFinanceiro) =>
+      l.situacao === "a_receber" || l.situacao === "pago" || l.situacao === "nao_compareceu";
     const resumo = {
       futurosBruto: lancamentos.filter((l) => l.situacao === "agendada").reduce((s, l) => s + l.bruto, 0),
       futurosLiquido: soma((l) => l.situacao === "agendada"),
       aReceber: soma((l) => l.situacao === "a_receber"),
       recebido: soma((l) => l.situacao === "pago"),
-      taxasAgendamento: lancamentos
-        .filter((l) => l.situacao !== "aguardando_pagamento" && l.situacao !== "cancelada")
-        .reduce((s, l) => s + l.taxaAgendamento, 0),
-      comissaoPercent: Number(prof.comissao_percent ?? 20),
+      taxasAgendamento: lancamentos.filter(contabiliza).reduce((s, l) => s + l.plataforma, 0),
+      taxaFixaCentavos: cfg.taxaPorConsultaCentavos,
       consultasRealizadas: lancamentos.filter((l) => l.situacao === "a_receber" || l.situacao === "pago").length,
       consultasAgendadas: lancamentos.filter((l) => l.situacao === "agendada").length,
     };

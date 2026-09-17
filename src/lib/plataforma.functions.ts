@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
-import { gerarSalaVideo } from "@/lib/video-sala";
 import { areaDosPapeis, type Papel } from "@/lib/areas";
 
 export type ProfissionalPublico = {
@@ -95,6 +94,11 @@ export const listarHorariosLivres = createServerFn({ method: "GET" })
 export type ConfiguracoesPlataforma = {
   taxaCentavos: number;
   comissaoPercent: number;
+  /** Taxa fixa em centavos cobrada do profissional por consulta realizada. */
+  taxaPorConsultaCentavos: number;
+  janelaCancelamentoHoras: number;
+  antecedenciaLinkMinutos: number;
+  janelaConfirmacaoHoras: number;
   duracaoPadraoMinutos: number;
   cancelamentoHoras: number;
   remarcacaoHoras: number;
@@ -110,15 +114,19 @@ export function mapearConfiguracoes(rows: { chave: string; valor: unknown }[] | 
   for (const row of rows ?? []) mapa[row.chave] = row.valor;
   const cfg: ConfiguracoesPlataforma = {
     taxaCentavos: Number(mapa["taxa_confirmacao_centavos"] ?? 5000),
-    comissaoPercent: Number(mapa["comissao_plataforma_percent"] ?? 20),
+    comissaoPercent: Number(mapa["comissao_plataforma_percent"] ?? 0),
+    taxaPorConsultaCentavos: Number(mapa["taxa_por_consulta_centavos"] ?? 2900),
+    janelaCancelamentoHoras: Number(mapa["janela_cancelamento_horas"] ?? 24),
+    antecedenciaLinkMinutos: Number(mapa["antecedencia_link_minutos"] ?? 15),
+    janelaConfirmacaoHoras: Number(mapa["janela_confirmacao_horas"] ?? 24),
     duracaoPadraoMinutos: Number(mapa["duracao_padrao_minutos"] ?? 50),
-    cancelamentoHoras: Number(mapa["cancelamento_horas_minimas"] ?? 24),
+    cancelamentoHoras: Number(mapa["janela_cancelamento_horas"] ?? mapa["cancelamento_horas_minimas"] ?? 24),
     remarcacaoHoras: Number(mapa["remarcacao_horas_minimas"] ?? 24),
     reembolsoTaxaNoPrazo: Boolean(mapa["reembolso_taxa_no_prazo"] ?? true),
     hotmartLivroUrl: String(mapa["hotmart_livro_url"] ?? ""),
     livroTitulo: String(mapa["livro_titulo"] ?? "Como Ser Feliz com TOC"),
     livroDescontoPercent: Number(mapa["livro_desconto_percent"] ?? 50),
-    videoProvider: String(mapa["video_provider"] ?? "jitsi"),
+    videoProvider: String(mapa["video_provider"] ?? "externo"),
   };
   return cfg;
 }
@@ -127,6 +135,11 @@ async function carregarConfiguracoesPrivadas() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin.from("platform_settings").select("chave, valor");
   return mapearConfiguracoes(data);
+}
+
+/** Uso interno do servidor (outras server functions). */
+export async function configuracoesPlataformaServidor() {
+  return carregarConfiguracoesPrivadas();
 }
 
 export const configuracoesAutenticadas = createServerFn({ method: "GET" })
@@ -256,7 +269,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
 
     const { data: prof, error: erroProf } = await supabase
       .from("professionals")
-      .select("id, slug, nome, slot_minutos, comissao_percent, status, valor_centavos")
+      .select("id, slug, nome, slot_minutos, status, valor_centavos, ferramenta_url_sala")
       .eq("slug", data.slug)
       .maybeSingle();
     if (erroProf || !prof || prof.status !== "aprovado") {
@@ -277,17 +290,16 @@ export const criarAgendamento = createServerFn({ method: "POST" })
 
     const cfg = await carregarConfiguracoesPrivadas();
 
-    // O sinal de agendamento é cobrado agora e abatido do valor total da
-    // consulta. O saldo restante é devido no atendimento.
-    const taxa = cfg.taxaCentavos;
+    // O paciente paga exatamente o preço definido pelo profissional. A taxa fixa
+    // da plataforma é cobrada do profissional e não compõe o preço.
     const valorConsulta = Number(prof.valor_centavos ?? 0);
-    const comissao = cfg.comissaoPercent;
-    const plataforma = Math.round((valorConsulta * comissao) / 100);
+    const taxaFixa = cfg.taxaPorConsultaCentavos;
     const duracao = prof.slot_minutos || cfg.duracaoPadraoMinutos;
     const fim = new Date(new Date(inicioIso).getTime() + duracao * 60000).toISOString();
 
     const consultaId = crypto.randomUUID();
-    const sala = gerarSalaVideo(cfg.videoProvider, consultaId);
+    // A sala de videochamada é do próprio profissional; guardamos apenas o link.
+    const linkAcesso = prof.ferramenta_url_sala ?? null;
 
     const { data: criada, error } = await supabase
       .from("appointments")
@@ -300,14 +312,17 @@ export const criarAgendamento = createServerFn({ method: "POST" })
         duracao_minutos: duracao,
         status: "aguardando_pagamento",
         payment_status: "pendente",
-        valor_centavos: taxa,
-        taxa_agendamento_centavos: taxa,
+        valor_centavos: valorConsulta,
+        taxa_agendamento_centavos: 0,
         valor_consulta_centavos: valorConsulta,
-        comissao_percent: comissao,
-        valor_plataforma_centavos: plataforma,
-        valor_profissional_centavos: valorConsulta - plataforma,
-        video_url: sala.url,
-        video_provider: sala.provider,
+        comissao_percent: 0,
+        valor_plataforma_centavos: 0,
+        valor_profissional_centavos: valorConsulta,
+        taxa_plataforma_centavos: taxaFixa,
+        link_acesso: linkAcesso,
+        video_url: linkAcesso,
+        video_provider: "externo",
+        reserva_expira_em: new Date(Date.now() + 15 * 60000).toISOString(),
       })
       .select("id, inicio, fim, valor_centavos")
       .single();
@@ -332,7 +347,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
         tipo: "reserva_criada",
         canal: "email",
         titulo: "Reserva registrada",
-        corpo: `Seu horário com ${prof.nome} em ${quando} está reservado e aguarda a confirmação do sinal de agendamento, que será abatido do valor total da consulta.`,
+        corpo: `Seu horário com ${prof.nome} em ${quando} está reservado por 15 minutos e aguarda a confirmação do pagamento.`,
       },
       {
         user_id: userId,
@@ -395,9 +410,9 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
       titulo: "Consulta cancelada",
       corpo: dentroDoPrazo
         ? cfg.reembolsoTaxaNoPrazo
-          ? "Cancelamento dentro do prazo. O sinal de agendamento será estornado pela nossa equipe."
+          ? "Cancelamento dentro do prazo. O valor pago será estornado pela nossa equipe."
           : "Cancelamento registrado dentro do prazo."
-        : `Cancelamento fora do prazo de ${cfg.cancelamentoHoras}h. O sinal de agendamento não é reembolsável.`,
+        : `Cancelamento fora do prazo de ${cfg.cancelamentoHoras}h: o valor pago não é reembolsável.`,
     });
     return { ok: true as const, dentroDoPrazo };
   });

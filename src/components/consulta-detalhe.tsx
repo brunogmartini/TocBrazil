@@ -1,14 +1,7 @@
-import { Link } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { Modal } from "@/components/modal";
-import {
-  adicionarAnotacao,
-  anotacoesDaConsulta,
-  marcarConsultaRealizada,
-  type ConsultaAgenda,
-} from "@/lib/profissional.functions";
+import { marcarConsultaRealizada, type ConsultaAgenda } from "@/lib/profissional.functions";
 import { chaveDia, horaDe, rotuloDiaLongo } from "@/lib/agenda-tempo";
 import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 
@@ -21,26 +14,12 @@ export function ConsultaDetalhe({
   onFechar: () => void;
   onAtualizado: () => Promise<void> | void;
 }) {
-  const queryClient = useQueryClient();
-  const carregarAnotacoes = useServerFn(anotacoesDaConsulta);
-  const anotar = useServerFn(adicionarAnotacao);
   const atualizar = useServerFn(marcarConsultaRealizada);
-  const [texto, setTexto] = useState("");
   const [erro, setErro] = useState<string | null>(null);
-  const [salvando, setSalvando] = useState(false);
-
-  const anotacoes = useQuery({
-    queryKey: ["anotacoes", consulta?.id],
-    queryFn: () => carregarAnotacoes({ data: { appointmentId: consulta!.id } }),
-    enabled: Boolean(consulta),
-  });
 
   if (!consulta) return null;
   const c = consulta;
   const futura = new Date(c.inicio).getTime() > Date.now();
-  const podeAnotar = c.status === "confirmada" || c.status === "realizada";
-  const liquido = Math.round(c.valor_consulta_centavos * 0.8);
-  const restante = Math.max(0, c.valor_consulta_centavos - c.taxa_agendamento_centavos);
 
   async function mudarStatus(status: "realizada" | "nao_compareceu" | "cancelada") {
     if (status === "cancelada" && !window.confirm("Cancelar esta consulta?")) return;
@@ -61,97 +40,38 @@ export function ConsultaDetalhe({
           </span>
         </div>
 
-        <dl className="grid gap-3 rounded-xl bg-muted p-4 sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="grid gap-3 rounded-xl bg-muted p-4 sm:grid-cols-3">
           <div>
-            <dt className="text-xs text-muted-foreground">Valor da consulta</dt>
+            <dt className="text-xs text-muted-foreground">Preço que você definiu</dt>
             <dd className="font-semibold">{moeda(c.valor_consulta_centavos)}</dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">Seu líquido {c.status === "realizada" ? "" : "(após realizar)"}</dt>
-            <dd className="font-semibold">{moeda(c.valor_profissional_centavos || liquido)}</dd>
+            <dt className="text-xs text-muted-foreground">Taxa fixa da plataforma</dt>
+            <dd className="font-semibold">{moeda(c.taxa_plataforma_centavos)}</dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">Sinal incluído no total</dt>
+            <dt className="text-xs text-muted-foreground">Pagamento do paciente</dt>
             <dd className="font-semibold">
-              {moeda(c.taxa_agendamento_centavos)}{" "}
-              <span className="font-normal text-muted-foreground">
-                ({c.payment_status === "aprovado" ? "paga" : "pendente"})
-              </span>
+              {c.payment_status === "aprovado" ? "confirmado" : "pendente"}
             </dd>
           </div>
-           <div>
-             <dt className="text-xs text-muted-foreground">Restante no atendimento</dt>
-             <dd className="font-semibold">{moeda(restante)}</dd>
-           </div>
         </dl>
 
-        <div className="flex flex-wrap gap-3">
-          {c.video_url && (c.status === "confirmada" || c.status === "realizada") && (
-            <a href={c.video_url} target="_blank" rel="noopener noreferrer" className="btn-base btn-primary">
-              Entrar na videochamada
-            </a>
-          )}
-          {c.vinculado && (
-            <Link
-              to="/profissional/ficha/$patientId"
-              params={{ patientId: c.patient_id }}
-              className="btn-base btn-ghost"
-            >
-              Abrir ficha sigilosa
-            </Link>
-          )}
-        </div>
+        {c.link_acesso && (c.status === "confirmada" || c.status === "realizada") && (
+          <a
+            href={c.link_acesso}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-base btn-primary"
+          >
+            Abrir sua sala de atendimento
+          </a>
+        )}
 
         {c.status === "aguardando_pagamento" && (
           <p className="rounded-xl border border-border/60 p-3 text-xs text-muted-foreground">
-            O paciente ainda não pagou o sinal incluído no valor da consulta. O horário fica reservado até a confirmação.
+            O paciente ainda não concluiu o pagamento. O horário fica reservado por 15 minutos.
           </p>
-        )}
-
-        {podeAnotar && (
-          <section>
-            <h3 className="text-base">Anotações da consulta</h3>
-            <ul className="mt-3 space-y-2">
-              {(anotacoes.data?.anotacoes ?? []).length === 0 && (
-                <li className="text-xs text-muted-foreground">Nenhuma anotação ainda.</li>
-              )}
-              {(anotacoes.data?.anotacoes ?? []).map((a) => (
-                <li key={a.id} className="rounded-xl bg-muted p-3">
-                  <p className="whitespace-pre-wrap">{a.conteudo}</p>
-                  <p className="mt-1 text-[11px] text-muted-foreground">
-                    {new Date(a.created_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}
-                  </p>
-                </li>
-              ))}
-            </ul>
-            <form
-              className="mt-3 space-y-2"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                setSalvando(true);
-                setErro(null);
-                const r = await anotar({ data: { appointmentId: c.id, conteudo: texto } });
-                setSalvando(false);
-                if (!r.ok) setErro(r.erro);
-                else {
-                  setTexto("");
-                  await queryClient.invalidateQueries({ queryKey: ["anotacoes", c.id] });
-                }
-              }}
-            >
-              <textarea
-                className="field-base"
-                rows={3}
-                maxLength={8000}
-                placeholder="Registre observações desta sessão (sigiloso, visível só para você)."
-                value={texto}
-                onChange={(e) => setTexto(e.target.value)}
-              />
-              <button type="submit" disabled={salvando || !texto.trim()} className="btn-base btn-primary disabled:opacity-60">
-                {salvando ? "Salvando…" : "Adicionar anotação"}
-              </button>
-            </form>
-          </section>
         )}
 
         {(c.status === "confirmada" || c.status === "aguardando_pagamento") && (
@@ -159,7 +79,7 @@ export function ConsultaDetalhe({
             {!futura && c.status === "confirmada" && (
               <>
                 <button type="button" className="btn-base btn-ghost" onClick={() => mudarStatus("realizada")}>
-                  Marcar como realizada
+                  Confirmar que a consulta ocorreu
                 </button>
                 <button type="button" className="btn-base btn-ghost" onClick={() => mudarStatus("nao_compareceu")}>
                   Paciente não compareceu

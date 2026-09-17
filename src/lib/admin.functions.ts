@@ -83,6 +83,11 @@ export type ProfissionalAdmin = {
   foto_url: string | null;
   observacao_admin: string | null;
   validado_em: string | null;
+  rqe: string | null;
+  ferramenta_provedor: string | null;
+  ferramenta_url_sala: string | null;
+  certidao_validade: string | null;
+  apolice_validade: string | null;
   temAgenda: boolean;
   criadoEm: string;
   documentos: {
@@ -313,6 +318,11 @@ export const painelAdmin = createServerFn({ method: "GET" })
         foto_url: p.foto_url,
         observacao_admin: p.observacao_admin,
         validado_em: p.validado_em,
+        rqe: p.rqe,
+        ferramenta_provedor: p.ferramenta_provedor,
+        ferramenta_url_sala: p.ferramenta_url_sala,
+        certidao_validade: p.certidao_validade,
+        apolice_validade: p.apolice_validade,
         temAgenda: comAgenda.has(p.id),
         criadoEm: p.created_at,
         documentos: docs,
@@ -373,6 +383,28 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await garantirAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    if (data.status === "aprovado") {
+      const { data: prof } = await supabaseAdmin
+        .from("professionals")
+        .select("ferramenta_url_sala, certidao_validade, apolice_validade")
+        .eq("id", data.id)
+        .maybeSingle();
+      const hoje = new Date().toISOString().slice(0, 10);
+      if (!prof?.ferramenta_url_sala) {
+        return {
+          ok: false as const,
+          erro: "O profissional ainda não cadastrou a ferramenta de videochamada. O perfil não pode ser publicado.",
+        };
+      }
+      if (prof.certidao_validade && prof.certidao_validade < hoje) {
+        return { ok: false as const, erro: "A certidão do conselho está vencida." };
+      }
+      if (prof.apolice_validade && prof.apolice_validade < hoje) {
+        return { ok: false as const, erro: "A apólice de seguro está vencida." };
+      }
+    }
+
     const { error } = await supabaseAdmin
       .from("professionals")
       .update({
