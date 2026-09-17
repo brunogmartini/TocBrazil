@@ -50,6 +50,13 @@
       "when": 1789663357874,
       "tag": "0006_ajustar_psicologos_taxa_fixa",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789666597650,
+      "tag": "0007_endurecer_avaliacoes_e_funcoes",
+      "breakpoints": true
     }
   ]
 }
