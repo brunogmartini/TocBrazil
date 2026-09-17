@@ -9,7 +9,6 @@ import { track } from "@/lib/analytics";
 
 const LABEL_PROFISSAO: Record<string, string> = {
   psicologo: "Psicólogo(a)",
-  psiquiatra: "Psiquiatra",
 };
 
 export const Route = createFileRoute("/profissionais/$slug")({
@@ -31,7 +30,7 @@ export const Route = createFileRoute("/profissionais/$slug")({
       };
     }
     const p = loaderData.profissional;
-    const titulo = `${p.nome} — ${LABEL_PROFISSAO[p.profissao]} online | TOC Brazil`;
+    const titulo = `${p.nome} — Psicólogo(a) online | TOC Brazil`;
     const desc = `${p.nome} (${p.registro}) atende online. ${p.apresentacao ?? ""}`;
     return {
       meta: [
@@ -96,17 +95,16 @@ function Perfil() {
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[1.4fr_0.9fr]">
         <div>
-          <span className="pill">{LABEL_PROFISSAO[p.profissao]}</span>
+          <span className="pill">Psicólogo(a)</span>
           <h1 className="mt-4 text-3xl sm:text-4xl">{p.nome}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {p.registro} · {p.uf} · {p.experiencia_anos} anos de experiência declarados
           </p>
           <p
             className="pill mt-4 inline-flex"
-            title="A verificação se limita à inscrição ativa no conselho profissional e aos documentos de formação declarados pelo profissional. A TOC Brazil não avalia a qualidade do atendimento."
+            title="Conferimos a inscrição ativa no CRP e os documentos de formação apresentados. Não avaliamos competência técnica nem garantimos resultado."
           >
-            Verificamos a inscrição ativa no conselho profissional e a documentação de formação
-            declarada
+            Inscrição no CRP conferida e documentos de formação apresentados
           </p>
 
           <div className="card-soft mt-8 p-6">
@@ -133,7 +131,7 @@ function Perfil() {
             <section className="card-soft p-6">
               <h2 className="text-lg">Abordagem</h2>
               <p className="mt-3 text-sm text-muted-foreground">
-                {p.abordagem ?? "Acompanhamento médico psiquiátrico."}
+                {p.abordagem ?? "Abordagem informada no cadastro."}
               </p>
             </section>
             <section className="card-soft p-6">
@@ -157,9 +155,7 @@ function Perfil() {
           </div>
 
           <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
-            As informações deste perfil são declaradas pelo profissional e sua documentação é
-            verificada pela plataforma. A TOC Brazil não realiza diagnósticos, não prescreve
-            tratamentos e não promete resultados.
+            As informações deste perfil são declaradas pelo profissional. Conferimos a inscrição ativa no CRP e os documentos de formação apresentados. A TOC Brazil não presta serviço de saúde e não avalia competência técnica nem garante resultado.
           </p>
         </div>
 

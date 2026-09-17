@@ -6,20 +6,20 @@ import { track } from "@/lib/analytics";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "TOC Brazil — plataforma especializada em TOC" },
+      { title: "TOC Brazil — encontre psicólogos com experiência em TOC" },
       {
         name: "description",
         content:
-          "Plataforma especializada em Transtorno Obsessivo-Compulsivo: metodologia própria, conteúdo especializado e profissionais selecionados, com atendimento online.",
+          "Busque psicólogos com experiência em TOC por abordagem, horário e valor. Agendamento e pagamento acontecem na plataforma; a consulta acontece na sala do próprio psicólogo.",
       },
       {
         property: "og:title",
-        content: "TOC Brazil — especialização, metodologia e profissionais selecionados",
+        content: "TOC Brazil — encontre psicólogos com experiência em TOC",
       },
       {
         property: "og:description",
         content:
-          "Uma jornada estruturada de cuidado em TOC: conhecimento, metodologia e profissionais selecionados.",
+          "Plataforma de tecnologia para busca, agendamento e pagamento de consultas online com psicólogos cadastrados.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/")({
           "@type": "WebSite",
           name: "TOC Brazil",
           description:
-            "Plataforma especializada em TOC que reúne conhecimento, metodologia e profissionais selecionados.",
+            "Plataforma de tecnologia para encontrar psicólogos com experiência em TOC e agendar consultas online.",
           url: "/",
         }),
       },
@@ -46,43 +46,43 @@ export const Route = createFileRoute("/")({
 const passos = [
   {
     titulo: "Entenda sobre o transtorno",
-    texto: "Tenha acesso a conteúdos sobre TOC para entender mais sobre o transtorno.",
+    texto: "Acesse conteúdos educativos sobre TOC em linguagem simples.",
   },
   {
-    titulo: "Encontre o profissional ideal",
+    titulo: "Encontre um psicólogo",
+    texto: "Busque por abordagem, idioma, preço, dia e turno disponíveis.",
+  },
+  {
+    titulo: "Agende uma consulta online",
+    texto: "Escolha um horário livre e confirme o pagamento pela plataforma.",
+  },
+  {
+    titulo: "Receba o link e entre na sala do seu psicólogo",
     texto:
-      "Escolha o profissional que melhor atende às suas necessidades a partir de filtros de pesquisa avançados.",
-  },
-  {
-    titulo: "Agende uma sessão online",
-    texto: "Escolha o melhor horário pra você disponível na agenda do profissional",
-  },
-  {
-    titulo: "Realize sua consulta online",
-    texto: "A consulta acontece por videochamada, no horário combinado, através da plataforma.",
+      "A sala de videochamada é do profissional. O link fica disponível para você 15 minutos antes do horário.",
   },
 ];
 
 const pilares = [
   {
-    titulo: "Especialização",
+    titulo: "Experiência declarada",
     texto:
-      "Nosso foco é o TOC e as necessidades de quem busca cuidado relacionado ao transtorno.",
+      "A plataforma reúne psicólogos que declaram experiência com TOC e apresentam suas abordagens no perfil.",
   },
   {
-    titulo: "Curadoria",
+    titulo: "Verificação de registro",
     texto:
-      "Profissionais selecionados, com formação, abordagem e experiência verificadas antes da publicação do perfil.",
+      "Conferimos a inscrição ativa no Conselho Regional de Psicologia e os documentos de formação apresentados pelo profissional.",
   },
   {
-    titulo: "Metodologia",
+    titulo: "Agendamento e pagamento",
     texto:
-      "Uma sequência clara de etapas, do entendimento do transtorno ao acompanhamento com profissional habilitado.",
+      "Você escolhe horário e paga a consulta pela plataforma. O preço exibido é o valor definido pelo psicólogo.",
   },
   {
-    titulo: "Jornada",
+    titulo: "Consulta fora da plataforma",
     texto:
-      "Descoberta, escolha, agendamento e atendimento reunidos em uma experiência integrada e contínua.",
+      "A consulta acontece na sala de videochamada do próprio psicólogo, contratada e mantida por ele.",
   },
 ];
 
@@ -109,10 +109,9 @@ const identificacao = [
   },
   {
     t: "Explicar de novo cansa",
-    d: "Já tentou terapia antes e sentiu que precisava explicar o TOC ao profissional em vez de ser cuidado.",
+    d: "Já tentou conversar sobre TOC e sentiu que precisava explicar o tema desde o início.",
   },
 ];
-
 
 function Home() {
   useEffect(() => {
@@ -121,30 +120,23 @@ function Home() {
 
   return (
     <>
-      {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="container-page grid items-center gap-12 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
           <div className="rise-in">
-            <span className="pill">Plataforma especializada em TOC</span>
+            <span className="pill">Plataforma de busca, agenda e pagamento</span>
             <h1 className="heading-hero mt-6">
-              Conectando você aos melhores profissionais com experiência em TOC
+              Encontre psicólogos com experiência em TOC e agende sua consulta online
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Consultas online com psicólogos e psiquiatras com experiência em transtorno
-              obsessivo compulsivo sem sair de casa e no horário que cabe na sua rotina. Selecione
-              profissionais de acordo com o seu perfil e as suas necessidades.
+              Busque por abordagem, horário e valor. O agendamento e o pagamento acontecem aqui; a consulta, na sala de videochamada do próprio psicólogo.
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link
-                to="/auth"
-                search={{ modo: "cadastro" as const, redirect: undefined }}
-                className="btn-base btn-primary"
-              >
-                Quero fazer parte
+              <Link to="/profissionais" className="btn-base btn-primary">
+                Ver psicólogos disponíveis
               </Link>
-              <Link to="/profissionais" className="btn-base btn-ghost">
-                Ver profissionais
+              <Link to="/como-funciona" className="btn-base btn-ghost">
+                Como funciona
               </Link>
             </div>
           </div>
@@ -165,17 +157,14 @@ function Home() {
         </div>
       </section>
 
-      {/* Nossa metodologia + diferencial */}
-      <section aria-labelledby="metodologia" className="border-y border-border bg-surface">
+      <section aria-labelledby="como-funciona" className="border-y border-border bg-surface">
         <div className="container-page py-16 lg:py-24">
-          <span className="section-label">Diferencial</span>
-          <h2 id="metodologia" className="heading-section mt-3 max-w-3xl">
-            Nossa metodologia
+          <span className="section-label">Como funciona</span>
+          <h2 id="como-funciona" className="heading-section mt-3 max-w-3xl">
+            Busca, agenda e pagamento em uma única plataforma
           </h2>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-            Não somos apenas uma plataforma de consultas online. Somos a primeira plataforma 100%
-            especializada em TOC, que reúne profissionais com experiência cujos tratamentos são
-            baseados em evidências científicas, através de uma jornada de cuidado e zelo.
+            Não somos apenas uma plataforma de consultas online. Somos a primeira plataforma 100% especializada em TOC, que reúne profissionais com experiência cujos tratamentos são baseados em evidências científicas, através de uma jornada de cuidado e zelo.
           </p>
 
           <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -187,7 +176,7 @@ function Home() {
             ))}
           </div>
 
-          <h3 className="heading-section mt-14">As etapas da sua jornada</h3>
+          <h3 className="heading-section mt-14">As etapas do agendamento</h3>
           <ol className="mt-6 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {passos.map((passo, i) => (
               <li key={passo.titulo} className="card-soft card-soft-hover h-full p-6">
@@ -200,42 +189,35 @@ function Home() {
         </div>
       </section>
 
-      {/* Profissionais */}
       <section aria-labelledby="profissionais" className="container-page py-16 lg:py-24">
         <div className="max-w-2xl">
-          <span className="section-label">Profissionais</span>
+          <span className="section-label">Psicólogos</span>
           <h2 id="profissionais" className="heading-section mt-3">
-            Psicólogos e psiquiatras com experiência na área.
+            Psicólogos cadastrados na plataforma com experiência na área.
           </h2>
           <p className="mt-4 text-muted-foreground">
             Aqui estão reunidos diversos profissionais da saúde mental com experiência em TOC.
           </p>
         </div>
         <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-          <Link
-            to="/auth"
-            search={{ modo: "cadastro" as const, redirect: undefined }}
-            className="btn-base btn-primary"
-          >
-            Quero fazer parte
+          <Link to="/profissionais" className="btn-base btn-primary">
+            Ver psicólogos disponíveis
           </Link>
-          <Link to="/profissionais" className="btn-base btn-ghost">
-            Ver profissionais
+          <Link to="/cadastro-profissional" className="btn-base btn-ghost">
+            Sou psicólogo
           </Link>
         </div>
       </section>
 
-      {/* Identificação */}
       <section aria-labelledby="identificacao" className="border-y border-border bg-surface">
         <div className="container-page py-16 lg:py-20">
           <div className="max-w-2xl">
-            <span className="section-label">Identificação</span>
-          <h2 id="identificacao" className="heading-section mt-3">
-            Talvez você já reconheça alguma destas situações.
-          </h2>
+            <span className="section-label">Conteúdo educativo</span>
+            <h2 id="identificacao" className="heading-section mt-3">
+              Talvez você já reconheça alguma destas situações.
+            </h2>
             <p className="mt-4 text-muted-foreground">
-              Nem todo profissional tem experiência em TOC e isso faz diferença. Aqui, os
-              profissionais já atuam nessa área.
+              Nem todo profissional tem experiência em TOC. Os perfis informam a experiência declarada e a abordagem de cada psicólogo.
             </p>
           </div>
 
@@ -248,40 +230,29 @@ function Home() {
             ))}
           </ul>
 
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <Link to="/profissionais" className="btn-base btn-primary">
-              Ver profissionais
-            </Link>
-            <Link to="/entenda-o-toc" className="btn-base btn-ghost">
-              Entender melhor o TOC
-            </Link>
-          </div>
+          <p className="mt-8 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            Reconhecer-se nessas situações não significa ter TOC. Só um profissional habilitado pode avaliar.
+          </p>
         </div>
       </section>
 
-      {/* Dúvida se tem TOC */}
-      <section aria-labelledby="duvida-toc" className="container-page py-16 lg:py-20">
+      <section aria-labelledby="ajuda" className="container-page py-16 lg:py-20">
         <div className="card-soft overflow-hidden p-8 sm:p-12">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div>
-              <span className="section-label">Diagnóstico</span>
-              <h2 id="duvida-toc" className="heading-section mt-3">
-                Dúvida se você tem TOC?
+              <span className="section-label">Informação</span>
+              <h2 id="ajuda" className="heading-section mt-3">
+                Como um psicólogo pode ajudar
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Agende um horário com profissional com experiência em TOC e descubra.
+                Um psicólogo habilitado pode escutar sua história, avaliar o que vem acontecendo em consulta e combinar próximos passos conforme sua formação e abordagem.
               </p>
-              <p className="mt-6 font-display text-2xl text-foreground sm:text-3xl">
-                O diagnóstico é o primeiro passo.
-              </p>
-              <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                Você não precisa continuar tentando entender sozinho o que está acontecendo.
-                Conversar com um profissional especializado em TOC ajuda a dar nome ao que você
-                sente e a encontrar o cuidado adequado, no seu tempo e sem julgamento.
+              <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                A TOC Brazil não avalia ninguém, não realiza diagnóstico e não promete que agendar uma consulta resolve uma situação. A plataforma oferece tecnologia para buscar profissionais, marcar horários e realizar o pagamento.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/profissionais" className="btn-base btn-primary">
-                  Agendar avaliação
+                  Ver psicólogos disponíveis
                 </Link>
                 <Link to="/entenda-o-toc" className="btn-base btn-ghost">
                   Entender melhor o TOC
@@ -290,144 +261,109 @@ function Home() {
             </div>
             <ul className="space-y-3 text-sm leading-relaxed text-muted-foreground">
               <li className="rounded-2xl bg-surface p-5">
-                Uma primeira conversa serve para entender sua história — não é um teste nem um
-                rótulo.
+                A consulta acontece na sala do próprio psicólogo, não em uma sala da TOC Brazil.
               </li>
               <li className="rounded-2xl bg-surface p-5">
-                Quem avalia é sempre um psicólogo ou psiquiatra habilitado; a plataforma não faz
-                diagnóstico.
+                A avaliação é feita por profissional habilitado, em consulta, sem teste ou triagem pela plataforma.
               </li>
               <li className="rounded-2xl bg-surface p-5">
-                Tudo acontece por videochamada, no seu horário, de onde você estiver.
+                O link da sala aparece na sua área pouco antes do horário marcado.
               </li>
             </ul>
           </div>
         </div>
       </section>
 
-      {/* Acolhimento */}
       <section aria-labelledby="acolhimento" className="container-page pb-4 lg:pb-8">
         <div className="card-soft mx-auto max-w-3xl p-8 text-center sm:p-12">
-          <span className="section-label">Acolhimento</span>
+          <span className="section-label">Apoio para decidir</span>
           <h2 id="acolhimento" className="heading-section mt-4">
-            Você não precisa enfrentar tudo isso sozinho.
+            Você pode buscar informação e escolher com calma.
           </h2>
           <p className="mt-6 text-base leading-relaxed text-muted-foreground">
-            Buscar ajuda pode ser difícil, especialmente quando determinados pensamentos ou
-            comportamentos causam vergonha, medo ou confusão.
+            Buscar ajuda pode ser difícil, especialmente quando determinados pensamentos ou comportamentos causam vergonha, medo ou confusão.
           </p>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Aqui, você encontra conteúdo especializado e profissionais selecionados para dar o
-            próximo passo com mais segurança.
+            Na plataforma, você encontra conteúdo educativo e psicólogos cadastrados com informações para comparar antes de agendar.
           </p>
-          <Link
-            to="/entenda-o-toc"
-            className="mt-8 inline-flex font-semibold text-primary underline underline-offset-4"
-          >
+          <Link to="/entenda-o-toc" className="mt-8 inline-flex font-semibold text-primary underline underline-offset-4">
             Entender melhor o TOC
           </Link>
         </div>
       </section>
 
-      {/* Do entendimento ao cuidado */}
-      <section
-        aria-labelledby="conceito"
-        className="mt-16 border-y border-border bg-primary text-primary-foreground"
-      >
+      <section aria-labelledby="conceito" className="mt-16 border-y border-border bg-primary text-primary-foreground">
         <div className="container-page py-20 lg:py-28">
           <p className="text-xs uppercase tracking-[0.14em] text-primary-foreground/70">
-            Nossa ideia central
+            Plataforma de tecnologia
           </p>
           <h2 id="conceito" className="heading-section mt-4 max-w-3xl">
-            Do entendimento ao cuidado.
+            Do entendimento à consulta com psicólogo.
           </h2>
           <div className="mt-10 grid gap-8 lg:grid-cols-2">
             <div className="space-y-4 text-lg leading-relaxed text-primary-foreground/85">
               <p>Talvez você tenha chegado aqui procurando uma resposta.</p>
               <p>Talvez tenha visto um conteúdo no Instagram.</p>
-              <p>
-                Talvez esteja tentando entender pensamentos, dúvidas ou comportamentos que vêm
-                ocupando espaço demais na sua vida.
-              </p>
+              <p>Talvez esteja tentando entender pensamentos, dúvidas ou comportamentos que vêm ocupando espaço demais na sua vida.</p>
             </div>
             <div className="space-y-4 text-lg leading-relaxed text-primary-foreground/85">
               <p className="font-display text-2xl text-primary-foreground">
-                Você não precisa descobrir tudo sozinho.
+                Informação ajuda, mas não substitui uma consulta.
               </p>
-              <p>Deixe que um profissional qualificado lhe ajude no processo.</p>
-              <Link
-                to="/profissionais"
-                className="btn-base mt-2 bg-background text-foreground hover:bg-background/90"
-              >
-                Ver profissionais
+              <p>Escolha um psicólogo cadastrado na plataforma e veja os horários disponíveis.</p>
+              <Link to="/profissionais" className="btn-base mt-2 bg-background text-foreground hover:bg-background/90">
+                Ver psicólogos disponíveis
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Segurança e privacidade */}
       <section aria-labelledby="seguranca" className="border-y border-border bg-surface">
         <div className="container-page grid gap-10 py-16 lg:grid-cols-2 lg:py-24">
           <div>
             <span className="section-label">Segurança e privacidade</span>
-          <h2 id="seguranca" className="heading-section mt-3">
-            Dados de saúde exigem cuidado redobrado.
-          </h2>
+            <h2 id="seguranca" className="heading-section mt-3">
+              Dados pessoais exigem cuidado redobrado.
+            </h2>
             <Link to="/seguranca" className="btn-base btn-ghost mt-8">
               Como protegemos seus dados
             </Link>
           </div>
           <ul className="space-y-4 text-sm leading-relaxed text-muted-foreground">
             <li className="card-soft p-5">
-              Coletamos apenas os dados necessários para agendamento, pagamento e documentação
-              fiscal, seguindo os princípios da LGPD.
+              Coletamos apenas os dados necessários para agendamento, pagamento e documentação fiscal, seguindo os princípios da LGPD.
             </li>
             <li className="card-soft p-5">
-              As consultas acontecem por videochamada no navegador e não são gravadas por padrão.
+              A TOC Brazil não hospeda a videochamada e não tem acesso ao conteúdo das consultas. A sala é do profissional.
             </li>
             <li className="card-soft p-5">
-              Acesso segmentado por papel: você acessa apenas os seus dados; o profissional acessa
-              apenas o necessário para o atendimento. Documentos de verificação ficam restritos à
-              equipe autorizada.
+              Acesso segmentado por papel: você acessa apenas os seus dados; o profissional acessa apenas o necessário para organizar a consulta. Documentos de verificação ficam restritos à equipe autorizada.
             </li>
             <li className="card-soft p-5">
-              A plataforma não realiza diagnósticos, não prescreve tratamentos e não promete
-              resultados. O atendimento é de responsabilidade do profissional habilitado.
+              A plataforma não realiza diagnósticos e não presta serviço de saúde. A consulta é de responsabilidade do psicólogo habilitado.
             </li>
           </ul>
         </div>
       </section>
 
-      {/* CTA final */}
       <section aria-labelledby="cta-final" className="container-page py-20 lg:py-28">
         <div className="mx-auto max-w-3xl text-center">
           <h2 id="cta-final" className="heading-hero">
-            Seu tratamento assertivo começa aqui.
+            Encontre um psicólogo e agende sua consulta.
           </h2>
 
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-            Pacientes e profissionais fazem parte da mesma jornada de cuidado especializado em TOC.
+            Busque perfis cadastrados, compare horários e confirme o pagamento em um só lugar.
           </p>
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link
-              to="/auth"
-              search={{ modo: "cadastro" as const, redirect: undefined }}
-              className="btn-base btn-primary"
-            >
-              Quero fazer parte
+            <Link to="/profissionais" className="btn-base btn-primary">
+              Ver psicólogos disponíveis
             </Link>
-            <Link to="/profissionais" className="btn-base btn-ghost">
-              Ver profissionais
+            <Link to="/cadastro-profissional" className="btn-base btn-ghost">
+              Sou psicólogo
             </Link>
           </div>
-          <p className="mt-6 text-sm text-muted-foreground">
-            É profissional de saúde mental?{" "}
-            <Link to="/cadastro-profissional" className="font-semibold underline underline-offset-4">
-              Comece seu cadastro profissional
-            </Link>
-            .
-          </p>
         </div>
       </section>
     </>

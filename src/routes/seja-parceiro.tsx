@@ -7,13 +7,13 @@ export const Route = createFileRoute("/seja-parceiro")({
       {
         name: "description",
         content:
-          "Psicólogos e psiquiatras com experiência em TOC: apresente seu trabalho, organize sua agenda e atenda online em uma plataforma especializada.",
+          "Psicólogos com experiência em TOC: apresente seu trabalho, organize sua agenda e use a plataforma para agendamento e pagamento."
       },
       { property: "og:title", content: "Seja um profissional parceiro da TOC Brazil" },
       {
         property: "og:description",
         content:
-          "Faça parte de uma rede especializada em TOC: perfil verificado, agenda organizada e atendimento online sem links externos.",
+          "Cadastre seu perfil, informe sua sala de videochamada, configure agenda e receba pagamentos pela sua conta no provedor."
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -34,27 +34,27 @@ const beneficios = [
     d: "Defina seus horários e deixe a plataforma cuidar dos agendamentos, sem conflitos de horário.",
   },
   {
-    t: "Atendimento online",
-    d: "Videochamada no navegador, sem enviar links externos e sem gravação por padrão.",
+    t: "Link da sua sala",
+    d: "Você informa a sala de videochamada que contrata e mantém; a plataforma transmite o link no horário agendado.",
   },
   {
-    t: "Perfil verificado",
-    d: "Sua documentação profissional é verificada antes da publicação do perfil.",
+    t: "Registro conferido",
+    d: "Conferimos sua inscrição ativa no CRP e os documentos de formação apresentados antes da publicação do perfil.",
   },
   {
-    t: "Gestão do atendimento",
-    d: "Acompanhe consultas, reagendamentos e o histórico do seu trabalho na plataforma.",
+    t: "Gestão administrativa",
+    d: "Acompanhe consultas, reagendamentos, confirmações e mensagens administrativas.",
   },
   {
     t: "Infraestrutura pronta",
-    d: "Tecnologia, segurança e conformidade cuidadas por nós, para você focar na clínica.",
+    d: "Tecnologia, segurança e pagamentos em um só lugar para organizar sua operação online.",
   },
 ];
 
 const etapas = [
   "Envie seus dados e sua documentação profissional.",
-  "Passe pela verificação de registro no conselho.",
-  "Monte seu perfil com formação, abordagem e subtipos atendidos.",
+  "Passe pela conferência de inscrição ativa no CRP.",
+  "Monte seu perfil com formação, abordagem, experiência em TOC e idiomas.",
   "Configure sua agenda e comece a receber agendamentos.",
 ];
 
@@ -64,11 +64,11 @@ function SejaParceiro() {
       <section className="container-page py-14 lg:py-20">
         <span className="section-label">Para profissionais</span>
         <h1 className="heading-page mt-4 max-w-3xl">
-          Você cuida do paciente. Nós cuidamos do resto.
+          Cadastre seu perfil e organize suas consultas online.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          Faça parte de uma rede especializada em conectar psicólogos e psiquiatras com
-          experiência em TOC a pessoas que procuram acompanhamento.
+          A TOC Brazil conecta pessoas interessadas em consulta online a psicólogos cadastrados
+          na plataforma com experiência em TOC.
         </p>
         <div className="mt-9 flex flex-col gap-3 sm:flex-row">
           <Link to="/cadastro-profissional" className="btn-base btn-primary">
@@ -76,7 +76,7 @@ function SejaParceiro() {
           </Link>
 
           <Link to="/como-funciona" className="btn-base btn-ghost">
-            Nossa metodologia
+            Como funciona
           </Link>
         </div>
       </section>
@@ -112,9 +112,6 @@ function SejaParceiro() {
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
           <Link to="/para-psicologos" className="btn-base btn-ghost">
             Sou psicólogo
-          </Link>
-          <Link to="/para-psiquiatras" className="btn-base btn-ghost">
-            Sou psiquiatra
           </Link>
           <Link to="/cadastro-profissional" className="btn-base btn-primary">
             Fazer meu cadastro

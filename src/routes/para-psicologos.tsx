@@ -8,13 +8,13 @@ export const Route = createFileRoute("/para-psicologos")({
       {
         name: "description",
         content:
-          "Crie seu perfil, configure disponibilidade e valores, receba agendamentos de pessoas que buscam acompanhamento em TOC e acompanhe seus repasses.",
+          "Crie seu perfil, configure disponibilidade e valores, informe sua sala de videochamada e receba pagamentos pela sua conta no provedor."
       },
       { property: "og:title", content: "Para psicólogos: estrutura completa para atender online" },
       {
         property: "og:description",
         content:
-          "Perfil verificado, agenda própria, checkout para o paciente e painel financeiro com repasses e comprovantes.",
+          "CRP conferido, agenda própria, checkout para o paciente e extrato de taxa fixa por consulta realizada."
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -31,12 +31,11 @@ const etapas = [
   "CRP",
   "Formação",
   "Abordagem",
-  "Subtipos",
+  "Experiência em TOC",
   "Documentos para validação",
-  "Preço da sessão",
+  "Preço da consulta",
   "Disponibilidade",
   "Dados de recebimento",
-  "Termos profissionais",
   "Aguardar aprovação",
 ];
 
@@ -47,12 +46,10 @@ function ParaPsicologos() {
         <div className="rise-in">
           <span className="pill">Para profissionais</span>
           <h1 className="heading-page mt-6">
-            Você cuida do paciente. Nós cuidamos do resto.
+            Organize sua agenda e receba consultas online.
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-            A TOC Brazil é especializada em TOC e conecta você a pessoas que já estão buscando
-            acompanhamento. Perfil verificado, agenda própria, checkout para o paciente e painel
-            financeiro com repasses e comprovantes.
+            A TOC Brazil é uma plataforma de tecnologia para busca, agendamento e pagamento. Você mantém sua própria sala de videochamada, define seu valor e contrata diretamente com o paciente.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link to="/cadastro-profissional" className="btn-base btn-primary">
@@ -99,10 +96,10 @@ function ParaPsicologos() {
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {[
             { t: "Agenda", d: "Dias, horários, recorrências, bloqueios, duração e intervalos." },
-            { t: "Consultas", d: "Próximas sessões, histórico, status e reagendamentos." },
-            { t: "Videochamada", d: "Atendimento no navegador, sem gravação por padrão." },
-            { t: "Financeiro", d: "Saldo, valores pendentes, repasses, taxas e comprovantes." },
-            { t: "Perfil", d: "Apresentação, abordagem, subtipos atendidos e valores." },
+            { t: "Consultas", d: "Próximas consultas, histórico, status e reagendamentos." },
+            { t: "Sua videochamada", d: "Informe a URL da sala contratada e mantida por você." },
+            { t: "Financeiro", d: "Extrato de consultas realizadas e taxa fixa por consulta." },
+            { t: "Perfil", d: "Apresentação, abordagem, experiência em TOC, idiomas e valores." },
             {
               t: "Segurança",
               d: "Preferências, autenticação em duas etapas e sessões ativas.",
@@ -115,9 +112,7 @@ function ParaPsicologos() {
           ))}
         </div>
         <p className="mt-8 max-w-3xl text-xs leading-relaxed text-muted-foreground">
-          A TOC Brazil atua como infraestrutura tecnológica e cobra uma taxa pelo uso. O atendimento
-          psicológico permanece sob responsabilidade do profissional habilitado, conforme as
-          normas do CFP. Não prometemos volume de pacientes nem resultados.
+          A TOC Brazil atua como infraestrutura tecnológica e cobra uma taxa fixa em reais por consulta realizada, igual para todos os profissionais. A consulta permanece sob responsabilidade do psicólogo habilitado, conforme as normas do CFP.
         </p>
       </section>
     </>

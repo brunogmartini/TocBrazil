@@ -80,11 +80,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "TOC Brazil — entenda o TOC e encontre o cuidado certo" },
+      { title: "TOC Brazil — encontre psicólogos com experiência em TOC" },
       {
         name: "description",
         content:
-          "Plataforma especializada em TOC: informação confiável e acesso a profissionais de Psicologia e Psiquiatria para quem busca acompanhamento, com agenda, pagamento e videochamada.",
+          "Plataforma de tecnologia para buscar psicólogos com experiência em TOC, agendar consultas online e pagar com segurança. A consulta acontece na sala do próprio psicólogo.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -135,9 +135,18 @@ function RootComponent() {
           <Outlet />
         </main>
         <MobileCta />
+        <UrgencyFooter />
         <SiteFooter />
       </div>
     </QueryClientProvider>
   );
 }
 
+
+function UrgencyFooter() {
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 px-4 py-2 text-center text-[11px] leading-snug text-muted-foreground backdrop-blur-xl lg:text-xs">
+      A TOC Brazil não é um serviço de urgência. Em caso de crise, ligue 188 (CVV) ou 192 (SAMU).
+    </div>
+  );
+}

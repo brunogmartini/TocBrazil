@@ -6,7 +6,7 @@ const colunas = [
     titulo: "Pacientes",
     links: [
       { to: "/profissionais", label: "Ver profissionais" },
-      { to: "/como-funciona", label: "Nossa metodologia" },
+      { to: "/como-funciona", label: "Como funciona" },
       { to: "/entenda-o-toc", label: "Sobre o transtorno" },
       { to: "/painel", label: "Minhas consultas" },
     ],
@@ -16,7 +16,6 @@ const colunas = [
     links: [
       { to: "/cadastro-profissional", label: "Quero fazer parte" },
       { to: "/para-psicologos", label: "Sou psicólogo" },
-      { to: "/para-psiquiatras", label: "Sou psiquiatra" },
       { to: "/profissional", label: "Área do profissional" },
       { to: "/auth", label: "Entrar" },
     ],
@@ -57,8 +56,7 @@ export function SiteFooter() {
           </div>
           <p className="mt-4 font-display text-base">Plataforma especializada em TOC.</p>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-            Conhecimento, metodologia e profissionais selecionados em uma jornada estruturada de
-            cuidado relacionado ao TOC.
+            Busca, agendamento e pagamento para consultas com psicólogos cadastrados na plataforma.
           </p>
         </div>
 
@@ -80,9 +78,7 @@ export function SiteFooter() {
 
       <div className="container-page border-t border-border py-6 text-xs leading-relaxed text-muted-foreground">
         <p>
-          Esta plataforma é uma infraestrutura tecnológica e não realiza diagnósticos, não prescreve
-          medicamentos e não promete resultados. Conteúdo educativo não substitui avaliação
-          profissional. O atendimento é de responsabilidade do profissional habilitado.
+          Esta plataforma é uma infraestrutura tecnológica e não presta serviço de saúde. Conteúdo educativo não substitui consulta com profissional habilitado. A consulta acontece na sala do próprio psicólogo.
         </p>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
           <p>© {new Date().getFullYear()} TOC Brazil.</p>
