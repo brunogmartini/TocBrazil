@@ -91,7 +91,6 @@ async function processar(request: Request) {
     { onConflict: "provider_ref" },
   );
 
-  // O sinal confirma a reserva e é abatido do valor total da consulta.
   if (status === "aprovado") {
     await supabaseAdmin.from("notifications").insert({
       user_id: consulta.patient_id,
@@ -99,9 +98,45 @@ async function processar(request: Request) {
       tipo: "pagamento_aprovado",
       canal: "email",
       titulo: "Consulta confirmada",
-      corpo: "Recebemos o sinal de agendamento. Ele será abatido do valor total da consulta, e o link da videochamada já está na sua área.",
+      corpo: "Pagamento aprovado. O endereço da sala aparece na sua área pouco antes do horário.",
     });
+
+    // E-mail de confirmação com os dados da consulta.
+    try {
+      const [{ data: paciente }, { data: prof }] = await Promise.all([
+        supabaseAdmin.from("profiles").select("nome, email").eq("id", consulta.patient_id).maybeSingle(),
+        supabaseAdmin
+          .from("professionals")
+          .select("nome, slot_minutos")
+          .eq("id", consulta.professional_id)
+          .maybeSingle(),
+      ]);
+      if (paciente?.email) {
+        const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+        const quando = new Date(consulta.inicio).toLocaleString("pt-BR", {
+          timeZone: "America/Sao_Paulo",
+          dateStyle: "short",
+          timeStyle: "short",
+        });
+        await sendTemplateEmail("consulta-confirmada", paciente.email, {
+          templateData: {
+            nomePaciente: paciente.nome?.split(" ")[0] ?? null,
+            nomeProfissional: prof?.nome ?? "seu profissional",
+            quando,
+            duracaoMinutos: prof?.slot_minutos ?? 50,
+            valor: (consulta.valor_centavos / 100).toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            }),
+          },
+          idempotencyKey: `consulta-confirmada-${consulta.id}`,
+        });
+      }
+    } catch (erro) {
+      console.error("falha ao enviar e-mail de confirmação", erro);
+    }
   }
+
 
   return new Response("ok", { status: 200 });
 }
