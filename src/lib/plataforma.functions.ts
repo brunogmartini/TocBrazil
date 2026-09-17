@@ -52,11 +52,20 @@ const CAMPOS =
   "id, slug, nome, profissao, registro, uf, cidade, foto_url, abordagem, apresentacao, experiencia_toc, experiencia_anos, graduacao, instituicao, cursos, formacao, especializacoes, areas, idiomas, genero, slot_minutos, valor_centavos";
 
 
+async function expirarReservas() {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.rpc("expirar_reservas_vencidas");
+  } catch {
+    // manutenção silenciosa: não bloqueia a listagem pública
+  }
+}
+
 export type ProfissionalComHorarios = ProfissionalPublico & { proximos: string[] };
 
 export const listarProfissionais = createServerFn({ method: "GET" }).handler(async () => {
   const cliente = clientePublico();
-  await cliente.rpc("expirar_reservas_vencidas");
+  await expirarReservas();
   const { data, error } = await cliente
     .from("professionals")
     .select(CAMPOS)
@@ -96,7 +105,7 @@ export const listarHorariosLivres = createServerFn({ method: "GET" })
   }))
   .handler(async ({ data }) => {
     const cliente = clientePublico();
-    await cliente.rpc("expirar_reservas_vencidas");
+    await expirarReservas();
     const { data: rows, error } = await cliente.rpc("slots_disponiveis", {
       _slug: data.slug,
       _dias: data.dias,
