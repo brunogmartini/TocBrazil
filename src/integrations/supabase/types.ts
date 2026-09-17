@@ -64,19 +64,24 @@ export type Database = {
           cancelada_em: string | null
           cancelada_por: string | null
           comissao_percent: number
+          confirmado_em: string | null
+          confirmado_realizado_por: string | null
           created_at: string
           duracao_minutos: number
           fim: string
           id: string
           inicio: string
+          link_acesso: string | null
           observacoes: string | null
           patient_id: string
           payment_status: Database["public"]["Enums"]["payment_status"]
           primeira_consulta: boolean
           professional_id: string
           realizada_em: string | null
+          reserva_expira_em: string | null
           status: Database["public"]["Enums"]["appointment_status"]
           taxa_agendamento_centavos: number
+          taxa_plataforma_centavos: number
           updated_at: string
           valor_centavos: number
           valor_consulta_centavos: number
@@ -89,19 +94,24 @@ export type Database = {
           cancelada_em?: string | null
           cancelada_por?: string | null
           comissao_percent?: number
+          confirmado_em?: string | null
+          confirmado_realizado_por?: string | null
           created_at?: string
           duracao_minutos?: number
           fim: string
           id?: string
           inicio: string
+          link_acesso?: string | null
           observacoes?: string | null
           patient_id: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
           primeira_consulta?: boolean
           professional_id: string
           realizada_em?: string | null
+          reserva_expira_em?: string | null
           status?: Database["public"]["Enums"]["appointment_status"]
           taxa_agendamento_centavos?: number
+          taxa_plataforma_centavos?: number
           updated_at?: string
           valor_centavos?: number
           valor_consulta_centavos?: number
@@ -114,19 +124,24 @@ export type Database = {
           cancelada_em?: string | null
           cancelada_por?: string | null
           comissao_percent?: number
+          confirmado_em?: string | null
+          confirmado_realizado_por?: string | null
           created_at?: string
           duracao_minutos?: number
           fim?: string
           id?: string
           inicio?: string
+          link_acesso?: string | null
           observacoes?: string | null
           patient_id?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
           primeira_consulta?: boolean
           professional_id?: string
           realizada_em?: string | null
+          reserva_expira_em?: string | null
           status?: Database["public"]["Enums"]["appointment_status"]
           taxa_agendamento_centavos?: number
+          taxa_plataforma_centavos?: number
           updated_at?: string
           valor_centavos?: number
           valor_consulta_centavos?: number
@@ -218,33 +233,45 @@ export type Database = {
       avaliacoes: {
         Row: {
           appointment_id: string
+          clareza: number | null
           comentario: string | null
+          cordialidade: number | null
           created_at: string
           id: string
+          moderacao: string
           nota: number
           patient_id: string
+          pontualidade: number | null
           professional_id: string
           publica: boolean
           updated_at: string
         }
         Insert: {
           appointment_id: string
+          clareza?: number | null
           comentario?: string | null
+          cordialidade?: number | null
           created_at?: string
           id?: string
+          moderacao?: string
           nota: number
           patient_id: string
+          pontualidade?: number | null
           professional_id: string
           publica?: boolean
           updated_at?: string
         }
         Update: {
           appointment_id?: string
+          clareza?: number | null
           comentario?: string | null
+          cordialidade?: number | null
           created_at?: string
           id?: string
+          moderacao?: string
           nota?: number
           patient_id?: string
+          pontualidade?: number | null
           professional_id?: string
           publica?: boolean
           updated_at?: string
@@ -306,6 +333,54 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "contratos_profissionais_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eventos_auditoria: {
+        Row: {
+          appointment_id: string | null
+          ator: string | null
+          ator_papel: string | null
+          id: string
+          metadados: Json
+          ocorrido_em: string
+          professional_id: string | null
+          tipo: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          ator?: string | null
+          ator_papel?: string | null
+          id?: string
+          metadados?: Json
+          ocorrido_em?: string
+          professional_id?: string | null
+          tipo: string
+        }
+        Update: {
+          appointment_id?: string | null
+          ator?: string | null
+          ator_papel?: string | null
+          id?: string
+          metadados?: Json
+          ocorrido_em?: string
+          professional_id?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eventos_auditoria_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventos_auditoria_professional_id_fkey"
             columns: ["professional_id"]
             isOneToOne: false
             referencedRelation: "professionals"
@@ -782,17 +857,25 @@ export type Database = {
       professionals: {
         Row: {
           abordagem: string | null
+          apolice_seguro_url: string | null
+          apolice_validade: string | null
           apresentacao: string | null
           areas: string[]
+          certidao_conselho_url: string | null
+          certidao_validade: string | null
           cidade: string | null
           comissao_percent: number
           created_at: string
           cursos: string[]
           destaque: string | null
+          documentos_formacao_urls: string[]
           email_contato: string | null
           especializacoes: string[]
           experiencia_anos: number
           experiencia_toc: string | null
+          ferramenta_instrucoes: string | null
+          ferramenta_provedor: string | null
+          ferramenta_url_sala: string | null
           formacao: string[]
           foto_url: string | null
           genero: string | null
@@ -807,30 +890,41 @@ export type Database = {
           profissao: Database["public"]["Enums"]["profissao"]
           registro: string
           requer_correcao: boolean
+          rqe: string | null
           slot_minutos: number
           slug: string
           status: Database["public"]["Enums"]["prof_status"]
           telefone: string | null
+          timezone: string
           uf: string
           updated_at: string
           user_id: string | null
           validado_em: string | null
           validado_por: string | null
           valor_centavos: number
+          verificado_em_doc: string | null
         }
         Insert: {
           abordagem?: string | null
+          apolice_seguro_url?: string | null
+          apolice_validade?: string | null
           apresentacao?: string | null
           areas?: string[]
+          certidao_conselho_url?: string | null
+          certidao_validade?: string | null
           cidade?: string | null
           comissao_percent?: number
           created_at?: string
           cursos?: string[]
           destaque?: string | null
+          documentos_formacao_urls?: string[]
           email_contato?: string | null
           especializacoes?: string[]
           experiencia_anos?: number
           experiencia_toc?: string | null
+          ferramenta_instrucoes?: string | null
+          ferramenta_provedor?: string | null
+          ferramenta_url_sala?: string | null
           formacao?: string[]
           foto_url?: string | null
           genero?: string | null
@@ -845,30 +939,41 @@ export type Database = {
           profissao: Database["public"]["Enums"]["profissao"]
           registro: string
           requer_correcao?: boolean
+          rqe?: string | null
           slot_minutos?: number
           slug: string
           status?: Database["public"]["Enums"]["prof_status"]
           telefone?: string | null
+          timezone?: string
           uf: string
           updated_at?: string
           user_id?: string | null
           validado_em?: string | null
           validado_por?: string | null
           valor_centavos?: number
+          verificado_em_doc?: string | null
         }
         Update: {
           abordagem?: string | null
+          apolice_seguro_url?: string | null
+          apolice_validade?: string | null
           apresentacao?: string | null
           areas?: string[]
+          certidao_conselho_url?: string | null
+          certidao_validade?: string | null
           cidade?: string | null
           comissao_percent?: number
           created_at?: string
           cursos?: string[]
           destaque?: string | null
+          documentos_formacao_urls?: string[]
           email_contato?: string | null
           especializacoes?: string[]
           experiencia_anos?: number
           experiencia_toc?: string | null
+          ferramenta_instrucoes?: string | null
+          ferramenta_provedor?: string | null
+          ferramenta_url_sala?: string | null
           formacao?: string[]
           foto_url?: string | null
           genero?: string | null
@@ -883,22 +988,28 @@ export type Database = {
           profissao?: Database["public"]["Enums"]["profissao"]
           registro?: string
           requer_correcao?: boolean
+          rqe?: string | null
           slot_minutos?: number
           slug?: string
           status?: Database["public"]["Enums"]["prof_status"]
           telefone?: string | null
+          timezone?: string
           uf?: string
           updated_at?: string
           user_id?: string | null
           validado_em?: string | null
           validado_por?: string | null
           valor_centavos?: number
+          verificado_em_doc?: string | null
         }
         Relationships: []
       }
       profiles: {
         Row: {
+          cidade: string | null
           codigo_anonimo: string | null
+          contato_emergencia_nome: string | null
+          contato_emergencia_telefone: string | null
           created_at: string
           data_nascimento: string | null
           email: string | null
@@ -906,10 +1017,14 @@ export type Database = {
           id: string
           nome: string | null
           telefone: string | null
+          uf: string | null
           updated_at: string
         }
         Insert: {
+          cidade?: string | null
           codigo_anonimo?: string | null
+          contato_emergencia_nome?: string | null
+          contato_emergencia_telefone?: string | null
           created_at?: string
           data_nascimento?: string | null
           email?: string | null
@@ -917,10 +1032,14 @@ export type Database = {
           id: string
           nome?: string | null
           telefone?: string | null
+          uf?: string | null
           updated_at?: string
         }
         Update: {
+          cidade?: string | null
           codigo_anonimo?: string | null
+          contato_emergencia_nome?: string | null
+          contato_emergencia_telefone?: string | null
           created_at?: string
           data_nascimento?: string | null
           email?: string | null
@@ -928,6 +1047,7 @@ export type Database = {
           id?: string
           nome?: string | null
           telefone?: string | null
+          uf?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1021,6 +1141,7 @@ export type Database = {
         | "cancelada"
         | "remarcada"
         | "nao_compareceu"
+        | "expirado"
       doc_status: "enviado" | "aprovado" | "recusado"
       payment_status:
         | "pendente"
@@ -1029,7 +1150,12 @@ export type Database = {
         | "estornado"
         | "cancelado"
       payout_status: "pendente" | "processando" | "pago" | "falhou"
-      prof_status: "pendente" | "aprovado" | "suspenso" | "rejeitado"
+      prof_status:
+        | "pendente"
+        | "aprovado"
+        | "suspenso"
+        | "rejeitado"
+        | "descredenciado"
       profissao: "psicologo" | "psiquiatra"
     }
     CompositeTypes: {
@@ -1166,6 +1292,7 @@ export const Constants = {
         "cancelada",
         "remarcada",
         "nao_compareceu",
+        "expirado",
       ],
       doc_status: ["enviado", "aprovado", "recusado"],
       payment_status: [
@@ -1176,7 +1303,13 @@ export const Constants = {
         "cancelado",
       ],
       payout_status: ["pendente", "processando", "pago", "falhou"],
-      prof_status: ["pendente", "aprovado", "suspenso", "rejeitado"],
+      prof_status: [
+        "pendente",
+        "aprovado",
+        "suspenso",
+        "rejeitado",
+        "descredenciado",
+      ],
       profissao: ["psicologo", "psiquiatra"],
     },
   },
