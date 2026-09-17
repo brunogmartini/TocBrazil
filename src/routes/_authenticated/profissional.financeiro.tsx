@@ -61,7 +61,7 @@ function Financeiro() {
 
   const { lancamentos, resumo } = dados.data;
   const visiveis = lancamentos.filter((l) => filtro === "todos" || l.situacao === filtro);
-  const comissao = resumo?.comissaoPercent ?? 20;
+  const taxaFixa = resumo?.taxaFixaCentavos ?? 0;
 
   return (
     <div className="professional-workspace py-12 lg:py-16">
@@ -70,9 +70,9 @@ function Financeiro() {
           <span className="professional-label">Consultório digital</span>
           <h1 className="mt-3 text-3xl sm:text-4xl">Financeiro</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            O valor da consulta só passa a ser devido a você depois que o atendimento é realizado. A
-             plataforma retém {comissao}% e você recebe {100 - comissao}%. O sinal pago no agendamento
-             faz parte do valor total da consulta e é abatido do saldo devido pelo paciente.
+            Você recebe integralmente o preço que definiu para a consulta. A plataforma cobra de você
+            uma taxa fixa de {moeda(taxaFixa)} por consulta realizada — ela não aparece para o paciente
+            e não altera o preço.
           </p>
         </div>
 
@@ -97,9 +97,9 @@ function Financeiro() {
             <p className="mt-2 text-xs text-muted-foreground">repasses já pagos pela plataforma</p>
           </div>
           <div className="professional-metric p-6">
-             <p className="professional-label">Sinais antecipados</p>
+             <p className="professional-label">Taxas da plataforma</p>
             <p className="mt-2 font-display text-2xl">{moeda(resumo?.taxasAgendamento ?? 0)}</p>
-             <p className="mt-2 text-xs text-muted-foreground">incluídos no valor total das consultas</p>
+             <p className="mt-2 text-xs text-muted-foreground">taxa fixa por consulta realizada</p>
           </div>
         </div>
 
@@ -157,9 +157,8 @@ function Financeiro() {
                           {l.codigo && <span className="ml-1 text-xs text-muted-foreground">{l.codigo}</span>}
                         </td>
                         <td className="px-5 py-3 text-right">{moeda(l.bruto)}</td>
-                        <td className="px-5 py-3 text-right text-muted-foreground">− {moeda(l.plataforma)}</td>
                         <td className="px-5 py-3 text-right font-semibold">{naoConta ? "—" : moeda(l.liquido)}</td>
-                        <td className="px-5 py-3 text-right text-muted-foreground">{moeda(l.taxaAgendamento)}</td>
+                        <td className="px-5 py-3 text-right text-muted-foreground">− {moeda(l.plataforma)}</td>
                         <td className="px-5 py-3">
                           <span className="pill">{rotuloSituacao[l.situacao]}</span>
                           {l.situacao === "pago" && l.pagoEm && (
