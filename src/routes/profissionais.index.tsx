@@ -126,7 +126,7 @@ function Busca() {
     [],
   );
 
-  const resultados = useMemo(() => {
+  const listaFiltrada = useMemo(() => {
     const faixaEscolhida = FAIXAS.find((f) => f.rotulo === faixa);
     const turnoEscolhido = TURNOS.find((t) => t.rotulo === turno);
     const diaEscolhido = DIAS.indexOf(dia);
@@ -167,9 +167,9 @@ function Busca() {
       faixa,
       dia,
       turno,
-      resultados: resultados.length,
+      itens: listaFiltrada.length,
     });
-  }, [abordagem, idioma, genero, faixa, dia, turno, resultados.length]);
+  }, [abordagem, idioma, genero, faixa, dia, turno, listaFiltrada.length]);
 
 
   return (
@@ -215,11 +215,11 @@ function Busca() {
       </form>
 
       <p className="mt-8 text-sm text-muted-foreground" role="status">
-        {resultados.length} psicólogo(s) — todos com consulta online
+        {listaFiltrada.length} psicólogo(s) — todos com consulta online
       </p>
 
       <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {resultados.map((p) => (
+        {listaFiltrada.map((p) => (
           <article key={p.slug} className="card-soft card-soft-hover flex h-full flex-col p-6">
             <span className="pill self-start">Psicólogo(a)</span>
             <h2 className="mt-4 text-lg">{p.nome}</h2>
@@ -258,7 +258,7 @@ function Busca() {
         ))}
       </div>
 
-      {resultados.length === 0 && (
+      {listaFiltrada.length === 0 && (
         <div className="card-soft mt-5 p-8">
           <h2 className="text-xl">
             {profissionais.length === 0
@@ -268,7 +268,7 @@ function Busca() {
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             {profissionais.length === 0
               ? "Cada perfil passa por conferência de CRP e documentos antes de ser publicado. Assim que a análise for concluída, os psicólogos aparecem aqui."
-              : "Tente remover uma preferência para ampliar o resultado."}
+              : "Tente remover uma preferência para ampliar a lista."}
           </p>
           {profissionais.length === 0 && (
             <Link to="/cadastro-profissional" className="btn-base btn-ghost mt-6">

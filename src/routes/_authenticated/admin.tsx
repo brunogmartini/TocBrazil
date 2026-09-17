@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
       {
         name: "description",
         content:
-          "Visão geral da plataforma: pacientes, profissionais, consultas, receita, pagamentos, livro e configurações.",
+          "Visão geral da plataforma: pacientes, psicólogos, consultas, taxa fixa, pagamentos e configurações.",
       },
       { property: "og:title", content: "Painel do gestor — TOC Brazil" },
       { property: "og:description", content: "Gestão completa da TOC Brazil." },
@@ -160,7 +160,7 @@ function Admin() {
       <span className="section-label">Gestão</span>
       <h1 className="mt-3 text-3xl sm:text-4xl">Painel do gestor</h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
-        Visão geral da plataforma, análise dos cadastros profissionais, pacientes, consultas, receita e
+        Visão geral da plataforma, análise dos cadastros profissionais, pacientes, consultas, taxa fixa e
         pagamentos. Dados clínicos dos pacientes não são acessíveis pela gestão.
       </p>
 
@@ -205,9 +205,9 @@ function Admin() {
               { rotulo: "Cadastros pendentes", valor: String(t.pendentes), destaque: t.pendentes > 0 },
               { rotulo: "Consultas futuras", valor: String(t.consultasFuturas) },
               { rotulo: "Consultas realizadas", valor: String(t.consultasRealizadas) },
-              { rotulo: "Receita — taxa fixa", valor: moeda(t.receitaTaxasCentavos) },
-              { rotulo: "Taxa fixa em consultas realizadas", valor: moeda(t.receitaTaxaFixaRealizadaCentavos) },
-              { rotulo: "Valores em consultas realizadas", valor: moeda(t.aPagarProfissionaisCentavos), destaque: t.aPagarProfissionaisCentavos > 0 },
+              { rotulo: "Taxas fixas registradas", valor: moeda(t.taxasRegistradasCentavos) },
+              { rotulo: "Taxa fixa em realizadas", valor: moeda(t.taxasRealizadasCentavos) },
+              { rotulo: "Valores pendentes de confirmação", valor: moeda(t.valorConsultasPendentesCentavos), destaque: t.valorConsultasPendentesCentavos > 0 },
             ].map((item) => (
               <div key={item.rotulo} className={`card-soft p-5 ${item.destaque ? "border-primary/50" : ""}`}>
                 <p className="section-label">{item.rotulo}</p>
@@ -222,7 +222,7 @@ function Admin() {
             </button>
             <button type="button" className="card-soft p-5 text-left hover:border-primary/60" onClick={() => setAba("financeiro")}>
               <p className="font-semibold">Extrato financeiro</p>
-              <p className="mt-1 text-sm text-muted-foreground">{moeda(t.aPagarProfissionaisCentavos)} em consultas realizadas.</p>
+              <p className="mt-1 text-sm text-muted-foreground">{moeda(t.valorConsultasPendentesCentavos)} em consultas realizadas pendentes de confirmação financeira.</p>
             </button>
           </div>
         </>
@@ -298,7 +298,7 @@ function Admin() {
                   <div>
                     <h2 className="text-lg">{p.nome}</h2>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {p.profissao === "psicólogo" ? "Psicólogo(a)" : "Psicólogo(a)"} · {p.registro} · {p.uf}
+                      Psicólogo(a) · {p.registro} · {p.uf}
                       {p.cidade ? ` · ${p.cidade}` : ""} · {p.email_login ?? p.email_contato ?? "sem e-mail"} · cadastro em {dataBR(p.criadoEm)}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -540,10 +540,10 @@ function Admin() {
         <>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { rotulo: "Taxas fixas registradas", valor: moeda(t.receitaTaxasCentavos) },
-              { rotulo: "Taxa fixa em realizadas", valor: moeda(t.receitaTaxaFixaRealizadaCentavos) },
-              { rotulo: "Valores em consultas realizadas", valor: moeda(t.aPagarProfissionaisCentavos) },
-              { rotulo: "Pagamentos aprovados", valor: moeda(t.pagoProfissionaisCentavos) },
+              { rotulo: "Taxas fixas registradas", valor: moeda(t.taxasRegistradasCentavos) },
+              { rotulo: "Taxa fixa em realizadas", valor: moeda(t.taxasRealizadasCentavos) },
+              { rotulo: "Valores pendentes de confirmação", valor: moeda(t.valorConsultasPendentesCentavos) },
+              { rotulo: "Valores com pagamento aprovado", valor: moeda(t.valorConsultasAprovadasCentavos) },
             ].map((i) => (
               <div key={i.rotulo} className="card-soft p-5">
                 <p className="section-label">{i.rotulo}</p>
@@ -584,10 +584,9 @@ function Admin() {
                   <th className="p-3">Profissional</th>
                   <th className="p-3">Consulta</th>
                   <th className="p-3">Data</th>
-                  <th className="p-3">Bruto</th>
+                  <th className="p-3">Preço da consulta</th>
                   <th className="p-3">Taxa fixa</th>
                   <th className="p-3">Valor do profissional</th>
-                  <th className="p-3">Pix</th>
                   <th className="p-3">Status</th>
                 </tr>
               </thead>
@@ -600,7 +599,6 @@ function Admin() {
                     <td className="p-3">{moeda(r.bruto)}</td>
                     <td className="p-3 text-muted-foreground">{moeda(r.plataforma)}</td>
                     <td className="p-3 font-semibold">{moeda(r.liquido)}</td>
-                    <td className="p-3 text-xs text-muted-foreground">{r.chavePix ?? "não informado"}</td>
                     <td className="p-3">
                       <span className="pill">{rotuloPagamento[r.status] ?? r.status}</span>
                       {r.pagoEm && <p className="mt-1 text-[11px] text-muted-foreground">aprovado em {dataBR(r.pagoEm)}</p>}
@@ -608,7 +606,7 @@ function Admin() {
                   </tr>
                 ))}
                 {pagamentosVisiveis.length === 0 && !painel.isLoading && (
-                  <tr><td colSpan={8} className="p-4 text-muted-foreground">Nenhum pagamento neste filtro.</td></tr>
+                  <tr><td colSpan={7} className="p-4 text-muted-foreground">Nenhum pagamento neste filtro.</td></tr>
                 )}
               </tbody>
             </table>

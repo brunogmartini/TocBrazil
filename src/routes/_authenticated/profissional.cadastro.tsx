@@ -8,7 +8,6 @@ import {
   registrarDocumento,
   removerDocumento,
   salvarCadastroProfissional,
-  salvarDadosPagamento,
 } from "@/lib/profissional.functions";
 import {
   desvincularMercadoPago,
@@ -27,12 +26,12 @@ export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
       { title: "Meu cadastro profissional — TOC Brazil" },
       {
         name: "description",
-        content: "Complete seus dados, envie documentos para verificação e informe seu pagamento.",
+        content: "Complete seus dados, envie documentos para verificação e configure o recebimento direto.",
       },
       { property: "og:title", content: "Meu cadastro profissional — TOC Brazil" },
       {
         property: "og:description",
-        content: "Dados profissionais, documentos e dados de pagamento na TOC Brazil.",
+        content: "Dados profissionais, documentos e recebimento direto na TOC Brazil.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -60,7 +59,6 @@ function CadastroProfissional() {
   const queryClient = useQueryClient();
   const carregar = useServerFn(meuCadastroProfissional);
   const salvar = useServerFn(salvarCadastroProfissional);
-  const salvarPagamento = useServerFn(salvarDadosPagamento);
   const registrar = useServerFn(registrarDocumento);
   const remover = useServerFn(removerDocumento);
   const statusVinculo = useServerFn(statusVinculoMercadoPago);
@@ -104,17 +102,9 @@ function CadastroProfissional() {
     ferramenta_url_sala: "",
     ferramenta_instrucoes: "",
   });
-  const [pagamento, setPagamento] = useState({
-    documento: "",
-    chave_pix: "",
-    banco: "",
-    agencia: "",
-    conta: "",
-    tipo_conta: "corrente",
-  });
   const [aviso, setAviso] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
-  const [tipoDoc, setTipoDoc] = useState(TIPOS_DOCUMENTO[0]!);
+  const [tipoDoc, setTipoDoc] = useState(TIPOS_DOCUMENTO[0] ?? "Documento de identidade");
   const [enviandoDoc, setEnviandoDoc] = useState(false);
 
   useEffect(() => {
@@ -150,19 +140,9 @@ function CadastroProfissional() {
         ferramenta_url_sala: p.ferramenta_url_sala ?? "",
         ferramenta_instrucoes: p.ferramenta_instrucoes ?? "",
       });
-    } else if (dados.data?.email) {
-      setForm((f) => ({ ...f, email_contato: dados.data!.email! }));
-    }
-    const r = dados.data?.pagamento;
-    if (r) {
-      setPagamento({
-        documento: r.documento ?? "",
-        chave_pix: r.chave_pix ?? "",
-        banco: r.banco ?? "",
-        agencia: r.agencia ?? "",
-        conta: r.conta ?? "",
-        tipo_conta: r.tipo_conta ?? "corrente",
-      });
+    } else {
+      const email = dados.data?.email;
+      if (email) setForm((f) => ({ ...f, email_contato: email }));
     }
   }, [dados.data]);
 
@@ -200,14 +180,6 @@ function CadastroProfissional() {
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Não foi possível salvar agora.");
     }
-  }
-
-  async function enviarPagamento(e: React.FormEvent) {
-    e.preventDefault();
-    setErro(null);
-    const r = await salvarPagamento({ data: pagamento });
-    if (!r.ok) setErro(r.erro);
-    else setAviso("Dados de pagamento salvos.");
   }
 
   async function enviarArquivo(file: File) {
@@ -608,8 +580,7 @@ function CadastroProfissional() {
         <div className="card-soft mt-5 p-7">
           {!vinculo.data?.configurado ? (
             <p className="text-sm text-muted-foreground">
-              O recebimento ainda está sendo configurado pela plataforma. Enquanto isso, seus
-              pagamentos são feitos pelos dados informados abaixo.
+              O recebimento direto ainda está sendo configurado. Assim que estiver disponível, você poderá ligar sua conta Mercado Pago aqui.
             </p>
           ) : vinculo.data.vinculado ? (
             <div className="flex flex-wrap items-center justify-between gap-4">
@@ -655,58 +626,6 @@ function CadastroProfissional() {
         </div>
       </section>
 
-      <section className="mt-12">
-        <h2 className="text-2xl">Dados administrativos de pagamento</h2>
-        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          Usamos estes dados apenas para identificação administrativa e suporte financeiro.
-        </p>
-
-        <form onSubmit={enviarPagamento} className="card-soft mt-5 grid gap-5 p-7 sm:grid-cols-2">
-          <Campo
-            label="CPF ou CNPJ"
-            value={pagamento.documento}
-            onChange={(v) => setPagamento({ ...pagamento, documento: v })}
-          />
-          <Campo
-            label="Chave Pix"
-            value={pagamento.chave_pix}
-            onChange={(v) => setPagamento({ ...pagamento, chave_pix: v })}
-          />
-          <Campo
-            label="Banco"
-            value={pagamento.banco}
-            onChange={(v) => setPagamento({ ...pagamento, banco: v })}
-          />
-          <div>
-            <label htmlFor="tipo-conta" className="section-label">
-              Tipo de conta
-            </label>
-            <select
-              id="tipo-conta"
-              className="field-base mt-2"
-              value={pagamento.tipo_conta}
-              onChange={(e) => setPagamento({ ...pagamento, tipo_conta: e.target.value })}
-            >
-              <option value="corrente">Conta corrente</option>
-              <option value="poupanca">Conta poupança</option>
-              <option value="pagamento">Conta de pagamento</option>
-            </select>
-          </div>
-          <Campo
-            label="Agência"
-            value={pagamento.agencia}
-            onChange={(v) => setPagamento({ ...pagamento, agencia: v })}
-          />
-          <Campo
-            label="Conta (com dígito)"
-            value={pagamento.conta}
-            onChange={(v) => setPagamento({ ...pagamento, conta: v })}
-          />
-          <button type="submit" className="btn-base btn-primary sm:col-span-2">
-            Salvar dados de pagamento
-          </button>
-        </form>
-      </section>
 
       <div className="mt-12 flex flex-wrap gap-3">
         <Link to="/profissional/agenda" className="btn-base btn-primary">

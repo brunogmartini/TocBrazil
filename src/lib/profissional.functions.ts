@@ -71,7 +71,6 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
         documentos: [],
         regras: [],
         bloqueios: [],
-        pagamento: null,
         contrato: null,
         email: (claims as { email?: string }).email ?? null,
       };
@@ -81,7 +80,6 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       { data: documentos },
       { data: regras },
       { data: bloqueios },
-      { data: pagamento },
       { data: contrato },
     ] = await Promise.all([
         supabase
@@ -101,11 +99,6 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
           .gte("fim", new Date().toISOString())
           .order("inicio"),
         supabase
-          .from("professional_payout_details")
-          .select("*")
-          .eq("professional_id", profissional.id)
-          .maybeSingle(),
-        supabase
           .from("contratos_profissionais")
           .select("id, versao, nome_assinatura, aceito_em")
           .eq("professional_id", profissional.id)
@@ -119,7 +112,6 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       documentos: documentos ?? [],
       regras: regras ?? [],
       bloqueios: bloqueios ?? [],
-      pagamento: pagamento ?? null,
       contrato: contrato ?? null,
       email: (claims as { email?: string }).email ?? null,
     };
@@ -209,40 +201,6 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     if (error) return { ok: false as const, erro: "Não foi possível criar seu cadastro agora." };
 
     return { ok: true as const, id: criado.id, slug: criado.slug };
-  });
-
-export const salvarDadosPagamento = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (data: {
-      banco?: string;
-      agencia?: string;
-      conta?: string;
-      tipo_conta?: string;
-      chave_pix?: string;
-      documento?: string;
-    }) => ({
-      banco: String(data.banco ?? "").trim().slice(0, 80) || null,
-      agencia: String(data.agencia ?? "").trim().slice(0, 20) || null,
-      conta: String(data.conta ?? "").trim().slice(0, 30) || null,
-      tipo_conta: String(data.tipo_conta ?? "").trim().slice(0, 20) || null,
-      chave_pix: String(data.chave_pix ?? "").trim().slice(0, 120) || null,
-      documento: String(data.documento ?? "").trim().slice(0, 30) || null,
-    }),
-  )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: prof } = await supabase
-      .from("professionals")
-      .select("id")
-      .eq("user_id", userId)
-      .maybeSingle();
-    if (!prof) return { ok: false as const, erro: "Complete seu cadastro primeiro." };
-    const { error } = await supabase
-      .from("professional_payout_details")
-      .upsert({ professional_id: prof.id, ...data }, { onConflict: "professional_id" });
-    if (error) return { ok: false as const, erro: "Não foi possível salvar os dados de pagamento." };
-    return { ok: true as const };
   });
 
 export const salvarDisponibilidade = createServerFn({ method: "POST" })
@@ -355,42 +313,8 @@ export const assinarContratoProfissional = createServerFn({ method: "POST" })
     if (documento.length < 11) throw new Error("Informe um CPF válido (11 dígitos).");
     return { nome_assinatura: nome, documento };
   })
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: prof } = await supabase
-      .from("professionals")
-      .select("id")
-      .eq("user_id", userId)
-      .maybeSingle();
-    if (!prof) return { ok: false as const, erro: "Complete seu cadastro primeiro." };
-
-    const { VERSAO_CONTRATO } = await import("@/lib/contrato-profissional");
-    const { getRequest } = await import("@tanstack/react-start/server");
-    let aceite_ip: string | null = null;
-    let user_agent: string | null = null;
-    try {
-      const req = getRequest();
-      aceite_ip =
-        req.headers.get("cf-connecting-ip") ??
-        req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-        null;
-      user_agent = req.headers.get("user-agent")?.slice(0, 400) ?? null;
-    } catch {
-      /* sem contexto de requisição */
-    }
-
-    const { error } = await supabase.from("contratos_profissionais").insert({
-      professional_id: prof.id,
-      versao: VERSAO_CONTRATO,
-      nome_assinatura: data.nome_assinatura,
-      documento: data.documento,
-      aceite_ip,
-      user_agent,
-    });
-    if (error && !error.message.includes("duplicate")) {
-      return { ok: false as const, erro: "Não foi possível registrar sua assinatura." };
-    }
-    return { ok: true as const };
+  .handler(async () => {
+    return { ok: false as const, erro: "O aceite contratual será habilitado em uma etapa futura." };
   });
 
 

@@ -10,6 +10,17 @@ import { exigirAreaProfissional } from "@/lib/role-access";
  */
 export const Route = createFileRoute("/_authenticated/profissional")({
   beforeLoad: () => exigirAreaProfissional(),
+  head: () => ({
+    meta: [
+      { title: "Área do profissional — TOC Brazil" },
+      { name: "description", content: "Agenda, cadastro, recebimento direto e consultas do psicólogo na TOC Brazil." },
+      { property: "og:title", content: "Área do profissional — TOC Brazil" },
+      { property: "og:description", content: "Agenda, cadastro, recebimento direto e consultas do psicólogo na TOC Brazil." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
   component: CascaProfissional,
 });
 
