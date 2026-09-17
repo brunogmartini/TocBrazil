@@ -245,7 +245,7 @@ function Home() {
                 Um psicólogo habilitado pode escutar sua história, avaliar o que vem acontecendo em consulta e lhe auxiliar a melhorar do TOC.
               </p>
               <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                A TOC Brazil não avalia ninguém, não realiza identificação clínica e não promete que agendar uma consulta resolve uma situação. A plataforma oferece tecnologia para buscar profissionais, marcar horários e realizar o pagamento.
+                Quem avalia é sempre um psicólogo, em consulta — nenhuma ferramenta substitui essa conversa. A TOC Brazil cuida da parte prática: encontrar profissionais, marcar horários e realização de pagamento.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/profissionais" className="btn-base btn-primary">
@@ -258,7 +258,7 @@ function Home() {
             </div>
             <ul className="space-y-3 text-sm leading-relaxed text-muted-foreground">
               <li className="rounded-2xl bg-surface p-5">
-                A consulta acontece na sala do próprio psicólogo, não em uma sala da TOC Brazil.
+                A consulta acontece na sala do próprio psicólogo, a TOC Brazil não possui salas virtuais para atendimento psicológico.
               </li>
               <li className="rounded-2xl bg-surface p-5">
                 A consulta é feita por profissional habilitado, em consulta, sem teste ou triagem pela plataforma.
