@@ -22,7 +22,8 @@ function lista(valor: unknown) {
 
 export type CadastroProfissionalEntrada = {
   nome: string;
-  profissao: "psicologo" | "psicólogo";
+  profissao: "psicologo";
+  cpf?: string;
   registro: string;
   uf: string;
   cidade?: string;
@@ -36,7 +37,6 @@ export type CadastroProfissionalEntrada = {
   experiencia_anos?: number;
   slot_minutos?: number;
   valor_centavos?: number;
-  rqe?: string;
   ferramenta_provedor?: string;
   ferramenta_url_sala?: string;
   ferramenta_instrucoes?: string;
@@ -132,13 +132,13 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     if (registro.length < 3) throw new Error("Informe seu registro profissional (CRP).");
     const uf = String(data.uf ?? "").trim().toUpperCase().slice(0, 2);
     if (uf.length !== 2) throw new Error("Informe a UF do registro.");
-    const profissao: "psicologo" | "psicólogo" =
-      data.profissao === "psicólogo" ? "psicólogo" : "psicologo";
+    const profissao: "psicologo" = "psicologo";
     return {
       nome,
       registro,
       uf,
       profissao,
+      cpf: String(data.cpf ?? "").replace(/\D/g, "").slice(0, 11) || null,
       cidade: String(data.cidade ?? "").trim().slice(0, 80) || null,
       telefone: String(data.telefone ?? "").trim().slice(0, 30) || null,
       email_contato: String(data.email_contato ?? "").trim().slice(0, 160) || null,
@@ -162,7 +162,6 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
 
       areas: lista(data.areas),
       idiomas: lista(data.idiomas),
-      rqe: String(data.rqe ?? "").trim().slice(0, 40) || null,
       ferramenta_provedor: String(data.ferramenta_provedor ?? "").trim().slice(0, 80) || null,
       ferramenta_url_sala: String(data.ferramenta_url_sala ?? "").trim().slice(0, 500) || null,
       ferramenta_instrucoes: String(data.ferramenta_instrucoes ?? "").trim().slice(0, 1000) || null,
@@ -514,7 +513,7 @@ async function profissionalDoUsuario(context: { supabase: unknown; userId: strin
   >;
   const { data } = await supabase
     .from("professionals")
-    .select("id, nome, slug, status, slot_minutos, comissao_percent, valor_centavos, requer_correcao, observacao_admin, graduacao, apresentacao, areas")
+    .select("id, nome, slug, status, slot_minutos, valor_centavos, requer_correcao, observacao_admin, graduacao, apresentacao, areas")
     .eq("user_id", context.userId)
     .maybeSingle();
   return { supabase, prof: data };
@@ -666,20 +665,14 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
     const { configuracoesPlataformaServidor } = await import("@/lib/plataforma.functions");
     const cfg = await configuracoesPlataformaServidor();
 
-    const [{ data: consultas }, { data: payouts }] = await Promise.all([
-      supabase
-        .from("appointments")
-        .select(
-          "id, inicio, status, payment_status, patient_id, valor_consulta_centavos, taxa_plataforma_centavos, valor_plataforma_centavos, valor_profissional_centavos",
-        )
-        .eq("professional_id", prof.id)
-        .order("inicio", { ascending: false })
-        .limit(300),
-      supabase
-        .from("payouts")
-        .select("id, appointment_id, status, pago_em, previsto_para, valor_centavos")
-        .eq("professional_id", prof.id),
-    ]);
+    const { data: consultas } = await supabase
+      .from("appointments")
+      .select(
+        "id, inicio, status, payment_status, patient_id, valor_consulta_centavos, taxa_plataforma_centavos, valor_plataforma_centavos, valor_profissional_centavos",
+      )
+      .eq("professional_id", prof.id)
+      .order("inicio", { ascending: false })
+      .limit(300);
 
     const ids = [...new Set((consultas ?? []).map((c) => c.patient_id))];
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -689,19 +682,16 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
     const perfilPorId = new Map(
       (perfis ?? []).map((p) => [p.id, { ...p, nome: p.nome?.trim().split(/\s+/)[0] ?? null }]),
     );
-    const payoutPorConsulta = new Map((payouts ?? []).map((p) => [p.appointment_id, p]));
-
     const lancamentos: LancamentoFinanceiro[] = (consultas ?? []).map((c) => {
       // Taxa da plataforma: valor fixo em reais por consulta, igual para todos.
       const bruto = c.valor_consulta_centavos ?? 0;
       const plataforma = c.taxa_plataforma_centavos ?? cfg.taxaPorConsultaCentavos;
       const liquido = bruto;
-      const payout = payoutPorConsulta.get(c.id);
       let situacao: LancamentoFinanceiro["situacao"] = "agendada";
       if (c.status === "aguardando_pagamento") situacao = "aguardando_pagamento";
       else if (c.status === "cancelada") situacao = "cancelada";
       else if (c.status === "nao_compareceu") situacao = "nao_compareceu";
-      else if (c.status === "realizada") situacao = payout?.status === "pago" ? "pago" : "a_receber";
+      else if (c.status === "realizada") situacao = c.payment_status === "aprovado" ? "pago" : "a_receber";
       const rotulo = rotuloPaciente(perfilPorId.get(c.patient_id), c.patient_id);
       return {
         id: c.id,
@@ -715,8 +705,8 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
         liquido,
         taxaFixaCentavos: plataforma,
         situacao,
-        pagoEm: payout?.pago_em ?? null,
-        previstoPara: payout?.previsto_para ?? null,
+        pagoEm: c.status === "realizada" && c.payment_status === "aprovado" ? c.inicio : null,
+        previstoPara: null,
       };
     });
 
