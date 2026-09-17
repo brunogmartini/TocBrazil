@@ -21,6 +21,7 @@ import { iniciarPagamento } from "@/lib/pagamento.functions";
 import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 import { horaDe, rotuloDiaLongo, chaveDia } from "@/lib/agenda-tempo";
 import { exigirAreaPaciente } from "@/lib/role-access";
+import { baixarIcs } from "@/lib/calendario-ics";
 
 export const Route = createFileRoute("/_authenticated/painel")({
   // Área exclusiva do paciente: profissionais e gestores são levados à sua própria área.
@@ -101,7 +102,7 @@ function Painel() {
       fim: c.fim,
       titulo: c.professionals?.nome ?? "Consulta",
       status: c.status,
-      videoUrl: c.video_url,
+      videoUrl: c.link_acesso,
     }));
   const consultaSelecionada = lista.find((c) => c.id === selecionada) ?? null;
 
@@ -189,27 +190,45 @@ function Painel() {
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">{formatarData(c.inicio)}</p>
 
-                  {c.video_url && c.status === "confirmada" && (
-                    <a
-                      href={c.video_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-base btn-primary mt-4"
-                    >
-                      Entrar na videochamada
-                    </a>
+                  {c.status === "confirmada" && (
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      {c.linkLiberado && c.link_acesso ? (
+                        <a
+                          href={c.link_acesso}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-base btn-primary"
+                        >
+                          Entrar na sala do profissional
+                        </a>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">
+                          O endereço da sala aparece aqui {c.antecedenciaLinkMinutos} minutos antes
+                          do horário.
+                        </p>
+                      )}
+                      <button
+                        type="button"
+                        className="btn-base btn-ghost"
+                        onClick={() =>
+                          baixarIcs({
+                            id: c.id,
+                            inicio: c.inicio,
+                            fim: c.fim,
+                            profissional: c.professionals?.nome ?? "profissional",
+                          })
+                        }
+                      >
+                        Adicionar ao meu calendário
+                      </button>
+                    </div>
                   )}
 
                   {c.status === "aguardando_pagamento" && (
                     <div className="mt-3 rounded-xl bg-muted p-4 text-sm text-muted-foreground">
                       <p>
-                        Para confirmar a reserva, pague o sinal de agendamento de{" "}
-                        <strong className="text-foreground">{moeda(c.taxa_agendamento_centavos)}</strong>.
-                        Esse valor faz parte da consulta de {moeda(c.valor_consulta_centavos)}. Restará{" "}
-                        <strong className="text-foreground">
-                          {moeda(Math.max(0, c.valor_consulta_centavos - c.taxa_agendamento_centavos))}
-                        </strong>{" "}
-                        para pagar no atendimento.
+                        Seu horário fica reservado por 15 minutos. Para confirmar, pague a consulta
+                        de <strong className="text-foreground">{moeda(c.valor_consulta_centavos)}</strong>.
                       </p>
                       <button
                         type="button"
@@ -392,37 +411,64 @@ function Painel() {
                 {horaDe(consultaSelecionada.fim)}
               </p>
             </div>
-             <dl className="grid gap-3 rounded-xl bg-muted p-4 sm:grid-cols-3">
+            <dl className="grid gap-3 rounded-xl bg-muted p-4 sm:grid-cols-2">
               <div>
-                 <dt className="text-xs text-muted-foreground">Valor total da consulta</dt>
-                 <dd className="font-semibold">{moeda(consultaSelecionada.valor_consulta_centavos)}</dd>
+                <dt className="text-xs text-muted-foreground">Valor da consulta</dt>
+                <dd className="font-semibold">{moeda(consultaSelecionada.valor_consulta_centavos)}</dd>
               </div>
               <div>
-                 <dt className="text-xs text-muted-foreground">
-                   Sinal de agendamento {consultaSelecionada.payment_status === "aprovado" ? "já pago" : "a pagar"}
-                 </dt>
-                 <dd className="font-semibold">{moeda(consultaSelecionada.taxa_agendamento_centavos)}</dd>
-               </div>
-               <div>
-                 <dt className="text-xs text-muted-foreground">Restante no atendimento</dt>
-                 <dd className="font-semibold">
-                   {moeda(Math.max(0, consultaSelecionada.valor_consulta_centavos - consultaSelecionada.taxa_agendamento_centavos))}
-                 </dd>
+                <dt className="text-xs text-muted-foreground">Pagamento</dt>
+                <dd className="font-semibold">
+                  {consultaSelecionada.payment_status === "aprovado" ? "Aprovado" : "Pendente"}
+                </dd>
               </div>
             </dl>
-            {consultaSelecionada.video_url && consultaSelecionada.status === "confirmada" && (
-              <a
-                href={consultaSelecionada.video_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-base btn-primary w-full"
+            {consultaSelecionada.status === "confirmada" &&
+              (consultaSelecionada.linkLiberado && consultaSelecionada.link_acesso ? (
+                <div className="space-y-3">
+                  <a
+                    href={consultaSelecionada.link_acesso}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-base btn-primary w-full"
+                  >
+                    Entrar na sala do profissional
+                  </a>
+                  {consultaSelecionada.professionals?.ferramenta_instrucoes && (
+                    <p className="rounded-xl bg-muted p-4 text-xs leading-relaxed text-muted-foreground">
+                      {consultaSelecionada.professionals.ferramenta_provedor
+                        ? `${consultaSelecionada.professionals.ferramenta_provedor}: `
+                        : ""}
+                      {consultaSelecionada.professionals.ferramenta_instrucoes}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  O endereço da sala do profissional aparece aqui{" "}
+                  {consultaSelecionada.antecedenciaLinkMinutos} minutos antes do horário e continua
+                  disponível até 2 horas depois do fim da consulta.
+                </p>
+              ))}
+            {consultaSelecionada.status === "confirmada" && (
+              <button
+                type="button"
+                className="btn-base btn-ghost w-full"
+                onClick={() =>
+                  baixarIcs({
+                    id: consultaSelecionada.id,
+                    inicio: consultaSelecionada.inicio,
+                    fim: consultaSelecionada.fim,
+                    profissional: consultaSelecionada.professionals?.nome ?? "profissional",
+                  })
+                }
               >
-                Entrar na videochamada
-              </a>
+                Adicionar ao meu calendário
+              </button>
             )}
             {consultaSelecionada.status === "aguardando_pagamento" && (
               <p className="text-xs text-muted-foreground">
-                 O link da videochamada é liberado assim que o sinal de agendamento for confirmado.
+                O endereço da sala é liberado depois que o pagamento da consulta for aprovado.
               </p>
             )}
           </div>
