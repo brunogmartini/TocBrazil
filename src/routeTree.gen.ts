@@ -38,6 +38,7 @@ import { Route as AuthenticatedProfissionalAgendaRouteImport } from './routes/_a
 import { Route as AuthenticatedProfissionalCadastroRouteImport } from './routes/_authenticated/profissional.cadastro'
 import { Route as AuthenticatedProfissionalFinanceiroRouteImport } from './routes/_authenticated/profissional.financeiro'
 import { Route as ApiPublicMercadopagoVinculoRouteImport } from './routes/api/public/mercadopago/vinculo'
+import { Route as ApiPublicNotificacoesEnviarRouteImport } from './routes/api/public/notificacoes/enviar'
 import { Route as ApiPublicWebhooksHotmartRouteImport } from './routes/api/public/webhooks/hotmart'
 import { Route as ApiPublicWebhooksMercadopagoRouteImport } from './routes/api/public/webhooks/mercadopago'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -193,6 +194,12 @@ const ApiPublicMercadopagoVinculoRoute =
     path: '/api/public/mercadopago/vinculo',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicNotificacoesEnviarRoute =
+  ApiPublicNotificacoesEnviarRouteImport.update({
+    id: '/api/public/notificacoes/enviar',
+    path: '/api/public/notificacoes/enviar',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicWebhooksHotmartRoute =
   ApiPublicWebhooksHotmartRouteImport.update({
     id: '/api/public/webhooks/hotmart',
@@ -241,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/profissional/financeiro': typeof AuthenticatedProfissionalFinanceiroRoute
   '/profissional/': typeof AuthenticatedProfissionalIndexRoute
   '/api/public/mercadopago/vinculo': typeof ApiPublicMercadopagoVinculoRoute
+  '/api/public/notificacoes/enviar': typeof ApiPublicNotificacoesEnviarRoute
   '/api/public/webhooks/hotmart': typeof ApiPublicWebhooksHotmartRoute
   '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -273,6 +281,7 @@ export interface FileRoutesByTo {
   '/profissional/financeiro': typeof AuthenticatedProfissionalFinanceiroRoute
   '/profissional': typeof AuthenticatedProfissionalIndexRoute
   '/api/public/mercadopago/vinculo': typeof ApiPublicMercadopagoVinculoRoute
+  '/api/public/notificacoes/enviar': typeof ApiPublicNotificacoesEnviarRoute
   '/api/public/webhooks/hotmart': typeof ApiPublicWebhooksHotmartRoute
   '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -308,6 +317,7 @@ export interface FileRoutesById {
   '/_authenticated/profissional/financeiro': typeof AuthenticatedProfissionalFinanceiroRoute
   '/_authenticated/profissional/': typeof AuthenticatedProfissionalIndexRoute
   '/api/public/mercadopago/vinculo': typeof ApiPublicMercadopagoVinculoRoute
+  '/api/public/notificacoes/enviar': typeof ApiPublicNotificacoesEnviarRoute
   '/api/public/webhooks/hotmart': typeof ApiPublicWebhooksHotmartRoute
   '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -343,6 +353,7 @@ export interface FileRouteTypes {
     | '/profissional/financeiro'
     | '/profissional/'
     | '/api/public/mercadopago/vinculo'
+    | '/api/public/notificacoes/enviar'
     | '/api/public/webhooks/hotmart'
     | '/api/public/webhooks/mercadopago'
     | '/lovable/email/transactional/preview'
@@ -375,6 +386,7 @@ export interface FileRouteTypes {
     | '/profissional/financeiro'
     | '/profissional'
     | '/api/public/mercadopago/vinculo'
+    | '/api/public/notificacoes/enviar'
     | '/api/public/webhooks/hotmart'
     | '/api/public/webhooks/mercadopago'
     | '/lovable/email/transactional/preview'
@@ -409,6 +421,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profissional/financeiro'
     | '/_authenticated/profissional/'
     | '/api/public/mercadopago/vinculo'
+    | '/api/public/notificacoes/enviar'
     | '/api/public/webhooks/hotmart'
     | '/api/public/webhooks/mercadopago'
     | '/lovable/email/transactional/preview'
@@ -436,6 +449,7 @@ export interface RootRouteChildren {
   ConteudosIndexRoute: typeof ConteudosIndexRoute
   ProfissionaisIndexRoute: typeof ProfissionaisIndexRoute
   ApiPublicMercadopagoVinculoRoute: typeof ApiPublicMercadopagoVinculoRoute
+  ApiPublicNotificacoesEnviarRoute: typeof ApiPublicNotificacoesEnviarRoute
   ApiPublicWebhooksHotmartRoute: typeof ApiPublicWebhooksHotmartRoute
   ApiPublicWebhooksMercadopagoRoute: typeof ApiPublicWebhooksMercadopagoRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -646,6 +660,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicMercadopagoVinculoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/notificacoes/enviar': {
+      id: '/api/public/notificacoes/enviar'
+      path: '/api/public/notificacoes/enviar'
+      fullPath: '/api/public/notificacoes/enviar'
+      preLoaderRoute: typeof ApiPublicNotificacoesEnviarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/webhooks/hotmart': {
       id: '/api/public/webhooks/hotmart'
       path: '/api/public/webhooks/hotmart'
@@ -731,6 +752,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConteudosIndexRoute: ConteudosIndexRoute,
   ProfissionaisIndexRoute: ProfissionaisIndexRoute,
   ApiPublicMercadopagoVinculoRoute: ApiPublicMercadopagoVinculoRoute,
+  ApiPublicNotificacoesEnviarRoute: ApiPublicNotificacoesEnviarRoute,
   ApiPublicWebhooksHotmartRoute: ApiPublicWebhooksHotmartRoute,
   ApiPublicWebhooksMercadopagoRoute: ApiPublicWebhooksMercadopagoRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
