@@ -52,14 +52,29 @@ const CAMPOS =
   "id, slug, nome, profissao, registro, uf, cidade, foto_url, abordagem, apresentacao, experiencia_toc, experiencia_anos, graduacao, instituicao, cursos, formacao, especializacoes, areas, idiomas, genero, slot_minutos, valor_centavos";
 
 
+export type ProfissionalComHorarios = ProfissionalPublico & { proximos: string[] };
+
 export const listarProfissionais = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await clientePublico()
+  const cliente = clientePublico();
+  await cliente.rpc("expirar_reservas_vencidas");
+  const { data, error } = await cliente
     .from("professionals")
     .select(CAMPOS)
     .eq("status", "aprovado")
     .order("nome");
-  if (error) return { profissionais: [] as ProfissionalPublico[], erro: error.message };
-  return { profissionais: (data ?? []) as ProfissionalPublico[], erro: null as string | null };
+  if (error) return { profissionais: [] as ProfissionalComHorarios[], erro: error.message };
+  const { data: horarios } = await cliente.rpc("proximos_horarios", { _dias: 21, _limite: 5 });
+  const porSlug = new Map<string, string[]>();
+  for (const h of (horarios ?? []) as { slug: string; inicio: string }[]) {
+    const lista = porSlug.get(h.slug) ?? [];
+    lista.push(h.inicio);
+    porSlug.set(h.slug, lista);
+  }
+  const profissionais = ((data ?? []) as ProfissionalPublico[]).map((p) => ({
+    ...p,
+    proximos: porSlug.get(p.slug) ?? [],
+  }));
+  return { profissionais, erro: null as string | null };
 });
 
 export const obterProfissional = createServerFn({ method: "GET" })
@@ -80,7 +95,9 @@ export const listarHorariosLivres = createServerFn({ method: "GET" })
     dias: Math.min(Math.max(Number(data.dias ?? 21), 1), 60),
   }))
   .handler(async ({ data }) => {
-    const { data: rows, error } = await clientePublico().rpc("slots_disponiveis", {
+    const cliente = clientePublico();
+    await cliente.rpc("expirar_reservas_vencidas");
+    const { data: rows, error } = await cliente.rpc("slots_disponiveis", {
       _slug: data.slug,
       _dias: data.dias,
     });
