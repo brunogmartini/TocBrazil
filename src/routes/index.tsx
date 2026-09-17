@@ -50,7 +50,7 @@ const passos = [
   },
   {
     titulo: "Encontre um psicólogo",
-    texto: "Busque por abordagem, idioma, preço, dia e turno disponíveis.",
+    texto: "Busque profissionais através de filtros avançados de pesquisa.",
   },
   {
     titulo: "Agende uma consulta online",
@@ -128,7 +128,7 @@ function Home() {
               Encontre psicólogos com experiência em TOC e agende sua consulta online
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Busque por abordagem, horário e valor. O agendamento e o pagamento acontecem aqui; a consulta, na sala de videochamada do próprio psicólogo.
+              Encontre profissionais que entendem de TOC, consulte horários disponíveis e agende em poucos minutos.
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -161,10 +161,10 @@ function Home() {
         <div className="container-page py-16 lg:py-24">
           <span className="section-label">Como funciona</span>
           <h2 id="como-funciona" className="heading-section mt-3 max-w-3xl">
-            Busca, agenda e pagamento em uma única plataforma
+            Busca, agendamento e pagamento em uma única plataforma
           </h2>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-            Não somos apenas uma plataforma de consultas online. Somos a primeira plataforma 100% especializada em TOC, que reúne profissionais com experiência cujos abordagens declaradas podem ser baseadas em evidências científicas, através de uma jornada de cuidado e zelo.
+            Não somos apenas uma plataforma de consultas online. Somos a primeira plataforma 100% focada em TOC, que reúne profissionais experientes que lhe ajudarão a entender melhor seus sentimentos e pensamentos, numa jornada de cuidado e zelo.
           </p>
 
           <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -216,9 +216,6 @@ function Home() {
             <h2 id="identificacao" className="heading-section mt-3">
               Talvez você já reconheça alguma destas situações.
             </h2>
-            <p className="mt-4 text-muted-foreground">
-              Nem todo profissional tem experiência em TOC. Os perfis informam a experiência declarada e a abordagem de cada psicólogo.
-            </p>
           </div>
 
           <ul className="mt-10 grid gap-5 md:grid-cols-3">
@@ -245,7 +242,7 @@ function Home() {
                 Como um psicólogo pode ajudar
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Um psicólogo habilitado pode escutar sua história, avaliar o que vem acontecendo em consulta e combinar próximos passos conforme sua formação e abordagem.
+                Um psicólogo habilitado pode escutar sua história, avaliar o que vem acontecendo em consulta e lhe auxiliar a melhorar do TOC.
               </p>
               <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
                 A TOC Brazil não avalia ninguém, não realiza identificação clínica e não promete que agendar uma consulta resolve uma situação. A plataforma oferece tecnologia para buscar profissionais, marcar horários e realizar o pagamento.
