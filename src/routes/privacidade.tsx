@@ -7,13 +7,13 @@ export const Route = createFileRoute("/privacidade")({
       {
         name: "description",
         content:
-          "Como a TOC Brazil trata dados pessoais: finalidades, minimização, base legal, seus direitos e retenção de informações.",
+          "Como a TOC Brazil usa dados pessoais: finalidades, minimização, base legal, seus direitos e retenção de informações.",
       },
       { property: "og:title", content: "Privacidade e LGPD na TOC Brazil" },
       {
         property: "og:description",
         content:
-          "Dados tratados com minimização, consentimento quando necessário e controle de acesso por papel.",
+          "Dados usados com minimização, consentimento quando necessário e controle de acesso por papel.",
       },
       { property: "og:url", content: "/privacidade" },
     ],
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/privacidade")({
 
 const secoes = [
   {
-    t: "Dados que tratamos",
+    t: "Uso de dados",
     p: [
       "Coletamos apenas o necessário: dados de identificação e contato, informações de agendamento, dados de pagamento processados por provedor especializado e, no caso de profissionais, documentação de habilitação.",
       "Informações sensíveis eventualmente necessárias ao agendamento recebem proteção reforçada, com acesso restrito ao estritamente necessário.",
@@ -60,7 +60,7 @@ const secoes = [
   {
     t: "Seus direitos",
     p: [
-      "Você pode solicitar confirmação de tratamento, acesso, correção, portabilidade, anonimização e exclusão de dados, além de informação sobre compartilhamentos, nos termos da LGPD.",
+      "Você pode solicitar confirmação de uso dos dados, acesso, correção, portabilidade, anonimização e exclusão, além de informação sobre compartilhamentos, nos termos da LGPD.",
       "Alguns dados devem ser retidos por prazos legais, como registros fiscais e financeiros, mesmo após uma solicitação de exclusão.",
     ],
   },

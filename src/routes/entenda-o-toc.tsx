@@ -45,7 +45,7 @@ const blocos = [
   },
 ];
 
-const subtipos = [
+const manifestacoes = [
   {
     t: "TOC de simetria",
     d: "Pode envolver uma necessidade intensa de alinhamento, equilíbrio ou sensação de que algo está exatamente certo.",
@@ -137,11 +137,11 @@ function EntendaOToc() {
         </div>
       </section>
 
-      <section aria-labelledby="subtipos" className="container-page py-14 lg:py-20">
+      <section aria-labelledby="manifestacoes" className="container-page py-14 lg:py-20">
         <div className="max-w-3xl">
           <span className="section-label">Manifestações do TOC</span>
-          <h2 id="subtipos" className="heading-section mt-3">
-            Conheça alguns subtipos do transtorno
+          <h2 id="manifestacoes" className="heading-section mt-3">
+            Conheça algumas manifestações do transtorno
           </h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground">
             O TOC pode se manifestar por temas diferentes, e uma mesma pessoa pode vivenciar mais
@@ -150,10 +150,10 @@ function EntendaOToc() {
           </p>
         </div>
         <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {subtipos.map((subtipo) => (
-            <article key={subtipo.t} className="card-soft h-full p-6">
-              <h3 className="heading-subsection">{subtipo.t}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{subtipo.d}</p>
+          {manifestacoes.map((manifestacao) => (
+            <article key={manifestacao.t} className="card-soft h-full p-6">
+              <h3 className="heading-subsection">{manifestacao.t}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{manifestacao.d}</p>
             </article>
           ))}
         </div>

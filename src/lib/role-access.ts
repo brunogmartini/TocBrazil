@@ -22,9 +22,9 @@ export function guardarPerfilPretendido(perfil: "paciente" | "profissional" | "g
  */
 export async function minhaArea(perfilPretendido?: "profissional"): Promise<Area> {
   const perfil = perfilPretendido ?? perfilPretendidoGuardado();
-  const resultado = await meusPapeis({ data: perfil ? { perfil } : {} });
+  const resposta = await meusPapeis({ data: perfil ? { perfil } : {} });
   if (typeof window !== "undefined") window.sessionStorage.removeItem(CHAVE_PERFIL_PRETENDIDO);
-  return resultado.area;
+  return resposta.area;
 }
 
 /** Bloqueia a rota se a conta não pertencer à área exigida, levando-a para a área correta. */

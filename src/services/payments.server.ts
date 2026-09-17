@@ -6,7 +6,7 @@
  * - A taxa fixa da plataforma é cobrada do profissional (split), nunca somada ao preço.
  * - O dinheiro do profissional não transita por conta da plataforma: a cobrança é
  *   liquidada na conta de recebimento dele no provedor.
- * - Não existe carteira, saldo interno nem repasse manual.
+ * - Não existe carteira, saldo interno nem transferência manual de valores.
  */
 
 export type MetodoPagamento = "cartao" | "pix";

@@ -71,7 +71,6 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
         documentos: [],
         regras: [],
         bloqueios: [],
-        pagamento: null,
         contrato: null,
         email: (claims as { email?: string }).email ?? null,
       };
@@ -81,7 +80,6 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       { data: documentos },
       { data: regras },
       { data: bloqueios },
-      { data: pagamento },
       { data: contrato },
     ] = await Promise.all([
         supabase
@@ -101,11 +99,6 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
           .gte("fim", new Date().toISOString())
           .order("inicio"),
         supabase
-          .from("professional_payout_details")
-          .select("*")
-          .eq("professional_id", profissional.id)
-          .maybeSingle(),
-        supabase
           .from("contratos_profissionais")
           .select("id, versao, nome_assinatura, aceito_em")
           .eq("professional_id", profissional.id)
@@ -119,7 +112,6 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       documentos: documentos ?? [],
       regras: regras ?? [],
       bloqueios: bloqueios ?? [],
-      pagamento: pagamento ?? null,
       contrato: contrato ?? null,
       email: (claims as { email?: string }).email ?? null,
     };
@@ -209,40 +201,6 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     if (error) return { ok: false as const, erro: "Não foi possível criar seu cadastro agora." };
 
     return { ok: true as const, id: criado.id, slug: criado.slug };
-  });
-
-export const salvarDadosPagamento = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (data: {
-      banco?: string;
-      agencia?: string;
-      conta?: string;
-      tipo_conta?: string;
-      chave_pix?: string;
-      documento?: string;
-    }) => ({
-      banco: String(data.banco ?? "").trim().slice(0, 80) || null,
-      agencia: String(data.agencia ?? "").trim().slice(0, 20) || null,
-      conta: String(data.conta ?? "").trim().slice(0, 30) || null,
-      tipo_conta: String(data.tipo_conta ?? "").trim().slice(0, 20) || null,
-      chave_pix: String(data.chave_pix ?? "").trim().slice(0, 120) || null,
-      documento: String(data.documento ?? "").trim().slice(0, 30) || null,
-    }),
-  )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: prof } = await supabase
-      .from("professionals")
-      .select("id")
-      .eq("user_id", userId)
-      .maybeSingle();
-    if (!prof) return { ok: false as const, erro: "Complete seu cadastro primeiro." };
-    const { error } = await supabase
-      .from("professional_payout_details")
-      .upsert({ professional_id: prof.id, ...data }, { onConflict: "professional_id" });
-    if (error) return { ok: false as const, erro: "Não foi possível salvar os dados de pagamento." };
-    return { ok: true as const };
   });
 
 export const salvarDisponibilidade = createServerFn({ method: "POST" })

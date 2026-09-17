@@ -315,10 +315,10 @@ export const painelAdmin = createServerFn({ method: "GET" })
         (c) => new Date(c.inicio).getTime() > agora && (c.status === "confirmada" || c.status === "aguardando_pagamento"),
       ).length,
       consultasRealizadas: realizadas.length,
-      receitaTaxasCentavos: listaConsultas
+      taxasRegistradasCentavos: listaConsultas
         .filter((c) => c.payment_status === "aprovado")
         .reduce((s, c) => s + c.taxa_centavos, 0),
-      receitaTaxaFixaRealizadaCentavos: realizadas.reduce((s, c) => s + c.valor_plataforma_centavos, 0),
+      taxasRealizadasCentavos: realizadas.reduce((s, c) => s + c.valor_plataforma_centavos, 0),
       valorConsultasPendentesCentavos: pagamentos
         .filter((r) => r.status !== "aprovado")
         .reduce((s, r) => s + r.liquido, 0),

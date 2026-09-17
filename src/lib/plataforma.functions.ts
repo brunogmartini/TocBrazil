@@ -525,8 +525,8 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
         .maybeSingle();
       if (pg?.provider_ref) {
         const { provedorPagamento } = await import("@/services/payments.server");
-        const resultado = await provedorPagamento().refund(pg.provider_ref);
-        if (resultado.ok) {
+        const respostaEstorno = await provedorPagamento().refund(pg.provider_ref);
+        if (respostaEstorno.ok) {
           estornado = true;
           await supabaseAdmin
             .from("payments")

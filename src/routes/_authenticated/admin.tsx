@@ -160,7 +160,7 @@ function Admin() {
       <span className="section-label">Gestão</span>
       <h1 className="mt-3 text-3xl sm:text-4xl">Painel do gestor</h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
-        Visão geral da plataforma, análise dos cadastros profissionais, pacientes, consultas, receita e
+        Visão geral da plataforma, análise dos cadastros profissionais, pacientes, consultas, taxa fixa e
         pagamentos. Dados clínicos dos pacientes não são acessíveis pela gestão.
       </p>
 
@@ -205,8 +205,8 @@ function Admin() {
               { rotulo: "Cadastros pendentes", valor: String(t.pendentes), destaque: t.pendentes > 0 },
               { rotulo: "Consultas futuras", valor: String(t.consultasFuturas) },
               { rotulo: "Consultas realizadas", valor: String(t.consultasRealizadas) },
-              { rotulo: "Receita — taxa fixa", valor: moeda(t.receitaTaxasCentavos) },
-              { rotulo: "Taxa fixa em consultas realizadas", valor: moeda(t.receitaTaxaFixaRealizadaCentavos) },
+              { rotulo: "Taxas fixas registradas", valor: moeda(t.taxasRegistradasCentavos) },
+              { rotulo: "Taxa fixa em realizadas", valor: moeda(t.taxasRealizadasCentavos) },
               { rotulo: "Valores pendentes de confirmação", valor: moeda(t.valorConsultasPendentesCentavos), destaque: t.valorConsultasPendentesCentavos > 0 },
             ].map((item) => (
               <div key={item.rotulo} className={`card-soft p-5 ${item.destaque ? "border-primary/50" : ""}`}>
@@ -540,8 +540,8 @@ function Admin() {
         <>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { rotulo: "Taxas fixas registradas", valor: moeda(t.receitaTaxasCentavos) },
-              { rotulo: "Taxa fixa em realizadas", valor: moeda(t.receitaTaxaFixaRealizadaCentavos) },
+              { rotulo: "Taxas fixas registradas", valor: moeda(t.taxasRegistradasCentavos) },
+              { rotulo: "Taxa fixa em realizadas", valor: moeda(t.taxasRealizadasCentavos) },
               { rotulo: "Valores pendentes de confirmação", valor: moeda(t.valorConsultasPendentesCentavos) },
               { rotulo: "Valores com pagamento aprovado", valor: moeda(t.valorConsultasAprovadasCentavos) },
             ].map((i) => (
