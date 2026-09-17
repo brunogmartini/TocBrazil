@@ -357,7 +357,25 @@ function Admin() {
                   <div className="mt-6 space-y-6">
                     <dl className="grid gap-4 text-sm sm:grid-cols-2">
                       <Info rotulo="Contato" valor={[p.email_contato, p.telefone].filter(Boolean).join(" · ")} />
-                      <Info rotulo="Valor da consulta / comissão" valor={`${moeda(p.valor_centavos)} · plataforma ${p.comissao_percent}%`} />
+                      <Info rotulo="Preço da consulta" valor={moeda(p.valor_centavos)} />
+                      {p.profissao === "psiquiatra" && <Info rotulo="RQE" valor={p.rqe} />}
+                      <Info
+                        rotulo="Ferramenta de videochamada"
+                        valor={
+                          p.ferramenta_url_sala
+                            ? [p.ferramenta_provedor, p.ferramenta_url_sala].filter(Boolean).join(" · ")
+                            : "não cadastrada — impede a publicação"
+                        }
+                      />
+                      <Info
+                        rotulo="Certidão do conselho (validade)"
+                        valor={p.certidao_validade ? dataBR(p.certidao_validade) : "—"}
+                      />
+                      <Info
+                        rotulo="Apólice de seguro (validade)"
+                        valor={p.apolice_validade ? dataBR(p.apolice_validade) : "—"}
+                      />
+
                       <Info rotulo="Graduação" valor={[p.graduacao, p.instituicao].filter(Boolean).join(" — ")} />
                       <Info rotulo="Abordagem" valor={p.abordagem} />
                       <Info rotulo="Formação" valor={p.formacao.join(", ")} />
