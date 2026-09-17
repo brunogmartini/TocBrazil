@@ -37,7 +37,6 @@ import { Route as AuthenticatedProfissionalIndexRouteImport } from './routes/_au
 import { Route as AuthenticatedProfissionalAgendaRouteImport } from './routes/_authenticated/profissional.agenda'
 import { Route as AuthenticatedProfissionalCadastroRouteImport } from './routes/_authenticated/profissional.cadastro'
 import { Route as AuthenticatedProfissionalFinanceiroRouteImport } from './routes/_authenticated/profissional.financeiro'
-import { Route as AuthenticatedProfissionalFichaPatientIdRouteImport } from './routes/_authenticated/profissional.ficha.$patientId'
 import { Route as ApiPublicMercadopagoVinculoRouteImport } from './routes/api/public/mercadopago/vinculo'
 import { Route as ApiPublicWebhooksHotmartRouteImport } from './routes/api/public/webhooks/hotmart'
 import { Route as ApiPublicWebhooksMercadopagoRouteImport } from './routes/api/public/webhooks/mercadopago'
@@ -187,12 +186,6 @@ const AuthenticatedProfissionalFinanceiroRoute =
     path: '/financeiro',
     getParentRoute: () => AuthenticatedProfissionalRoute,
   } as any)
-const AuthenticatedProfissionalFichaPatientIdRoute =
-  AuthenticatedProfissionalFichaPatientIdRouteImport.update({
-    id: '/ficha/$patientId',
-    path: '/ficha/$patientId',
-    getParentRoute: () => AuthenticatedProfissionalRoute,
-  } as any)
 const ApiPublicMercadopagoVinculoRoute =
   ApiPublicMercadopagoVinculoRouteImport.update({
     id: '/api/public/mercadopago/vinculo',
@@ -240,7 +233,6 @@ export interface FileRoutesByFullPath {
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/profissional/financeiro': typeof AuthenticatedProfissionalFinanceiroRoute
   '/profissional/': typeof AuthenticatedProfissionalIndexRoute
-  '/profissional/ficha/$patientId': typeof AuthenticatedProfissionalFichaPatientIdRoute
   '/api/public/mercadopago/vinculo': typeof ApiPublicMercadopagoVinculoRoute
   '/api/public/webhooks/hotmart': typeof ApiPublicWebhooksHotmartRoute
   '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
@@ -272,7 +264,6 @@ export interface FileRoutesByTo {
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/profissional/financeiro': typeof AuthenticatedProfissionalFinanceiroRoute
   '/profissional': typeof AuthenticatedProfissionalIndexRoute
-  '/profissional/ficha/$patientId': typeof AuthenticatedProfissionalFichaPatientIdRoute
   '/api/public/mercadopago/vinculo': typeof ApiPublicMercadopagoVinculoRoute
   '/api/public/webhooks/hotmart': typeof ApiPublicWebhooksHotmartRoute
   '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
@@ -307,7 +298,6 @@ export interface FileRoutesById {
   '/_authenticated/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/_authenticated/profissional/financeiro': typeof AuthenticatedProfissionalFinanceiroRoute
   '/_authenticated/profissional/': typeof AuthenticatedProfissionalIndexRoute
-  '/_authenticated/profissional/ficha/$patientId': typeof AuthenticatedProfissionalFichaPatientIdRoute
   '/api/public/mercadopago/vinculo': typeof ApiPublicMercadopagoVinculoRoute
   '/api/public/webhooks/hotmart': typeof ApiPublicWebhooksHotmartRoute
   '/api/public/webhooks/mercadopago': typeof ApiPublicWebhooksMercadopagoRoute
@@ -342,7 +332,6 @@ export interface FileRouteTypes {
     | '/profissional/cadastro'
     | '/profissional/financeiro'
     | '/profissional/'
-    | '/profissional/ficha/$patientId'
     | '/api/public/mercadopago/vinculo'
     | '/api/public/webhooks/hotmart'
     | '/api/public/webhooks/mercadopago'
@@ -374,7 +363,6 @@ export interface FileRouteTypes {
     | '/profissional/cadastro'
     | '/profissional/financeiro'
     | '/profissional'
-    | '/profissional/ficha/$patientId'
     | '/api/public/mercadopago/vinculo'
     | '/api/public/webhooks/hotmart'
     | '/api/public/webhooks/mercadopago'
@@ -408,7 +396,6 @@ export interface FileRouteTypes {
     | '/_authenticated/profissional/cadastro'
     | '/_authenticated/profissional/financeiro'
     | '/_authenticated/profissional/'
-    | '/_authenticated/profissional/ficha/$patientId'
     | '/api/public/mercadopago/vinculo'
     | '/api/public/webhooks/hotmart'
     | '/api/public/webhooks/mercadopago'
@@ -638,13 +625,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfissionalFinanceiroRouteImport
       parentRoute: typeof AuthenticatedProfissionalRoute
     }
-    '/_authenticated/profissional/ficha/$patientId': {
-      id: '/_authenticated/profissional/ficha/$patientId'
-      path: '/ficha/$patientId'
-      fullPath: '/profissional/ficha/$patientId'
-      preLoaderRoute: typeof AuthenticatedProfissionalFichaPatientIdRouteImport
-      parentRoute: typeof AuthenticatedProfissionalRoute
-    }
     '/api/public/mercadopago/vinculo': {
       id: '/api/public/mercadopago/vinculo'
       path: '/api/public/mercadopago/vinculo'
@@ -674,7 +654,6 @@ interface AuthenticatedProfissionalRouteChildren {
   AuthenticatedProfissionalCadastroRoute: typeof AuthenticatedProfissionalCadastroRoute
   AuthenticatedProfissionalFinanceiroRoute: typeof AuthenticatedProfissionalFinanceiroRoute
   AuthenticatedProfissionalIndexRoute: typeof AuthenticatedProfissionalIndexRoute
-  AuthenticatedProfissionalFichaPatientIdRoute: typeof AuthenticatedProfissionalFichaPatientIdRoute
 }
 
 const AuthenticatedProfissionalRouteChildren: AuthenticatedProfissionalRouteChildren =
@@ -685,8 +664,6 @@ const AuthenticatedProfissionalRouteChildren: AuthenticatedProfissionalRouteChil
     AuthenticatedProfissionalFinanceiroRoute:
       AuthenticatedProfissionalFinanceiroRoute,
     AuthenticatedProfissionalIndexRoute: AuthenticatedProfissionalIndexRoute,
-    AuthenticatedProfissionalFichaPatientIdRoute:
-      AuthenticatedProfissionalFichaPatientIdRoute,
   }
 
 const AuthenticatedProfissionalRouteWithChildren =
