@@ -1117,12 +1117,20 @@ export type Database = {
         }[]
       }
       concluir_consultas_vencidas: { Args: never; Returns: number }
+      expirar_reservas_vencidas: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      proximos_horarios: {
+        Args: { _dias: number; _limite: number }
+        Returns: {
+          inicio: string
+          slug: string
+        }[]
       }
       slots_disponiveis: {
         Args: { _dias: number; _slug: string }

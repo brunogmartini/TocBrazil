@@ -15,6 +15,13 @@
       "when": 1789660040551,
       "tag": "0001_encerrar_dados_clinicos",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789660268802,
+      "tag": "0002_fase2_busca_horarios",
+      "breakpoints": true
     }
   ]
 }
