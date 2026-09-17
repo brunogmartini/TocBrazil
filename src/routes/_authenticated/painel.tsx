@@ -293,7 +293,7 @@ function Painel() {
                             onClick={async () => {
                               const r = await confirmarConsulta({ data: { id: c.id } });
                               setAviso(r.ok ? "Obrigado por confirmar." : r.erro);
-                              if (r.ok) await queryClient.invalidateQueries({ queryKey: ["minhas-consultas"] });
+                              if (r.ok) await queryClient.invalidateQueries({ queryKey: ["consultas"] });
                             }}
                           >
                             Confirmar que aconteceu

@@ -75,7 +75,7 @@ const rotuloRepasse: Record<string, string> = {
   falhou: "Falhou",
 };
 
-type Aba = "visao" | "pacientes" | "profissionais" | "consultas" | "financeiro" | "livro" | "configuracoes";
+type Aba = "visao" | "pacientes" | "profissionais" | "consultas" | "financeiro" | "relatorio" | "livro" | "configuracoes";
 type FiltroProf = "todos" | "pendente" | "aprovado" | "rejeitado" | "suspenso";
 type FiltroRepasse = "a_receber" | "historico" | "todos";
 
@@ -162,6 +162,7 @@ function Admin() {
     ["profissionais", `Profissionais${t?.pendentes ? ` (${t.pendentes})` : ""}`],
     ["consultas", "Consultas"],
     ["financeiro", "Pagamentos aos profissionais"],
+    ["relatorio", "Relatório"],
     ["livro", "Livro"],
     ["configuracoes", "Configurações"],
   ];
@@ -657,6 +658,68 @@ function Admin() {
             </table>
           </div>
         </>
+      )}
+
+      {aba === "relatorio" && (
+        <section className="mt-6">
+          <h2 className="text-xl">Relatório de metadados</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Consultas realizadas, cancelamentos, faltas e taxas por profissional nos últimos meses.
+            Nenhuma informação de atendimento é registrada.
+          </p>
+          {relatorio.isLoading && <p className="mt-4 text-sm text-muted-foreground">Carregando…</p>}
+          <div className="mt-5 overflow-x-auto">
+            <table className="w-full min-w-[820px] text-sm">
+              <thead className="text-left text-xs uppercase text-muted-foreground">
+                <tr>
+                  <th className="p-3">Profissional</th>
+                  <th className="p-3">Realizadas</th>
+                  <th className="p-3">Cancel. paciente</th>
+                  <th className="p-3">Cancel. profissional</th>
+                  <th className="p-3">Faltas</th>
+                  <th className="p-3">Reservas expiradas</th>
+                  <th className="p-3">Taxas devidas</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(relatorio.data?.linhas ?? []).map((l) => (
+                  <tr key={l.professional_id} className="border-t border-border/60">
+                    <td className="p-3">{l.nome}</td>
+                    <td className="p-3">{l.realizadas}</td>
+                    <td className="p-3">{l.canceladas_paciente}</td>
+                    <td className="p-3">{l.canceladas_profissional}</td>
+                    <td className="p-3">{l.nao_comparecimentos}</td>
+                    <td className="p-3">{l.expiradas}</td>
+                    <td className="p-3 font-semibold">{moeda(l.taxas_centavos)}</td>
+                  </tr>
+                ))}
+                {!relatorio.isLoading && (relatorio.data?.linhas ?? []).length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="p-4 text-muted-foreground">
+                      Nenhum profissional cadastrado ainda.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="mt-10 text-lg">Últimos eventos registrados</h3>
+          <ul className="mt-4 space-y-2 text-sm">
+            {(relatorio.data?.eventos ?? []).map((e) => (
+              <li key={e.id} className="card-soft flex flex-wrap justify-between gap-3 p-4">
+                <span>{e.tipo.replace(/_/g, " ")}</span>
+                <span className="text-muted-foreground">
+                  {e.ator_papel ?? "sistema"} ·{" "}
+                  {new Date(e.ocorrido_em).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}
+                </span>
+              </li>
+            ))}
+            {!relatorio.isLoading && (relatorio.data?.eventos ?? []).length === 0 && (
+              <li className="text-muted-foreground">Nenhum evento no período.</li>
+            )}
+          </ul>
+        </section>
       )}
 
       {aba === "livro" && dados && (
