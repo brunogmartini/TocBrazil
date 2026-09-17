@@ -1117,6 +1117,10 @@ export type Database = {
         }[]
       }
       concluir_consultas_vencidas: { Args: never; Returns: number }
+      cron_token_valido: {
+        Args: { _nome: string; _token: string }
+        Returns: boolean
+      }
       expirar_reservas_vencidas: { Args: never; Returns: number }
       has_role: {
         Args: {
