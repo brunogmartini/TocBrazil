@@ -112,6 +112,10 @@ function CadastroProfissional() {
     especializacoes: "",
     areas: "",
     idiomas: "",
+    rqe: "",
+    ferramenta_provedor: "",
+    ferramenta_url_sala: "",
+    ferramenta_instrucoes: "",
   });
   const [repasse, setRepasse] = useState({
     documento: "",
@@ -144,7 +148,7 @@ function CadastroProfissional() {
         experiencia_toc: p.experiencia_toc ?? "",
         experiencia_anos: String(p.experiencia_anos ?? 0),
         slot_minutos: String(p.slot_minutos ?? 50),
-        valor: String(Math.round((p.valor_centavos ?? 24000) / 1.2 / 100)),
+        valor: String(Math.round((p.valor_centavos ?? 20000) / 100)),
         graduacao: p.graduacao ?? "",
         instituicao: p.instituicao ?? "",
         cursos: (p.cursos ?? []).join(", "),
@@ -153,6 +157,10 @@ function CadastroProfissional() {
         especializacoes: (p.especializacoes ?? []).join(", "),
         areas: (p.areas ?? []).filter((area) => SUBTIPOS_TOC.includes(area)).join(", "),
         idiomas: (p.idiomas ?? []).join(", "),
+        rqe: p.rqe ?? "",
+        ferramenta_provedor: p.ferramenta_provedor ?? "",
+        ferramenta_url_sala: p.ferramenta_url_sala ?? "",
+        ferramenta_instrucoes: p.ferramenta_instrucoes ?? "",
       });
     } else if (dados.data?.email) {
       setForm((f) => ({ ...f, email_contato: dados.data!.email! }));
@@ -385,16 +393,16 @@ function CadastroProfissional() {
         />
         <div>
           <Campo
-            label="Valor que você quer receber por consulta (R$)"
+            label="Preço da sua consulta (R$)"
             type="number"
             value={form.valor}
             onChange={(v) => setForm({ ...form, valor: v })}
             required
           />
           <p className="mt-1 text-xs text-muted-foreground">
-            Sobre esse valor aplicamos 20% da plataforma: sua sessão será exibida no site por{" "}
-            <strong>{moeda(Math.round((Number(form.valor) || 0) * 1.2 * 100))}</strong>. O sinal
-            pago no agendamento é abatido desse total.
+            O paciente vê exatamente este valor:{" "}
+            <strong>{moeda(Math.round((Number(form.valor) || 0) * 100))}</strong>. A taxa fixa da
+            plataforma é cobrada de você por consulta realizada e não entra no preço.
           </p>
         </div>
         <div>
@@ -510,6 +518,45 @@ function CadastroProfissional() {
             onChange={(e) => setForm({ ...form, experiencia_toc: e.target.value })}
           />
         </div>
+        {form.profissao === "psiquiatra" && (
+          <Campo
+            label="RQE (registro de qualificação de especialista)"
+            value={form.rqe}
+            onChange={(v) => setForm({ ...form, rqe: v })}
+          />
+        )}
+        <fieldset className="sm:col-span-2 rounded-xl border border-border p-5">
+          <legend className="section-label px-1">Ferramenta de videochamada</legend>
+          <p className="mt-2 text-sm text-muted-foreground">
+            A sala de videochamada é contratada e mantida por você. A TOC Brazil apenas transmite
+            este link ao paciente no horário agendado. O preenchimento é obrigatório para o seu
+            perfil ser publicado.
+          </p>
+          <div className="mt-4 grid gap-5 sm:grid-cols-2">
+            <Campo
+              label="Provedor (Google Meet, Zoom, Whereby, Doxy.me…)"
+              value={form.ferramenta_provedor}
+              onChange={(v) => setForm({ ...form, ferramenta_provedor: v })}
+            />
+            <Campo
+              label="Endereço da sua sala (URL)"
+              value={form.ferramenta_url_sala}
+              onChange={(v) => setForm({ ...form, ferramenta_url_sala: v })}
+            />
+            <div className="sm:col-span-2">
+              <label htmlFor="ferramenta_instrucoes" className="section-label">
+                Instruções para o paciente
+              </label>
+              <textarea
+                id="ferramenta_instrucoes"
+                rows={3}
+                className="field-base mt-2"
+                value={form.ferramenta_instrucoes}
+                onChange={(e) => setForm({ ...form, ferramenta_instrucoes: e.target.value })}
+              />
+            </div>
+          </div>
+        </fieldset>
         <button type="submit" className="btn-base btn-primary sm:col-span-2">
           Salvar cadastro
         </button>
