@@ -87,8 +87,6 @@ function Agendar() {
   }, [horarios.data]);
 
   const p = prof.data?.profissional;
-  const taxa = config.data?.taxaCentavos ?? 5000;
-  const restante = Math.max(0, (p?.valor_centavos ?? 0) - taxa);
   const horasCancelamento = config.data?.cancelamentoHoras ?? 24;
 
   if (prof.isLoading) {
@@ -117,7 +115,7 @@ function Agendar() {
         await queryClient.invalidateQueries({ queryKey: ["horarios", slug] });
         return;
       }
-      // Vai direto para o pagamento do sinal incluído no valor da consulta.
+      // Reserva de 15 minutos: o horário só fica confirmado com o pagamento aprovado.
       const pg = await pagar({ data: { consultaId: r.consultaId, origem: window.location.origin } });
       if (pg.ok) {
         window.location.href = pg.link;
@@ -205,18 +203,10 @@ function Agendar() {
                 <dt className="text-muted-foreground">Horário</dt>
                 <dd>{selecionado ? `${diaRotulo(selecionado)}, ${hora(selecionado)}` : "—"}</dd>
               </div>
-              <div className="flex justify-between border-t border-border pt-3">
-                <dt className="text-muted-foreground">Valor da consulta</dt>
-                <dd>{moeda(p.valor_centavos)}</dd>
+              <div className="flex justify-between border-t border-border pt-3 text-base">
+                <dt>Valor da consulta</dt>
+                <dd className="font-semibold">{moeda(p.valor_centavos)}</dd>
               </div>
-              <div className="flex justify-between text-base">
-                 <dt>Sinal de agendamento (agora)</dt>
-                <dd className="font-semibold">{moeda(taxa)}</dd>
-              </div>
-               <div className="flex justify-between text-sm">
-                 <dt className="text-muted-foreground">Restante no atendimento</dt>
-                 <dd>{moeda(restante)}</dd>
-               </div>
             </dl>
 
             <button
@@ -225,15 +215,17 @@ function Agendar() {
               onClick={confirmar}
               className="btn-base btn-primary mt-6 w-full disabled:opacity-50"
             >
-               {enviando ? "Reservando…" : selecionado ? "Reservar e pagar o sinal" : "Escolha um horário"}
+              {enviando ? "Reservando…" : selecionado ? "Reservar e pagar" : "Escolha um horário"}
             </button>
             {erro && <p className="mt-3 text-sm text-destructive">{erro}</p>}
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-               O sinal de {moeda(taxa)} confirma sua reserva e faz parte do valor total da consulta de{" "}
-               {moeda(p.valor_centavos)}. Após o abatimento, restarão {moeda(restante)} para pagar no atendimento.
+              Este é o valor definido pelo profissional. Ao reservar, o horário fica guardado para
+              você por 15 minutos até a aprovação do pagamento. A consulta acontece na sala de
+              videochamada do próprio profissional, e o endereço da sala aparece na sua área pouco
+              antes do horário.
             </p>
             <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-              Cancelamento com estorno da taxa até {horasCancelamento} horas antes do horário marcado.
+              Cancelamento com estorno até {horasCancelamento} horas antes do horário marcado.
             </p>
           </div>
         </aside>
