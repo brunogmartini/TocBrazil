@@ -151,11 +151,9 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       slot_minutos: [30, 40, 50, 60].includes(Number(data.slot_minutos))
         ? Number(data.slot_minutos)
         : 50,
-      // O profissional declara quanto quer receber; o site exibe +20% da plataforma.
-      valor_centavos: Math.min(
-        Math.max(Math.round(Number(data.valor_centavos ?? 0) * 1.2 || 0), 0),
-        500000,
-      ),
+      // O profissional define o preço da consulta. A plataforma exibe exatamente
+      // esse valor ao paciente: nenhuma margem é somada.
+      valor_centavos: Math.min(Math.max(Math.round(Number(data.valor_centavos ?? 0) || 0), 0), 500000),
       graduacao: String(data.graduacao ?? "").trim().slice(0, 160) || null,
       instituicao: String(data.instituicao ?? "").trim().slice(0, 160) || null,
       cursos: lista(data.cursos),
@@ -164,6 +162,10 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
 
       areas: lista(data.areas),
       idiomas: lista(data.idiomas),
+      rqe: String(data.rqe ?? "").trim().slice(0, 40) || null,
+      ferramenta_provedor: String(data.ferramenta_provedor ?? "").trim().slice(0, 80) || null,
+      ferramenta_url_sala: String(data.ferramenta_url_sala ?? "").trim().slice(0, 500) || null,
+      ferramenta_instrucoes: String(data.ferramenta_instrucoes ?? "").trim().slice(0, 1000) || null,
     };
   })
   .handler(async ({ data, context }) => {
