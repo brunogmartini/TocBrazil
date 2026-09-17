@@ -12,6 +12,7 @@ import {
   definirStatusRepasse,
   editarProfissionalAdmin,
   painelAdmin,
+  relatorioMetadados,
   salvarConfiguracoes,
   type ProfissionalAdmin,
 } from "@/lib/admin.functions";
@@ -82,6 +83,7 @@ type FiltroRepasse = "a_receber" | "historico" | "todos";
 function Admin() {
   const queryClient = useQueryClient();
   const carregar = useServerFn(painelAdmin);
+  const carregarRelatorio = useServerFn(relatorioMetadados);
   const mudarStatusProf = useServerFn(definirStatusProfissional);
   const mudarStatusDoc = useServerFn(definirStatusDocumento);
   const editarProf = useServerFn(editarProfissionalAdmin);
@@ -103,6 +105,11 @@ function Admin() {
     queryKey: ["painel-admin"],
     queryFn: () => carregar(),
     refetchInterval: aba === "financeiro" ? 15_000 : false,
+  });
+  const relatorio = useQuery({
+    queryKey: ["admin-relatorio"],
+    queryFn: () => carregarRelatorio({ data: {} }),
+    enabled: aba === "relatorio",
     refetchIntervalInBackground: true,
     refetchOnWindowFocus: true,
   });
