@@ -3,8 +3,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { baseSegura } from "@/lib/origem-segura";
 
 /**
- * Checkout Mercado Pago (Checkout Pro) do sinal de agendamento.
- * O sinal confirma a reserva e é abatido do valor total da consulta.
+ * Cobrança da consulta: o paciente paga exatamente o preço definido pelo
+ * profissional. A taxa fixa da plataforma é descontada do profissional no
+ * split do provedor — nunca somada ao preço nem exibida ao paciente.
  */
 export const iniciarPagamento = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -13,16 +14,11 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
     origem: String(data.origem),
   }))
   .handler(async ({ data, context }) => {
-    const token = process.env["MERCADOPAGO_ACCESS_TOKEN"];
-    if (!token) {
-      return { ok: false as const, erro: "O meio de pagamento ainda não está configurado." };
-    }
-
     const { supabase, userId } = context;
     const { data: consulta } = await supabase
       .from("appointments")
       .select(
-        "id, inicio, patient_id, professional_id, status, payment_status, valor_centavos, taxa_agendamento_centavos, duracao_minutos, professionals(nome, slug)",
+        "id, inicio, patient_id, professional_id, status, payment_status, valor_centavos, taxa_plataforma_centavos, duracao_minutos, professionals(nome, slug)",
       )
       .eq("id", data.consultaId)
       .maybeSingle();
@@ -35,7 +31,6 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
     }
 
     const prof = consulta.professionals as { nome?: string; slug?: string } | null;
-    const taxa = consulta.taxa_agendamento_centavos || consulta.valor_centavos;
     const quando = new Date(consulta.inicio).toLocaleString("pt-BR", {
       timeZone: "America/Sao_Paulo",
       dateStyle: "short",
@@ -43,46 +38,25 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
     });
     const base = baseSegura(data.origem);
 
-    const resposta = await fetch("https://api.mercadopago.com/checkout/preferences", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+    const { provedorPagamento, tokenRecebedor } = await import("@/services/payments.server");
+    const provedor = provedorPagamento();
+    const recebedorToken = await tokenRecebedor(consulta.professional_id);
+
+    const cobranca = await provedor.createCharge({
+      referencia: consulta.id,
+      valorCentavos: consulta.valor_centavos,
+      taxaPlataformaCentavos: consulta.taxa_plataforma_centavos ?? 0,
+      descricao: `Consulta online de ${consulta.duracao_minutos ?? 50} minutos com ${prof?.nome ?? "profissional"} em ${quando}`,
+      metodos: ["cartao", "pix"],
+      recebedorToken,
+      urls: {
+        sucesso: `${base}/painel?pagamento=aprovado`,
+        pendente: `${base}/painel?pagamento=pendente`,
+        falha: `${base}/painel?pagamento=recusado`,
+        aviso: `${base}/api/public/webhooks/mercadopago`,
       },
-      body: JSON.stringify({
-        external_reference: consulta.id,
-        statement_descriptor: "TOCBRAZIL",
-        items: [
-          {
-            id: consulta.id,
-            title: `Sinal da consulta com ${prof?.nome ?? "profissional"} em ${quando}`,
-            description: `Adiantamento incluído no valor da consulta online de ${consulta.duracao_minutos ?? 50} minutos`,
-            quantity: 1,
-            currency_id: "BRL",
-            unit_price: taxa / 100,
-          },
-        ],
-        back_urls: {
-          success: `${base}/painel?pagamento=aprovado`,
-          pending: `${base}/painel?pagamento=pendente`,
-          failure: `${base}/painel?pagamento=recusado`,
-        },
-        auto_return: "approved",
-        notification_url: `${base}/api/public/webhooks/mercadopago`,
-      }),
     });
 
-    if (!resposta.ok) {
-      return { ok: false as const, erro: "Não foi possível abrir o pagamento agora." };
-    }
-
-    const pref = (await resposta.json()) as {
-      id: string;
-      init_point?: string;
-      sandbox_init_point?: string;
-    };
-    const link = pref.init_point ?? pref.sandbox_init_point;
-    if (!link) return { ok: false as const, erro: "Não foi possível abrir o pagamento agora." };
-
-    return { ok: true as const, link, preferenciaId: pref.id };
+    if (!cobranca.ok) return { ok: false as const, erro: cobranca.erro };
+    return { ok: true as const, link: cobranca.link, preferenciaId: cobranca.cobrancaId };
   });
