@@ -291,17 +291,16 @@ export const criarAgendamento = createServerFn({ method: "POST" })
 
     const cfg = await carregarConfiguracoesPrivadas();
 
-    // O sinal de agendamento é cobrado agora e abatido do valor total da
-    // consulta. O saldo restante é devido no atendimento.
-    const taxa = cfg.taxaCentavos;
+    // O paciente paga exatamente o preço definido pelo profissional. A taxa fixa
+    // da plataforma é cobrada do profissional e não compõe o preço.
     const valorConsulta = Number(prof.valor_centavos ?? 0);
-    const comissao = cfg.comissaoPercent;
-    const plataforma = Math.round((valorConsulta * comissao) / 100);
+    const taxaFixa = cfg.taxaPorConsultaCentavos;
     const duracao = prof.slot_minutos || cfg.duracaoPadraoMinutos;
     const fim = new Date(new Date(inicioIso).getTime() + duracao * 60000).toISOString();
 
     const consultaId = crypto.randomUUID();
-    const sala = gerarSalaVideo(cfg.videoProvider, consultaId);
+    // A sala de videochamada é do próprio profissional; guardamos apenas o link.
+    const linkAcesso = prof.ferramenta_url_sala ?? null;
 
     const { data: criada, error } = await supabase
       .from("appointments")
@@ -314,14 +313,17 @@ export const criarAgendamento = createServerFn({ method: "POST" })
         duracao_minutos: duracao,
         status: "aguardando_pagamento",
         payment_status: "pendente",
-        valor_centavos: taxa,
-        taxa_agendamento_centavos: taxa,
+        valor_centavos: valorConsulta,
+        taxa_agendamento_centavos: 0,
         valor_consulta_centavos: valorConsulta,
-        comissao_percent: comissao,
-        valor_plataforma_centavos: plataforma,
-        valor_profissional_centavos: valorConsulta - plataforma,
-        video_url: sala.url,
-        video_provider: sala.provider,
+        comissao_percent: 0,
+        valor_plataforma_centavos: 0,
+        valor_profissional_centavos: valorConsulta,
+        taxa_plataforma_centavos: taxaFixa,
+        link_acesso: linkAcesso,
+        video_url: linkAcesso,
+        video_provider: "externo",
+        reserva_expira_em: new Date(Date.now() + 15 * 60000).toISOString(),
       })
       .select("id, inicio, fim, valor_centavos")
       .single();
