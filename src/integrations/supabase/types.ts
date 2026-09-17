@@ -1132,6 +1132,19 @@ export type Database = {
           slug: string
         }[]
       }
+      relatorio_metadados: {
+        Args: { _ate: string; _de: string }
+        Returns: {
+          canceladas_paciente: number
+          canceladas_profissional: number
+          expiradas: number
+          nao_comparecimentos: number
+          nome: string
+          professional_id: string
+          realizadas: number
+          taxas_centavos: number
+        }[]
+      }
       slots_disponiveis: {
         Args: { _dias: number; _slug: string }
         Returns: {
