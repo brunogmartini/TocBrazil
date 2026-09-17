@@ -179,7 +179,7 @@ function Painel() {
                     </span>
                   </div>
                   <h3 className="mt-4 text-lg">
-                    {c.professionals?.nome} · {c.professionals?.profissao === "psicólogo" ? "Psicólogo(a)" : "Psicólogo(a)"}
+                    {c.professionals?.nome} · Psicólogo(a)
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">{formatarData(c.inicio)}</p>
 

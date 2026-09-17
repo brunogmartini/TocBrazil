@@ -44,7 +44,6 @@ export type PagamentoAdmin = {
   previstoPara: string | null;
   pagoEm: string | null;
   observacao: string | null;
-  chavePix: string | null;
 };
 
 export type ProfissionalAdmin = {
@@ -132,7 +131,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
       { data: profissionais },
       { data: cfgRows },
       { data: regras },
-      { data: pagamentoDetalhes },
     ] = await Promise.all([
       supabaseAdmin
         .from("profiles")
@@ -149,7 +147,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
       supabaseAdmin.from("professionals").select("*").order("created_at", { ascending: false }),
       supabaseAdmin.from("platform_settings").select("chave, valor"),
       supabaseAdmin.from("availability_rules").select("professional_id"),
-      supabaseAdmin.from("professional_payout_details").select("professional_id, chave_pix"),
     ]);
 
     const nomePorId = new Map((perfis ?? []).map((p) => [p.id, p.nome ?? p.email ?? "—"]));
@@ -159,8 +156,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
       papeisPorId.set(p.user_id, [...(papeisPorId.get(p.user_id) ?? []), p.role as string]);
     }
     const comAgenda = new Set((regras ?? []).map((r) => r.professional_id));
-    const pixPorProf = new Map((pagamentoDetalhes ?? []).map((r) => [r.professional_id, r.chave_pix]));
-
     const consultasPorPaciente = new Map<string, { total: number; realizadas: number; pago: number }>();
     const consultasPorProfissional = new Map<string, { total: number; realizadas: number }>();
     for (const c of consultas ?? []) {
@@ -221,7 +216,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
         previstoPara: null,
         pagoEm: c.payment_status === "aprovado" ? c.inicio : null,
         observacao: null,
-        chavePix: pixPorProf.get(String((consultas ?? []).find((row) => row.id === c.id)?.professional_id ?? "")) ?? null,
       }));
 
     const idsProfissionais = (profissionais ?? []).map((p) => p.id);
@@ -325,10 +319,10 @@ export const painelAdmin = createServerFn({ method: "GET" })
         .filter((c) => c.payment_status === "aprovado")
         .reduce((s, c) => s + c.taxa_centavos, 0),
       receitaTaxaFixaRealizadaCentavos: realizadas.reduce((s, c) => s + c.valor_plataforma_centavos, 0),
-      aPagarProfissionaisCentavos: pagamentos
+      valorConsultasPendentesCentavos: pagamentos
         .filter((r) => r.status !== "aprovado")
         .reduce((s, r) => s + r.liquido, 0),
-      pagoProfissionaisCentavos: pagamentos
+      valorConsultasAprovadasCentavos: pagamentos
         .filter((r) => r.status === "aprovado")
         .reduce((s, r) => s + r.liquido, 0),
     };
