@@ -470,8 +470,10 @@ function Painel() {
                 O endereço da sala é liberado depois que o pagamento da consulta for aprovado.
               </p>
             )}
+            <ChatAdministrativo consultaId={consultaSelecionada.id} />
           </div>
         )}
+
       </Modal>
     </div>
   );
