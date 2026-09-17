@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { listarProfissionais } from "@/lib/plataforma.functions";
 import { track } from "@/lib/analytics";
+import { moeda } from "@/lib/video-sala";
 
 export const Route = createFileRoute("/profissionais/")({
   loader: () => listarProfissionais(),
@@ -35,6 +36,64 @@ export const Route = createFileRoute("/profissionais/")({
 });
 
 const TODOS = "Todos";
+const TZ = "America/Sao_Paulo";
+
+const FAIXAS: { rotulo: string; min: number; max: number }[] = [
+  { rotulo: "Até R$ 150", min: 0, max: 15000 },
+  { rotulo: "R$ 150 a R$ 250", min: 15000, max: 25000 },
+  { rotulo: "R$ 250 a R$ 400", min: 25000, max: 40000 },
+  { rotulo: "Acima de R$ 400", min: 40000, max: Number.MAX_SAFE_INTEGER },
+];
+
+const DIAS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+
+const TURNOS: { rotulo: string; de: number; ate: number }[] = [
+  { rotulo: "Manhã (até 12h)", de: 0, ate: 12 },
+  { rotulo: "Tarde (12h às 18h)", de: 12, ate: 18 },
+  { rotulo: "Noite (a partir de 18h)", de: 18, ate: 24 },
+];
+
+function horarioBR(iso: string) {
+  return new Date(iso).toLocaleString("pt-BR", {
+    timeZone: TZ,
+    weekday: "short",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function partesSP(iso: string) {
+  const d = new Date(iso);
+  const dia = Number(
+    new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "numeric" as never }).format(d),
+  );
+  const semana = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "long" }).format(d);
+  const hora = Number(
+    new Intl.DateTimeFormat("pt-BR", { timeZone: TZ, hour: "2-digit", hour12: false }).format(d),
+  );
+  const indice = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].indexOf(
+    semana,
+  );
+  return { diaSemana: Number.isNaN(dia) ? indice : indice, hora };
+}
+
+/** Sorteio estável por sessão: mesma ordem enquanto a pessoa navega. */
+function semente() {
+  if (typeof window === "undefined") return 1;
+  const existente = window.sessionStorage.getItem("busca-ordem");
+  if (existente) return Number(existente);
+  const nova = Math.floor(Math.random() * 100000) + 1;
+  window.sessionStorage.setItem("busca-ordem", String(nova));
+  return nova;
+}
+
+function pesoAleatorio(slug: string, seed: number) {
+  let h = seed;
+  for (let i = 0; i < slug.length; i += 1) h = (h * 31 + slug.charCodeAt(i)) % 1000003;
+  return h;
+}
 export const ABORDAGEM_EPR = "Exposição e Prevenção de Resposta (EPR)";
 export const LABEL_PROFISSAO: Record<string, string> = {
   psicologo: "Psicólogo(a)",
@@ -47,6 +106,10 @@ function Busca() {
   const [abordagem, setAbordagem] = useState(TODOS);
   const [idioma, setIdioma] = useState(TODOS);
   const [genero, setGenero] = useState(TODOS);
+  const [faixa, setFaixa] = useState(TODOS);
+  const [dia, setDia] = useState(TODOS);
+  const [turno, setTurno] = useState(TODOS);
+  const seed = useMemo(() => semente(), []);
 
   const abordagens = useMemo(
     () => [
@@ -65,19 +128,39 @@ function Busca() {
     [],
   );
 
-  const resultados = useMemo(
-    () =>
-      profissionais
-        .filter(
-          (p) =>
-            (profissao === TODOS || LABEL_PROFISSAO[p.profissao] === profissao) &&
-            (abordagem === TODOS || p.abordagem === abordagem) &&
-            (idioma === TODOS || p.idiomas.includes(idioma)) &&
-            (genero === TODOS || p.genero === genero.toLowerCase()),
-        )
-        .sort((a, b) => a.nome.localeCompare(b.nome)),
-    [profissionais, profissao, abordagem, idioma, genero],
-  );
+  const resultados = useMemo(() => {
+    const faixaEscolhida = FAIXAS.find((f) => f.rotulo === faixa);
+    const turnoEscolhido = TURNOS.find((t) => t.rotulo === turno);
+    const diaEscolhido = DIAS.indexOf(dia);
+
+    const combinaDisponibilidade = (proximos: string[]) => {
+      if (dia === TODOS && turno === TODOS) return true;
+      return proximos.some((iso) => {
+        const { diaSemana, hora } = partesSP(iso);
+        const okDia = diaEscolhido < 0 || diaSemana === diaEscolhido;
+        const okTurno = !turnoEscolhido || (hora >= turnoEscolhido.de && hora < turnoEscolhido.ate);
+        return okDia && okTurno;
+      });
+    };
+
+    return profissionais
+      .filter(
+        (p) =>
+          (profissao === TODOS || LABEL_PROFISSAO[p.profissao] === profissao) &&
+          (abordagem === TODOS || p.abordagem === abordagem) &&
+          (idioma === TODOS || p.idiomas.includes(idioma)) &&
+          (genero === TODOS || p.genero === genero.toLowerCase()) &&
+          (!faixaEscolhida ||
+            (p.valor_centavos >= faixaEscolhida.min && p.valor_centavos < faixaEscolhida.max)) &&
+          combinaDisponibilidade(p.proximos),
+      )
+      .sort((a, b) => {
+        const ha = a.proximos[0] ? new Date(a.proximos[0]).getTime() : Infinity;
+        const hb = b.proximos[0] ? new Date(b.proximos[0]).getTime() : Infinity;
+        if (ha !== hb) return ha - hb;
+        return pesoAleatorio(a.slug, seed) - pesoAleatorio(b.slug, seed);
+      });
+  }, [profissionais, profissao, abordagem, idioma, genero, faixa, dia, turno, seed]);
 
   useEffect(() => {
     track("professional_search", {
@@ -85,9 +168,12 @@ function Busca() {
       abordagem,
       idioma,
       genero,
+      faixa,
+      dia,
+      turno,
       resultados: resultados.length,
     });
-  }, [profissao, abordagem, idioma, genero, resultados.length]);
+  }, [profissao, abordagem, idioma, genero, faixa, dia, turno, resultados.length]);
 
 
   return (
@@ -95,11 +181,9 @@ function Busca() {
       <span className="section-label">Profissionais</span>
       <h1 className="heading-page mt-3">Encontre profissional com experiência em TOC</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
-        As informações são declaradas pelos profissionais e a documentação é verificada pela
-        plataforma. A ordenação é neutra: não indicamos que um profissional é melhor do que outro.
-      </p>
-      <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-        Somente perfis com documentação verificada e aprovados pela nossa equipe aparecem aqui.
+        Verificamos a inscrição ativa no conselho profissional e a documentação de formação
+        declarada. A ordenação mostra primeiro quem tem o horário livre mais próximo, sem destaque
+        pago e sem indicar que um profissional é melhor do que outro.
       </p>
 
 
@@ -126,6 +210,19 @@ function Busca() {
           onChange={setGenero}
           options={[TODOS, "Feminino", "Masculino"]}
         />
+        <Select
+          label="Faixa de preço"
+          value={faixa}
+          onChange={setFaixa}
+          options={[TODOS, ...FAIXAS.map((f) => f.rotulo)]}
+        />
+        <Select label="Dia da semana" value={dia} onChange={setDia} options={[TODOS, ...DIAS]} />
+        <Select
+          label="Turno"
+          value={turno}
+          onChange={setTurno}
+          options={[TODOS, ...TURNOS.map((t) => t.rotulo)]}
+        />
 
       </form>
 
@@ -151,8 +248,16 @@ function Busca() {
             </ul>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{p.apresentacao}</p>
             <p className="mt-4 text-xs text-muted-foreground">Idiomas: {p.idiomas.join(", ")}</p>
-            <p className="mt-3 text-xs text-muted-foreground">
-              Valores e horários disponíveis aparecem após o cadastro na plataforma.
+            <p className="mt-4 text-sm font-semibold">
+              {moeda(p.valor_centavos)}{" "}
+              <span className="font-normal text-muted-foreground">
+                · sessão de {p.slot_minutos} min
+              </span>
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {p.proximos[0]
+                ? `Próximo horário: ${horarioBR(p.proximos[0])}`
+                : "Sem horários livres nos próximos dias"}
             </p>
             <Link
               to="/profissionais/$slug"
