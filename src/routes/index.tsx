@@ -125,7 +125,11 @@ function Home() {
           <div className="rise-in">
             <span className="pill">Plataforma de busca, agenda e pagamento</span>
             <h1 className="heading-hero mt-6">
-              Encontre psicólogos com experiência em TOC e agende sua consulta online
+              Encontre{" "}
+              <span className="text-primary">
+                psicólogos com experiência em TOC
+              </span>{" "}
+              e agende sua consulta online
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
               Encontre profissionais que entendem de TOC, consulte horários disponíveis e agende em poucos minutos.
