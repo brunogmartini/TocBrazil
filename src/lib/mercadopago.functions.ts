@@ -4,7 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 /**
  * Vínculo da conta Mercado Pago de cada profissional.
  * O profissional autoriza a plataforma (OAuth do Mercado Pago) e passa a
- * receber o valor da consulta direto na própria conta, com a comissão da
+ * receber o valor da consulta direto na própria conta, com a taxa fixa da
  * plataforma retida automaticamente (marketplace_fee).
  */
 

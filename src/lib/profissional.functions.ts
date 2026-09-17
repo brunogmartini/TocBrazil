@@ -22,7 +22,7 @@ function lista(valor: unknown) {
 
 export type CadastroProfissionalEntrada = {
   nome: string;
-  profissao: "psicologo" | "psiquiatra";
+  profissao: "psicologo" | "psicólogo";
   registro: string;
   uf: string;
   cidade?: string;
@@ -69,7 +69,7 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
         documentos: [],
         regras: [],
         bloqueios: [],
-        repasse: null,
+        pagamento: null,
         contrato: null,
         email: (claims as { email?: string }).email ?? null,
       };
@@ -79,7 +79,7 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       { data: documentos },
       { data: regras },
       { data: bloqueios },
-      { data: repasse },
+      { data: pagamento },
       { data: contrato },
     ] = await Promise.all([
         supabase
@@ -117,7 +117,7 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       documentos: documentos ?? [],
       regras: regras ?? [],
       bloqueios: bloqueios ?? [],
-      repasse: repasse ?? null,
+      pagamento: pagamento ?? null,
       contrato: contrato ?? null,
       email: (claims as { email?: string }).email ?? null,
     };
@@ -129,11 +129,11 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     const nome = String(data.nome ?? "").trim().slice(0, 120);
     if (nome.length < 3) throw new Error("Informe seu nome completo.");
     const registro = String(data.registro ?? "").trim().slice(0, 40);
-    if (registro.length < 3) throw new Error("Informe seu registro profissional (CRP ou CRM).");
+    if (registro.length < 3) throw new Error("Informe seu registro profissional (CRP).");
     const uf = String(data.uf ?? "").trim().toUpperCase().slice(0, 2);
     if (uf.length !== 2) throw new Error("Informe a UF do registro.");
-    const profissao: "psicologo" | "psiquiatra" =
-      data.profissao === "psiquiatra" ? "psiquiatra" : "psicologo";
+    const profissao: "psicologo" | "psicólogo" =
+      data.profissao === "psicólogo" ? "psicólogo" : "psicologo";
     return {
       nome,
       registro,
@@ -208,7 +208,7 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     return { ok: true as const, id: criado.id, slug: criado.slug };
   });
 
-export const salvarDadosRepasse = createServerFn({ method: "POST" })
+export const salvarDadosPagamento = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
     (data: {
@@ -238,7 +238,7 @@ export const salvarDadosRepasse = createServerFn({ method: "POST" })
     const { error } = await supabase
       .from("professional_payout_details")
       .upsert({ professional_id: prof.id, ...data }, { onConflict: "professional_id" });
-    if (error) return { ok: false as const, erro: "Não foi possível salvar os dados de repasse." };
+    if (error) return { ok: false as const, erro: "Não foi possível salvar os dados de pagamento." };
     return { ok: true as const };
   });
 

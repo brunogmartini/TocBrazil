@@ -184,7 +184,7 @@ function Painel() {
                     </span>
                   </div>
                   <h3 className="mt-4 text-lg">
-                    {c.professionals?.nome} · {c.professionals?.profissao === "psiquiatra" ? "Psiquiatra" : "Psicólogo(a)"}
+                    {c.professionals?.nome} · {c.professionals?.profissao === "psicólogo" ? "Psicólogo(a)" : "Psicólogo(a)"}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">{formatarData(c.inicio)}</p>
 
@@ -238,7 +238,7 @@ function Painel() {
                           else setErroPagamento(r.erro);
                         }}
                       >
-                        Pagar sinal com Mercado Pago
+                        Pagar pagamento com Mercado Pago
                       </button>
                       {erroPagamento && <p className="mt-3 text-destructive">{erroPagamento}</p>}
                     </div>

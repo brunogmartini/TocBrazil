@@ -8,7 +8,7 @@ export type ProfissionalPublico = {
   id: string;
   slug: string;
   nome: string;
-  profissao: "psicologo" | "psiquiatra";
+  profissao: "psicologo" | "psicólogo";
   registro: string;
   uf: string;
   foto_url: string | null;
@@ -734,6 +734,6 @@ export const salvarAvaliacao = createServerFn({ method: "POST" })
       },
       { onConflict: "appointment_id" },
     );
-    if (error) return { ok: false as const, erro: "Não foi possível salvar sua avaliação." };
+    if (error) return { ok: false as const, erro: "Não foi possível salvar sua consulta." };
     return { ok: true as const };
   });

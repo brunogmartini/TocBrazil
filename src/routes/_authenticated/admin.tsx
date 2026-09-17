@@ -9,7 +9,7 @@ import {
   definirStatusLivro,
   definirStatusPagamento,
   definirStatusProfissional,
-  definirStatusRepasse,
+  definirStatusPagamento,
   editarProfissionalAdmin,
   painelAdmin,
   relatorioMetadados,
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
       {
         name: "description",
         content:
-          "Visão geral da plataforma: pacientes, profissionais, consultas, receita, repasses, livro e configurações.",
+          "Visão geral da plataforma: pacientes, profissionais, consultas, receita, pagamentos, livro e configurações.",
       },
       { property: "og:title", content: "Painel do gestor — TOC Brazil" },
       { property: "og:description", content: "Gestão completa da TOC Brazil." },
@@ -69,7 +69,7 @@ const rotuloLivro: Record<string, string> = {
   cancelada: "Cancelada",
 };
 
-const rotuloRepasse: Record<string, string> = {
+const rotuloPagamento: Record<string, string> = {
   pendente: "A pagar",
   processando: "Processando",
   pago: "Pago",
@@ -78,7 +78,7 @@ const rotuloRepasse: Record<string, string> = {
 
 type Aba = "visao" | "pacientes" | "profissionais" | "consultas" | "financeiro" | "relatorio" | "livro" | "configuracoes";
 type FiltroProf = "todos" | "pendente" | "aprovado" | "rejeitado" | "suspenso";
-type FiltroRepasse = "a_receber" | "historico" | "todos";
+type FiltroPagamento = "a_receber" | "historico" | "todos";
 
 function Admin() {
   const queryClient = useQueryClient();
@@ -89,14 +89,14 @@ function Admin() {
   const editarProf = useServerFn(editarProfissionalAdmin);
   const mudarPagamento = useServerFn(definirStatusPagamento);
   const mudarConsulta = useServerFn(definirStatusConsultaAdmin);
-  const mudarRepasse = useServerFn(definirStatusRepasse);
+  const mudarPagamento = useServerFn(definirStatusPagamento);
   const mudarLivro = useServerFn(definirStatusLivro);
   const salvarCfg = useServerFn(salvarConfiguracoes);
 
   const [aba, setAba] = useState<Aba>("visao");
   const [busca, setBusca] = useState("");
   const [filtroProf, setFiltroProf] = useState<FiltroProf>("pendente");
-  const [filtroRepasse, setFiltroRepasse] = useState<FiltroRepasse>("a_receber");
+  const [filtroPagamento, setFiltroPagamento] = useState<FiltroPagamento>("a_receber");
   const [aberto, setAberto] = useState<string | null>(null);
   const [observacao, setObservacao] = useState<Record<string, string>>({});
   const [aviso, setAviso] = useState<string | null>(null);
@@ -144,10 +144,10 @@ function Admin() {
       (!filtro || p.nome.toLowerCase().includes(filtro) || p.registro.toLowerCase().includes(filtro)) &&
       (filtroProf === "todos" || p.status === filtroProf),
   );
-  const repasses = (dados?.repasses ?? []).filter((r) => !filtro || r.profissional.toLowerCase().includes(filtro));
-  const repassesVisiveis = repasses.filter((r) => {
-    if (filtroRepasse === "a_receber") return r.status === "pendente" || r.status === "processando" || r.status === "falhou";
-    if (filtroRepasse === "historico") return r.status === "pago";
+  const pagamentos = (dados?.pagamentos ?? []).filter((r) => !filtro || r.profissional.toLowerCase().includes(filtro));
+  const pagamentosVisiveis = pagamentos.filter((r) => {
+    if (filtroPagamento === "a_receber") return r.status === "pendente" || r.status === "processando" || r.status === "falhou";
+    if (filtroPagamento === "historico") return r.status === "pago";
     return true;
   });
 
@@ -180,7 +180,7 @@ function Admin() {
       <h1 className="mt-3 text-3xl sm:text-4xl">Painel do gestor</h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
         Visão geral da plataforma, análise dos cadastros profissionais, pacientes, consultas, receita e
-        repasses. Dados clínicos dos pacientes não são acessíveis pela gestão.
+        pagamentos. Dados clínicos dos pacientes não são acessíveis pela gestão.
       </p>
 
       <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -225,7 +225,7 @@ function Admin() {
               { rotulo: "Consultas futuras", valor: String(t.consultasFuturas) },
               { rotulo: "Consultas realizadas", valor: String(t.consultasRealizadas) },
               { rotulo: "Receita — taxas de agendamento", valor: moeda(t.receitaTaxasCentavos) },
-              { rotulo: "Receita — comissão (realizadas)", valor: moeda(t.receitaComissaoCentavos) },
+              { rotulo: "Receita — taxa fixa (realizadas)", valor: moeda(t.receitaComissaoCentavos) },
               { rotulo: "A pagar aos profissionais", valor: moeda(t.aPagarProfissionaisCentavos), destaque: t.aPagarProfissionaisCentavos > 0 },
               { rotulo: "Compras do livro", valor: `${t.livrosConfirmados} confirmada(s) · ${t.livrosPendentes} pendente(s)` },
             ].map((item) => (
@@ -241,7 +241,7 @@ function Admin() {
               <p className="mt-1 text-sm text-muted-foreground">{t.pendentes} profissional(is) aguardando validação.</p>
             </button>
             <button type="button" className="card-soft p-5 text-left hover:border-primary/60" onClick={() => setAba("financeiro")}>
-              <p className="font-semibold">Repasses a pagar</p>
+              <p className="font-semibold">Pagamentos a pagar</p>
               <p className="mt-1 text-sm text-muted-foreground">{moeda(t.aPagarProfissionaisCentavos)} em consultas realizadas.</p>
             </button>
           </div>
@@ -336,7 +336,7 @@ function Admin() {
                   <div>
                     <h2 className="text-lg">{p.nome}</h2>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {p.profissao === "psiquiatra" ? "Psiquiatra" : "Psicólogo(a)"} · {p.registro} · {p.uf}
+                      {p.profissao === "psicólogo" ? "Psicólogo(a)" : "Psicólogo(a)"} · {p.registro} · {p.uf}
                       {p.cidade ? ` · ${p.cidade}` : ""} · {p.email_login ?? p.email_contato ?? "sem e-mail"} · cadastro em {dataBR(p.criadoEm)}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -366,7 +366,7 @@ function Admin() {
                     <dl className="grid gap-4 text-sm sm:grid-cols-2">
                       <Info rotulo="Contato" valor={[p.email_contato, p.telefone].filter(Boolean).join(" · ")} />
                       <Info rotulo="Preço da consulta" valor={moeda(p.valor_centavos)} />
-                      {p.profissao === "psiquiatra" && <Info rotulo="RQE" valor={p.rqe} />}
+                      {p.profissao === "psicólogo" && <Info rotulo="RQE" valor={p.rqe} />}
                       <Info
                         rotulo="Ferramenta de videochamada"
                         valor={
@@ -580,7 +580,7 @@ function Admin() {
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { rotulo: "Taxas de agendamento recebidas", valor: moeda(t.receitaTaxasCentavos) },
-              { rotulo: "Comissão sobre realizadas", valor: moeda(t.receitaComissaoCentavos) },
+              { rotulo: "Taxa fixa sobre realizadas", valor: moeda(t.receitaComissaoCentavos) },
               { rotulo: "A pagar aos profissionais", valor: moeda(t.aPagarProfissionaisCentavos) },
               { rotulo: "Já pago aos profissionais", valor: moeda(t.pagoProfissionaisCentavos) },
             ].map((i) => (
@@ -608,8 +608,8 @@ function Admin() {
                 <button
                   key={id}
                   type="button"
-                  onClick={() => setFiltroRepasse(id)}
-                  className={`rounded-full px-3 py-1.5 ${filtroRepasse === id ? "bg-background font-semibold" : "text-muted-foreground"}`}
+                  onClick={() => setFiltroPagamento(id)}
+                  className={`rounded-full px-3 py-1.5 ${filtroPagamento === id ? "bg-background font-semibold" : "text-muted-foreground"}`}
                 >
                   {rotulo}
                 </button>
@@ -631,7 +631,7 @@ function Admin() {
                 </tr>
               </thead>
               <tbody>
-                {repassesVisiveis.map((r) => (
+                {pagamentosVisiveis.map((r) => (
                   <tr key={r.id} className="border-t border-border/60">
                     <td className="p-3 font-semibold">{r.profissional}</td>
                     <td className="p-3">{r.consultaInicio ? dataHoraBR(r.consultaInicio) : "—"}</td>
@@ -643,14 +643,14 @@ function Admin() {
                     <td className="p-3">
                       <select
                         className="field-base py-1.5"
-                        aria-label={`Status do repasse de ${r.profissional}`}
+                        aria-label={`Status do pagamento de ${r.profissional}`}
                         value={r.status}
                         onChange={async (e) => {
-                          await mudarRepasse({ data: { id: r.id, status: e.target.value as "pendente" | "processando" | "pago" | "falhou" } });
+                          await mudarPagamento({ data: { id: r.id, status: e.target.value as "pendente" | "processando" | "pago" | "falhou" } });
                           await atualizar();
                         }}
                       >
-                        {Object.entries(rotuloRepasse).map(([v, rot]) => (
+                        {Object.entries(rotuloPagamento).map(([v, rot]) => (
                           <option key={v} value={v}>{rot}</option>
                         ))}
                       </select>
@@ -658,7 +658,7 @@ function Admin() {
                     </td>
                   </tr>
                 ))}
-                {repassesVisiveis.length === 0 && !painel.isLoading && (
+                {pagamentosVisiveis.length === 0 && !painel.isLoading && (
                   <tr><td colSpan={8} className="p-4 text-muted-foreground">Nenhum pagamento neste filtro.</td></tr>
                 )}
               </tbody>
@@ -828,10 +828,10 @@ function FormularioConfiguracoes({
       }}
     >
       <h2 className="text-xl sm:col-span-2">Regras financeiras</h2>
-       {num("taxaCentavos", "Sinal de agendamento (R$)", "Pago ao reservar e abatido do valor total da consulta.", 100)}
-      {num("comissaoPercent", "Comissão da plataforma (%)", "Retida sobre o valor da consulta após a realização.")}
+       {num("taxaCentavos", "Taxa de reserva (R$)", "Pago ao reservar e abatido do valor total da consulta.", 100)}
+      {num("comissaoPercent", "Taxa fixa da plataforma (%)", "Retida sobre o valor da consulta após a realização.")}
       {num("duracaoPadraoMinutos", "Duração padrão (minutos)", "Usada quando o profissional não define outra.")}
-      {num("cancelamentoHoras", "Cancelamento sem custo até (horas antes)", "Prazo para o paciente cancelar com direito a estorno do sinal.")}
+      {num("cancelamentoHoras", "Cancelamento sem custo até (horas antes)", "Prazo para o paciente cancelar com direito a estorno do pagamento.")}
       {num("remarcacaoHoras", "Remarcação até (horas antes)", "Prazo mínimo para remarcar.")}
       <label className="flex items-center gap-2 text-sm">
         <input
@@ -839,7 +839,7 @@ function FormularioConfiguracoes({
           checked={cfg.reembolsoTaxaNoPrazo}
           onChange={(e) => setCfg({ ...cfg, reembolsoTaxaNoPrazo: e.target.checked })}
         />
-        Estornar o sinal quando o cancelamento é feito dentro do prazo
+        Estornar o pagamento quando o cancelamento é feito dentro do prazo
       </label>
 
       <h2 className="mt-4 text-xl sm:col-span-2">Livro “Como Ser Feliz com TOC”</h2>
@@ -920,7 +920,7 @@ function EdicaoProfissional({
             ["instituicao", "Instituição"],
             ["abordagem", "Abordagem"],
             ["experiencia_anos", "Anos de experiência"],
-            ["comissao_percent", "Comissão da plataforma (%)"],
+            ["comissao_percent", "Taxa fixa da plataforma (%)"],
             ["formacao", "Formação (vírgulas)"],
             ["especializacoes", "Especializações (vírgulas)"],
             ["cursos", "Cursos relevantes (vírgulas)"],

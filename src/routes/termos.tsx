@@ -26,15 +26,15 @@ const secoes = [
   {
     t: "1. Natureza da plataforma",
     p: [
-      "A TOC Brazil é uma plataforma de tecnologia que conecta pessoas interessadas em acompanhamento de saúde mental a profissionais habilitados de Psicologia e Psiquiatria.",
-      "A TOC Brazil não presta serviços de saúde, não realiza diagnósticos, não prescreve tratamentos e não promete resultados terapêuticos.",
+      "A TOC Brazil é uma plataforma de tecnologia que conecta pessoas interessadas em acompanhamento de saúde mental a profissionais habilitados de Psicologia.",
+      "A TOC Brazil não presta serviços de saúde, não realiza identificação clínicas, não prescreve cuidados e não promete desfechos terapêuticos.",
     ],
   },
   {
     t: "2. Responsabilidade profissional",
     p: [
-      "O atendimento é de responsabilidade exclusiva do profissional habilitado, que responde pela sua conduta perante seu conselho de classe (CFP ou CFM) e pela legislação aplicável.",
-      "A plataforma não interfere na conduta clínica, no plano de tratamento ou em qualquer decisão profissional.",
+      "O atendimento é de responsabilidade exclusiva do profissional habilitado, que responde pela sua conduta perante seu conselho de classe (CFP) e pela legislação aplicável.",
+      "A plataforma não interfere na conduta clínica, no plano de cuidado ou em qualquer decisão profissional.",
     ],
   },
   {
@@ -54,8 +54,8 @@ const secoes = [
   {
     t: "5. Uso adequado",
     p: [
-      "É vedado utilizar a plataforma para fins ilícitos, para divulgar informação enganosa em saúde ou para prometer cura, diagnóstico automático ou resultado garantido.",
-      "Conteúdos educativos publicados pela TOC Brazil têm finalidade informativa e não substituem avaliação profissional.",
+      "É vedado utilizar a plataforma para fins ilícitos, para divulgar informação enganosa em saúde ou para prometer cura, identificação clínica automático ou resultado garantido.",
+      "Conteúdos educativos publicados pela TOC Brazil têm finalidade informativa e não substituem consulta com profissional habilitado.",
     ],
   },
   {

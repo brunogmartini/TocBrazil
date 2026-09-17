@@ -55,7 +55,7 @@ function Seguranca() {
       <div className="card-soft mt-10 max-w-3xl p-6">
         <h2 className="heading-subsection">Limites da plataforma</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          A TOC Brazil não realiza diagnósticos, não prescreve medicamentos e não promete resultados.
+          A TOC Brazil não realiza identificação clínicas, não prescreve medicamentos e não promete desfechos.
           Também não somos um serviço de emergência: em situação de risco imediato, procure
           atendimento de urgência na sua região.
         </p>

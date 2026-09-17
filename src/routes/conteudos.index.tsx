@@ -6,17 +6,17 @@ import { track } from "@/lib/analytics";
 export const Route = createFileRoute("/conteudos/")({
   head: () => ({
     meta: [
-      { title: "Conteúdos sobre TOC: pensamentos intrusivos, rituais e tratamento | TOC Brazil" },
+      { title: "Conteúdos sobre TOC: pensamentos intrusivos, rituais e cuidado | TOC Brazil" },
       {
         name: "description",
         content:
-          "Artigos educativos sobre TOC organizados por tema: pensamentos intrusivos, compulsões, checagem, contaminação, família, adolescentes e tratamento.",
+          "Artigos educativos sobre TOC organizados por tema: pensamentos intrusivos, compulsões, checagem, contaminação, família, adolescentes e cuidado.",
       },
       { property: "og:title", content: "Conteúdos sobre TOC" },
       {
         property: "og:description",
         content:
-          "Informação educativa e cuidadosa sobre TOC, sem diagnóstico e sem promessas de resultado.",
+          "Informação educativa e cuidadosa sobre TOC, sem identificação clínica e sem promessas de resultado.",
       },
       { property: "og:url", content: "/conteudos" },
     ],
@@ -44,7 +44,7 @@ function Conteudos() {
       <h1 className="mt-3 text-3xl sm:text-4xl">Conteúdo para entender o TOC</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
         Material educativo escrito em linguagem simples. Nenhum conteúdo aqui substitui uma
-        avaliação profissional, e não oferecemos testes de autodiagnóstico.
+        consulta com profissional habilitado, e não oferecemos testes de autoidentificação clínica.
       </p>
 
       <ul className="mt-8 flex flex-wrap gap-2">
@@ -84,7 +84,7 @@ function Conteudos() {
       <div className="card-soft mt-12 p-8 text-center">
         <h2 className="text-2xl">Quer conversar com um profissional?</h2>
         <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">
-          Você pode conhecer psicólogos e psiquiatras com atendimento online quando se sentir
+          Você pode conhecer psicólogos com atendimento online quando se sentir
           pronto.
         </p>
         <Link to="/profissionais" className="btn-base btn-primary mt-6">

@@ -89,12 +89,12 @@ function Financeiro() {
           <div className="professional-metric p-6">
             <p className="professional-label">A receber</p>
             <p className="mt-2 font-display text-2xl">{moeda(resumo?.aReceber ?? 0)}</p>
-            <p className="mt-2 text-xs text-muted-foreground">consultas realizadas aguardando repasse</p>
+            <p className="mt-2 text-xs text-muted-foreground">consultas realizadas aguardando pagamento</p>
           </div>
           <div className="professional-metric p-6">
             <p className="professional-label">Recebido</p>
             <p className="mt-2 font-display text-2xl">{moeda(resumo?.recebido ?? 0)}</p>
-            <p className="mt-2 text-xs text-muted-foreground">repasses já pagos pela plataforma</p>
+            <p className="mt-2 text-xs text-muted-foreground">pagamentos já pagos pela plataforma</p>
           </div>
           <div className="professional-metric p-6">
              <p className="professional-label">Taxas da plataforma</p>
@@ -139,7 +139,7 @@ function Financeiro() {
                     <th className="px-5 py-3 text-right">Bruto</th>
                     <th className="px-5 py-3 text-right">Plataforma</th>
                     <th className="px-5 py-3 text-right">Líquido</th>
-                     <th className="px-5 py-3 text-right">Sinal incluído</th>
+                     <th className="px-5 py-3 text-right">Pagamento incluído</th>
                     <th className="px-5 py-3">Status</th>
                   </tr>
                 </thead>

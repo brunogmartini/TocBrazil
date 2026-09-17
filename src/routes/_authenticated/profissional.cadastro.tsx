@@ -8,7 +8,7 @@ import {
   registrarDocumento,
   removerDocumento,
   salvarCadastroProfissional,
-  salvarDadosRepasse,
+  salvarDadosPagamento,
 } from "@/lib/profissional.functions";
 import {
   desvincularMercadoPago,
@@ -27,12 +27,12 @@ export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
       { title: "Meu cadastro profissional — TOC Brazil" },
       {
         name: "description",
-        content: "Complete seus dados, envie documentos para verificação e informe seu repasse.",
+        content: "Complete seus dados, envie documentos para verificação e informe seu pagamento.",
       },
       { property: "og:title", content: "Meu cadastro profissional — TOC Brazil" },
       {
         property: "og:description",
-        content: "Dados profissionais, documentos e dados de repasse na TOC Brazil.",
+        content: "Dados profissionais, documentos e dados de pagamento na TOC Brazil.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -44,7 +44,7 @@ export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
 
 const TIPOS_DOCUMENTO = [
   "Documento de identidade",
-  "Comprovante de registro no conselho (CRP/CRM)",
+  "Comprovante de registro no conselho (CRP)",
   "Diploma de graduação",
   "Certificado de especialização",
   "Comprovante de endereço",
@@ -74,7 +74,7 @@ function CadastroProfissional() {
   const queryClient = useQueryClient();
   const carregar = useServerFn(meuCadastroProfissional);
   const salvar = useServerFn(salvarCadastroProfissional);
-  const salvarRepasse = useServerFn(salvarDadosRepasse);
+  const salvarPagamento = useServerFn(salvarDadosPagamento);
   const registrar = useServerFn(registrarDocumento);
   const remover = useServerFn(removerDocumento);
   const statusVinculo = useServerFn(statusVinculoMercadoPago);
@@ -117,7 +117,7 @@ function CadastroProfissional() {
     ferramenta_url_sala: "",
     ferramenta_instrucoes: "",
   });
-  const [repasse, setRepasse] = useState({
+  const [pagamento, setPagamento] = useState({
     documento: "",
     chave_pix: "",
     banco: "",
@@ -165,9 +165,9 @@ function CadastroProfissional() {
     } else if (dados.data?.email) {
       setForm((f) => ({ ...f, email_contato: dados.data!.email! }));
     }
-    const r = dados.data?.repasse;
+    const r = dados.data?.pagamento;
     if (r) {
-      setRepasse({
+      setPagamento({
         documento: r.documento ?? "",
         chave_pix: r.chave_pix ?? "",
         banco: r.banco ?? "",
@@ -197,7 +197,7 @@ function CadastroProfissional() {
       const r = await salvar({
         data: {
           ...restoForm,
-          profissao: form.profissao === "psiquiatra" ? "psiquiatra" : "psicologo",
+          profissao: form.profissao === "psicólogo" ? "psicólogo" : "psicologo",
           experiencia_anos: Number(form.experiencia_anos) || 0,
           slot_minutos: Number(form.slot_minutos) || 50,
           valor_centavos: Math.round((Number(valor) || 0) * 100),
@@ -214,12 +214,12 @@ function CadastroProfissional() {
     }
   }
 
-  async function enviarRepasse(e: React.FormEvent) {
+  async function enviarPagamento(e: React.FormEvent) {
     e.preventDefault();
     setErro(null);
-    const r = await salvarRepasse({ data: repasse });
+    const r = await salvarPagamento({ data: pagamento });
     if (!r.ok) setErro(r.erro);
-    else setAviso("Dados de repasse salvos.");
+    else setAviso("Dados de pagamento salvos.");
   }
 
   async function enviarArquivo(file: File) {
@@ -321,11 +321,11 @@ function CadastroProfissional() {
             onChange={(e) => setForm({ ...form, profissao: e.target.value })}
           >
             <option value="psicologo">Psicólogo(a)</option>
-            <option value="psiquiatra">Psiquiatra</option>
+            <option value="psicólogo">Psicólogo(a)</option>
           </select>
         </div>
         <Campo
-          label="Registro profissional (CRP ou CRM)"
+          label="Registro profissional (CRP)"
           value={form.registro}
           onChange={(v) => setForm({ ...form, registro: v })}
           required
@@ -518,7 +518,7 @@ function CadastroProfissional() {
             onChange={(e) => setForm({ ...form, experiencia_toc: e.target.value })}
           />
         </div>
-        {form.profissao === "psiquiatra" && (
+        {form.profissao === "psicólogo" && (
           <Campo
             label="RQE (registro de qualificação de especialista)"
             value={form.rqe}
@@ -646,20 +646,20 @@ function CadastroProfissional() {
         <h2 className="text-2xl">Receber direto na sua conta Mercado Pago</h2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
           Ao ligar sua conta Mercado Pago, o valor de cada consulta cai direto na sua conta e a
-          plataforma retém apenas a comissão combinada, de forma automática.
+          plataforma retém apenas a taxa fixa combinada, de forma automática.
         </p>
         <div className="card-soft mt-5 p-7">
           {!vinculo.data?.configurado ? (
             <p className="text-sm text-muted-foreground">
               O recebimento ainda está sendo configurado pela plataforma. Enquanto isso, seus
-              repasses são feitos pelos dados informados abaixo.
+              pagamentos são feitos pelos dados informados abaixo.
             </p>
           ) : vinculo.data.vinculado ? (
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold">Conta ligada</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Comissão da plataforma: {vinculo.data.comissaoPercent}% por consulta.
+                  Taxa fixa da plataforma: {vinculo.data.comissaoPercent}% por consulta.
                 </p>
               </div>
               <button
@@ -699,26 +699,26 @@ function CadastroProfissional() {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-2xl">Dados para receber seus repasses</h2>
+        <h2 className="text-2xl">Dados para receber seus pagamentos</h2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
           Usamos estes dados apenas para transferir a sua parte do valor das consultas.
         </p>
 
-        <form onSubmit={enviarRepasse} className="card-soft mt-5 grid gap-5 p-7 sm:grid-cols-2">
+        <form onSubmit={enviarPagamento} className="card-soft mt-5 grid gap-5 p-7 sm:grid-cols-2">
           <Campo
             label="CPF ou CNPJ"
-            value={repasse.documento}
-            onChange={(v) => setRepasse({ ...repasse, documento: v })}
+            value={pagamento.documento}
+            onChange={(v) => setPagamento({ ...pagamento, documento: v })}
           />
           <Campo
             label="Chave Pix"
-            value={repasse.chave_pix}
-            onChange={(v) => setRepasse({ ...repasse, chave_pix: v })}
+            value={pagamento.chave_pix}
+            onChange={(v) => setPagamento({ ...pagamento, chave_pix: v })}
           />
           <Campo
             label="Banco"
-            value={repasse.banco}
-            onChange={(v) => setRepasse({ ...repasse, banco: v })}
+            value={pagamento.banco}
+            onChange={(v) => setPagamento({ ...pagamento, banco: v })}
           />
           <div>
             <label htmlFor="tipo-conta" className="section-label">
@@ -727,8 +727,8 @@ function CadastroProfissional() {
             <select
               id="tipo-conta"
               className="field-base mt-2"
-              value={repasse.tipo_conta}
-              onChange={(e) => setRepasse({ ...repasse, tipo_conta: e.target.value })}
+              value={pagamento.tipo_conta}
+              onChange={(e) => setPagamento({ ...pagamento, tipo_conta: e.target.value })}
             >
               <option value="corrente">Conta corrente</option>
               <option value="poupanca">Conta poupança</option>
@@ -737,16 +737,16 @@ function CadastroProfissional() {
           </div>
           <Campo
             label="Agência"
-            value={repasse.agencia}
-            onChange={(v) => setRepasse({ ...repasse, agencia: v })}
+            value={pagamento.agencia}
+            onChange={(v) => setPagamento({ ...pagamento, agencia: v })}
           />
           <Campo
             label="Conta (com dígito)"
-            value={repasse.conta}
-            onChange={(v) => setRepasse({ ...repasse, conta: v })}
+            value={pagamento.conta}
+            onChange={(v) => setPagamento({ ...pagamento, conta: v })}
           />
           <button type="submit" className="btn-base btn-primary sm:col-span-2">
-            Salvar dados de repasse
+            Salvar dados de pagamento
           </button>
         </form>
       </section>

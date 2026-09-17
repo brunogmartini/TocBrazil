@@ -35,7 +35,7 @@ export type ConsultaAdmin = {
   video_url: string | null;
 };
 
-export type RepasseAdmin = {
+export type PagamentoAdmin = {
   id: string;
   profissional: string;
   professional_id: string;
@@ -139,7 +139,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
       { data: payouts },
       { data: cfgRows },
       { data: regras },
-      { data: repasseDetalhes },
+      { data: pagamentoDetalhes },
     ] = await Promise.all([
       supabaseAdmin
         .from("profiles")
@@ -174,7 +174,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
     }
     const livroPorUser = new Map((livros ?? []).map((l) => [l.user_id, l]));
     const comAgenda = new Set((regras ?? []).map((r) => r.professional_id));
-    const pixPorProf = new Map((repasseDetalhes ?? []).map((r) => [r.professional_id, r.chave_pix]));
+    const pixPorProf = new Map((pagamentoDetalhes ?? []).map((r) => [r.professional_id, r.chave_pix]));
 
     const consultasPorPaciente = new Map<string, { total: number; realizadas: number; pago: number }>();
     const consultasPorProfissional = new Map<string, { total: number; realizadas: number }>();
@@ -227,7 +227,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
     }));
 
     const inicioPorConsulta = new Map((consultas ?? []).map((c) => [c.id, c.inicio]));
-    const repasses: RepasseAdmin[] = (payouts ?? []).map((p) => ({
+    const pagamentos: PagamentoAdmin[] = (payouts ?? []).map((p) => ({
       id: p.id,
       profissional: (p.professionals as { nome?: string } | null)?.nome ?? "—",
       professional_id: p.professional_id,
@@ -345,10 +345,10 @@ export const painelAdmin = createServerFn({ method: "GET" })
         .filter((c) => c.payment_status === "aprovado")
         .reduce((s, c) => s + c.taxa_centavos, 0),
       receitaComissaoCentavos: realizadas.reduce((s, c) => s + c.valor_plataforma_centavos, 0),
-      aPagarProfissionaisCentavos: repasses
+      aPagarProfissionaisCentavos: pagamentos
         .filter((r) => r.status === "pendente" || r.status === "processando")
         .reduce((s, r) => s + r.liquido, 0),
-      pagoProfissionaisCentavos: repasses
+      pagoProfissionaisCentavos: pagamentos
         .filter((r) => r.status === "pago")
         .reduce((s, r) => s + r.liquido, 0),
       livrosConfirmados: pacientes.filter((p) => p.livroStatus === "confirmada").length,
@@ -359,7 +359,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
       pacientes,
       consultas: listaConsultas,
       profissionais: listaProfissionais,
-      repasses,
+      pagamentos,
       configuracoes: mapearConfiguracoes(cfgRows),
       totais,
     };
@@ -591,7 +591,7 @@ export const definirStatusConsultaAdmin = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
-export const definirStatusRepasse = createServerFn({ method: "POST" })
+export const definirStatusPagamento = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
     (data: {
@@ -616,7 +616,7 @@ export const definirStatusRepasse = createServerFn({ method: "POST" })
         pago_por: data.status === "pago" ? context.userId : null,
       })
       .eq("id", data.id);
-    if (error) return { ok: false as const, erro: "Não foi possível atualizar o repasse." };
+    if (error) return { ok: false as const, erro: "Não foi possível atualizar o pagamento." };
     return { ok: true as const };
   });
 
