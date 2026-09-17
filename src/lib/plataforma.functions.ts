@@ -266,7 +266,7 @@ export async function registrarEvento(evento: {
   professionalId?: string | null;
   ator?: string | null;
   atorPapel?: string | null;
-  metadados?: Record<string, unknown>;
+  metadados?: Record<string, string | number | boolean | null>;
 }) {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
