@@ -92,6 +92,8 @@ export function ConsultaDetalhe({
           </div>
         )}
         {erro && <p className="text-destructive">{erro}</p>}
+        <ChatAdministrativo consultaId={c.id} />
+
       </div>
     </Modal>
   );
