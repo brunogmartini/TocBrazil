@@ -326,6 +326,47 @@ export const minhasConsultas = createServerFn({ method: "GET" })
     return { consultas };
   });
 
+/** Consulta acontece fora da plataforma: o paciente pode confirmar que ela ocorreu. */
+export const confirmarRealizacao = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { id: string }) => ({ id: String(data.id) }))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: consulta } = await supabase
+      .from("appointments")
+      .select("id, fim, status, patient_id, professional_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!consulta || consulta.patient_id !== userId) {
+      return { ok: false as const, erro: "Consulta não encontrada." };
+    }
+    if (consulta.status !== "confirmada") {
+      return { ok: false as const, erro: "Esta consulta não pode ser confirmada." };
+    }
+    if (new Date(consulta.fim).getTime() > Date.now()) {
+      return { ok: false as const, erro: "Você pode confirmar depois do horário de término." };
+    }
+    const agora = new Date().toISOString();
+    const { error } = await supabase
+      .from("appointments")
+      .update({
+        status: "realizada",
+        realizada_em: agora,
+        confirmado_realizado_por: "paciente",
+        confirmado_em: agora,
+      })
+      .eq("id", data.id);
+    if (error) return { ok: false as const, erro: "Não foi possível confirmar agora." };
+    await registrarEvento({
+      tipo: "realizacao_confirmada",
+      appointmentId: consulta.id,
+      professionalId: consulta.professional_id,
+      ator: userId,
+      atorPapel: "paciente",
+    });
+    return { ok: true as const };
+  });
+
 export const criarAgendamento = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { slug: string; inicio: string }) => ({

@@ -599,10 +599,16 @@ export const marcarConsultaRealizada = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, prof } = await profissionalDoUsuario(context);
     if (!prof) return { ok: false as const, erro: "Acesso exclusivo para profissionais." };
+    const agora = new Date().toISOString();
     const extra =
       data.status === "cancelada"
-        ? { cancelada_em: new Date().toISOString(), cancelada_por: "profissional" }
-        : {};
+        ? { cancelada_em: agora, cancelada_por: "profissional" }
+        : {
+            // A consulta ocorre fora da plataforma: quem confirma fica registrado.
+            confirmado_realizado_por: "profissional",
+            confirmado_em: agora,
+            ...(data.status === "realizada" ? { realizada_em: agora } : {}),
+          };
     const { data: consulta } = await supabase
       .from("appointments")
       .select("id")
@@ -616,6 +622,14 @@ export const marcarConsultaRealizada = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .eq("professional_id", prof.id);
     if (error) return { ok: false as const, erro: "Não foi possível atualizar a consulta." };
+    const { registrarEvento } = await import("@/lib/plataforma.functions");
+    await registrarEvento({
+      tipo: data.status === "cancelada" ? "cancelamento_profissional" : `status_${data.status}`,
+      appointmentId: data.id,
+      professionalId: prof.id,
+      ator: context.userId,
+      atorPapel: "profissional",
+    });
     return { ok: true as const };
   });
 
