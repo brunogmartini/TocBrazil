@@ -83,6 +83,11 @@ export type ProfissionalAdmin = {
   foto_url: string | null;
   observacao_admin: string | null;
   validado_em: string | null;
+  rqe: string | null;
+  ferramenta_provedor: string | null;
+  ferramenta_url_sala: string | null;
+  certidao_validade: string | null;
+  apolice_validade: string | null;
   temAgenda: boolean;
   criadoEm: string;
   documentos: {
