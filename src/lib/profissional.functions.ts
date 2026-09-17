@@ -488,6 +488,8 @@ export type ConsultaAgenda = {
   taxa_agendamento_centavos: number;
   valor_profissional_centavos: number;
   valor_plataforma_centavos: number;
+  taxa_plataforma_centavos: number;
+  link_acesso: string | null;
   video_url: string | null;
   patient_id: string;
   paciente: string;
@@ -540,7 +542,7 @@ export const minhaAgendaProfissional = createServerFn({ method: "GET" })
         supabase
           .from("appointments")
           .select(
-            "id, inicio, fim, status, payment_status, duracao_minutos, valor_consulta_centavos, taxa_agendamento_centavos, valor_profissional_centavos, valor_plataforma_centavos, video_url, patient_id",
+            "id, inicio, fim, status, payment_status, duracao_minutos, valor_consulta_centavos, taxa_agendamento_centavos, valor_profissional_centavos, valor_plataforma_centavos, taxa_plataforma_centavos, link_acesso, video_url, patient_id",
           )
           .eq("professional_id", prof.id)
           .gte("inicio", de.toISOString())
