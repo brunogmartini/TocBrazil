@@ -270,7 +270,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
 
     const { data: prof, error: erroProf } = await supabase
       .from("professionals")
-      .select("id, slug, nome, slot_minutos, comissao_percent, status, valor_centavos")
+      .select("id, slug, nome, slot_minutos, status, valor_centavos, ferramenta_url_sala")
       .eq("slug", data.slug)
       .maybeSingle();
     if (erroProf || !prof || prof.status !== "aprovado") {
