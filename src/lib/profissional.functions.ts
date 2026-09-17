@@ -647,11 +647,14 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
     const { concluirConsultasVencidas } = await import("@/lib/plataforma.functions");
     await concluirConsultasVencidas();
 
+    const { configuracoesPlataformaServidor } = await import("@/lib/plataforma.functions");
+    const cfg = await configuracoesPlataformaServidor();
+
     const [{ data: consultas }, { data: payouts }] = await Promise.all([
       supabase
         .from("appointments")
         .select(
-          "id, inicio, status, payment_status, patient_id, valor_consulta_centavos, taxa_agendamento_centavos, valor_plataforma_centavos, valor_profissional_centavos, comissao_percent",
+          "id, inicio, status, payment_status, patient_id, valor_consulta_centavos, taxa_plataforma_centavos, valor_plataforma_centavos, valor_profissional_centavos",
         )
         .eq("professional_id", prof.id)
         .order("inicio", { ascending: false })
@@ -673,10 +676,10 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
     const payoutPorConsulta = new Map((payouts ?? []).map((p) => [p.appointment_id, p]));
 
     const lancamentos: LancamentoFinanceiro[] = (consultas ?? []).map((c) => {
-      const comissao = Number(c.comissao_percent ?? 20);
+      // Taxa da plataforma: valor fixo em reais por consulta, igual para todos.
       const bruto = c.valor_consulta_centavos ?? 0;
-      const plataforma = Math.round((bruto * comissao) / 100);
-      const liquido = bruto - plataforma;
+      const plataforma = c.taxa_plataforma_centavos ?? cfg.taxaPorConsultaCentavos;
+      const liquido = bruto;
       const payout = payoutPorConsulta.get(c.id);
       let situacao: LancamentoFinanceiro["situacao"] = "agendada";
       if (c.status === "aguardando_pagamento") situacao = "aguardando_pagamento";
@@ -691,10 +694,10 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
         paciente: rotulo.paciente,
         codigo: rotulo.codigo,
         bruto,
-        taxaAgendamento: c.taxa_agendamento_centavos ?? 0,
+        taxaAgendamento: plataforma,
         plataforma,
         liquido,
-        comissaoPercent: comissao,
+        taxaFixaCentavos: plataforma,
         situacao,
         pagoEm: payout?.pago_em ?? null,
         previstoPara: payout?.previsto_para ?? null,
@@ -703,15 +706,15 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
 
     const soma = (f: (l: LancamentoFinanceiro) => boolean) =>
       lancamentos.filter(f).reduce((s, l) => s + l.liquido, 0);
+    const contabiliza = (l: LancamentoFinanceiro) =>
+      l.situacao === "a_receber" || l.situacao === "pago" || l.situacao === "nao_compareceu";
     const resumo = {
       futurosBruto: lancamentos.filter((l) => l.situacao === "agendada").reduce((s, l) => s + l.bruto, 0),
       futurosLiquido: soma((l) => l.situacao === "agendada"),
       aReceber: soma((l) => l.situacao === "a_receber"),
       recebido: soma((l) => l.situacao === "pago"),
-      taxasAgendamento: lancamentos
-        .filter((l) => l.situacao !== "aguardando_pagamento" && l.situacao !== "cancelada")
-        .reduce((s, l) => s + l.taxaAgendamento, 0),
-      comissaoPercent: Number(prof.comissao_percent ?? 20),
+      taxasAgendamento: lancamentos.filter(contabiliza).reduce((s, l) => s + l.plataforma, 0),
+      taxaFixaCentavos: cfg.taxaPorConsultaCentavos,
       consultasRealizadas: lancamentos.filter((l) => l.situacao === "a_receber" || l.situacao === "pago").length,
       consultasAgendadas: lancamentos.filter((l) => l.situacao === "agendada").length,
     };
