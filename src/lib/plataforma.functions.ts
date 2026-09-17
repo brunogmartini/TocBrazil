@@ -95,6 +95,11 @@ export const listarHorariosLivres = createServerFn({ method: "GET" })
 export type ConfiguracoesPlataforma = {
   taxaCentavos: number;
   comissaoPercent: number;
+  /** Taxa fixa em centavos cobrada do profissional por consulta realizada. */
+  taxaPorConsultaCentavos: number;
+  janelaCancelamentoHoras: number;
+  antecedenciaLinkMinutos: number;
+  janelaConfirmacaoHoras: number;
   duracaoPadraoMinutos: number;
   cancelamentoHoras: number;
   remarcacaoHoras: number;
@@ -110,15 +115,19 @@ export function mapearConfiguracoes(rows: { chave: string; valor: unknown }[] | 
   for (const row of rows ?? []) mapa[row.chave] = row.valor;
   const cfg: ConfiguracoesPlataforma = {
     taxaCentavos: Number(mapa["taxa_confirmacao_centavos"] ?? 5000),
-    comissaoPercent: Number(mapa["comissao_plataforma_percent"] ?? 20),
+    comissaoPercent: Number(mapa["comissao_plataforma_percent"] ?? 0),
+    taxaPorConsultaCentavos: Number(mapa["taxa_por_consulta_centavos"] ?? 2900),
+    janelaCancelamentoHoras: Number(mapa["janela_cancelamento_horas"] ?? 24),
+    antecedenciaLinkMinutos: Number(mapa["antecedencia_link_minutos"] ?? 15),
+    janelaConfirmacaoHoras: Number(mapa["janela_confirmacao_horas"] ?? 24),
     duracaoPadraoMinutos: Number(mapa["duracao_padrao_minutos"] ?? 50),
-    cancelamentoHoras: Number(mapa["cancelamento_horas_minimas"] ?? 24),
+    cancelamentoHoras: Number(mapa["janela_cancelamento_horas"] ?? mapa["cancelamento_horas_minimas"] ?? 24),
     remarcacaoHoras: Number(mapa["remarcacao_horas_minimas"] ?? 24),
     reembolsoTaxaNoPrazo: Boolean(mapa["reembolso_taxa_no_prazo"] ?? true),
     hotmartLivroUrl: String(mapa["hotmart_livro_url"] ?? ""),
     livroTitulo: String(mapa["livro_titulo"] ?? "Como Ser Feliz com TOC"),
     livroDescontoPercent: Number(mapa["livro_desconto_percent"] ?? 50),
-    videoProvider: String(mapa["video_provider"] ?? "jitsi"),
+    videoProvider: String(mapa["video_provider"] ?? "externo"),
   };
   return cfg;
 }
@@ -127,6 +136,11 @@ async function carregarConfiguracoesPrivadas() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin.from("platform_settings").select("chave, valor");
   return mapearConfiguracoes(data);
+}
+
+/** Uso interno do servidor (outras server functions). */
+export async function configuracoesPlataformaServidor() {
+  return carregarConfiguracoesPrivadas();
 }
 
 export const configuracoesAutenticadas = createServerFn({ method: "GET" })
