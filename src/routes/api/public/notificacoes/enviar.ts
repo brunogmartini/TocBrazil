@@ -9,13 +9,13 @@ async function autenticar(request: Request, supabaseAdmin: any) {
   const match = /^Bearer ([^\s,]+)$/.exec(request.headers.get("authorization") ?? "");
   const token = match?.[1];
   if (!token) return false;
-  const { data } = await supabaseAdmin.schema("private").from("cron_token").select("token").eq("nome", "notificacoes").maybeSingle();
-  const esperado = data?.token as string | undefined;
-  if (!esperado || token.length !== esperado.length) return false;
-  const { createHash, timingSafeEqual } = await import("node:crypto");
-  const digest = (v: string) => createHash("sha256").update(v, "utf8").digest();
-  return timingSafeEqual(digest(token), digest(esperado));
+  const { data } = await supabaseAdmin.rpc("cron_token_valido", {
+    _nome: "notificacoes",
+    _token: token,
+  });
+  return data === true;
 }
+
 
 async function processar(request: Request) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
