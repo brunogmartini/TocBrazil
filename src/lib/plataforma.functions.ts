@@ -574,12 +574,15 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
       canal: "email",
       titulo: "Consulta cancelada",
       corpo: dentroDoPrazo
-        ? cfg.reembolsoTaxaNoPrazo
-          ? "Cancelamento dentro do prazo. O valor pago será estornado pela nossa equipe."
-          : "Cancelamento registrado dentro do prazo."
+        ? estornado
+          ? "Cancelamento dentro do prazo. O estorno já foi solicitado ao meio de pagamento."
+          : cfg.reembolsoTaxaNoPrazo
+            ? "Cancelamento dentro do prazo. O valor pago será estornado pela nossa equipe."
+            : "Cancelamento registrado dentro do prazo."
         : `Cancelamento fora do prazo de ${cfg.cancelamentoHoras}h: o valor pago não é reembolsável.`,
     });
-    return { ok: true as const, dentroDoPrazo };
+    return { ok: true as const, dentroDoPrazo, estornado };
+
   });
 
 /* ---------- livro "Como Ser Feliz com TOC" ---------- */
