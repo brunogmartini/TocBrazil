@@ -632,7 +632,7 @@ export type LancamentoFinanceiro = {
   taxaAgendamento: number;
   plataforma: number;
   liquido: number;
-  comissaoPercent: number;
+  taxaFixaCentavos: number;
   situacao: "agendada" | "a_receber" | "pago" | "cancelada" | "nao_compareceu" | "aguardando_pagamento";
   pagoEm: string | null;
   previstoPara: string | null;
