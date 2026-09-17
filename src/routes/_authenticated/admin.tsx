@@ -105,13 +105,13 @@ function Admin() {
     queryKey: ["painel-admin"],
     queryFn: () => carregar(),
     refetchInterval: aba === "financeiro" ? 15_000 : false,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
   });
   const relatorio = useQuery({
     queryKey: ["admin-relatorio"],
     queryFn: () => carregarRelatorio({ data: {} }),
     enabled: aba === "relatorio",
-    refetchIntervalInBackground: true,
-    refetchOnWindowFocus: true,
   });
   const atualizar = () => queryClient.invalidateQueries({ queryKey: ["painel-admin"] });
 
