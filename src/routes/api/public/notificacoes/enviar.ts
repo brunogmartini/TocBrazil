@@ -1,16 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { authenticateCronRequest } from "@/integrations/supabase/cron-auth";
 
 /**
  * Disparo dos e-mails já programados (lembretes de 24h e de 15 minutos) e dos
  * avisos de vencimento de certidão e apólice (30, 15 e 7 dias).
- * Chamado por tarefa agendada — autenticado pelo segredo de cron.
+ * Chamado pela tarefa agendada do banco, autenticada por token interno.
  */
-async function processar(request: Request) {
-  const negado = await authenticateCronRequest(request);
-  if (negado) return negado;
+async function autenticar(request: Request, supabaseAdmin: any) {
+  const match = /^Bearer ([^\s,]+)$/.exec(request.headers.get("authorization") ?? "");
+  const token = match?.[1];
+  if (!token) return false;
+  const { data } = await supabaseAdmin.schema("private").from("cron_token").select("token").eq("nome", "notificacoes").maybeSingle();
+  const esperado = data?.token as string | undefined;
+  if (!esperado || token.length !== esperado.length) return false;
+  const { createHash, timingSafeEqual } = await import("node:crypto");
+  const digest = (v: string) => createHash("sha256").update(v, "utf8").digest();
+  return timingSafeEqual(digest(token), digest(esperado));
+}
 
+async function processar(request: Request) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  if (!(await autenticar(request, supabaseAdmin))) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
 
   const agora = new Date();
@@ -47,10 +59,10 @@ async function processar(request: Request) {
           : Promise.resolve({ data: null }),
       ]);
 
-      const cancelada =
-        !consulta || !["confirmada", "aguardando_pagamento"].includes(String(consulta.status));
+      const ativa =
+        consulta && ["confirmada", "aguardando_pagamento"].includes(String(consulta.status));
 
-      if (paciente?.email && !cancelada) {
+      if (paciente?.email && ativa) {
         const prof = consulta.professionals as { nome?: string } | null;
         await sendTemplateEmail("lembrete-consulta", paciente.email, {
           templateData: {
@@ -83,11 +95,11 @@ async function processar(request: Request) {
 
   const { data: profissionais } = await supabaseAdmin
     .from("professionals")
-    .select("id, nome, email_contato, user_id, certidao_validade, apolice_validade")
+    .select("id, nome, email_contato, certidao_validade, apolice_validade")
     .in("status", ["aprovado", "pendente"]);
 
   for (const p of profissionais ?? []) {
-    const email = p.email_contato;
+    const email = p.email_contato as string | null;
     if (!email) continue;
     for (const alvo of alvos) {
       const itens: Array<{ documento: string; validade: string | null }> = [
