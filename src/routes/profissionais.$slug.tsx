@@ -1,6 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { avaliacoesDoProfissional, obterProfissional } from "@/lib/plataforma.functions";
+import {
+  avaliacoesDoProfissional,
+  listarHorariosLivres,
+  obterProfissional,
+} from "@/lib/plataforma.functions";
+import { moeda } from "@/lib/video-sala";
 import { Estrelas } from "@/components/estrelas";
 import { track } from "@/lib/analytics";
 
@@ -13,10 +18,11 @@ export const Route = createFileRoute("/profissionais/$slug")({
   loader: async ({ params }) => {
     const { profissional } = await obterProfissional({ data: { slug: params.slug } });
     if (!profissional) throw notFound();
-    const avaliacoes = await avaliacoesDoProfissional({
-      data: { professionalId: profissional.id },
-    });
-    return { profissional, avaliacoes };
+    const [avaliacoes, agenda] = await Promise.all([
+      avaliacoesDoProfissional({ data: { professionalId: profissional.id } }),
+      listarHorariosLivres({ data: { slug: params.slug, dias: 21 } }),
+    ]);
+    return { profissional, avaliacoes, horarios: agenda.horarios.slice(0, 6) };
   },
   head: ({ params, loaderData }) => {
     if (!loaderData) {
@@ -62,8 +68,21 @@ function NaoEncontrado() {
   );
 }
 
+const TZ = "America/Sao_Paulo";
+
+function horarioBR(iso: string) {
+  return new Date(iso).toLocaleString("pt-BR", {
+    timeZone: TZ,
+    weekday: "short",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 function Perfil() {
-  const { profissional: p, avaliacoes } = Route.useLoaderData();
+  const { profissional: p, avaliacoes, horarios } = Route.useLoaderData();
 
   useEffect(() => {
     track("professional_profile_view", { slug: p.slug, profissao: p.profissao });
@@ -84,6 +103,13 @@ function Perfil() {
           <h1 className="mt-4 text-3xl sm:text-4xl">{p.nome}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {p.registro} · {p.uf} · {p.experiencia_anos} anos de experiência declarados
+          </p>
+          <p
+            className="pill mt-4 inline-flex"
+            title="A verificação se limita à inscrição ativa no conselho profissional e aos documentos de formação declarados pelo profissional. A TOC Brazil não avalia a qualidade do atendimento."
+          >
+            Verificamos a inscrição ativa no conselho profissional e a documentação de formação
+            declarada
           </p>
 
           <div className="card-soft mt-8 p-6">
@@ -135,7 +161,7 @@ function Perfil() {
 
           <section className="card-soft mt-5 p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-lg">Avaliações de pacientes</h2>
+              <h2 className="text-lg">Avaliações administrativas</h2>
               {avaliacoes.total > 0 && (
                 <span className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Estrelas nota={avaliacoes.media} />
@@ -146,8 +172,8 @@ function Perfil() {
             </div>
             {avaliacoes.total === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">
-                Este profissional ainda não recebeu avaliações. Depois da consulta, você pode dar
-                até 5 estrelas na sua área.
+                Este profissional ainda não recebeu avaliações. Depois da consulta, o paciente
+                avalia apenas pontualidade, clareza das orientações administrativas e cordialidade.
               </p>
             ) : (
               <ul className="mt-4 space-y-3">
@@ -170,10 +196,24 @@ function Perfil() {
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="card-soft p-6">
-            <p className="text-lg">Sessão de {p.slot_minutos} minutos, online</p>
+            <p className="text-2xl font-semibold">{moeda(p.valor_centavos)}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Os horários livres e o valor da consulta aparecem depois que você cria sua conta.
+              Sessão de {p.slot_minutos} minutos, online. Este é o valor definido pelo profissional.
             </p>
+            <div className="mt-5">
+              <p className="section-label">Próximos horários</p>
+              {horarios.length === 0 ? (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Sem horários livres nos próximos dias.
+                </p>
+              ) : (
+                <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                  {horarios.map((h) => (
+                    <li key={h.inicio}>{horarioBR(h.inicio)}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
             <Link
               to="/agendar/$slug"
               params={{ slug: p.slug }}
@@ -183,8 +223,9 @@ function Perfil() {
               Ver horários e agendar
             </Link>
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-              A consulta é confirmada após a aprovação do pagamento. Cancelamento sem custo até 24
-              horas antes do horário marcado.
+              A consulta é confirmada após a aprovação do pagamento e acontece na sala de
+              videochamada mantida pelo próprio profissional. Cancelamento sem custo até 24 horas
+              antes do horário marcado.
             </p>
           </div>
         </aside>
