@@ -497,7 +497,7 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: consulta } = await supabase
       .from("appointments")
-      .select("id, inicio, patient_id, status")
+      .select("id, inicio, patient_id, status, payment_status")
       .eq("id", data.id)
       .maybeSingle();
     if (!consulta || consulta.patient_id !== userId) {
@@ -524,6 +524,40 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
       })
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível cancelar agora." };
+
+    // Estorno pelo provedor quando o cancelamento é dentro do prazo e já houve pagamento.
+    let estornado = false;
+    if (dentroDoPrazo && consulta.payment_status === "aprovado" && cfg.reembolsoTaxaNoPrazo) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: pg } = await supabaseAdmin
+        .from("payments")
+        .select("id, provider_ref")
+        .eq("appointment_id", consulta.id)
+        .eq("status", "aprovado")
+        .maybeSingle();
+      if (pg?.provider_ref) {
+        const { provedorPagamento } = await import("@/services/payments.server");
+        const resultado = await provedorPagamento().refund(pg.provider_ref);
+        if (resultado.ok) {
+          estornado = true;
+          await supabaseAdmin
+            .from("payments")
+            .update({ status: "estornado" })
+            .eq("id", pg.id);
+          await supabaseAdmin
+            .from("appointments")
+            .update({ payment_status: "estornado" })
+            .eq("id", consulta.id);
+          await registrarEvento({
+            tipo: "estorno_realizado",
+            appointmentId: consulta.id,
+            ator: userId,
+            atorPapel: "paciente",
+          });
+        }
+      }
+    }
+
 
     await registrarEvento({
       tipo: dentroDoPrazo ? "cancelamento_no_prazo" : "cancelamento_tardio",
