@@ -216,7 +216,6 @@ function Home() {
             <h2 id="identificacao" className="heading-section mt-3">
               Talvez você já reconheça alguma destas situações.
             </h2>
-            <div className="mt-4" />
           </div>
 
           <ul className="mt-10 grid gap-5 md:grid-cols-3">
