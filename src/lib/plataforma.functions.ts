@@ -348,7 +348,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
         tipo: "reserva_criada",
         canal: "email",
         titulo: "Reserva registrada",
-        corpo: `Seu horário com ${prof.nome} em ${quando} está reservado e aguarda a confirmação do sinal de agendamento, que será abatido do valor total da consulta.`,
+        corpo: `Seu horário com ${prof.nome} em ${quando} está reservado por 15 minutos e aguarda a confirmação do pagamento.`,
       },
       {
         user_id: userId,
