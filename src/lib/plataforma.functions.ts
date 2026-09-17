@@ -8,7 +8,7 @@ export type ProfissionalPublico = {
   id: string;
   slug: string;
   nome: string;
-  profissao: "psicologo" | "psicólogo";
+  profissao: "psicologo";
   registro: string;
   uf: string;
   foto_url: string | null;
@@ -109,8 +109,6 @@ export const listarHorariosLivres = createServerFn({ method: "GET" })
   });
 
 export type ConfiguracoesPlataforma = {
-  taxaCentavos: number;
-  comissaoPercent: number;
   /** Taxa fixa em centavos cobrada do profissional por consulta realizada. */
   taxaPorConsultaCentavos: number;
   janelaCancelamentoHoras: number;
@@ -120,18 +118,12 @@ export type ConfiguracoesPlataforma = {
   cancelamentoHoras: number;
   remarcacaoHoras: number;
   reembolsoTaxaNoPrazo: boolean;
-  hotmartLivroUrl: string;
-  livroTitulo: string;
-  livroDescontoPercent: number;
-  videoProvider: string;
 };
 
 export function mapearConfiguracoes(rows: { chave: string; valor: unknown }[] | null) {
   const mapa: Record<string, unknown> = {};
   for (const row of rows ?? []) mapa[row.chave] = row.valor;
   const cfg: ConfiguracoesPlataforma = {
-    taxaCentavos: Number(mapa["taxa_confirmacao_centavos"] ?? 5000),
-    comissaoPercent: Number(mapa["comissao_plataforma_percent"] ?? 0),
     taxaPorConsultaCentavos: Number(mapa["taxa_por_consulta_centavos"] ?? 2900),
     janelaCancelamentoHoras: Number(mapa["janela_cancelamento_horas"] ?? 24),
     antecedenciaLinkMinutos: Number(mapa["antecedencia_link_minutos"] ?? 15),
@@ -140,10 +132,6 @@ export function mapearConfiguracoes(rows: { chave: string; valor: unknown }[] | 
     cancelamentoHoras: Number(mapa["janela_cancelamento_horas"] ?? mapa["cancelamento_horas_minimas"] ?? 24),
     remarcacaoHoras: Number(mapa["remarcacao_horas_minimas"] ?? 24),
     reembolsoTaxaNoPrazo: Boolean(mapa["reembolso_taxa_no_prazo"] ?? true),
-    hotmartLivroUrl: String(mapa["hotmart_livro_url"] ?? ""),
-    livroTitulo: String(mapa["livro_titulo"] ?? "Como Ser Feliz com TOC"),
-    livroDescontoPercent: Number(mapa["livro_desconto_percent"] ?? 50),
-    videoProvider: String(mapa["video_provider"] ?? "externo"),
   };
   return cfg;
 }
@@ -214,7 +202,7 @@ export const meuContexto = createServerFn({ method: "GET" })
       supabase
         .from("professionals")
         .select(
-          "id, user_id, slug, nome, profissao, registro, uf, cidade, foto_url, abordagem, apresentacao, experiencia_toc, experiencia_anos, formacao, especializacoes, areas, idiomas, genero, status, comissao_percent, slot_minutos, valor_centavos, destaque, graduacao, instituicao, cursos, observacao_admin, requer_correcao, created_at, updated_at",
+          "id, user_id, slug, nome, profissao, registro, uf, cidade, foto_url, abordagem, apresentacao, experiencia_toc, experiencia_anos, formacao, especializacoes, areas, idiomas, genero, status, slot_minutos, valor_centavos, destaque, graduacao, instituicao, cursos, observacao_admin, requer_correcao, created_at, updated_at",
         )
         .eq("user_id", userId)
         .maybeSingle(),
@@ -612,9 +600,9 @@ export const meuLivro = createServerFn({ method: "GET" })
         | "cancelada",
       clicadoEm: compra?.clicado_em ?? null,
       compradoEm: compra?.comprado_em ?? null,
-      url: cfg.hotmartLivroUrl,
-      titulo: cfg.livroTitulo,
-      descontoPercent: cfg.livroDescontoPercent,
+      url: "",
+      titulo: "",
+      descontoPercent: 0,
     };
   });
 
