@@ -44,24 +44,10 @@ export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
 
 const TIPOS_DOCUMENTO = [
   "Documento de identidade",
-  "Comprovante de registro no conselho (CRP)",
+  "Certidão de regularidade do CRP",
+  "Apólice de seguro de responsabilidade civil profissional",
   "Diploma de graduação",
-  "Certificado de especialização",
-  "Comprovante de endereço",
-];
-
-const SUBTIPOS_TOC = [
-  "TOC de simetria",
-  "TOC de falsas memórias",
-  "TOC de orientação sexual",
-  "TOC de contaminação e limpeza",
-  "TOC religioso/escrupulosidade",
-  "TOC de relacionamento",
-  "TOC puro",
-  "TOC existencial",
-  "TOC de organização",
-  "TOC de dúvida e checagem",
-  "TOC sexual",
+  "Certificado de formação",
 ];
 
 const rotuloDoc: Record<string, string> = {
@@ -90,7 +76,7 @@ function CadastroProfissional() {
 
   const [form, setForm] = useState({
     nome: "",
-    profissao: "psicologo",
+    cpf: "",
     registro: "",
     uf: "",
     cidade: "",
@@ -112,7 +98,8 @@ function CadastroProfissional() {
     especializacoes: "",
     areas: "",
     idiomas: "",
-    rqe: "",
+    certidao_validade: "",
+    apolice_validade: "",
     ferramenta_provedor: "",
     ferramenta_url_sala: "",
     ferramenta_instrucoes: "",
@@ -135,7 +122,7 @@ function CadastroProfissional() {
     if (p) {
       setForm({
         nome: p.nome ?? "",
-        profissao: p.profissao ?? "psicologo",
+        cpf: p.cpf ?? "",
         registro: p.registro ?? "",
         uf: p.uf ?? "",
         cidade: p.cidade ?? "",
@@ -155,9 +142,10 @@ function CadastroProfissional() {
         formacao: (p.formacao ?? []).join(", "),
 
         especializacoes: (p.especializacoes ?? []).join(", "),
-        areas: (p.areas ?? []).filter((area) => SUBTIPOS_TOC.includes(area)).join(", "),
+        areas: (p.areas ?? []).join(", "),
         idiomas: (p.idiomas ?? []).join(", "),
-        rqe: p.rqe ?? "",
+        certidao_validade: p.certidao_validade ?? "",
+        apolice_validade: p.apolice_validade ?? "",
         ferramenta_provedor: p.ferramenta_provedor ?? "",
         ferramenta_url_sala: p.ferramenta_url_sala ?? "",
         ferramenta_instrucoes: p.ferramenta_instrucoes ?? "",
@@ -197,7 +185,7 @@ function CadastroProfissional() {
       const r = await salvar({
         data: {
           ...restoForm,
-          profissao: form.profissao === "psicólogo" ? "psicólogo" : "psicologo",
+          profissao: "psicologo",
           experiencia_anos: Number(form.experiencia_anos) || 0,
           slot_minutos: Number(form.slot_minutos) || 50,
           valor_centavos: Math.round((Number(valor) || 0) * 100),
@@ -250,17 +238,6 @@ function CadastroProfissional() {
 
   const temCadastro = Boolean(dados.data?.profissional);
   const documentos = dados.data?.documentos ?? [];
-  const areasSelecionadas = form.areas
-    .split(",")
-    .map((area) => area.trim())
-    .filter(Boolean);
-
-  function alternarArea(area: string) {
-    const proximaLista = areasSelecionadas.includes(area)
-      ? areasSelecionadas.filter((item) => item !== area)
-      : [...areasSelecionadas, area];
-    setForm({ ...form, areas: proximaLista.join(", ") });
-  }
 
   return (
     <div className="professional-workspace py-12 lg:py-16">
@@ -310,20 +287,12 @@ function CadastroProfissional() {
           className="sm:col-span-2"
           required
         />
-        <div>
-          <label htmlFor="profissao" className="section-label">
-            Profissão
-          </label>
-          <select
-            id="profissao"
-            className="field-base mt-2"
-            value={form.profissao}
-            onChange={(e) => setForm({ ...form, profissao: e.target.value })}
-          >
-            <option value="psicologo">Psicólogo(a)</option>
-            <option value="psicólogo">Psicólogo(a)</option>
-          </select>
-        </div>
+        <Campo
+          label="CPF"
+          value={form.cpf}
+          onChange={(v) => setForm({ ...form, cpf: v.replace(/\D/g, "").slice(0, 11) })}
+          required
+        />
         <Campo
           label="Registro profissional (CRP)"
           value={form.registro}
@@ -461,23 +430,6 @@ function CadastroProfissional() {
           onChange={(v) => setForm({ ...form, especializacoes: v })}
           className="sm:col-span-2"
         />
-        <fieldset className="sm:col-span-2">
-          <legend className="section-label">Subtipos</legend>
-          <p className="mt-2 text-sm text-muted-foreground">Selecione todos os subtipos que você atende.</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {SUBTIPOS_TOC.map((subtipo) => (
-              <label key={subtipo} className="flex items-start gap-3 rounded-lg border border-border p-3 text-sm">
-                <input
-                  type="checkbox"
-                  checked={areasSelecionadas.includes(subtipo)}
-                  onChange={() => alternarArea(subtipo)}
-                  className="mt-0.5 size-4 accent-primary"
-                />
-                <span>{subtipo}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
         <div className="sm:col-span-2">
           <label htmlFor="idiomas" className="section-label">Idiomas</label>
           <input
@@ -518,13 +470,18 @@ function CadastroProfissional() {
             onChange={(e) => setForm({ ...form, experiencia_toc: e.target.value })}
           />
         </div>
-        {form.profissao === "psicólogo" && (
-          <Campo
-            label="RQE (registro de qualificação de especialista)"
-            value={form.rqe}
-            onChange={(v) => setForm({ ...form, rqe: v })}
-          />
-        )}
+        <Campo
+          label="Validade da certidão do CRP"
+          type="date"
+          value={form.certidao_validade}
+          onChange={(v) => setForm({ ...form, certidao_validade: v })}
+        />
+        <Campo
+          label="Validade da apólice de seguro"
+          type="date"
+          value={form.apolice_validade}
+          onChange={(v) => setForm({ ...form, apolice_validade: v })}
+        />
         <fieldset className="sm:col-span-2 rounded-xl border border-border p-5">
           <legend className="section-label px-1">Ferramenta de videochamada</legend>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -659,7 +616,7 @@ function CadastroProfissional() {
               <div>
                 <p className="text-sm font-semibold">Conta ligada</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Taxa fixa da plataforma: {vinculo.data.comissaoPercent}% por consulta.
+                  Conta preparada para split: taxa fixa em reais por consulta realizada.
                 </p>
               </div>
               <button
@@ -699,9 +656,9 @@ function CadastroProfissional() {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-2xl">Dados para receber seus pagamentos</h2>
+        <h2 className="text-2xl">Dados administrativos de pagamento</h2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          Usamos estes dados apenas para transferir a sua parte do valor das consultas.
+          Usamos estes dados apenas para identificação administrativa e suporte financeiro.
         </p>
 
         <form onSubmit={enviarPagamento} className="card-soft mt-5 grid gap-5 p-7 sm:grid-cols-2">
