@@ -6,10 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   cancelarConsulta,
   meuContexto,
-  meuLivro,
   minhasConsultas,
   minhasNotificacoes,
-  registrarInteresseLivro,
   confirmarRealizacao,
   salvarPerfil,
 } from "@/lib/plataforma.functions";
@@ -50,8 +48,6 @@ function Painel() {
   const carregarContexto = useServerFn(meuContexto);
   const carregarConsultas = useServerFn(minhasConsultas);
   const carregarNotificacoes = useServerFn(minhasNotificacoes);
-  const carregarLivro = useServerFn(meuLivro);
-  const interesseLivro = useServerFn(registrarInteresseLivro);
   const salvar = useServerFn(salvarPerfil);
   const cancelar = useServerFn(cancelarConsulta);
   const confirmarConsulta = useServerFn(confirmarRealizacao);
@@ -60,7 +56,6 @@ function Painel() {
   const contexto = useQuery({ queryKey: ["contexto"], queryFn: () => carregarContexto() });
   const consultas = useQuery({ queryKey: ["consultas"], queryFn: () => carregarConsultas() });
   const notificacoes = useQuery({ queryKey: ["notificacoes"], queryFn: () => carregarNotificacoes() });
-  const livro = useQuery({ queryKey: ["livro"], queryFn: () => carregarLivro() });
 
   const [editandoPerfil, setEditandoPerfil] = useState(false);
   const [selecionada, setSelecionada] = useState<string | null>(null);
@@ -184,7 +179,7 @@ function Painel() {
                     </span>
                   </div>
                   <h3 className="mt-4 text-lg">
-                    {c.professionals?.nome} · {c.professionals?.profissao === "psiquiatra" ? "Psiquiatra" : "Psicólogo(a)"}
+                    {c.professionals?.nome} · {c.professionals?.profissao === "psicólogo" ? "Psicólogo(a)" : "Psicólogo(a)"}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">{formatarData(c.inicio)}</p>
 
@@ -238,7 +233,7 @@ function Painel() {
                           else setErroPagamento(r.erro);
                         }}
                       >
-                        Pagar sinal com Mercado Pago
+                        Pagar pagamento com Mercado Pago
                       </button>
                       {erroPagamento && <p className="mt-3 text-destructive">{erroPagamento}</p>}
                     </div>
@@ -311,44 +306,7 @@ function Painel() {
         </div>
 
          <aside className="flex h-full flex-col gap-8">
-           <section className="card-soft flex-1 overflow-hidden p-6">
-            <span className="section-label">Benefício exclusivo</span>
-            <h2 className="mt-2 text-xl">{livro.data?.titulo ?? "Como Ser Feliz com TOC"}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Pacientes cadastrados na TOC Brazil têm{" "}
-              <strong className="text-foreground">{livro.data?.descontoPercent ?? 50}% de desconto</strong> na
-              aquisição do livro.
-            </p>
-            {livro.data?.status === "confirmada" ? (
-              <p className="mt-4 rounded-xl bg-primary/10 p-3 text-sm">
-                Compra confirmada. Boa leitura!
-              </p>
-            ) : livro.data?.url ? (
-              <a
-                href={livro.data.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-base btn-primary mt-5 w-full"
-                onClick={async () => {
-                  await interesseLivro();
-                  await queryClient.invalidateQueries({ queryKey: ["livro"] });
-                }}
-              >
-                Adquirir com {livro.data.descontoPercent}% de desconto
-              </a>
-            ) : (
-              <p className="mt-4 rounded-xl bg-muted p-3 text-xs text-muted-foreground">
-                O link com desconto será liberado em breve nesta área.
-              </p>
-            )}
-            {livro.data?.status === "pendente" && (
-              <p className="mt-3 text-xs text-muted-foreground">
-                Sua compra está pendente de confirmação. Assim que a Hotmart confirmar, avisaremos aqui.
-              </p>
-            )}
-          </section>
-
-          <section className="card-soft p-6">
+           <section className="card-soft p-6">
             <h2 className="text-lg">Lembretes</h2>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               {(notificacoes.data?.notificacoes ?? []).length === 0 && (

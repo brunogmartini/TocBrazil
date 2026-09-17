@@ -26,21 +26,21 @@ const secoes = [
   {
     t: "1. Natureza da plataforma",
     p: [
-      "A TOC Brazil é uma plataforma de tecnologia que conecta pessoas interessadas em acompanhamento de saúde mental a profissionais habilitados de Psicologia e Psiquiatria.",
-      "A TOC Brazil não presta serviços de saúde, não realiza diagnósticos, não prescreve tratamentos e não promete resultados terapêuticos.",
+      "A TOC Brazil é uma plataforma de tecnologia que oferece busca, agendamento e pagamento para consultas com psicólogos cadastrados.",
+      "A TOC Brazil não presta serviços de saúde, não avalia pacientes, não realiza diagnósticos, não prescreve condutas e não faz promessa de desfecho.",
     ],
   },
   {
     t: "2. Responsabilidade profissional",
     p: [
-      "O atendimento é de responsabilidade exclusiva do profissional habilitado, que responde pela sua conduta perante seu conselho de classe (CFP ou CFM) e pela legislação aplicável.",
-      "A plataforma não interfere na conduta clínica, no plano de tratamento ou em qualquer decisão profissional.",
+      "O atendimento é de responsabilidade exclusiva do profissional habilitado, que responde pela sua conduta perante seu conselho de classe (CFP) e pela legislação aplicável.",
+      "A plataforma não interfere na conduta clínica, no plano de cuidado ou em qualquer decisão profissional.",
     ],
   },
   {
     t: "3. Cadastro e verificação",
     p: [
-      "Profissionais devem informar dados verdadeiros e enviar documentação para verificação. O perfil é publicado apenas após aprovação.",
+      "Profissionais devem informar dados verdadeiros e enviar documentação para verificação. O perfil é publicado após a conferência de registro e documentos.",
       "A plataforma pode solicitar correções, suspender ou remover perfis em caso de inconsistência, irregularidade de registro ou violação destes termos.",
     ],
   },
@@ -48,14 +48,14 @@ const secoes = [
     t: "4. Agendamento, pagamento e cancelamento",
     p: [
       "A consulta é confirmada após a aprovação do pagamento. A plataforma cobra uma taxa pelo uso da infraestrutura, informada de forma transparente ao profissional.",
-      "Cancelamentos e reembolsos seguem a política informada no perfil do profissional e as regras da plataforma. Pagamentos nunca são simulados: valores só são movimentados por meio de provedor de pagamento oficialmente integrado.",
+      "Cancelamentos e estornos seguem as regras exibidas na plataforma. Valores são movimentados por meio de provedor de pagamento integrado.",
     ],
   },
   {
     t: "5. Uso adequado",
     p: [
-      "É vedado utilizar a plataforma para fins ilícitos, para divulgar informação enganosa em saúde ou para prometer cura, diagnóstico automático ou resultado garantido.",
-      "Conteúdos educativos publicados pela TOC Brazil têm finalidade informativa e não substituem avaliação profissional.",
+      "É vedado utilizar a plataforma para fins ilícitos, para divulgar informação enganosa em saúde ou para divulgar informação enganosa em saúde ou prometer cura/desfecho.",
+      "Conteúdos educativos publicados pela TOC Brazil têm finalidade informativa e não substituem consulta com profissional habilitado.",
     ],
   },
   {

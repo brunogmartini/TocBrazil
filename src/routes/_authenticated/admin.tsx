@@ -6,10 +6,8 @@ import { useEffect, useState } from "react";
 import {
   definirStatusConsultaAdmin,
   definirStatusDocumento,
-  definirStatusLivro,
   definirStatusPagamento,
   definirStatusProfissional,
-  definirStatusRepasse,
   editarProfissionalAdmin,
   painelAdmin,
   relatorioMetadados,
@@ -29,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
       {
         name: "description",
         content:
-          "Visão geral da plataforma: pacientes, profissionais, consultas, receita, repasses, livro e configurações.",
+          "Visão geral da plataforma: pacientes, profissionais, consultas, receita, pagamentos, livro e configurações.",
       },
       { property: "og:title", content: "Painel do gestor — TOC Brazil" },
       { property: "og:description", content: "Gestão completa da TOC Brazil." },
@@ -62,23 +60,9 @@ const rotuloDoc: Record<string, string> = {
   recusado: "Recusado",
 };
 
-const rotuloLivro: Record<string, string> = {
-  nao_comprado: "Não comprado",
-  pendente: "Pendente / não confirmada",
-  confirmada: "Compra confirmada",
-  cancelada: "Cancelada",
-};
-
-const rotuloRepasse: Record<string, string> = {
-  pendente: "A pagar",
-  processando: "Processando",
-  pago: "Pago",
-  falhou: "Falhou",
-};
-
-type Aba = "visao" | "pacientes" | "profissionais" | "consultas" | "financeiro" | "relatorio" | "livro" | "configuracoes";
+type Aba = "visao" | "pacientes" | "profissionais" | "consultas" | "financeiro" | "relatorio" | "configuracoes";
 type FiltroProf = "todos" | "pendente" | "aprovado" | "rejeitado" | "suspenso";
-type FiltroRepasse = "a_receber" | "historico" | "todos";
+type FiltroPagamento = "pendente" | "aprovado" | "todos";
 
 function Admin() {
   const queryClient = useQueryClient();
@@ -89,14 +73,12 @@ function Admin() {
   const editarProf = useServerFn(editarProfissionalAdmin);
   const mudarPagamento = useServerFn(definirStatusPagamento);
   const mudarConsulta = useServerFn(definirStatusConsultaAdmin);
-  const mudarRepasse = useServerFn(definirStatusRepasse);
-  const mudarLivro = useServerFn(definirStatusLivro);
   const salvarCfg = useServerFn(salvarConfiguracoes);
 
   const [aba, setAba] = useState<Aba>("visao");
   const [busca, setBusca] = useState("");
   const [filtroProf, setFiltroProf] = useState<FiltroProf>("pendente");
-  const [filtroRepasse, setFiltroRepasse] = useState<FiltroRepasse>("a_receber");
+  const [filtroPagamento, setFiltroPagamento] = useState<FiltroPagamento>("pendente");
   const [aberto, setAberto] = useState<string | null>(null);
   const [observacao, setObservacao] = useState<Record<string, string>>({});
   const [aviso, setAviso] = useState<string | null>(null);
@@ -144,10 +126,10 @@ function Admin() {
       (!filtro || p.nome.toLowerCase().includes(filtro) || p.registro.toLowerCase().includes(filtro)) &&
       (filtroProf === "todos" || p.status === filtroProf),
   );
-  const repasses = (dados?.repasses ?? []).filter((r) => !filtro || r.profissional.toLowerCase().includes(filtro));
-  const repassesVisiveis = repasses.filter((r) => {
-    if (filtroRepasse === "a_receber") return r.status === "pendente" || r.status === "processando" || r.status === "falhou";
-    if (filtroRepasse === "historico") return r.status === "pago";
+  const pagamentos = (dados?.pagamentos ?? []).filter((r) => !filtro || r.profissional.toLowerCase().includes(filtro));
+  const pagamentosVisiveis = pagamentos.filter((r) => {
+    if (filtroPagamento === "pendente") return r.status !== "aprovado";
+    if (filtroPagamento === "aprovado") return r.status === "aprovado";
     return true;
   });
 
@@ -168,9 +150,8 @@ function Admin() {
     ["pacientes", "Pacientes"],
     ["profissionais", `Profissionais${t?.pendentes ? ` (${t.pendentes})` : ""}`],
     ["consultas", "Consultas"],
-    ["financeiro", "Pagamentos aos profissionais"],
+    ["financeiro", "Extrato financeiro"],
     ["relatorio", "Relatório"],
-    ["livro", "Livro"],
     ["configuracoes", "Configurações"],
   ];
 
@@ -180,7 +161,7 @@ function Admin() {
       <h1 className="mt-3 text-3xl sm:text-4xl">Painel do gestor</h1>
       <p className="mt-2 max-w-2xl text-muted-foreground">
         Visão geral da plataforma, análise dos cadastros profissionais, pacientes, consultas, receita e
-        repasses. Dados clínicos dos pacientes não são acessíveis pela gestão.
+        pagamentos. Dados clínicos dos pacientes não são acessíveis pela gestão.
       </p>
 
       <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -224,10 +205,9 @@ function Admin() {
               { rotulo: "Cadastros pendentes", valor: String(t.pendentes), destaque: t.pendentes > 0 },
               { rotulo: "Consultas futuras", valor: String(t.consultasFuturas) },
               { rotulo: "Consultas realizadas", valor: String(t.consultasRealizadas) },
-              { rotulo: "Receita — taxas de agendamento", valor: moeda(t.receitaTaxasCentavos) },
-              { rotulo: "Receita — comissão (realizadas)", valor: moeda(t.receitaComissaoCentavos) },
-              { rotulo: "A pagar aos profissionais", valor: moeda(t.aPagarProfissionaisCentavos), destaque: t.aPagarProfissionaisCentavos > 0 },
-              { rotulo: "Compras do livro", valor: `${t.livrosConfirmados} confirmada(s) · ${t.livrosPendentes} pendente(s)` },
+              { rotulo: "Receita — taxa fixa", valor: moeda(t.receitaTaxasCentavos) },
+              { rotulo: "Taxa fixa em consultas realizadas", valor: moeda(t.receitaTaxaFixaRealizadaCentavos) },
+              { rotulo: "Valores em consultas realizadas", valor: moeda(t.aPagarProfissionaisCentavos), destaque: t.aPagarProfissionaisCentavos > 0 },
             ].map((item) => (
               <div key={item.rotulo} className={`card-soft p-5 ${item.destaque ? "border-primary/50" : ""}`}>
                 <p className="section-label">{item.rotulo}</p>
@@ -241,7 +221,7 @@ function Admin() {
               <p className="mt-1 text-sm text-muted-foreground">{t.pendentes} profissional(is) aguardando validação.</p>
             </button>
             <button type="button" className="card-soft p-5 text-left hover:border-primary/60" onClick={() => setAba("financeiro")}>
-              <p className="font-semibold">Repasses a pagar</p>
+              <p className="font-semibold">Extrato financeiro</p>
               <p className="mt-1 text-sm text-muted-foreground">{moeda(t.aPagarProfissionaisCentavos)} em consultas realizadas.</p>
             </button>
           </div>
@@ -258,8 +238,7 @@ function Admin() {
                 <th className="p-3">Cadastro</th>
                 <th className="p-3">Status</th>
                 <th className="p-3">Consultas</th>
-                <th className="p-3">Livro</th>
-                <th className="p-3">Data da compra</th>
+                <th className="p-3">Total pago</th>
               </tr>
             </thead>
             <tbody>
@@ -275,28 +254,11 @@ function Admin() {
                   <td className="p-3">
                     {u.consultas} <span className="text-xs text-muted-foreground">({u.consultasRealizadas} realizadas)</span>
                   </td>
-                  <td className="p-3">
-                    <select
-                      className="field-base py-1.5"
-                      aria-label={`Status do livro de ${u.nome ?? u.email}`}
-                      value={u.livroStatus}
-                      onChange={async (e) => {
-                        await mudarLivro({ data: { userId: u.id, status: e.target.value as typeof u.livroStatus } });
-                        await atualizar();
-                      }}
-                    >
-                      {Object.entries(rotuloLivro).map(([v, r]) => (
-                        <option key={v} value={v}>{r}</option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className="p-3 text-muted-foreground">
-                    {u.livroCompradoEm ? dataBR(u.livroCompradoEm) : u.livroClicadoEm ? `clique em ${dataBR(u.livroClicadoEm)}` : "—"}
-                  </td>
-                </tr>
+                  <td className="p-3 font-semibold">{moeda(u.pagoCentavos)}</td>
+               </tr>
               ))}
               {pacientes.length === 0 && !painel.isLoading && (
-                <tr><td colSpan={7} className="p-4 text-muted-foreground">Nenhum paciente encontrado.</td></tr>
+                <tr><td colSpan={6} className="p-4 text-muted-foreground">Nenhum paciente encontrado.</td></tr>
               )}
             </tbody>
           </table>
@@ -336,7 +298,7 @@ function Admin() {
                   <div>
                     <h2 className="text-lg">{p.nome}</h2>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {p.profissao === "psiquiatra" ? "Psiquiatra" : "Psicólogo(a)"} · {p.registro} · {p.uf}
+                      {p.profissao === "psicólogo" ? "Psicólogo(a)" : "Psicólogo(a)"} · {p.registro} · {p.uf}
                       {p.cidade ? ` · ${p.cidade}` : ""} · {p.email_login ?? p.email_contato ?? "sem e-mail"} · cadastro em {dataBR(p.criadoEm)}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -366,7 +328,6 @@ function Admin() {
                     <dl className="grid gap-4 text-sm sm:grid-cols-2">
                       <Info rotulo="Contato" valor={[p.email_contato, p.telefone].filter(Boolean).join(" · ")} />
                       <Info rotulo="Preço da consulta" valor={moeda(p.valor_centavos)} />
-                      {p.profissao === "psiquiatra" && <Info rotulo="RQE" valor={p.rqe} />}
                       <Info
                         rotulo="Ferramenta de videochamada"
                         valor={
@@ -389,7 +350,7 @@ function Admin() {
                       <Info rotulo="Formação" valor={p.formacao.join(", ")} />
                       <Info rotulo="Especializações" valor={p.especializacoes.join(", ")} />
                       <Info rotulo="Cursos relevantes" valor={p.cursos.join(", ")} />
-                      <Info rotulo="Subtipos" valor={p.areas.join(", ")} />
+                      <Info rotulo="Áreas de experiência" valor={p.areas.join(", ")} />
                       <Info rotulo="Idiomas" valor={p.idiomas.join(", ")} />
                       <Info rotulo="Apresentação" valor={p.apresentacao} />
                       <Info rotulo="Experiência com TOC" valor={p.experiencia_toc} />
@@ -517,11 +478,11 @@ function Admin() {
                 <th className="p-3">Data</th>
                 <th className="p-3">Paciente</th>
                 <th className="p-3">Profissional</th>
-                <th className="p-3">Taxa</th>
+                <th className="p-3">Reserva</th>
                 <th className="p-3">Consulta</th>
                 <th className="p-3">Plataforma</th>
                 <th className="p-3">Profissional recebe</th>
-                <th className="p-3">Pagamento da taxa</th>
+                <th className="p-3">Pagamento</th>
                 <th className="p-3">Status</th>
               </tr>
             </thead>
@@ -534,7 +495,7 @@ function Admin() {
                   <td className="p-3">{moeda(c.taxa_centavos)}</td>
                   <td className="p-3">{moeda(c.valor_consulta_centavos)}</td>
                   <td className="p-3">{moeda(c.valor_plataforma_centavos)}</td>
-                  <td className="p-3">{c.status === "realizada" ? moeda(c.valor_profissional_centavos) : <span className="text-muted-foreground">após realizar</span>}</td>
+                  <td className="p-3">{c.status === "realizada" ? moeda(c.valor_profissional_centavos) : <span className="text-muted-foreground">após acontecer</span>}</td>
                   <td className="p-3">
                     <select
                       className="field-base py-1.5"
@@ -579,10 +540,10 @@ function Admin() {
         <>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { rotulo: "Taxas de agendamento recebidas", valor: moeda(t.receitaTaxasCentavos) },
-              { rotulo: "Comissão sobre realizadas", valor: moeda(t.receitaComissaoCentavos) },
-              { rotulo: "A pagar aos profissionais", valor: moeda(t.aPagarProfissionaisCentavos) },
-              { rotulo: "Já pago aos profissionais", valor: moeda(t.pagoProfissionaisCentavos) },
+              { rotulo: "Taxas fixas registradas", valor: moeda(t.receitaTaxasCentavos) },
+              { rotulo: "Taxa fixa em realizadas", valor: moeda(t.receitaTaxaFixaRealizadaCentavos) },
+              { rotulo: "Valores em consultas realizadas", valor: moeda(t.aPagarProfissionaisCentavos) },
+              { rotulo: "Pagamentos aprovados", valor: moeda(t.pagoProfissionaisCentavos) },
             ].map((i) => (
               <div key={i.rotulo} className="card-soft p-5">
                 <p className="section-label">{i.rotulo}</p>
@@ -592,24 +553,24 @@ function Admin() {
           </div>
           <div className="mt-10 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 className="text-xl">Pagamentos aos profissionais</h2>
+              <h2 className="text-xl">Extrato por profissional</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Um pagamento é gerado automaticamente quando a consulta é marcada como realizada.
+                Registro de consultas realizadas, preço do profissional e taxa fixa da plataforma.
               </p>
             </div>
             <div className="flex gap-1 rounded-full bg-muted p-1 text-xs">
               {(
                 [
-                  ["a_receber", "Valores a receber"],
-                  ["historico", "Histórico de pagamentos"],
+                  ["pendente", "Pendentes"],
+                  ["aprovado", "Aprovados"],
                   ["todos", "Todos"],
                 ] as const
               ).map(([id, rotulo]) => (
                 <button
                   key={id}
                   type="button"
-                  onClick={() => setFiltroRepasse(id)}
-                  className={`rounded-full px-3 py-1.5 ${filtroRepasse === id ? "bg-background font-semibold" : "text-muted-foreground"}`}
+                  onClick={() => setFiltroPagamento(id)}
+                  className={`rounded-full px-3 py-1.5 ${filtroPagamento === id ? "bg-background font-semibold" : "text-muted-foreground"}`}
                 >
                   {rotulo}
                 </button>
@@ -622,16 +583,16 @@ function Admin() {
                 <tr>
                   <th className="p-3">Profissional</th>
                   <th className="p-3">Consulta</th>
-                  <th className="p-3">Pagamento previsto</th>
+                  <th className="p-3">Data</th>
                   <th className="p-3">Bruto</th>
-                  <th className="p-3">Plataforma</th>
-                  <th className="p-3">Líquido</th>
+                  <th className="p-3">Taxa fixa</th>
+                  <th className="p-3">Valor do profissional</th>
                   <th className="p-3">Pix</th>
                   <th className="p-3">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {repassesVisiveis.map((r) => (
+                {pagamentosVisiveis.map((r) => (
                   <tr key={r.id} className="border-t border-border/60">
                     <td className="p-3 font-semibold">{r.profissional}</td>
                     <td className="p-3">{r.consultaInicio ? dataHoraBR(r.consultaInicio) : "—"}</td>
@@ -641,24 +602,12 @@ function Admin() {
                     <td className="p-3 font-semibold">{moeda(r.liquido)}</td>
                     <td className="p-3 text-xs text-muted-foreground">{r.chavePix ?? "não informado"}</td>
                     <td className="p-3">
-                      <select
-                        className="field-base py-1.5"
-                        aria-label={`Status do repasse de ${r.profissional}`}
-                        value={r.status}
-                        onChange={async (e) => {
-                          await mudarRepasse({ data: { id: r.id, status: e.target.value as "pendente" | "processando" | "pago" | "falhou" } });
-                          await atualizar();
-                        }}
-                      >
-                        {Object.entries(rotuloRepasse).map(([v, rot]) => (
-                          <option key={v} value={v}>{rot}</option>
-                        ))}
-                      </select>
-                      {r.pagoEm && <p className="mt-1 text-[11px] text-muted-foreground">pago em {dataBR(r.pagoEm)}</p>}
+                      <span className="pill">{rotuloPagamento[r.status] ?? r.status}</span>
+                      {r.pagoEm && <p className="mt-1 text-[11px] text-muted-foreground">aprovado em {dataBR(r.pagoEm)}</p>}
                     </td>
                   </tr>
                 ))}
-                {repassesVisiveis.length === 0 && !painel.isLoading && (
+                {pagamentosVisiveis.length === 0 && !painel.isLoading && (
                   <tr><td colSpan={8} className="p-4 text-muted-foreground">Nenhum pagamento neste filtro.</td></tr>
                 )}
               </tbody>
@@ -729,50 +678,6 @@ function Admin() {
         </section>
       )}
 
-      {aba === "livro" && dados && (
-        <>
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            {[
-              { rotulo: "Compras confirmadas", valor: String(t?.livrosConfirmados ?? 0) },
-              { rotulo: "Pendentes de confirmação", valor: String(t?.livrosPendentes ?? 0) },
-              { rotulo: "Desconto para pacientes", valor: `${dados.configuracoes.livroDescontoPercent}%` },
-            ].map((i) => (
-              <div key={i.rotulo} className="card-soft p-5">
-                <p className="section-label">{i.rotulo}</p>
-                <p className="mt-2 font-display text-2xl">{i.valor}</p>
-              </div>
-            ))}
-          </div>
-          <div className="card-soft mt-6 overflow-x-auto p-2">
-            <table className="w-full min-w-[40rem] text-sm">
-              <thead className="text-left text-muted-foreground">
-                <tr>
-                  <th className="p-3">Paciente</th>
-                  <th className="p-3">E-mail</th>
-                  <th className="p-3">Cadastro</th>
-                  <th className="p-3">Status da compra</th>
-                  <th className="p-3">Data</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pacientes.map((u) => (
-                  <tr key={u.id} className="border-t border-border/60">
-                    <td className="p-3 font-semibold">{u.nome ?? "—"}</td>
-                    <td className="p-3 text-muted-foreground">{u.email ?? "—"}</td>
-                    <td className="p-3 text-muted-foreground">{dataBR(u.criadoEm)}</td>
-                    <td className="p-3">{rotuloLivro[u.livroStatus]}</td>
-                    <td className="p-3 text-muted-foreground">{u.livroCompradoEm ? dataBR(u.livroCompradoEm) : "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-4 text-xs text-muted-foreground">
-            A confirmação automática acontece pelo aviso de compra da Hotmart, cruzando o e-mail do comprador com o
-            e-mail do cadastro. Configure o link com desconto na aba Configurações.
-          </p>
-        </>
-      )}
 
       {aba === "configuracoes" && dados && (
         <FormularioConfiguracoes
@@ -827,40 +732,19 @@ function FormularioConfiguracoes({
         await salvar(cfg);
       }}
     >
-      <h2 className="text-xl sm:col-span-2">Regras financeiras</h2>
-       {num("taxaCentavos", "Sinal de agendamento (R$)", "Pago ao reservar e abatido do valor total da consulta.", 100)}
-      {num("comissaoPercent", "Comissão da plataforma (%)", "Retida sobre o valor da consulta após a realização.")}
+      <h2 className="text-xl sm:col-span-2">Regras financeiras e operacionais</h2>
+      {num("taxaPorConsultaCentavos", "Taxa fixa por consulta realizada (R$)", "Cobrada do profissional, igual para todos, sem alterar o preço visto pelo paciente.", 100)}
       {num("duracaoPadraoMinutos", "Duração padrão (minutos)", "Usada quando o profissional não define outra.")}
-      {num("cancelamentoHoras", "Cancelamento sem custo até (horas antes)", "Prazo para o paciente cancelar com direito a estorno do sinal.")}
+      {num("cancelamentoHoras", "Cancelamento sem custo até (horas antes)", "Prazo para o paciente cancelar com direito a estorno do pagamento.")}
       {num("remarcacaoHoras", "Remarcação até (horas antes)", "Prazo mínimo para remarcar.")}
-      <label className="flex items-center gap-2 text-sm">
+      <label className="flex items-center gap-2 text-sm sm:col-span-2">
         <input
           type="checkbox"
           checked={cfg.reembolsoTaxaNoPrazo}
           onChange={(e) => setCfg({ ...cfg, reembolsoTaxaNoPrazo: e.target.checked })}
         />
-        Estornar o sinal quando o cancelamento é feito dentro do prazo
+        Estornar o pagamento quando o cancelamento é feito dentro do prazo
       </label>
-
-      <h2 className="mt-4 text-xl sm:col-span-2">Livro “Como Ser Feliz com TOC”</h2>
-      <label className="block text-sm sm:col-span-2">
-        Link da Hotmart com desconto
-        <input
-          type="url"
-          className="field-base mt-1"
-          placeholder="https://pay.hotmart.com/... (fornecido pela TOC Brazil)"
-          value={cfg.hotmartLivroUrl}
-          onChange={(e) => setCfg({ ...cfg, hotmartLivroUrl: e.target.value })}
-        />
-        <span className="mt-1 block text-xs text-muted-foreground">
-          Enquanto vazio, o painel do paciente informa que o link será liberado em breve.
-        </span>
-      </label>
-      <label className="block text-sm">
-        Título do livro
-        <input className="field-base mt-1" value={cfg.livroTitulo} onChange={(e) => setCfg({ ...cfg, livroTitulo: e.target.value })} />
-      </label>
-      {num("livroDescontoPercent", "Desconto para pacientes (%)", "Exibido no painel do paciente.")}
       <div className="sm:col-span-2">
         <button type="submit" className="btn-base btn-primary">
           Salvar configurações
@@ -885,7 +769,6 @@ function EdicaoProfissional({
     apresentacao: profissional.apresentacao ?? "",
     experiencia_toc: profissional.experiencia_toc ?? "",
     experiencia_anos: String(profissional.experiencia_anos ?? 0),
-    comissao_percent: String(profissional.comissao_percent ?? 20),
     formacao: profissional.formacao.join(", "),
     especializacoes: profissional.especializacoes.join(", "),
     cursos: profissional.cursos.join(", "),
@@ -905,7 +788,6 @@ function EdicaoProfissional({
         await salvar({
           ...form,
           experiencia_anos: Number(form.experiencia_anos) || 0,
-          comissao_percent: Number(form.comissao_percent) || 25,
           voltarParaAnalise,
         });
         setSalvo(true);
@@ -920,11 +802,10 @@ function EdicaoProfissional({
             ["instituicao", "Instituição"],
             ["abordagem", "Abordagem"],
             ["experiencia_anos", "Anos de experiência"],
-            ["comissao_percent", "Comissão da plataforma (%)"],
             ["formacao", "Formação (vírgulas)"],
             ["especializacoes", "Especializações (vírgulas)"],
             ["cursos", "Cursos relevantes (vírgulas)"],
-            ["areas", "Subtipos (vírgulas)"],
+            ["areas", "Áreas de experiência (vírgulas)"],
             ["idiomas", "Idiomas (vírgulas)"],
             ["foto_url", "Endereço da foto"],
           ] as const

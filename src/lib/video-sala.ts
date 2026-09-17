@@ -1,23 +1,8 @@
 /**
- * Camada de videochamada.
- * Cada consulta recebe um link exclusivo, guardado em `appointments.video_url`
- * junto com o provedor usado (`video_provider`). Para trocar de serviço
- * (Daily, Whereby, Zoom, Google Meet...), basta adicionar um ramo aqui e
- * definir a configuração `video_provider` nas configurações da plataforma.
+ * Utilitários de exibição de consultas.
+ * A TOC Brazil não cria nem hospeda sala de videochamada: a consulta acontece
+ * na ferramenta cadastrada e mantida pelo próprio psicólogo.
  */
-export type ProvedorVideo = "jitsi" | "externo";
-
-export function gerarSalaVideo(provedor: string | undefined, consultaId: string) {
-  const codigo = consultaId.replace(/-/g, "").slice(0, 16);
-  switch (provedor) {
-    case "jitsi":
-    default:
-      return {
-        provider: "jitsi" as ProvedorVideo,
-        url: `https://meet.jit.si/tocbrazil-${codigo}`,
-      };
-  }
-}
 
 export const rotuloStatusConsulta: Record<string, string> = {
   aguardando_pagamento: "Aguardando pagamento",
@@ -26,14 +11,11 @@ export const rotuloStatusConsulta: Record<string, string> = {
   cancelada: "Cancelada",
   remarcada: "Remarcada",
   nao_compareceu: "Não compareceu",
+  expirado: "Expirado",
 };
 
 export function moeda(centavos: number) {
   return (centavos / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-export function saldoConsulta(valorTotalCentavos: number, taxaAgendamentoCentavos: number) {
-  return Math.max(0, valorTotalCentavos - taxaAgendamentoCentavos);
 }
 
 export const TZ = "America/Sao_Paulo";

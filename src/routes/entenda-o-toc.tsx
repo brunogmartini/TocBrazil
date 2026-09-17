@@ -15,7 +15,7 @@ export const Route = createFileRoute("/entenda-o-toc")({
       {
         property: "og:description",
         content:
-          "Conteúdo educativo sobre obsessões, compulsões, checagem e tratamento — sem diagnóstico e sem promessas.",
+          "Conteúdo educativo sobre obsessões, compulsões, checagem e cuidado — sem identificação clínica e sem promessas.",
       },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
@@ -106,7 +106,7 @@ function EntendaOToc() {
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
           Reunimos informação clara sobre o Transtorno Obsessivo-Compulsivo para que você possa
-          entender melhor o que vem acontecendo. Nada aqui é diagnóstico: apenas um profissional
+          entender melhor o que vem acontecendo. Nada aqui é identificação clínica: apenas um profissional
           qualificado pode avaliar.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -146,7 +146,7 @@ function EntendaOToc() {
           <p className="mt-5 text-base leading-relaxed text-muted-foreground">
             O TOC pode se manifestar por temas diferentes, e uma mesma pessoa pode vivenciar mais
             de um deles. Os nomes abaixo ajudam a descrever experiências frequentes, mas não
-            substituem uma avaliação individual feita por profissional qualificado.
+            substituem uma consulta individual feita por profissional qualificado.
           </p>
         </div>
         <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -165,7 +165,7 @@ function EntendaOToc() {
             Quando fizer sentido para você, o próximo passo está aqui.
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-muted-foreground">
-            Conheça profissionais de Psicologia e Psiquiatria com atendimento online.
+            Conheça profissionais de Psicologia com atendimento online.
           </p>
           <Link to="/profissionais" className="btn-base btn-primary mt-8">
             Ver profissionais

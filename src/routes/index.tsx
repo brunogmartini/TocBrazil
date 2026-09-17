@@ -164,7 +164,7 @@ function Home() {
             Busca, agenda e pagamento em uma única plataforma
           </h2>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-            Não somos apenas uma plataforma de consultas online. Somos a primeira plataforma 100% especializada em TOC, que reúne profissionais com experiência cujos tratamentos são baseados em evidências científicas, através de uma jornada de cuidado e zelo.
+            Não somos apenas uma plataforma de consultas online. Somos a primeira plataforma 100% especializada em TOC, que reúne profissionais com experiência cujos abordagens declaradas podem ser baseadas em evidências científicas, através de uma jornada de cuidado e zelo.
           </p>
 
           <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -248,7 +248,7 @@ function Home() {
                 Um psicólogo habilitado pode escutar sua história, avaliar o que vem acontecendo em consulta e combinar próximos passos conforme sua formação e abordagem.
               </p>
               <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                A TOC Brazil não avalia ninguém, não realiza diagnóstico e não promete que agendar uma consulta resolve uma situação. A plataforma oferece tecnologia para buscar profissionais, marcar horários e realizar o pagamento.
+                A TOC Brazil não avalia ninguém, não realiza identificação clínica e não promete que agendar uma consulta resolve uma situação. A plataforma oferece tecnologia para buscar profissionais, marcar horários e realizar o pagamento.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/profissionais" className="btn-base btn-primary">
@@ -264,7 +264,7 @@ function Home() {
                 A consulta acontece na sala do próprio psicólogo, não em uma sala da TOC Brazil.
               </li>
               <li className="rounded-2xl bg-surface p-5">
-                A avaliação é feita por profissional habilitado, em consulta, sem teste ou triagem pela plataforma.
+                A consulta é feita por profissional habilitado, em consulta, sem teste ou triagem pela plataforma.
               </li>
               <li className="rounded-2xl bg-surface p-5">
                 O link da sala aparece na sua área pouco antes do horário marcado.
@@ -341,7 +341,7 @@ function Home() {
               Acesso segmentado por papel: você acessa apenas os seus dados; o profissional acessa apenas o necessário para organizar a consulta. Documentos de verificação ficam restritos à equipe autorizada.
             </li>
             <li className="card-soft p-5">
-              A plataforma não realiza diagnósticos e não presta serviço de saúde. A consulta é de responsabilidade do psicólogo habilitado.
+              A plataforma não realiza identificação clínicas e não presta serviço de saúde. A consulta é de responsabilidade do psicólogo habilitado.
             </li>
           </ul>
         </div>

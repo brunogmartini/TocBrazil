@@ -392,7 +392,7 @@ function Auth() {
           <Link to="/privacidade" className="underline underline-offset-4">
             Política de privacidade
           </Link>
-          , incluindo o tratamento de dados de saúde conforme a LGPD.
+          , incluindo o uso de dados necessários para cadastro, agendamento e pagamento conforme a LGPD.
         </p>
       </div>
     </div>

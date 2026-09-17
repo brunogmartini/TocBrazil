@@ -42,7 +42,7 @@ export const Route = createFileRoute("/_authenticated/profissional/agenda")({
 });
 
 type Faixa = { ativo: boolean; inicio: string; fim: string };
-const MOTIVOS = ["Médico", "Férias", "Compromisso pessoal", "Congresso", "Ausência", "Indisponível"];
+const MOTIVOS = ["Consulta externa", "Férias", "Compromisso pessoal", "Congresso", "Ausência", "Indisponível"];
 
 function PaginaAgenda() {
   const queryClient = useQueryClient();

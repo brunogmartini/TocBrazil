@@ -92,14 +92,13 @@ function Artigo() {
         </section>
 
         <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
-          Este conteúdo é informativo e não constitui diagnóstico, indicação de tratamento ou
-          prescrição. Somente um profissional qualificado pode avaliar cada caso.
+          Este conteúdo é informativo e não constitui diagnóstico, triagem ou indicação de conduta. Somente um profissional habilitado pode avaliar cada caso.
         </p>
 
         <div className="card-soft mt-10 p-8">
           <h2 className="text-2xl">Quando se sentir pronto</h2>
           <p className="mt-3 text-sm text-muted-foreground">
-            Conheça profissionais de Psicologia e Psiquiatria com atendimento online.
+            Conheça profissionais de Psicologia com atendimento online.
           </p>
           <Link to="/profissionais" className="btn-base btn-primary mt-6">
             Ver profissionais

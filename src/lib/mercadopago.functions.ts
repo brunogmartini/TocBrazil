@@ -4,7 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 /**
  * Vínculo da conta Mercado Pago de cada profissional.
  * O profissional autoriza a plataforma (OAuth do Mercado Pago) e passa a
- * receber o valor da consulta direto na própria conta, com a comissão da
+ * receber o valor da consulta direto na própria conta, com a taxa fixa da
  * plataforma retida automaticamente (marketplace_fee).
  */
 
@@ -36,7 +36,7 @@ export const statusVinculoMercadoPago = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data: prof } = await supabase
       .from("professionals")
-      .select("id, mp_user_id, mp_vinculado_em, comissao_percent")
+      .select("id, mp_user_id, mp_vinculado_em")
       .eq("user_id", userId)
       .maybeSingle();
 
@@ -48,7 +48,6 @@ export const statusVinculoMercadoPago = createServerFn({ method: "GET" })
       vinculado: Boolean(prof?.mp_user_id),
       contaId: prof?.mp_user_id ?? null,
       vinculadoEm: prof?.mp_vinculado_em ?? null,
-      comissaoPercent: Number(prof?.comissao_percent ?? 20),
     };
   });
 

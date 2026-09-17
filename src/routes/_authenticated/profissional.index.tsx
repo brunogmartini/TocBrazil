@@ -155,7 +155,7 @@ function PainelProfissional() {
           <div className="professional-metric p-6">
             <p className="professional-label">A receber</p>
             <p className="mt-2 font-display text-2xl">{moeda(resumo?.aReceber ?? 0)}</p>
-            <p className="mt-2 text-xs text-muted-foreground">consultas realizadas aguardando repasse</p>
+            <p className="mt-2 text-xs text-muted-foreground">consultas realizadas aguardando confirmação financeira</p>
           </div>
           <div className="professional-metric p-6">
             <p className="professional-label">Já recebido</p>
@@ -173,7 +173,7 @@ function PainelProfissional() {
               {pendentesDeConclusao.length} consulta{pendentesDeConclusao.length > 1 ? "s" : ""} com horário encerrado
             </p>
             <p className="mt-1 text-muted-foreground">
-              Confirme se foram realizadas para liberar o valor a receber.
+              Confirme se elas aconteceram para atualizar seu extrato.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {pendentesDeConclusao.map((c) => (

@@ -8,7 +8,7 @@ import {
   registrarDocumento,
   removerDocumento,
   salvarCadastroProfissional,
-  salvarDadosRepasse,
+  salvarDadosPagamento,
 } from "@/lib/profissional.functions";
 import {
   desvincularMercadoPago,
@@ -27,12 +27,12 @@ export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
       { title: "Meu cadastro profissional — TOC Brazil" },
       {
         name: "description",
-        content: "Complete seus dados, envie documentos para verificação e informe seu repasse.",
+        content: "Complete seus dados, envie documentos para verificação e informe seu pagamento.",
       },
       { property: "og:title", content: "Meu cadastro profissional — TOC Brazil" },
       {
         property: "og:description",
-        content: "Dados profissionais, documentos e dados de repasse na TOC Brazil.",
+        content: "Dados profissionais, documentos e dados de pagamento na TOC Brazil.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -44,24 +44,10 @@ export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
 
 const TIPOS_DOCUMENTO = [
   "Documento de identidade",
-  "Comprovante de registro no conselho (CRP/CRM)",
+  "Certidão de regularidade do CRP",
+  "Apólice de seguro de responsabilidade civil profissional",
   "Diploma de graduação",
-  "Certificado de especialização",
-  "Comprovante de endereço",
-];
-
-const SUBTIPOS_TOC = [
-  "TOC de simetria",
-  "TOC de falsas memórias",
-  "TOC de orientação sexual",
-  "TOC de contaminação e limpeza",
-  "TOC religioso/escrupulosidade",
-  "TOC de relacionamento",
-  "TOC puro",
-  "TOC existencial",
-  "TOC de organização",
-  "TOC de dúvida e checagem",
-  "TOC sexual",
+  "Certificado de formação",
 ];
 
 const rotuloDoc: Record<string, string> = {
@@ -74,7 +60,7 @@ function CadastroProfissional() {
   const queryClient = useQueryClient();
   const carregar = useServerFn(meuCadastroProfissional);
   const salvar = useServerFn(salvarCadastroProfissional);
-  const salvarRepasse = useServerFn(salvarDadosRepasse);
+  const salvarPagamento = useServerFn(salvarDadosPagamento);
   const registrar = useServerFn(registrarDocumento);
   const remover = useServerFn(removerDocumento);
   const statusVinculo = useServerFn(statusVinculoMercadoPago);
@@ -90,7 +76,7 @@ function CadastroProfissional() {
 
   const [form, setForm] = useState({
     nome: "",
-    profissao: "psicologo",
+    cpf: "",
     registro: "",
     uf: "",
     cidade: "",
@@ -112,12 +98,13 @@ function CadastroProfissional() {
     especializacoes: "",
     areas: "",
     idiomas: "",
-    rqe: "",
+    certidao_validade: "",
+    apolice_validade: "",
     ferramenta_provedor: "",
     ferramenta_url_sala: "",
     ferramenta_instrucoes: "",
   });
-  const [repasse, setRepasse] = useState({
+  const [pagamento, setPagamento] = useState({
     documento: "",
     chave_pix: "",
     banco: "",
@@ -135,7 +122,7 @@ function CadastroProfissional() {
     if (p) {
       setForm({
         nome: p.nome ?? "",
-        profissao: p.profissao ?? "psicologo",
+        cpf: p.cpf ?? "",
         registro: p.registro ?? "",
         uf: p.uf ?? "",
         cidade: p.cidade ?? "",
@@ -155,9 +142,10 @@ function CadastroProfissional() {
         formacao: (p.formacao ?? []).join(", "),
 
         especializacoes: (p.especializacoes ?? []).join(", "),
-        areas: (p.areas ?? []).filter((area) => SUBTIPOS_TOC.includes(area)).join(", "),
+        areas: (p.areas ?? []).join(", "),
         idiomas: (p.idiomas ?? []).join(", "),
-        rqe: p.rqe ?? "",
+        certidao_validade: p.certidao_validade ?? "",
+        apolice_validade: p.apolice_validade ?? "",
         ferramenta_provedor: p.ferramenta_provedor ?? "",
         ferramenta_url_sala: p.ferramenta_url_sala ?? "",
         ferramenta_instrucoes: p.ferramenta_instrucoes ?? "",
@@ -165,9 +153,9 @@ function CadastroProfissional() {
     } else if (dados.data?.email) {
       setForm((f) => ({ ...f, email_contato: dados.data!.email! }));
     }
-    const r = dados.data?.repasse;
+    const r = dados.data?.pagamento;
     if (r) {
-      setRepasse({
+      setPagamento({
         documento: r.documento ?? "",
         chave_pix: r.chave_pix ?? "",
         banco: r.banco ?? "",
@@ -197,7 +185,7 @@ function CadastroProfissional() {
       const r = await salvar({
         data: {
           ...restoForm,
-          profissao: form.profissao === "psiquiatra" ? "psiquiatra" : "psicologo",
+          profissao: "psicologo",
           experiencia_anos: Number(form.experiencia_anos) || 0,
           slot_minutos: Number(form.slot_minutos) || 50,
           valor_centavos: Math.round((Number(valor) || 0) * 100),
@@ -214,12 +202,12 @@ function CadastroProfissional() {
     }
   }
 
-  async function enviarRepasse(e: React.FormEvent) {
+  async function enviarPagamento(e: React.FormEvent) {
     e.preventDefault();
     setErro(null);
-    const r = await salvarRepasse({ data: repasse });
+    const r = await salvarPagamento({ data: pagamento });
     if (!r.ok) setErro(r.erro);
-    else setAviso("Dados de repasse salvos.");
+    else setAviso("Dados de pagamento salvos.");
   }
 
   async function enviarArquivo(file: File) {
@@ -250,17 +238,6 @@ function CadastroProfissional() {
 
   const temCadastro = Boolean(dados.data?.profissional);
   const documentos = dados.data?.documentos ?? [];
-  const areasSelecionadas = form.areas
-    .split(",")
-    .map((area) => area.trim())
-    .filter(Boolean);
-
-  function alternarArea(area: string) {
-    const proximaLista = areasSelecionadas.includes(area)
-      ? areasSelecionadas.filter((item) => item !== area)
-      : [...areasSelecionadas, area];
-    setForm({ ...form, areas: proximaLista.join(", ") });
-  }
 
   return (
     <div className="professional-workspace py-12 lg:py-16">
@@ -310,22 +287,14 @@ function CadastroProfissional() {
           className="sm:col-span-2"
           required
         />
-        <div>
-          <label htmlFor="profissao" className="section-label">
-            Profissão
-          </label>
-          <select
-            id="profissao"
-            className="field-base mt-2"
-            value={form.profissao}
-            onChange={(e) => setForm({ ...form, profissao: e.target.value })}
-          >
-            <option value="psicologo">Psicólogo(a)</option>
-            <option value="psiquiatra">Psiquiatra</option>
-          </select>
-        </div>
         <Campo
-          label="Registro profissional (CRP ou CRM)"
+          label="CPF"
+          value={form.cpf}
+          onChange={(v) => setForm({ ...form, cpf: v.replace(/\D/g, "").slice(0, 11) })}
+          required
+        />
+        <Campo
+          label="Registro profissional (CRP)"
           value={form.registro}
           onChange={(v) => setForm({ ...form, registro: v })}
           required
@@ -461,23 +430,6 @@ function CadastroProfissional() {
           onChange={(v) => setForm({ ...form, especializacoes: v })}
           className="sm:col-span-2"
         />
-        <fieldset className="sm:col-span-2">
-          <legend className="section-label">Subtipos</legend>
-          <p className="mt-2 text-sm text-muted-foreground">Selecione todos os subtipos que você atende.</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {SUBTIPOS_TOC.map((subtipo) => (
-              <label key={subtipo} className="flex items-start gap-3 rounded-lg border border-border p-3 text-sm">
-                <input
-                  type="checkbox"
-                  checked={areasSelecionadas.includes(subtipo)}
-                  onChange={() => alternarArea(subtipo)}
-                  className="mt-0.5 size-4 accent-primary"
-                />
-                <span>{subtipo}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
         <div className="sm:col-span-2">
           <label htmlFor="idiomas" className="section-label">Idiomas</label>
           <input
@@ -518,13 +470,18 @@ function CadastroProfissional() {
             onChange={(e) => setForm({ ...form, experiencia_toc: e.target.value })}
           />
         </div>
-        {form.profissao === "psiquiatra" && (
-          <Campo
-            label="RQE (registro de qualificação de especialista)"
-            value={form.rqe}
-            onChange={(v) => setForm({ ...form, rqe: v })}
-          />
-        )}
+        <Campo
+          label="Validade da certidão do CRP"
+          type="date"
+          value={form.certidao_validade}
+          onChange={(v) => setForm({ ...form, certidao_validade: v })}
+        />
+        <Campo
+          label="Validade da apólice de seguro"
+          type="date"
+          value={form.apolice_validade}
+          onChange={(v) => setForm({ ...form, apolice_validade: v })}
+        />
         <fieldset className="sm:col-span-2 rounded-xl border border-border p-5">
           <legend className="section-label px-1">Ferramenta de videochamada</legend>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -646,20 +603,20 @@ function CadastroProfissional() {
         <h2 className="text-2xl">Receber direto na sua conta Mercado Pago</h2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
           Ao ligar sua conta Mercado Pago, o valor de cada consulta cai direto na sua conta e a
-          plataforma retém apenas a comissão combinada, de forma automática.
+          plataforma retém apenas a taxa fixa combinada, de forma automática.
         </p>
         <div className="card-soft mt-5 p-7">
           {!vinculo.data?.configurado ? (
             <p className="text-sm text-muted-foreground">
               O recebimento ainda está sendo configurado pela plataforma. Enquanto isso, seus
-              repasses são feitos pelos dados informados abaixo.
+              pagamentos são feitos pelos dados informados abaixo.
             </p>
           ) : vinculo.data.vinculado ? (
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold">Conta ligada</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Comissão da plataforma: {vinculo.data.comissaoPercent}% por consulta.
+                  Conta preparada para split: taxa fixa em reais por consulta realizada.
                 </p>
               </div>
               <button
@@ -699,26 +656,26 @@ function CadastroProfissional() {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-2xl">Dados para receber seus repasses</h2>
+        <h2 className="text-2xl">Dados administrativos de pagamento</h2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          Usamos estes dados apenas para transferir a sua parte do valor das consultas.
+          Usamos estes dados apenas para identificação administrativa e suporte financeiro.
         </p>
 
-        <form onSubmit={enviarRepasse} className="card-soft mt-5 grid gap-5 p-7 sm:grid-cols-2">
+        <form onSubmit={enviarPagamento} className="card-soft mt-5 grid gap-5 p-7 sm:grid-cols-2">
           <Campo
             label="CPF ou CNPJ"
-            value={repasse.documento}
-            onChange={(v) => setRepasse({ ...repasse, documento: v })}
+            value={pagamento.documento}
+            onChange={(v) => setPagamento({ ...pagamento, documento: v })}
           />
           <Campo
             label="Chave Pix"
-            value={repasse.chave_pix}
-            onChange={(v) => setRepasse({ ...repasse, chave_pix: v })}
+            value={pagamento.chave_pix}
+            onChange={(v) => setPagamento({ ...pagamento, chave_pix: v })}
           />
           <Campo
             label="Banco"
-            value={repasse.banco}
-            onChange={(v) => setRepasse({ ...repasse, banco: v })}
+            value={pagamento.banco}
+            onChange={(v) => setPagamento({ ...pagamento, banco: v })}
           />
           <div>
             <label htmlFor="tipo-conta" className="section-label">
@@ -727,8 +684,8 @@ function CadastroProfissional() {
             <select
               id="tipo-conta"
               className="field-base mt-2"
-              value={repasse.tipo_conta}
-              onChange={(e) => setRepasse({ ...repasse, tipo_conta: e.target.value })}
+              value={pagamento.tipo_conta}
+              onChange={(e) => setPagamento({ ...pagamento, tipo_conta: e.target.value })}
             >
               <option value="corrente">Conta corrente</option>
               <option value="poupanca">Conta poupança</option>
@@ -737,16 +694,16 @@ function CadastroProfissional() {
           </div>
           <Campo
             label="Agência"
-            value={repasse.agencia}
-            onChange={(v) => setRepasse({ ...repasse, agencia: v })}
+            value={pagamento.agencia}
+            onChange={(v) => setPagamento({ ...pagamento, agencia: v })}
           />
           <Campo
             label="Conta (com dígito)"
-            value={repasse.conta}
-            onChange={(v) => setRepasse({ ...repasse, conta: v })}
+            value={pagamento.conta}
+            onChange={(v) => setPagamento({ ...pagamento, conta: v })}
           />
           <button type="submit" className="btn-base btn-primary sm:col-span-2">
-            Salvar dados de repasse
+            Salvar dados de pagamento
           </button>
         </form>
       </section>

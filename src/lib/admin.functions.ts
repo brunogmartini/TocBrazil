@@ -15,9 +15,6 @@ export type PacienteAdmin = {
   consultas: number;
   consultasRealizadas: number;
   pagoCentavos: number;
-  livroStatus: "nao_comprado" | "pendente" | "confirmada" | "cancelada";
-  livroClicadoEm: string | null;
-  livroCompradoEm: string | null;
 };
 
 export type ConsultaAdmin = {
@@ -35,7 +32,7 @@ export type ConsultaAdmin = {
   video_url: string | null;
 };
 
-export type RepasseAdmin = {
+export type PagamentoAdmin = {
   id: string;
   profissional: string;
   professional_id: string;
@@ -63,7 +60,6 @@ export type ProfissionalAdmin = {
   requer_correcao: boolean;
   etapa: EtapaCadastro;
   valor_centavos: number;
-  comissao_percent: number;
   consultas: number;
   consultasRealizadas: number;
   telefone: string | null;
@@ -83,7 +79,6 @@ export type ProfissionalAdmin = {
   foto_url: string | null;
   observacao_admin: string | null;
   validado_em: string | null;
-  rqe: string | null;
   ferramenta_provedor: string | null;
   ferramenta_url_sala: string | null;
   certidao_validade: string | null;
@@ -135,11 +130,9 @@ export const painelAdmin = createServerFn({ method: "GET" })
       { data: papeis },
       { data: consultas },
       { data: profissionais },
-      { data: livros },
-      { data: payouts },
       { data: cfgRows },
       { data: regras },
-      { data: repasseDetalhes },
+      { data: pagamentoDetalhes },
     ] = await Promise.all([
       supabaseAdmin
         .from("profiles")
@@ -154,13 +147,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
         .order("inicio", { ascending: false })
         .limit(500),
       supabaseAdmin.from("professionals").select("*").order("created_at", { ascending: false }),
-      supabaseAdmin.from("livro_compras").select("user_id, status, clicado_em, comprado_em"),
-      supabaseAdmin
-        .from("payouts")
-        .select(
-          "id, professional_id, appointment_id, valor_centavos, valor_bruto_centavos, valor_plataforma_centavos, status, previsto_para, pago_em, observacao, professionals(nome)",
-        )
-        .order("created_at", { ascending: false }),
       supabaseAdmin.from("platform_settings").select("chave, valor"),
       supabaseAdmin.from("availability_rules").select("professional_id"),
       supabaseAdmin.from("professional_payout_details").select("professional_id, chave_pix"),
@@ -172,9 +158,8 @@ export const painelAdmin = createServerFn({ method: "GET" })
     for (const p of papeis ?? []) {
       papeisPorId.set(p.user_id, [...(papeisPorId.get(p.user_id) ?? []), p.role as string]);
     }
-    const livroPorUser = new Map((livros ?? []).map((l) => [l.user_id, l]));
     const comAgenda = new Set((regras ?? []).map((r) => r.professional_id));
-    const pixPorProf = new Map((repasseDetalhes ?? []).map((r) => [r.professional_id, r.chave_pix]));
+    const pixPorProf = new Map((pagamentoDetalhes ?? []).map((r) => [r.professional_id, r.chave_pix]));
 
     const consultasPorPaciente = new Map<string, { total: number; realizadas: number; pago: number }>();
     const consultasPorProfissional = new Map<string, { total: number; realizadas: number }>();
@@ -191,7 +176,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
     }
 
     const pacientes: PacienteAdmin[] = (perfis ?? []).map((p) => {
-      const livro = livroPorUser.get(p.id);
       const stats = consultasPorPaciente.get(p.id);
       return {
         id: p.id,
@@ -205,9 +189,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
         consultas: stats?.total ?? 0,
         consultasRealizadas: stats?.realizadas ?? 0,
         pagoCentavos: stats?.pago ?? 0,
-        livroStatus: (livro?.status ?? "nao_comprado") as PacienteAdmin["livroStatus"],
-        livroClicadoEm: livro?.clicado_em ?? null,
-        livroCompradoEm: livro?.comprado_em ?? null,
       };
     });
 
@@ -226,21 +207,22 @@ export const painelAdmin = createServerFn({ method: "GET" })
       video_url: c.video_url,
     }));
 
-    const inicioPorConsulta = new Map((consultas ?? []).map((c) => [c.id, c.inicio]));
-    const repasses: RepasseAdmin[] = (payouts ?? []).map((p) => ({
-      id: p.id,
-      profissional: (p.professionals as { nome?: string } | null)?.nome ?? "—",
-      professional_id: p.professional_id,
-      consultaInicio: p.appointment_id ? (inicioPorConsulta.get(p.appointment_id) ?? null) : null,
-      bruto: p.valor_bruto_centavos ?? 0,
-      plataforma: p.valor_plataforma_centavos ?? 0,
-      liquido: p.valor_centavos,
-      status: p.status as string,
-      previstoPara: p.previsto_para,
-      pagoEm: p.pago_em,
-      observacao: p.observacao,
-      chavePix: pixPorProf.get(p.professional_id) ?? null,
-    }));
+    const pagamentos: PagamentoAdmin[] = listaConsultas
+      .filter((c) => c.status === "realizada" || c.status === "nao_compareceu")
+      .map((c) => ({
+        id: c.id,
+        profissional: c.profissional,
+        professional_id: String((consultas ?? []).find((row) => row.id === c.id)?.professional_id ?? ""),
+        consultaInicio: c.inicio,
+        bruto: c.valor_consulta_centavos,
+        plataforma: c.valor_plataforma_centavos,
+        liquido: c.valor_profissional_centavos,
+        status: c.payment_status,
+        previstoPara: null,
+        pagoEm: c.payment_status === "aprovado" ? c.inicio : null,
+        observacao: null,
+        chavePix: pixPorProf.get(String((consultas ?? []).find((row) => row.id === c.id)?.professional_id ?? "")) ?? null,
+      }));
 
     const idsProfissionais = (profissionais ?? []).map((p) => p.id);
     const [{ data: documentos }, { data: historico }] = idsProfissionais.length
@@ -298,7 +280,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
         requer_correcao: Boolean(p.requer_correcao),
         etapa: calcularEtapa(p, docs, comAgenda.has(p.id)),
         valor_centavos: p.valor_centavos,
-        comissao_percent: Number(p.comissao_percent ?? 20),
         consultas: stats?.total ?? 0,
         consultasRealizadas: stats?.realizadas ?? 0,
         telefone: p.telefone,
@@ -318,7 +299,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
         foto_url: p.foto_url,
         observacao_admin: p.observacao_admin,
         validado_em: p.validado_em,
-        rqe: p.rqe,
         ferramenta_provedor: p.ferramenta_provedor,
         ferramenta_url_sala: p.ferramenta_url_sala,
         certidao_validade: p.certidao_validade,
@@ -344,22 +324,20 @@ export const painelAdmin = createServerFn({ method: "GET" })
       receitaTaxasCentavos: listaConsultas
         .filter((c) => c.payment_status === "aprovado")
         .reduce((s, c) => s + c.taxa_centavos, 0),
-      receitaComissaoCentavos: realizadas.reduce((s, c) => s + c.valor_plataforma_centavos, 0),
-      aPagarProfissionaisCentavos: repasses
-        .filter((r) => r.status === "pendente" || r.status === "processando")
+      receitaTaxaFixaRealizadaCentavos: realizadas.reduce((s, c) => s + c.valor_plataforma_centavos, 0),
+      aPagarProfissionaisCentavos: pagamentos
+        .filter((r) => r.status !== "aprovado")
         .reduce((s, r) => s + r.liquido, 0),
-      pagoProfissionaisCentavos: repasses
-        .filter((r) => r.status === "pago")
+      pagoProfissionaisCentavos: pagamentos
+        .filter((r) => r.status === "aprovado")
         .reduce((s, r) => s + r.liquido, 0),
-      livrosConfirmados: pacientes.filter((p) => p.livroStatus === "confirmada").length,
-      livrosPendentes: pacientes.filter((p) => p.livroStatus === "pendente").length,
     };
 
     return {
       pacientes,
       consultas: listaConsultas,
       profissionais: listaProfissionais,
-      repasses,
+      pagamentos,
       configuracoes: mapearConfiguracoes(cfgRows),
       totais,
     };
@@ -499,7 +477,6 @@ export const editarProfissionalAdmin = createServerFn({ method: "POST" })
       areas?: string;
       idiomas?: string;
       foto_url?: string;
-      comissao_percent?: number;
       voltarParaAnalise?: boolean;
     }) => {
       const texto = (v: unknown, max: number) => String(v ?? "").trim().slice(0, max) || null;
@@ -524,7 +501,6 @@ export const editarProfissionalAdmin = createServerFn({ method: "POST" })
         areas: lista(data.areas),
         idiomas: lista(data.idiomas),
         foto_url: texto(data.foto_url, 500),
-        comissao_percent: Math.min(Math.max(Number(data.comissao_percent ?? 20) || 20, 0), 100),
         voltarParaAnalise: Boolean(data.voltarParaAnalise),
       };
     },
@@ -591,98 +567,24 @@ export const definirStatusConsultaAdmin = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
-export const definirStatusRepasse = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (data: {
-      id: string;
-      status: "pendente" | "processando" | "pago" | "falhou";
-      observacao?: string;
-    }) => ({
-      id: String(data.id),
-      status: data.status,
-      observacao: data.observacao ? String(data.observacao).trim().slice(0, 300) : null,
-    }),
-  )
-  .handler(async ({ data, context }) => {
-    await garantirAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
-      .from("payouts")
-      .update({
-        status: data.status,
-        observacao: data.observacao,
-        pago_em: data.status === "pago" ? new Date().toISOString() : null,
-        pago_por: data.status === "pago" ? context.userId : null,
-      })
-      .eq("id", data.id);
-    if (error) return { ok: false as const, erro: "Não foi possível atualizar o repasse." };
-    return { ok: true as const };
-  });
-
-export const definirStatusLivro = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (data: { userId: string; status: "nao_comprado" | "pendente" | "confirmada" | "cancelada" }) => ({
-      userId: String(data.userId),
-      status: data.status,
-    }),
-  )
-  .handler(async ({ data, context }) => {
-    await garantirAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: perfil } = await supabaseAdmin
-      .from("profiles")
-      .select("email")
-      .eq("id", data.userId)
-      .maybeSingle();
-    const { data: atual } = await supabaseAdmin
-      .from("livro_compras")
-      .select("id")
-      .eq("user_id", data.userId)
-      .maybeSingle();
-    const registro = {
-      ...(atual ? { id: atual.id } : {}),
-      user_id: data.userId,
-      email: perfil?.email ?? null,
-      status: data.status,
-      comprado_em: data.status === "confirmada" ? new Date().toISOString() : null,
-      origem: "manual",
-    };
-    const { error } = await supabaseAdmin.from("livro_compras").upsert(registro, { onConflict: "id" });
-    if (error) return { ok: false as const, erro: "Não foi possível atualizar." };
-    return { ok: true as const };
-  });
-
 export const salvarConfiguracoes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: Partial<ConfiguracoesPlataforma>) => ({
-    taxaCentavos: Math.max(0, Math.round(Number(data.taxaCentavos ?? 5000) || 0)),
-    comissaoPercent: Math.min(100, Math.max(0, Number(data.comissaoPercent ?? 20) || 0)),
+    taxaPorConsultaCentavos: Math.max(0, Math.round(Number(data.taxaPorConsultaCentavos ?? 2900) || 0)),
     duracaoPadraoMinutos: Math.min(180, Math.max(15, Number(data.duracaoPadraoMinutos ?? 50) || 50)),
     cancelamentoHoras: Math.max(0, Number(data.cancelamentoHoras ?? 24) || 0),
     remarcacaoHoras: Math.max(0, Number(data.remarcacaoHoras ?? 24) || 0),
     reembolsoTaxaNoPrazo: Boolean(data.reembolsoTaxaNoPrazo),
-    hotmartLivroUrl: String(data.hotmartLivroUrl ?? "").trim().slice(0, 500),
-    livroTitulo: String(data.livroTitulo ?? "Como Ser Feliz com TOC").trim().slice(0, 120),
-    livroDescontoPercent: Math.min(100, Math.max(0, Number(data.livroDescontoPercent ?? 50) || 0)),
   }))
   .handler(async ({ data, context }) => {
     await garantirAdmin(context);
-    if (data.hotmartLivroUrl && !/^https:\/\//.test(data.hotmartLivroUrl)) {
-      return { ok: false as const, erro: "O link da Hotmart precisa começar com https://" };
-    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const linhas = [
-      ["taxa_confirmacao_centavos", data.taxaCentavos],
-      ["comissao_plataforma_percent", data.comissaoPercent],
+      ["taxa_por_consulta_centavos", data.taxaPorConsultaCentavos],
       ["duracao_padrao_minutos", data.duracaoPadraoMinutos],
       ["cancelamento_horas_minimas", data.cancelamentoHoras],
       ["remarcacao_horas_minimas", data.remarcacaoHoras],
       ["reembolso_taxa_no_prazo", data.reembolsoTaxaNoPrazo],
-      ["hotmart_livro_url", data.hotmartLivroUrl],
-      ["livro_titulo", data.livroTitulo],
-      ["livro_desconto_percent", data.livroDescontoPercent],
     ] as const;
     const { error } = await supabaseAdmin.from("platform_settings").upsert(
       linhas.map(([chave, valor]) => ({ chave, valor, updated_at: new Date().toISOString() })),

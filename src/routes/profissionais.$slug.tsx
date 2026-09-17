@@ -81,8 +81,8 @@ function Perfil() {
   const { profissional: p, horarios } = Route.useLoaderData();
 
   useEffect(() => {
-    track("professional_profile_view", { slug: p.slug, profissao: p.profissao });
-  }, [p.slug, p.profissao]);
+    track("professional_profile_view", { slug: p.slug });
+  }, [p.slug]);
 
   return (
     <div className="container-page py-12 lg:py-16">
@@ -102,7 +102,7 @@ function Perfil() {
           </p>
           <p
             className="pill mt-4 inline-flex"
-            title="Conferimos a inscrição ativa no CRP e os documentos de formação apresentados. Não avaliamos competência técnica nem garantimos resultado."
+            title="Conferimos a inscrição ativa no CRP e os documentos de formação apresentados. Não avaliamos competência técnica nem fazemos promessa de desfecho."
           >
             Inscrição no CRP conferida e documentos de formação apresentados
           </p>
@@ -139,7 +139,7 @@ function Perfil() {
               <p className="mt-3 text-sm text-muted-foreground">{p.experiencia_toc}</p>
             </section>
             <section className="card-soft p-6">
-              <h2 className="text-lg">Subtipos e idiomas</h2>
+              <h2 className="text-lg">Áreas de experiência e idiomas</h2>
               <ul className="mt-3 flex flex-wrap gap-2">
                 {p.areas.map((a) => (
                   <li key={a} className="pill">
@@ -155,7 +155,7 @@ function Perfil() {
           </div>
 
           <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
-            As informações deste perfil são declaradas pelo profissional. Conferimos a inscrição ativa no CRP e os documentos de formação apresentados. A TOC Brazil não presta serviço de saúde e não avalia competência técnica nem garante resultado.
+            As informações deste perfil são declaradas pelo profissional. Conferimos a inscrição ativa no CRP e os documentos de formação apresentados. A TOC Brazil não presta serviço de saúde e não avalia competência técnica nem faz promessa de desfecho.
           </p>
         </div>
 

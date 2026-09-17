@@ -23,7 +23,7 @@ export const CATEGORIAS = [
   "Dúvidas e incertezas",
   "TOC e família",
   "TOC em adolescentes",
-  "Tratamento",
+  "Cuidado",
   "Saúde mental",
 ] as const;
 
@@ -39,7 +39,7 @@ export const CONTEUDOS: Conteudo[] = [
       "O Transtorno Obsessivo-Compulsivo, conhecido como TOC, é descrito na literatura clínica pela presença de obsessões — pensamentos, imagens ou impulsos indesejados e repetitivos — e de compulsões, que são comportamentos ou rituais mentais realizados para reduzir o desconforto causado por essas obsessões.",
       "Cada pessoa pode vivenciar isso de forma bem diferente. Há quem conviva com dúvidas persistentes, quem sinta necessidade de verificar, organizar, contar ou lavar, e quem realize rituais apenas mentalmente, sem que ninguém perceba.",
       "Ter um pensamento intrusivo, isoladamente, é uma experiência comum. O que costuma ser observado no TOC é o quanto esses pensamentos passam a ocupar tempo, gerar sofrimento e interferir na rotina.",
-      "Alguns comportamentos podem aparecer em pessoas com TOC, mas somente um profissional qualificado pode realizar uma avaliação. Nenhum conteúdo, teste online ou lista de sinais substitui uma consulta.",
+      "Alguns comportamentos podem aparecer em pessoas com TOC, mas somente um profissional qualificado pode realizar uma consulta. Nenhum conteúdo, teste online ou lista de sinais substitui uma consulta.",
     ],
     fontes: [
       "Organização Mundial da Saúde — Classificação Internacional de Doenças (CID-11)",
@@ -57,7 +57,7 @@ export const CONTEUDOS: Conteudo[] = [
       "Pensamentos intrusivos são conteúdos mentais que aparecem sem convite e frequentemente contrariam aquilo que a pessoa valoriza. Justamente por isso eles causam tanto estranhamento.",
       "Uma dificuldade comum é interpretar o pensamento como se ele revelasse algo sobre o caráter ou sobre uma intenção real. Essa interpretação tende a aumentar a vigilância mental, e a vigilância aumenta a frequência com que o pensamento é notado.",
       "Buscar garantias — pesquisar, perguntar repetidamente, revisar a própria memória — pode aliviar no curto prazo e, com o tempo, reforçar o ciclo.",
-      "Se esses pensamentos vêm ocupando espaço demais na sua vida, conversar com um profissional pode ser um passo importante. A avaliação é sempre individual.",
+      "Se esses pensamentos vêm ocupando espaço demais na sua vida, conversar com um profissional pode ser um passo importante. A consulta é sempre individual.",
     ],
     fontes: ["Literatura científica sobre terapias cognitivo-comportamentais para TOC"],
   },
@@ -71,9 +71,9 @@ export const CONTEUDOS: Conteudo[] = [
     paragrafos: [
       "Compulsões são ações — visíveis ou mentais — realizadas para reduzir uma sensação de risco, dúvida ou desconforto. Podem incluir verificar, lavar, repetir, contar, rezar mentalmente ou revisar cenas na memória.",
       "O alívio geralmente vem rápido, o que faz o comportamento se repetir. Com o tempo, a exigência interna pode aumentar: mais verificações, mais tempo, mais regras.",
-      "Reconhecer o ciclo não é o mesmo que resolvê-lo, e não é falta de força de vontade. Abordagens de tratamento com apoio de evidências existem e são conduzidas por profissionais habilitados.",
+      "Reconhecer o ciclo não é o mesmo que resolvê-lo, e não é falta de força de vontade. Abordagens de cuidado com apoio de evidências existem e são conduzidas por profissionais habilitados.",
     ],
-    fontes: ["Diretrizes internacionais de tratamento do TOC"],
+    fontes: ["Diretrizes internacionais de cuidado do TOC"],
   },
   {
     slug: "checagem",
@@ -99,23 +99,23 @@ export const CONTEUDOS: Conteudo[] = [
     paragrafos: [
       "É comum que pessoas próximas passem a dar garantias, responder às mesmas perguntas ou assumir tarefas para reduzir o desconforto de quem sofre. Isso vem do afeto.",
       "A literatura descreve esse fenômeno como acomodação familiar, e observa que ele pode, involuntariamente, manter o ciclo.",
-      "Orientação profissional pode ajudar a família a encontrar formas de apoiar que respeitem o vínculo e o processo de tratamento. Cada caso é único.",
+      "Orientação profissional pode ajudar a família a encontrar formas de apoiar que respeitem o vínculo e o processo de cuidado. Cada caso é único.",
     ],
     fontes: ["Publicações sobre acomodação familiar em TOC"],
   },
   {
-    slug: "tratamento-do-toc",
-    categoria: "Tratamento",
-    titulo: "Como o tratamento do TOC costuma ser conduzido",
+    slug: "cuidado-do-toc",
+    categoria: "Cuidado",
+    titulo: "Como uma consulta psicológica pode ajudar",
     resumo:
-      "Psicoterapia, acompanhamento psiquiátrico quando indicado e a importância de um plano combinado.",
+      "Psicoterapia, avaliação individual e a importância de um plano combinado com profissional habilitado.",
     leitura: "7 min",
     paragrafos: [
-      "O tratamento do TOC é conduzido por profissionais habilitados e definido caso a caso. Em geral envolve psicoterapia e, quando indicado pelo médico, acompanhamento psiquiátrico.",
-      "Abordagens psicoterapêuticas com apoio de evidências para TOC incluem intervenções cognitivo-comportamentais. A escolha depende da avaliação profissional e das preferências da pessoa.",
-      "Somente um médico pode avaliar a necessidade e a indicação de medicação. Nenhuma plataforma pode fazer isso, e nós não fazemos.",
-      "Nosso papel é reunir informação confiável e facilitar o acesso a profissionais para que você possa dar o próximo passo com mais segurança.",
+      "O cuidado do TOC é conduzido por profissionais habilitados e definido caso a caso. Na Psicologia, a consulta permite compreender o contexto da pessoa e combinar próximos passos.",
+      "Abordagens psicoterapêuticas com apoio de evidências para TOC incluem intervenções cognitivo-comportamentais. A escolha depende da consulta com profissional habilitado e das preferências da pessoa.",
+      "A TOC Brazil não avalia pacientes, não indica condutas e não faz triagem. Nosso papel é reunir informação confiável e facilitar busca, agendamento e pagamento.",
+      "Se houver risco imediato ou crise, procure ajuda de urgência: ligue 188 (CVV) ou 192 (SAMU).",
     ],
-    fontes: ["Diretrizes clínicas internacionais para transtornos relacionados ao TOC"],
+    fontes: ["Diretrizes científicas internacionais sobre TOC"],
   },
 ];
