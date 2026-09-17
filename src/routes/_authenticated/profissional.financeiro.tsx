@@ -29,7 +29,7 @@ const rotuloSituacao: Record<LancamentoFinanceiro["situacao"], string> = {
   pago: "Pago",
   cancelada: "Cancelada",
   nao_compareceu: "Não compareceu",
-  aguardando_pagamento: "Aguardando taxa",
+  aguardando_pagamento: "Aguardando pagamento",
 };
 
 type Filtro = "todos" | "agendada" | "a_receber" | "pago";
@@ -89,12 +89,12 @@ function Financeiro() {
           <div className="professional-metric p-6">
             <p className="professional-label">A receber</p>
             <p className="mt-2 font-display text-2xl">{moeda(resumo?.aReceber ?? 0)}</p>
-            <p className="mt-2 text-xs text-muted-foreground">consultas realizadas aguardando pagamento</p>
+            <p className="mt-2 text-xs text-muted-foreground">consultas realizadas aguardando confirmação financeira</p>
           </div>
           <div className="professional-metric p-6">
             <p className="professional-label">Recebido</p>
             <p className="mt-2 font-display text-2xl">{moeda(resumo?.recebido ?? 0)}</p>
-            <p className="mt-2 text-xs text-muted-foreground">pagamentos já pagos pela plataforma</p>
+            <p className="mt-2 text-xs text-muted-foreground">pagamentos confirmados no provedor</p>
           </div>
           <div className="professional-metric p-6">
              <p className="professional-label">Taxas da plataforma</p>
@@ -136,11 +136,10 @@ function Financeiro() {
                   <tr className="border-b border-border/60">
                     <th className="px-5 py-3">Consulta</th>
                     <th className="px-5 py-3">Paciente</th>
-                    <th className="px-5 py-3 text-right">Bruto</th>
-                    <th className="px-5 py-3 text-right">Plataforma</th>
-                    <th className="px-5 py-3 text-right">Líquido</th>
-                     <th className="px-5 py-3 text-right">Pagamento incluído</th>
-                    <th className="px-5 py-3">Status</th>
+                    <th className="px-5 py-3 text-right">Valor da consulta</th>
+                    <th className="px-5 py-3 text-right">Taxa fixa</th>
+                    <th className="px-5 py-3 text-right">Valor do profissional</th>
+                    <th className="px-5 py-3">Situação</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -157,15 +156,15 @@ function Financeiro() {
                           {l.codigo && <span className="ml-1 text-xs text-muted-foreground">{l.codigo}</span>}
                         </td>
                         <td className="px-5 py-3 text-right">{moeda(l.bruto)}</td>
+                        <td className="px-5 py-3 text-right text-muted-foreground">{naoConta ? "—" : moeda(l.plataforma)}</td>
                         <td className="px-5 py-3 text-right font-semibold">{naoConta ? "—" : moeda(l.liquido)}</td>
-                        <td className="px-5 py-3 text-right text-muted-foreground">− {moeda(l.plataforma)}</td>
                         <td className="px-5 py-3">
                           <span className="pill">{rotuloSituacao[l.situacao]}</span>
                           {l.situacao === "pago" && l.pagoEm && (
-                            <p className="mt-1 text-[11px] text-muted-foreground">pago em {dataBR(l.pagoEm)}</p>
+                            <p className="mt-1 text-[11px] text-muted-foreground">confirmado em {dataBR(l.pagoEm)}</p>
                           )}
                           {l.situacao === "a_receber" && l.previstoPara && (
-                            <p className="mt-1 text-[11px] text-muted-foreground">previsto {dataBR(l.previstoPara)}</p>
+                            <p className="mt-1 text-[11px] text-muted-foreground">aguardando confirmação</p>
                           )}
                         </td>
                       </tr>

@@ -15,9 +15,6 @@ export type PacienteAdmin = {
   consultas: number;
   consultasRealizadas: number;
   pagoCentavos: number;
-  livroStatus: "nao_comprado" | "pendente" | "confirmada" | "cancelada";
-  livroClicadoEm: string | null;
-  livroCompradoEm: string | null;
 };
 
 export type ConsultaAdmin = {
@@ -133,7 +130,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
       { data: papeis },
       { data: consultas },
       { data: profissionais },
-      { data: livros },
       { data: cfgRows },
       { data: regras },
       { data: pagamentoDetalhes },
@@ -151,7 +147,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
         .order("inicio", { ascending: false })
         .limit(500),
       supabaseAdmin.from("professionals").select("*").order("created_at", { ascending: false }),
-      supabaseAdmin.from("livro_compras").select("user_id, status, clicado_em, comprado_em"),
       supabaseAdmin.from("platform_settings").select("chave, valor"),
       supabaseAdmin.from("availability_rules").select("professional_id"),
       supabaseAdmin.from("professional_payout_details").select("professional_id, chave_pix"),
@@ -163,7 +158,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
     for (const p of papeis ?? []) {
       papeisPorId.set(p.user_id, [...(papeisPorId.get(p.user_id) ?? []), p.role as string]);
     }
-    const livroPorUser = new Map((livros ?? []).map((l) => [l.user_id, l]));
     const comAgenda = new Set((regras ?? []).map((r) => r.professional_id));
     const pixPorProf = new Map((pagamentoDetalhes ?? []).map((r) => [r.professional_id, r.chave_pix]));
 
@@ -182,7 +176,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
     }
 
     const pacientes: PacienteAdmin[] = (perfis ?? []).map((p) => {
-      const livro = livroPorUser.get(p.id);
       const stats = consultasPorPaciente.get(p.id);
       return {
         id: p.id,
@@ -196,9 +189,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
         consultas: stats?.total ?? 0,
         consultasRealizadas: stats?.realizadas ?? 0,
         pagoCentavos: stats?.pago ?? 0,
-        livroStatus: (livro?.status ?? "nao_comprado") as PacienteAdmin["livroStatus"],
-        livroClicadoEm: livro?.clicado_em ?? null,
-        livroCompradoEm: livro?.comprado_em ?? null,
       };
     });
 
@@ -334,15 +324,13 @@ export const painelAdmin = createServerFn({ method: "GET" })
       receitaTaxasCentavos: listaConsultas
         .filter((c) => c.payment_status === "aprovado")
         .reduce((s, c) => s + c.taxa_centavos, 0),
-      receitaComissaoCentavos: realizadas.reduce((s, c) => s + c.valor_plataforma_centavos, 0),
+      receitaTaxaFixaRealizadaCentavos: realizadas.reduce((s, c) => s + c.valor_plataforma_centavos, 0),
       aPagarProfissionaisCentavos: pagamentos
         .filter((r) => r.status !== "aprovado")
         .reduce((s, r) => s + r.liquido, 0),
       pagoProfissionaisCentavos: pagamentos
         .filter((r) => r.status === "aprovado")
         .reduce((s, r) => s + r.liquido, 0),
-      livrosConfirmados: pacientes.filter((p) => p.livroStatus === "confirmada").length,
-      livrosPendentes: pacientes.filter((p) => p.livroStatus === "pendente").length,
     };
 
     return {
@@ -575,40 +563,6 @@ export const definirStatusConsultaAdmin = createServerFn({ method: "POST" })
       .from("appointments")
       .update({ status: data.status, ...extra })
       .eq("id", data.id);
-    if (error) return { ok: false as const, erro: "Não foi possível atualizar." };
-    return { ok: true as const };
-  });
-
-export const definirStatusLivro = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (data: { userId: string; status: "nao_comprado" | "pendente" | "confirmada" | "cancelada" }) => ({
-      userId: String(data.userId),
-      status: data.status,
-    }),
-  )
-  .handler(async ({ data, context }) => {
-    await garantirAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: perfil } = await supabaseAdmin
-      .from("profiles")
-      .select("email")
-      .eq("id", data.userId)
-      .maybeSingle();
-    const { data: atual } = await supabaseAdmin
-      .from("livro_compras")
-      .select("id")
-      .eq("user_id", data.userId)
-      .maybeSingle();
-    const registro = {
-      ...(atual ? { id: atual.id } : {}),
-      user_id: data.userId,
-      email: perfil?.email ?? null,
-      status: data.status,
-      comprado_em: data.status === "confirmada" ? new Date().toISOString() : null,
-      origem: "manual",
-    };
-    const { error } = await supabaseAdmin.from("livro_compras").upsert(registro, { onConflict: "id" });
     if (error) return { ok: false as const, erro: "Não foi possível atualizar." };
     return { ok: true as const };
   });

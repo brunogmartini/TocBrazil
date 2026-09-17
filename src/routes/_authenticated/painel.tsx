@@ -6,10 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   cancelarConsulta,
   meuContexto,
-  meuLivro,
   minhasConsultas,
   minhasNotificacoes,
-  registrarInteresseLivro,
   confirmarRealizacao,
   salvarPerfil,
 } from "@/lib/plataforma.functions";
@@ -50,8 +48,6 @@ function Painel() {
   const carregarContexto = useServerFn(meuContexto);
   const carregarConsultas = useServerFn(minhasConsultas);
   const carregarNotificacoes = useServerFn(minhasNotificacoes);
-  const carregarLivro = useServerFn(meuLivro);
-  const interesseLivro = useServerFn(registrarInteresseLivro);
   const salvar = useServerFn(salvarPerfil);
   const cancelar = useServerFn(cancelarConsulta);
   const confirmarConsulta = useServerFn(confirmarRealizacao);
@@ -60,7 +56,6 @@ function Painel() {
   const contexto = useQuery({ queryKey: ["contexto"], queryFn: () => carregarContexto() });
   const consultas = useQuery({ queryKey: ["consultas"], queryFn: () => carregarConsultas() });
   const notificacoes = useQuery({ queryKey: ["notificacoes"], queryFn: () => carregarNotificacoes() });
-  const livro = useQuery({ queryKey: ["livro"], queryFn: () => carregarLivro() });
 
   const [editandoPerfil, setEditandoPerfil] = useState(false);
   const [selecionada, setSelecionada] = useState<string | null>(null);

@@ -573,69 +573,6 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
 
   });
 
-/* ---------- livro "Como Ser Feliz com TOC" ---------- */
-
-export const meuLivro = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { supabase, userId } = context;
-    const [{ data: papeis }, { data: compra }, cfg] = await Promise.all([
-      supabase.from("user_roles").select("role").eq("user_id", userId),
-      supabase
-        .from("livro_compras")
-        .select("status, clicado_em, comprado_em")
-        .eq("user_id", userId)
-        .maybeSingle(),
-      carregarConfiguracoesPrivadas(),
-    ]);
-    const listaPapeis = (papeis ?? []).map((p) => p.role as string);
-    if (!listaPapeis.includes("paciente") || listaPapeis.includes("profissional") || listaPapeis.includes("admin")) {
-      throw new Error("Benefício exclusivo para pacientes.");
-    }
-    return {
-      status: (compra?.status ?? "nao_comprado") as
-        | "nao_comprado"
-        | "pendente"
-        | "confirmada"
-        | "cancelada",
-      clicadoEm: compra?.clicado_em ?? null,
-      compradoEm: compra?.comprado_em ?? null,
-      url: "",
-      titulo: "",
-      descontoPercent: 0,
-    };
-  });
-
-export const registrarInteresseLivro = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { supabase, userId, claims } = context;
-    const { data: papeis } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-    const listaPapeis = (papeis ?? []).map((p) => p.role as string);
-    if (!listaPapeis.includes("paciente") || listaPapeis.includes("profissional") || listaPapeis.includes("admin")) {
-      return { ok: false as const, erro: "Benefício exclusivo para pacientes." };
-    }
-    const email = (claims as { email?: string }).email ?? null;
-    const { data: atual } = await supabase
-      .from("livro_compras")
-      .select("id, status")
-      .eq("user_id", userId)
-      .maybeSingle();
-    if (atual?.status === "confirmada") return { ok: true as const };
-    const { error } = await supabase.from("livro_compras").upsert(
-      {
-        ...(atual ? { id: atual.id } : {}),
-        user_id: userId,
-        email,
-        status: "pendente",
-        clicado_em: new Date().toISOString(),
-      },
-      { onConflict: "id" },
-    );
-    if (error) return { ok: false as const, erro: "Não foi possível registrar agora." };
-    return { ok: true as const };
-  });
-
 export const minhasNotificacoes = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

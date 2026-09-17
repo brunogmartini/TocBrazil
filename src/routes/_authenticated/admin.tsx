@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import {
   definirStatusConsultaAdmin,
   definirStatusDocumento,
-  definirStatusLivro,
   definirStatusPagamento,
   definirStatusProfissional,
   editarProfissionalAdmin,
@@ -61,13 +60,6 @@ const rotuloDoc: Record<string, string> = {
   recusado: "Recusado",
 };
 
-const rotuloLivro: Record<string, string> = {
-  nao_comprado: "Não comprado",
-  pendente: "Pendente / não confirmada",
-  confirmada: "Compra confirmada",
-  cancelada: "Cancelada",
-};
-
 type Aba = "visao" | "pacientes" | "profissionais" | "consultas" | "financeiro" | "relatorio" | "configuracoes";
 type FiltroProf = "todos" | "pendente" | "aprovado" | "rejeitado" | "suspenso";
 type FiltroPagamento = "pendente" | "aprovado" | "todos";
@@ -81,13 +73,12 @@ function Admin() {
   const editarProf = useServerFn(editarProfissionalAdmin);
   const mudarPagamento = useServerFn(definirStatusPagamento);
   const mudarConsulta = useServerFn(definirStatusConsultaAdmin);
-  const mudarLivro = useServerFn(definirStatusLivro);
   const salvarCfg = useServerFn(salvarConfiguracoes);
 
   const [aba, setAba] = useState<Aba>("visao");
   const [busca, setBusca] = useState("");
   const [filtroProf, setFiltroProf] = useState<FiltroProf>("pendente");
-  const [filtroPagamento, setFiltroPagamento] = useState<FiltroPagamento>("a_receber");
+  const [filtroPagamento, setFiltroPagamento] = useState<FiltroPagamento>("pendente");
   const [aberto, setAberto] = useState<string | null>(null);
   const [observacao, setObservacao] = useState<Record<string, string>>({});
   const [aviso, setAviso] = useState<string | null>(null);
@@ -215,9 +206,8 @@ function Admin() {
               { rotulo: "Consultas futuras", valor: String(t.consultasFuturas) },
               { rotulo: "Consultas realizadas", valor: String(t.consultasRealizadas) },
               { rotulo: "Receita — taxa fixa", valor: moeda(t.receitaTaxasCentavos) },
-              { rotulo: "Taxa fixa em consultas realizadas", valor: moeda(t.receitaComissaoCentavos) },
+              { rotulo: "Taxa fixa em consultas realizadas", valor: moeda(t.receitaTaxaFixaRealizadaCentavos) },
               { rotulo: "Valores em consultas realizadas", valor: moeda(t.aPagarProfissionaisCentavos), destaque: t.aPagarProfissionaisCentavos > 0 },
-              { rotulo: "Histórico de compras", valor: `${t.livrosConfirmados} confirmada(s) · ${t.livrosPendentes} pendente(s)` },
             ].map((item) => (
               <div key={item.rotulo} className={`card-soft p-5 ${item.destaque ? "border-primary/50" : ""}`}>
                 <p className="section-label">{item.rotulo}</p>
@@ -232,7 +222,7 @@ function Admin() {
             </button>
             <button type="button" className="card-soft p-5 text-left hover:border-primary/60" onClick={() => setAba("financeiro")}>
               <p className="font-semibold">Extrato financeiro</p>
-              <p className="mt-1 text-sm text-muted-foreground">{moeda(t.aPagarProfissionaisCentavos)} registrados em consultas realizadas.</p>
+              <p className="mt-1 text-sm text-muted-foreground">{moeda(t.aPagarProfissionaisCentavos)} em consultas realizadas.</p>
             </button>
           </div>
         </>
@@ -248,8 +238,7 @@ function Admin() {
                 <th className="p-3">Cadastro</th>
                 <th className="p-3">Status</th>
                 <th className="p-3">Consultas</th>
-                <th className="p-3">Livro</th>
-                <th className="p-3">Data da compra</th>
+                <th className="p-3">Total pago</th>
               </tr>
             </thead>
             <tbody>
@@ -265,28 +254,11 @@ function Admin() {
                   <td className="p-3">
                     {u.consultas} <span className="text-xs text-muted-foreground">({u.consultasRealizadas} realizadas)</span>
                   </td>
-                  <td className="p-3">
-                    <select
-                      className="field-base py-1.5"
-                      aria-label={`Status do livro de ${u.nome ?? u.email}`}
-                      value={u.livroStatus}
-                      onChange={async (e) => {
-                        await mudarLivro({ data: { userId: u.id, status: e.target.value as typeof u.livroStatus } });
-                        await atualizar();
-                      }}
-                    >
-                      {Object.entries(rotuloLivro).map(([v, r]) => (
-                        <option key={v} value={v}>{r}</option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className="p-3 text-muted-foreground">
-                    {u.livroCompradoEm ? dataBR(u.livroCompradoEm) : u.livroClicadoEm ? `clique em ${dataBR(u.livroClicadoEm)}` : "—"}
-                  </td>
-                </tr>
+                  <td className="p-3 font-semibold">{moeda(u.pagoCentavos)}</td>
+               </tr>
               ))}
               {pacientes.length === 0 && !painel.isLoading && (
-                <tr><td colSpan={7} className="p-4 text-muted-foreground">Nenhum paciente encontrado.</td></tr>
+                <tr><td colSpan={6} className="p-4 text-muted-foreground">Nenhum paciente encontrado.</td></tr>
               )}
             </tbody>
           </table>
@@ -569,7 +541,7 @@ function Admin() {
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { rotulo: "Taxas fixas registradas", valor: moeda(t.receitaTaxasCentavos) },
-              { rotulo: "Taxa fixa em realizadas", valor: moeda(t.receitaComissaoCentavos) },
+              { rotulo: "Taxa fixa em realizadas", valor: moeda(t.receitaTaxaFixaRealizadaCentavos) },
               { rotulo: "Valores em consultas realizadas", valor: moeda(t.aPagarProfissionaisCentavos) },
               { rotulo: "Pagamentos aprovados", valor: moeda(t.pagoProfissionaisCentavos) },
             ].map((i) => (
