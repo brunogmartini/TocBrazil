@@ -259,6 +259,30 @@ export async function concluirConsultasVencidas() {
   }
 }
 
+/** Registra apenas metadados administrativos (nunca conteúdo de atendimento). */
+export async function registrarEvento(evento: {
+  tipo: string;
+  appointmentId?: string | null;
+  professionalId?: string | null;
+  ator?: string | null;
+  atorPapel?: string | null;
+  metadados?: Record<string, unknown>;
+}) {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("eventos_auditoria").insert({
+      tipo: evento.tipo,
+      appointment_id: evento.appointmentId ?? null,
+      professional_id: evento.professionalId ?? null,
+      ator: evento.ator ?? null,
+      ator_papel: evento.atorPapel ?? null,
+      metadados: evento.metadados ?? {},
+    });
+  } catch {
+    /* auditoria não bloqueia o usuário */
+  }
+}
+
 export const minhasConsultas = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -267,12 +291,39 @@ export const minhasConsultas = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("appointments")
       .select(
-        "id, inicio, fim, status, payment_status, valor_centavos, taxa_agendamento_centavos, valor_consulta_centavos, duracao_minutos, video_url, cancelada_em, professionals(nome, profissao, slug, registro)",
+        "id, inicio, fim, status, payment_status, valor_centavos, taxa_agendamento_centavos, valor_consulta_centavos, duracao_minutos, link_acesso, cancelada_em, professionals(nome, profissao, slug, registro, ferramenta_provedor, ferramenta_instrucoes)",
       )
       .eq("patient_id", userId)
       .order("inicio", { ascending: false });
     if (error) throw new Error(error.message);
-    return { consultas: data ?? [] };
+
+    const cfg = await carregarConfiguracoesPrivadas();
+    const agora = Date.now();
+    const revelados: string[] = [];
+    const consultas = (data ?? []).map((c) => {
+      const inicio = new Date(c.inicio).getTime();
+      const fim = new Date(c.fim).getTime();
+      const dentroDaJanela =
+        agora >= inicio - cfg.antecedenciaLinkMinutos * 60000 && agora <= fim + 2 * 3600_000;
+      const liberado = c.status === "confirmada" && dentroDaJanela && Boolean(c.link_acesso);
+      if (liberado) revelados.push(c.id);
+      return {
+        ...c,
+        link_acesso: liberado ? c.link_acesso : null,
+        linkLiberado: liberado,
+        linkLiberadoEm: new Date(inicio - cfg.antecedenciaLinkMinutos * 60000).toISOString(),
+        antecedenciaLinkMinutos: cfg.antecedenciaLinkMinutos,
+      };
+    });
+    for (const id of revelados) {
+      await registrarEvento({
+        tipo: "acesso_link",
+        appointmentId: id,
+        ator: userId,
+        atorPapel: "paciente",
+      });
+    }
+    return { consultas };
   });
 
 export const criarAgendamento = createServerFn({ method: "POST" })
@@ -378,13 +429,22 @@ export const criarAgendamento = createServerFn({ method: "POST" })
       {
         user_id: userId,
         appointment_id: criada.id,
-        tipo: "lembrete_1h",
+        tipo: "lembrete_15min",
         canal: "email",
-        titulo: "Sua consulta começa em 1 hora",
-        corpo: `Consulta com ${prof.nome} às ${quando}.`,
-        agendada_para: new Date(new Date(criada.inicio).getTime() - 3600_000).toISOString(),
+        titulo: "Sua consulta começa em 15 minutos",
+        corpo: `Consulta com ${prof.nome} às ${quando}. O endereço da sala já está disponível na sua área.`,
+        agendada_para: new Date(new Date(criada.inicio).getTime() - 15 * 60000).toISOString(),
       },
     ]);
+
+    await registrarEvento({
+      tipo: "reserva_criada",
+      appointmentId: criada.id,
+      professionalId: prof.id,
+      ator: userId,
+      atorPapel: "paciente",
+      metadados: { inicio: criada.inicio },
+    });
 
     return { ok: true as const, consultaId: criada.id, valorCentavos: criada.valor_centavos };
   });
@@ -409,15 +469,28 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
     const horasAntes = (new Date(consulta.inicio).getTime() - Date.now()) / 3600_000;
     const dentroDoPrazo = horasAntes >= cfg.cancelamentoHoras;
 
+    // Cancelamento tardio de consulta já paga conta como não comparecimento e
+    // gera a taxa fixa devida pelo profissional, conforme as regras da plataforma.
+    const novoStatus =
+      !dentroDoPrazo && consulta.status === "confirmada" ? "nao_compareceu" : "cancelada";
+
     const { error } = await supabase
       .from("appointments")
       .update({
-        status: "cancelada",
+        status: novoStatus,
         cancelada_em: new Date().toISOString(),
         cancelada_por: "paciente",
       })
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível cancelar agora." };
+
+    await registrarEvento({
+      tipo: dentroDoPrazo ? "cancelamento_no_prazo" : "cancelamento_tardio",
+      appointmentId: consulta.id,
+      ator: userId,
+      atorPapel: "paciente",
+      metadados: { horasAntes: Math.round(horasAntes), status: novoStatus },
+    });
 
     await supabase.from("notifications").insert({
       user_id: userId,
