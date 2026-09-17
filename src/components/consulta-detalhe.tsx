@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Modal } from "@/components/modal";
+import { ChatAdministrativo } from "@/components/chat-administrativo";
+
 import { marcarConsultaRealizada, type ConsultaAgenda } from "@/lib/profissional.functions";
 import { chaveDia, horaDe, rotuloDiaLongo } from "@/lib/agenda-tempo";
 import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
@@ -92,6 +94,8 @@ export function ConsultaDetalhe({
           </div>
         )}
         {erro && <p className="text-destructive">{erro}</p>}
+        <ChatAdministrativo consultaId={c.id} />
+
       </div>
     </Modal>
   );

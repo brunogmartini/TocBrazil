@@ -29,6 +29,13 @@
       "when": 1789660701906,
       "tag": "0003_fase4_confirmacao_realizacao",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789661801047,
+      "tag": "0004_mensagens_administrativas",
+      "breakpoints": true
     }
   ]
 }

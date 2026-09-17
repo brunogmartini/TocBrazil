@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointment_messages: {
+        Row: {
+          appointment_id: string
+          autor_id: string
+          autor_papel: string
+          corpo: string
+          created_at: string
+          id: string
+          lida_em: string | null
+        }
+        Insert: {
+          appointment_id: string
+          autor_id: string
+          autor_papel: string
+          corpo: string
+          created_at?: string
+          id?: string
+          lida_em?: string | null
+        }
+        Update: {
+          appointment_id?: string
+          autor_id?: string
+          autor_papel?: string
+          corpo?: string
+          created_at?: string
+          id?: string
+          lida_em?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_messages_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointment_notes: {
         Row: {
           appointment_id: string

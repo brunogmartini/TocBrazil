@@ -15,6 +15,8 @@ import {
 } from "@/lib/plataforma.functions";
 import { CalendarioConsultas, type ItemCalendario } from "@/components/calendario-consultas";
 import { Modal } from "@/components/modal";
+import { ChatAdministrativo } from "@/components/chat-administrativo";
+
 import { iniciarPagamento } from "@/lib/pagamento.functions";
 import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 import { horaDe, rotuloDiaLongo, chaveDia } from "@/lib/agenda-tempo";
@@ -468,8 +470,10 @@ function Painel() {
                 O endereço da sala é liberado depois que o pagamento da consulta for aprovado.
               </p>
             )}
+            <ChatAdministrativo consultaId={consultaSelecionada.id} />
           </div>
         )}
+
       </Modal>
     </div>
   );
