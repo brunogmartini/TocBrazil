@@ -3,17 +3,17 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/como-funciona")({
   head: () => ({
     meta: [
-      { title: "Nossa metodologia especializada em TOC | TOC Brazil" },
+      { title: "Como funciona a TOC Brazil" },
       {
         name: "description",
         content:
-          "Conheça as etapas para entender o transtorno, encontrar o profissional ideal, agendar a sessão e realizar a consulta online.",
+          "Entenda como buscar psicólogos, agendar consultas online, pagar pela plataforma e acessar o link da sala do próprio psicólogo.",
       },
-      { property: "og:title", content: "Nossa metodologia — TOC Brazil" },
+      { property: "og:title", content: "Como funciona a TOC Brazil" },
       {
         property: "og:description",
         content:
-          "Quatro etapas: entenda o transtorno, encontre o profissional ideal, agende a sessão e realize sua consulta online.",
+          "Busca, agenda e pagamento para consultas com psicólogos cadastrados na plataforma.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -27,55 +27,54 @@ export const Route = createFileRoute("/como-funciona")({
 const etapas = [
   {
     t: "Entenda sobre o transtorno",
-    d: "Tenha acesso a conteúdos sobre TOC para entender mais sobre o transtorno.",
+    d: "Leia conteúdos educativos sobre TOC. Eles não substituem consulta com profissional habilitado.",
   },
   {
-    t: "Encontre o profissional ideal",
-    d: "Escolha o profissional que melhor atende às suas necessidades a partir de filtros de pesquisa avançados.",
+    t: "Encontre um psicólogo",
+    d: "Compare abordagem, idioma, valor, duração e horários disponíveis em cada perfil.",
   },
   {
-    t: "Agende uma sessão online",
-    d: "Escolha o melhor horário pra você disponível na agenda do profissional",
+    t: "Agende uma consulta online",
+    d: "Escolha o horário e confirme o pagamento pela plataforma. A reserva aguarda pagamento por 15 minutos.",
   },
   {
-    t: "Realize sua consulta online",
-    d: "A consulta acontece por videochamada, no horário combinado, através da plataforma.",
+    t: "Receba o link e entre na sala do seu psicólogo",
+    d: "A sala de videochamada é do profissional. O link fica disponível para você 15 minutos antes do horário.",
   },
 ];
-
 
 const perguntas = [
   {
     q: "A TOC Brazil faz diagnóstico?",
-    a: "Não. Somos infraestrutura tecnológica e conteúdo educativo. Avaliação, diagnóstico e conduta são de responsabilidade do profissional habilitado.",
+    a: "Não. Somos uma empresa de tecnologia. A avaliação é feita por profissional habilitado, em consulta.",
   },
   {
-    q: "Posso remarcar ou cancelar?",
-    a: "Sim, respeitando a política de cancelamento informada em cada perfil profissional. Reembolsos seguem essa política e as regras da plataforma.",
+    q: "A TOC Brazil presta serviço psicológico?",
+    a: "Não. Quem presta o serviço é o psicólogo. A plataforma oferece busca, agendamento, pagamento e comunicação administrativa.",
   },
   {
-    q: "A consulta é gravada?",
-    a: "Não. As videochamadas não são gravadas por padrão.",
+    q: "A consulta acontece onde?",
+    a: "Na sala de videochamada do próprio psicólogo, contratada e mantida por ele. A TOC Brazil apenas guarda o link e transmite no horário agendado.",
   },
   {
-    q: "Preciso de psicólogo ou de psiquiatra?",
-    a: "Essa definição depende de avaliação profissional. Você pode começar por qualquer um dos dois; muitas pessoas fazem acompanhamento com ambos.",
+    q: "Como escolho um psicólogo?",
+    a: "Você pode comparar abordagem, idioma, valor, duração, horários e informações declaradas no perfil, sem ranking por desempenho ou destaque pago.",
   },
   {
-    q: "Como escolho um profissional?",
-    a: "Você pode comparar profissão, abordagem teórica, idioma e outras informações apresentadas em cada perfil antes de agendar.",
-  },
-  {
-    q: "Como funciona a consulta online?",
-    a: "No horário agendado, paciente e profissional acessam o link exclusivo da videochamada pelas suas respectivas áreas na plataforma.",
-  },
-  {
-    q: "Meus dados e informações são protegidos?",
-    a: "Sim. Cada área possui acesso próprio, e informações clínicas ficam disponíveis somente para o paciente e o profissional responsável pelo atendimento.",
+    q: "O que a plataforma confere?",
+    a: "Conferimos a inscrição ativa no CRP e os documentos de formação apresentados. Não avaliamos competência técnica nem garantimos resultado.",
   },
   {
     q: "Como funciona o pagamento da consulta?",
-    a: "O valor e as condições são apresentados durante o agendamento. O sinal pago para confirmar o horário é abatido do valor total da consulta.",
+    a: "O paciente paga exatamente o valor definido pelo psicólogo. A taxa da plataforma é fixa em reais por consulta realizada e é paga pelo profissional.",
+  },
+  {
+    q: "Posso remarcar ou cancelar?",
+    a: "Sim, conforme a janela de cancelamento configurada. Cancelamentos dentro do prazo podem gerar estorno pelo meio de pagamento.",
+  },
+  {
+    q: "Meus dados são protegidos?",
+    a: "Sim. Cada área possui acesso próprio, e a gestão acessa apenas dados operacionais necessários à plataforma.",
   },
 ];
 
@@ -83,15 +82,12 @@ function ComoFunciona() {
   return (
     <>
       <section className="container-page py-14 lg:py-20">
-        <span className="section-label">Nossa metodologia</span>
-        <h1 className="heading-page mt-4">Nossa metodologia</h1>
+        <span className="section-label">Como funciona</span>
+        <h1 className="heading-page mt-4">Como funciona</h1>
         <p className="mt-6 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-          Não somos apenas uma plataforma de consultas online. Somos uma plataforma especializada em
-          TOC, que reúne conhecimento, metodologia e profissionais selecionados em uma jornada
-          estruturada de cuidado.
+          A TOC Brazil é uma plataforma de tecnologia para buscar psicólogos com experiência em TOC, agendar consultas online e realizar o pagamento. A consulta acontece fora da plataforma, na sala do próprio psicólogo.
         </p>
       </section>
-
 
       <section className="border-y border-border bg-surface">
         <div className="container-page py-14 lg:py-20">
@@ -106,17 +102,14 @@ function ComoFunciona() {
           </ol>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link to="/profissionais" className="btn-base btn-primary">
-              Ver profissionais
+              Ver psicólogos disponíveis
             </Link>
           </div>
         </div>
-
       </section>
 
       <section aria-labelledby="duvidas" className="container-page py-14 lg:py-20">
-        <h2 id="duvidas" className="heading-section">
-          Dúvidas frequentes
-        </h2>
+        <h2 id="duvidas" className="heading-section">Dúvidas frequentes</h2>
         <dl className="mt-8 grid gap-5 md:grid-cols-2">
           {perguntas.map((p) => (
             <div key={p.q} className="card-soft p-6">

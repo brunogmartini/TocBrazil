@@ -10,7 +10,7 @@ export const Route = createFileRoute("/cadastro-profissional")({
       {
         name: "description",
         content:
-          "Cadastre-se como psicólogo ou psiquiatra com experiência em TOC, ou entre na sua conta profissional. Verificação de registro e documentos antes da publicação.",
+          "Cadastre-se como psicólogo com experiência em TOC, ou entre na sua conta profissional. Conferência de CRP e documentos antes da publicação."
       },
       { property: "og:title", content: "Sou profissional — TOC Brazil" },
       {
@@ -28,16 +28,17 @@ export const Route = createFileRoute("/cadastro-profissional")({
 
 const etapas = [
   { t: "Crie sua conta", d: "E-mail e senha ou Google. Leva menos de um minuto." },
-  { t: "Preencha seu cadastro", d: "Registro profissional, formação, subtipos atendidos, experiência com TOC e valor da consulta." },
-  { t: "Envie seus documentos", d: "Documento de identidade, comprovante de registro no conselho e diplomas/títulos." },
-  { t: "Análise da equipe", d: "Verificamos registro e documentos. Se algo precisar de correção, avisamos na sua área." },
+  { t: "Preencha seu cadastro", d: "CRP, formação, abordagens, experiência com TOC, idiomas e valor da consulta." },
+  { t: "Envie seus documentos", d: "Documento de identidade, certidão de regularidade do CRP, apólice de seguro profissional e documentos de formação." },
+  { t: "Conferência documental", d: "Conferimos inscrição ativa no CRP e documentos apresentados. Se algo precisar de correção, avisamos na sua área." },
   { t: "Configure sua agenda", d: "Defina sua disponibilidade recorrente e bloqueie exceções direto no calendário." },
   { t: "Perfil publicado", d: "Depois da aprovação, seu perfil fica visível e pronto para receber agendamentos." },
 ];
 
 const documentos = [
   "Documento de identidade com foto",
-  "Comprovante de registro ativo no conselho (CRP ou CRM)",
+  "Certidão de regularidade do CRP com validade",
+  "Apólice de seguro de responsabilidade civil profissional com validade",
   "Diploma de graduação",
   "Certificados de especialização e cursos em TOC/TCC/EPR",
 ];
@@ -84,7 +85,7 @@ function CadastroProfissional() {
       <span className="section-label">Para profissionais</span>
       <h1 className="heading-page mt-3">Sou profissional</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
-        Psicólogos e psiquiatras com experiência em TOC. Se você ainda não tem cadastro, comece pelo
+        Psicólogos com experiência em TOC. Se você ainda não tem cadastro, comece pelo
         lado esquerdo. Se já é cadastrado, entre pelo lado direito.
       </p>
 
@@ -191,7 +192,7 @@ function CadastroProfissional() {
       <section className="mt-14">
         <h2 className="heading-section">Etapas do seu cadastro</h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Você acompanha em que etapa está dentro da sua área. A equipe da plataforma valida cada etapa
+          Você acompanha em que etapa está dentro da sua área. A equipe confere os documentos
           e o perfil só fica público depois que todos os requisitos forem aprovados.
         </p>
         <ol className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -203,8 +204,8 @@ function CadastroProfissional() {
           ))}
         </ol>
         <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
-          A verificação de registro e documentos é obrigatória antes da publicação. A plataforma não
-          interfere na conduta clínica e não promete volume de pacientes.
+          A conferência do CRP e dos documentos é obrigatória antes da publicação. A plataforma não
+          interfere na conduta profissional e não promete volume de pacientes.
         </p>
       </section>
     </div>

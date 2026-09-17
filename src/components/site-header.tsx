@@ -6,7 +6,7 @@ import { INICIO_DA_AREA } from "@/lib/areas";
 import { CHAVE_PERFIL_PRETENDIDO, minhaArea } from "@/lib/role-access";
 
 const nav = [
-  { to: "/como-funciona", label: "Nossa metodologia" },
+  { to: "/como-funciona", label: "Como funciona" },
   { to: "/entenda-o-toc", label: "Sobre o transtorno" },
   { to: "/profissionais", label: "Ver profissionais" },
 ] as const;

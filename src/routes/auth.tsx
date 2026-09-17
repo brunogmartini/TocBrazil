@@ -31,7 +31,7 @@ export const Route = createFileRoute("/auth")({
       {
         name: "description",
         content:
-          "Acesse sua conta TOC Brazil para agendar consultas online com psicólogos e psiquiatras com experiência em TOC.",
+          "Acesse sua conta TOC Brazil para agendar consultas online com psicólogos com experiência em TOC."
       },
       { property: "og:title", content: "Entrar ou criar conta — TOC Brazil" },
       {
@@ -260,7 +260,7 @@ function Auth() {
           <ul className="mt-8 space-y-3 text-sm text-muted-foreground">
             <li className="card-soft p-4">Agenda real dos profissionais, com confirmação imediata.</li>
             <li className="card-soft p-4">Histórico de consultas, lembretes e recibos em um só lugar.</li>
-            <li className="card-soft p-4">Seus dados de saúde ficam visíveis apenas para você e para o profissional que atende você.</li>
+            <li className="card-soft p-4">Seus dados de cadastro e agendamento ficam protegidos por área de acesso.</li>
           </ul>
         )}
          {profissional && (

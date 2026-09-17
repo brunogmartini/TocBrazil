@@ -8,13 +8,13 @@ export const Route = createFileRoute("/profissionais/")({
   loader: () => listarProfissionais(),
   head: () => ({
     meta: [
-      { title: "Encontrar psicólogo ou psiquiatra online — TOC Brazil" },
+      { title: "Encontrar psicólogo online — TOC Brazil" },
       {
         name: "description",
         content:
-          "Compare perfis de psicólogos e psiquiatras por profissão, abordagem, subtipo de TOC, idioma e experiência para atendimento online.",
+          "Compare perfis de psicólogos por abordagem, preço, idioma, dia, turno e experiência declarada em TOC para agendamento de consultas online.",
       },
-      { property: "og:title", content: "Encontre profissional com experiência em TOC" },
+      { property: "og:title", content: "Encontre psicólogo com experiência em TOC" },
       {
         property: "og:description",
         content:
@@ -97,12 +97,10 @@ function pesoAleatorio(slug: string, seed: number) {
 export const ABORDAGEM_EPR = "Exposição e Prevenção de Resposta (EPR)";
 export const LABEL_PROFISSAO: Record<string, string> = {
   psicologo: "Psicólogo(a)",
-  psiquiatra: "Psiquiatra",
 };
 
 function Busca() {
   const { profissionais } = Route.useLoaderData();
-  const [profissao, setProfissao] = useState(TODOS);
   const [abordagem, setAbordagem] = useState(TODOS);
   const [idioma, setIdioma] = useState(TODOS);
   const [genero, setGenero] = useState(TODOS);
@@ -146,7 +144,6 @@ function Busca() {
     return profissionais
       .filter(
         (p) =>
-          (profissao === TODOS || LABEL_PROFISSAO[p.profissao] === profissao) &&
           (abordagem === TODOS || p.abordagem === abordagem) &&
           (idioma === TODOS || p.idiomas.includes(idioma)) &&
           (genero === TODOS || p.genero === genero.toLowerCase()) &&
@@ -160,11 +157,10 @@ function Busca() {
         if (ha !== hb) return ha - hb;
         return pesoAleatorio(a.slug, seed) - pesoAleatorio(b.slug, seed);
       });
-  }, [profissionais, profissao, abordagem, idioma, genero, faixa, dia, turno, seed]);
+  }, [profissionais, abordagem, idioma, genero, faixa, dia, turno, seed]);
 
   useEffect(() => {
     track("professional_search", {
-      profissao,
       abordagem,
       idioma,
       genero,
@@ -173,17 +169,15 @@ function Busca() {
       turno,
       resultados: resultados.length,
     });
-  }, [profissao, abordagem, idioma, genero, faixa, dia, turno, resultados.length]);
+  }, [abordagem, idioma, genero, faixa, dia, turno, resultados.length]);
 
 
   return (
     <div className="container-page py-12 lg:py-16">
       <span className="section-label">Profissionais</span>
-      <h1 className="heading-page mt-3">Encontre profissional com experiência em TOC</h1>
+      <h1 className="heading-page mt-3">Encontre psicólogo com experiência em TOC</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
-        Verificamos a inscrição ativa no conselho profissional e a documentação de formação
-        declarada. A ordenação mostra primeiro quem tem o horário livre mais próximo, sem destaque
-        pago e sem indicar que um profissional é melhor do que outro.
+        Profissionais cadastrados, com inscrição no CRP conferida e documentos de formação apresentados. A ordenação mostra primeiro quem tem o horário livre mais próximo, sem destaque pago e sem indicar que um profissional é melhor do que outro.
       </p>
 
 
@@ -191,12 +185,6 @@ function Busca() {
         className="card-soft mt-8 grid gap-5 p-6 md:grid-cols-2 lg:grid-cols-4"
         onSubmit={(e) => e.preventDefault()}
       >
-        <Select
-          label="Profissionais"
-          value={profissao}
-          onChange={setProfissao}
-          options={[TODOS, "Psicólogo(a)", "Psiquiatra"]}
-        />
         <Select
           label="Abordagem teórica"
           value={abordagem}
@@ -227,13 +215,13 @@ function Busca() {
       </form>
 
       <p className="mt-8 text-sm text-muted-foreground" role="status">
-        {resultados.length} profissional(is) — todos com atendimento online
+        {resultados.length} psicólogo(s) — todos com consulta online
       </p>
 
       <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {resultados.map((p) => (
           <article key={p.slug} className="card-soft card-soft-hover flex h-full flex-col p-6">
-            <span className="pill self-start">{LABEL_PROFISSAO[p.profissao]}</span>
+            <span className="pill self-start">Psicólogo(a)</span>
             <h2 className="mt-4 text-lg">{p.nome}</h2>
             <p className="mt-1 text-xs text-muted-foreground">
               {p.registro} · {p.uf} · {p.experiencia_anos} anos declarados
@@ -274,17 +262,17 @@ function Busca() {
         <div className="card-soft mt-5 p-8">
           <h2 className="text-xl">
             {profissionais.length === 0
-              ? "Em breve, novos profissionais especializados em TOC estarão disponíveis na plataforma."
+              ? "Em breve, novos psicólogos com experiência em TOC estarão disponíveis na plataforma."
               : "Nenhum profissional corresponde a esses filtros no momento."}
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             {profissionais.length === 0
-              ? "Cada perfil passa por verificação de registro e documentos antes de ser publicado. Assim que a análise for concluída, os profissionais aparecem aqui."
+              ? "Cada perfil passa por conferência de CRP e documentos antes de ser publicado. Assim que a análise for concluída, os psicólogos aparecem aqui."
               : "Tente remover uma preferência para ampliar o resultado."}
           </p>
           {profissionais.length === 0 && (
             <Link to="/cadastro-profissional" className="btn-base btn-ghost mt-6">
-              Sou profissional e quero fazer parte
+              Sou psicólogo e quero fazer parte
             </Link>
           )}
         </div>
