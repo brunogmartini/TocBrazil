@@ -1,12 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect } from "react";
 import {
-  avaliacoesDoProfissional,
   listarHorariosLivres,
   obterProfissional,
 } from "@/lib/plataforma.functions";
 import { moeda } from "@/lib/video-sala";
-import { Estrelas } from "@/components/estrelas";
 import { track } from "@/lib/analytics";
 
 const LABEL_PROFISSAO: Record<string, string> = {
@@ -18,11 +16,10 @@ export const Route = createFileRoute("/profissionais/$slug")({
   loader: async ({ params }) => {
     const { profissional } = await obterProfissional({ data: { slug: params.slug } });
     if (!profissional) throw notFound();
-    const [avaliacoes, agenda] = await Promise.all([
-      avaliacoesDoProfissional({ data: { professionalId: profissional.id } }),
+    const [agenda] = await Promise.all([
       listarHorariosLivres({ data: { slug: params.slug, dias: 21 } }),
     ]);
-    return { profissional, avaliacoes, horarios: agenda.horarios.slice(0, 6) };
+    return { profissional, horarios: agenda.horarios.slice(0, 6) };
   },
   head: ({ params, loaderData }) => {
     if (!loaderData) {
@@ -82,7 +79,7 @@ function horarioBR(iso: string) {
 }
 
 function Perfil() {
-  const { profissional: p, avaliacoes, horarios } = Route.useLoaderData();
+  const { profissional: p, horarios } = Route.useLoaderData();
 
   useEffect(() => {
     track("professional_profile_view", { slug: p.slug, profissao: p.profissao });
@@ -158,34 +155,6 @@ function Perfil() {
               <p className="mt-2 text-sm text-muted-foreground">Modalidade: online</p>
             </section>
           </div>
-
-          <section className="card-soft mt-5 p-6">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-lg">Avaliações administrativas</h2>
-              {avaliacoes.total > 0 && (
-                <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Estrelas nota={avaliacoes.media} />
-                  {avaliacoes.media.toFixed(1)} · {avaliacoes.total}{" "}
-                  {avaliacoes.total === 1 ? "avaliação" : "avaliações"}
-                </span>
-              )}
-            </div>
-            {avaliacoes.total === 0 ? (
-              <p className="mt-3 text-sm text-muted-foreground">
-                Este profissional ainda não recebeu avaliações. Depois da consulta, o paciente
-                avalia apenas pontualidade, clareza das orientações administrativas e cordialidade.
-              </p>
-            ) : (
-              <ul className="mt-4 space-y-3">
-                {avaliacoes.avaliacoes.map((a) => (
-                  <li key={a.id} className="rounded-xl bg-muted p-4 text-sm">
-                    <Estrelas nota={a.nota} />
-                    {a.comentario && <p className="mt-2 text-muted-foreground">{a.comentario}</p>}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
 
           <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
             As informações deste perfil são declaradas pelo profissional e sua documentação é

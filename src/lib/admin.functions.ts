@@ -365,6 +365,48 @@ export const painelAdmin = createServerFn({ method: "GET" })
     };
   });
 
+export type LinhaRelatorio = {
+  professional_id: string;
+  nome: string;
+  realizadas: number;
+  canceladas_paciente: number;
+  canceladas_profissional: number;
+  nao_comparecimentos: number;
+  expiradas: number;
+  taxas_centavos: number;
+};
+
+/** Relatório de metadados administrativos (nunca conteúdo de atendimento). */
+export const relatorioMetadados = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data?: { de?: string; ate?: string }) => ({
+    de: data?.de ? String(data.de) : null,
+    ate: data?.ate ? String(data.ate) : null,
+  }))
+  .handler(async ({ data, context }) => {
+    await garantirAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.rpc("concluir_consultas_vencidas");
+    const agora = new Date();
+    const de = data.de ? new Date(data.de) : new Date(agora.getFullYear(), agora.getMonth() - 2, 1);
+    const ate = data.ate ? new Date(data.ate) : new Date(agora.getFullYear(), agora.getMonth() + 1, 1);
+    const { data: linhas } = await supabaseAdmin.rpc("relatorio_metadados", {
+      _de: de.toISOString(),
+      _ate: ate.toISOString(),
+    });
+    const { data: eventos } = await supabaseAdmin
+      .from("eventos_auditoria")
+      .select("id, tipo, appointment_id, ator_papel, ocorrido_em")
+      .gte("ocorrido_em", de.toISOString())
+      .order("ocorrido_em", { ascending: false })
+      .limit(120);
+    return {
+      periodo: { de: de.toISOString(), ate: ate.toISOString() },
+      linhas: (linhas ?? []) as LinhaRelatorio[],
+      eventos: eventos ?? [],
+    };
+  });
+
 export const definirStatusProfissional = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(

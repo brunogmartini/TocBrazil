@@ -7,15 +7,13 @@ import {
   cancelarConsulta,
   meuContexto,
   meuLivro,
-  minhasAvaliacoes,
   minhasConsultas,
   minhasNotificacoes,
   registrarInteresseLivro,
-  salvarAvaliacao,
+  confirmarRealizacao,
   salvarPerfil,
 } from "@/lib/plataforma.functions";
 import { CalendarioConsultas, type ItemCalendario } from "@/components/calendario-consultas";
-import { Estrelas, SeletorEstrelas } from "@/components/estrelas";
 import { Modal } from "@/components/modal";
 import { iniciarPagamento } from "@/lib/pagamento.functions";
 import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
@@ -54,14 +52,12 @@ function Painel() {
   const interesseLivro = useServerFn(registrarInteresseLivro);
   const salvar = useServerFn(salvarPerfil);
   const cancelar = useServerFn(cancelarConsulta);
-  const carregarAvaliacoes = useServerFn(minhasAvaliacoes);
-  const enviarAvaliacao = useServerFn(salvarAvaliacao);
+  const confirmarConsulta = useServerFn(confirmarRealizacao);
   const pagar = useServerFn(iniciarPagamento);
 
   const contexto = useQuery({ queryKey: ["contexto"], queryFn: () => carregarContexto() });
   const consultas = useQuery({ queryKey: ["consultas"], queryFn: () => carregarConsultas() });
   const notificacoes = useQuery({ queryKey: ["notificacoes"], queryFn: () => carregarNotificacoes() });
-  const avaliacoes = useQuery({ queryKey: ["minhas-avaliacoes"], queryFn: () => carregarAvaliacoes() });
   const livro = useQuery({ queryKey: ["livro"], queryFn: () => carregarLivro() });
 
   const [editandoPerfil, setEditandoPerfil] = useState(false);
@@ -266,7 +262,6 @@ function Painel() {
               <h2 className="text-xl">Histórico</h2>
               <ul className="mt-4 space-y-3">
                 {historico.map((c) => {
-                  const feita = (avaliacoes.data?.avaliacoes ?? []).find((a) => a.appointment_id === c.id);
                   return (
                     <li key={c.id} className="card-soft p-5 text-sm">
                       <div className="flex flex-wrap justify-between gap-2">
@@ -275,33 +270,35 @@ function Painel() {
                         </span>
                         <span className="text-muted-foreground">{rotuloStatusConsulta[c.status] ?? c.status}</span>
                       </div>
-                       <dl className="mt-3 grid gap-2 rounded-xl bg-muted p-3 sm:grid-cols-3">
-                         <div>
-                           <dt className="text-xs text-muted-foreground">Valor total</dt>
-                           <dd className="font-semibold">{moeda(c.valor_consulta_centavos)}</dd>
-                         </div>
-                         <div>
-                           <dt className="text-xs text-muted-foreground">Sinal incluído</dt>
-                           <dd className="font-semibold">{moeda(c.taxa_agendamento_centavos)}</dd>
-                         </div>
-                         <div>
-                           <dt className="text-xs text-muted-foreground">Restante</dt>
-                           <dd className="font-semibold">
-                             {moeda(Math.max(0, c.valor_consulta_centavos - c.taxa_agendamento_centavos))}
-                           </dd>
-                         </div>
-                       </dl>
-                      {c.status === "realizada" && (
-                        <FormularioAvaliacao
-                          consultaId={c.id}
-                          notaAtual={feita?.nota ?? 0}
-                          comentarioAtual={feita?.comentario ?? ""}
-                          onSalvar={async (nota, comentario) => {
-                            const r = await enviarAvaliacao({ data: { consultaId: c.id, nota, comentario } });
-                            if (r.ok) await queryClient.invalidateQueries({ queryKey: ["minhas-avaliacoes"] });
-                            return r.ok ? null : r.erro;
-                          }}
-                        />
+                      <dl className="mt-3 grid gap-2 rounded-xl bg-muted p-3 sm:grid-cols-2">
+                        <div>
+                          <dt className="text-xs text-muted-foreground">Valor da consulta</dt>
+                          <dd className="font-semibold">{moeda(c.valor_consulta_centavos)}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-muted-foreground">Pagamento</dt>
+                          <dd className="font-semibold">
+                            {c.payment_status === "aprovado" ? "Aprovado" : "Pendente"}
+                          </dd>
+                        </div>
+                      </dl>
+                      {c.status === "confirmada" && new Date(c.fim).getTime() <= agora && (
+                        <div className="mt-4 border-t border-border/60 pt-4">
+                          <p className="text-xs text-muted-foreground">
+                            A consulta acontece na sala do profissional. Confirme que ela aconteceu.
+                          </p>
+                          <button
+                            type="button"
+                            className="btn-base btn-primary mt-3"
+                            onClick={async () => {
+                              const r = await confirmarConsulta({ data: { id: c.id } });
+                              setAviso(r.ok ? "Obrigado por confirmar." : r.erro);
+                              if (r.ok) await queryClient.invalidateQueries({ queryKey: ["consultas"] });
+                            }}
+                          >
+                            Confirmar que aconteceu
+                          </button>
+                        </div>
                       )}
                     </li>
                   );
@@ -522,68 +519,3 @@ function FormularioPerfil({
   );
 }
 
-function FormularioAvaliacao({
-  consultaId,
-  notaAtual,
-  comentarioAtual,
-  onSalvar,
-}: {
-  consultaId: string;
-  notaAtual: number;
-  comentarioAtual: string;
-  onSalvar: (nota: number, comentario: string) => Promise<string | null>;
-}) {
-  const [aberto, setAberto] = useState(notaAtual === 0);
-  const [nota, setNota] = useState(notaAtual);
-  const [comentario, setComentario] = useState(comentarioAtual);
-  const [erro, setErro] = useState<string | null>(null);
-  const [salvando, setSalvando] = useState(false);
-
-  if (!aberto) {
-    return (
-      <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/60 pt-4">
-        <Estrelas nota={notaAtual} />
-        <span className="text-xs text-muted-foreground">Sua avaliação foi registrada.</span>
-        <button type="button" className="text-xs underline underline-offset-4" onClick={() => setAberto(true)}>
-          Alterar
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <form
-      className="mt-4 space-y-3 border-t border-border/60 pt-4"
-      onSubmit={async (e) => {
-        e.preventDefault();
-        if (nota < 1) {
-          setErro("Escolha de 1 a 5 estrelas.");
-          return;
-        }
-        setSalvando(true);
-        const falha = await onSalvar(nota, comentario);
-        setSalvando(false);
-        setErro(falha);
-        if (!falha) setAberto(false);
-      }}
-    >
-      <p className="text-sm font-semibold text-foreground">Como foi sua consulta?</p>
-      <SeletorEstrelas valor={nota} onChange={setNota} />
-      <label className="block text-sm" htmlFor={`comentario-${consultaId}`}>
-        Comentário (opcional)
-        <textarea
-          id={`comentario-${consultaId}`}
-          className="field-base mt-1"
-          rows={3}
-          maxLength={800}
-          value={comentario}
-          onChange={(e) => setComentario(e.target.value)}
-        />
-      </label>
-      {erro && <p className="text-sm text-destructive">{erro}</p>}
-      <button type="submit" disabled={salvando} className="btn-base btn-primary disabled:opacity-60">
-        {salvando ? "Enviando…" : "Enviar avaliação"}
-      </button>
-    </form>
-  );
-}
