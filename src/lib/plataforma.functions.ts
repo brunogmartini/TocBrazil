@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
-import { gerarSalaVideo } from "@/lib/video-sala";
 import { areaDosPapeis, type Papel } from "@/lib/areas";
 
 export type ProfissionalPublico = {
@@ -411,9 +410,9 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
       titulo: "Consulta cancelada",
       corpo: dentroDoPrazo
         ? cfg.reembolsoTaxaNoPrazo
-          ? "Cancelamento dentro do prazo. O sinal de agendamento será estornado pela nossa equipe."
+          ? "Cancelamento dentro do prazo. O valor pago será estornado pela nossa equipe."
           : "Cancelamento registrado dentro do prazo."
-        : `Cancelamento fora do prazo de ${cfg.cancelamentoHoras}h. O sinal de agendamento não é reembolsável.`,
+        : `Cancelamento fora do prazo de ${cfg.cancelamentoHoras}h: o valor pago não é reembolsável.`,
     });
     return { ok: true as const, dentroDoPrazo };
   });
