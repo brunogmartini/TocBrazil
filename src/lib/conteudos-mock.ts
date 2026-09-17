@@ -43,7 +43,7 @@ export const CONTEUDOS: Conteudo[] = [
     ],
     fontes: [
       "Organização Mundial da Saúde — Classificação Internacional de Doenças (CID-11)",
-      "Manual Identificação clínica e Estatístico de Transtornos Mentais (DSM-5-TR)",
+      "Manual Diagnóstico e Estatístico de Transtornos Mentais (DSM-5-TR)",
     ],
   },
   {
@@ -85,7 +85,7 @@ export const CONTEUDOS: Conteudo[] = [
     paragrafos: [
       "Conferir se a porta está trancada é comportamento comum. A dificuldade aparece quando a checagem não encerra a dúvida e precisa ser repetida para produzir alívio.",
       "Muitas pessoas relatam que, quanto mais verificam, menos confiam na própria memória. Esse é um fenômeno descrito na literatura sobre TOC.",
-      "Não existe um número de verificações que defina um identificação clínica. O que importa clinicamente é o sofrimento e a interferência na vida — e isso é avaliado por um profissional.",
+      "Não existe um número de verificações que defina um diagnóstico. O que importa clinicamente é o sofrimento e a interferência na vida — e isso é avaliado por um profissional.",
     ],
     fontes: ["Estudos sobre memória e comportamento de checagem no TOC"],
   },
@@ -106,16 +106,16 @@ export const CONTEUDOS: Conteudo[] = [
   {
     slug: "cuidado-do-toc",
     categoria: "Cuidado",
-    titulo: "Como o cuidado do TOC costuma ser conduzido",
+    titulo: "Como uma consulta psicológica pode ajudar",
     resumo:
-      "Psicoterapia, acompanhamento psiquiátrico quando indicado e a importância de um plano combinado.",
+      "Psicoterapia, avaliação individual e a importância de um plano combinado com profissional habilitado.",
     leitura: "7 min",
     paragrafos: [
-      "O cuidado do TOC é conduzido por profissionais habilitados e definido caso a caso. Em geral envolve psicoterapia e, quando indicado pelo médico, acompanhamento psiquiátrico.",
+      "O cuidado do TOC é conduzido por profissionais habilitados e definido caso a caso. Na Psicologia, a consulta permite compreender o contexto da pessoa e combinar próximos passos.",
       "Abordagens psicoterapêuticas com apoio de evidências para TOC incluem intervenções cognitivo-comportamentais. A escolha depende da consulta com profissional habilitado e das preferências da pessoa.",
-      "Somente um médico pode avaliar a necessidade e a indicação de medicação. Nenhuma plataforma pode fazer isso, e nós não fazemos.",
-      "Nosso papel é reunir informação confiável e facilitar o acesso a profissionais para que você possa dar o próximo passo com mais segurança.",
+      "A TOC Brazil não avalia pacientes, não indica condutas e não faz triagem. Nosso papel é reunir informação confiável e facilitar busca, agendamento e pagamento.",
+      "Se houver risco imediato ou crise, procure ajuda de urgência: ligue 188 (CVV) ou 192 (SAMU).",
     ],
-    fontes: ["Diretrizes clínicas internacionais para transtornos relacionados ao TOC"],
+    fontes: ["Diretrizes científicas internacionais sobre TOC"],
   },
 ];

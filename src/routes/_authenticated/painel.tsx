@@ -306,44 +306,7 @@ function Painel() {
         </div>
 
          <aside className="flex h-full flex-col gap-8">
-           <section className="card-soft flex-1 overflow-hidden p-6">
-            <span className="section-label">Benefício exclusivo</span>
-            <h2 className="mt-2 text-xl">{livro.data?.titulo ?? "Como Ser Feliz com TOC"}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Pacientes cadastrados na TOC Brazil têm{" "}
-              <strong className="text-foreground">{livro.data?.descontoPercent ?? 50}% de desconto</strong> na
-              aquisição do livro.
-            </p>
-            {livro.data?.status === "confirmada" ? (
-              <p className="mt-4 rounded-xl bg-primary/10 p-3 text-sm">
-                Compra confirmada. Boa leitura!
-              </p>
-            ) : livro.data?.url ? (
-              <a
-                href={livro.data.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-base btn-primary mt-5 w-full"
-                onClick={async () => {
-                  await interesseLivro();
-                  await queryClient.invalidateQueries({ queryKey: ["livro"] });
-                }}
-              >
-                Adquirir com {livro.data.descontoPercent}% de desconto
-              </a>
-            ) : (
-              <p className="mt-4 rounded-xl bg-muted p-3 text-xs text-muted-foreground">
-                O link com desconto será liberado em breve nesta área.
-              </p>
-            )}
-            {livro.data?.status === "pendente" && (
-              <p className="mt-3 text-xs text-muted-foreground">
-                Sua compra está pendente de confirmação. Assim que a Hotmart confirmar, avisaremos aqui.
-              </p>
-            )}
-          </section>
-
-          <section className="card-soft p-6">
+           <section className="card-soft p-6">
             <h2 className="text-lg">Lembretes</h2>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               {(notificacoes.data?.notificacoes ?? []).length === 0 && (

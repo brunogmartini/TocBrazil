@@ -92,8 +92,7 @@ function Artigo() {
         </section>
 
         <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
-          Este conteúdo é informativo e não constitui identificação clínica, indicação de cuidado ou
-          prescrição. Somente um profissional qualificado pode avaliar cada caso.
+          Este conteúdo é informativo e não constitui diagnóstico, triagem ou indicação de conduta. Somente um profissional habilitado pode avaliar cada caso.
         </p>
 
         <div className="card-soft mt-10 p-8">

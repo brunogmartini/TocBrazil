@@ -16,7 +16,7 @@ export const Route = createFileRoute("/conteudos/")({
       {
         property: "og:description",
         content:
-          "Informação educativa e cuidadosa sobre TOC, sem identificação clínica e sem promessas de resultado.",
+          "Informação educativa e cuidadosa sobre TOC, sem diagnóstico, triagem ou promessa de desfecho.",
       },
       { property: "og:url", content: "/conteudos" },
     ],
@@ -44,7 +44,7 @@ function Conteudos() {
       <h1 className="mt-3 text-3xl sm:text-4xl">Conteúdo para entender o TOC</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
         Material educativo escrito em linguagem simples. Nenhum conteúdo aqui substitui uma
-        consulta com profissional habilitado, e não oferecemos testes de autoidentificação clínica.
+        consulta com profissional habilitado, e não oferecemos testes, triagem ou escores.
       </p>
 
       <ul className="mt-8 flex flex-wrap gap-2">

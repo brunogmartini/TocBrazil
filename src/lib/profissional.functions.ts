@@ -507,7 +507,8 @@ function rotuloPaciente(
   if (!perfil) return { paciente: `Paciente ${patientId.slice(0, 4).toUpperCase()}`, codigo: null, vinculado: false };
   const primeiro = (perfil.nome ?? "").trim().split(/\s+/)[0] || "Paciente";
   const sobrenome = (perfil.nome ?? "").trim().split(/\s+/).slice(1).pop();
-  const rotulo = sobrenome ? `${primeiro} ${sobrenome[0]!.toUpperCase()}.` : primeiro;
+  const inicialSobrenome = sobrenome?.[0]?.toUpperCase();
+  const rotulo = inicialSobrenome ? `${primeiro} ${inicialSobrenome}.` : primeiro;
   return { paciente: rotulo, codigo: perfil.codigo_anonimo, vinculado: true };
 }
 

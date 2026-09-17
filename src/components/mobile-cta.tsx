@@ -5,7 +5,7 @@ export function MobileCta() {
   const [aberto, setAberto] = useState(false);
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-xl lg:hidden">
+    <div className="fixed inset-x-0 bottom-8 z-40 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-xl lg:hidden">
       {aberto && (
         <div className="mb-3 flex flex-col rounded-2xl bg-muted p-2">
           <Link

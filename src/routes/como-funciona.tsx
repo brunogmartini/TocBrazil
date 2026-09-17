@@ -62,7 +62,7 @@ const perguntas = [
   },
   {
     q: "O que a plataforma confere?",
-    a: "Conferimos a inscrição ativa no CRP e os documentos de formação apresentados. Não avaliamos competência técnica nem garantimos resultado.",
+    a: "Conferimos a inscrição ativa no CRP e os documentos de formação apresentados. Não avaliamos competência técnica nem fazemos promessa de desfecho.",
   },
   {
     q: "Como funciona o pagamento da consulta?",

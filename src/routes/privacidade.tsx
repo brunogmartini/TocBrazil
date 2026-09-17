@@ -7,13 +7,13 @@ export const Route = createFileRoute("/privacidade")({
       {
         name: "description",
         content:
-          "Como a TOC Brazil trata dados pessoais e dados sensíveis de saúde: finalidades, minimização, base legal, seus direitos e retenção de informações.",
+          "Como a TOC Brazil trata dados pessoais: finalidades, minimização, base legal, seus direitos e retenção de informações.",
       },
       { property: "og:title", content: "Privacidade e LGPD na TOC Brazil" },
       {
         property: "og:description",
         content:
-          "Tratamento de dados com minimização, consentimento explícito e controle de acesso por papel.",
+          "Dados tratados com minimização, consentimento quando necessário e controle de acesso por papel.",
       },
       { property: "og:url", content: "/privacidade" },
     ],
@@ -27,34 +27,34 @@ const secoes = [
     t: "Dados que tratamos",
     p: [
       "Coletamos apenas o necessário: dados de identificação e contato, informações de agendamento, dados de pagamento processados por provedor especializado e, no caso de profissionais, documentação de habilitação.",
-      "Dados relacionados à saúde são considerados dados pessoais sensíveis pela LGPD e recebem proteção reforçada, com acesso restrito ao estritamente necessário.",
+      "Informações sensíveis eventualmente necessárias ao agendamento recebem proteção reforçada, com acesso restrito ao estritamente necessário.",
     ],
   },
   {
     t: "Finalidades",
     p: [
-      "Usamos os dados para viabilizar o agendamento, o pagamento, a realização da consulta por videochamada, a emissão de documentos fiscais e as comunicações essenciais do serviço.",
+      "Usamos os dados para viabilizar cadastro, agendamento, pagamento, emissão de documentos fiscais e comunicações essenciais.",
       "Não vendemos dados pessoais e não usamos conteúdo de consultas para publicidade.",
     ],
   },
   {
     t: "Consentimento",
     p: [
-      "O tratamento de dados sensíveis de saúde ocorre com consentimento explícito e específico, registrado com data e finalidade.",
+      "Dados sensíveis, quando necessários, são tratados com base legal adequada e consentimento explícito quando aplicável.",
       "Você pode revogar consentimentos de comunicação a qualquer momento, sem prejuízo dos registros exigidos por obrigação legal.",
     ],
   },
   {
     t: "Acesso segmentado",
     p: [
-      "Cada papel acessa apenas o que precisa: o paciente acessa seus próprios dados; o profissional acessa apenas os dados necessários ao atendimento; a administração acessa dados operacionais, sem acesso a conteúdo clínico.",
+      "Cada papel acessa apenas o que precisa: o paciente acessa seus próprios dados; o profissional acessa apenas os dados necessários à consulta; a administração acessa dados operacionais, sem acesso a conteúdo clínico.",
       "Ações sensíveis são registradas em log de auditoria.",
     ],
   },
   {
     t: "Videochamada",
     p: [
-      "As consultas não são gravadas por padrão. Qualquer gravação dependeria de consentimento explícito e específico das partes envolvidas.",
+      "A TOC Brazil não hospeda a videochamada e não tem acesso ao conteúdo das consultas. A sala é do profissional.",
     ],
   },
   {
@@ -72,7 +72,7 @@ function Privacidade() {
       <span className="section-label">Institucional</span>
       <h1 className="heading-page mt-3">Privacidade e LGPD</h1>
       <p className="mt-4 max-w-2xl text-sm text-muted-foreground">
-        Dados de saúde exigem cuidado redobrado. Este documento explica nossa abordagem e será
+        Dados pessoais exigem cuidado redobrado. Este documento explica nossa abordagem e será
         revisado por assessoria jurídica antes do lançamento comercial.
       </p>
 

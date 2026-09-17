@@ -74,9 +74,7 @@ function ParaPsicologos() {
         <div className="container-page py-14 lg:py-20">
           <h2 className="heading-section">Como funciona o cadastro</h2>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Seu perfil fica público apenas após a verificação dos requisitos definidos pela
-            plataforma. Os status possíveis são: cadastro incompleto, em análise, aprovado,
-            requer correção e suspenso.
+            Seu perfil fica público apenas após conferirmos registro e documentos. Os status possíveis são: cadastro incompleto, em análise, publicado, requer correção e suspenso.
           </p>
           <ol className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {etapas.map((e, i) => (
@@ -114,6 +112,26 @@ function ParaPsicologos() {
         <p className="mt-8 max-w-3xl text-xs leading-relaxed text-muted-foreground">
           A TOC Brazil atua como infraestrutura tecnológica e cobra uma taxa fixa em reais por consulta realizada, igual para todos os profissionais. A consulta permanece sob responsabilidade do psicólogo habilitado, conforme as normas do CFP.
         </p>
+      </section>
+
+      <section className="border-t border-border bg-surface">
+        <div className="container-page py-14 lg:py-20">
+          <h2 className="heading-section">Dúvidas dos profissionais</h2>
+          <dl className="mt-8 grid gap-5 md:grid-cols-2">
+            <div className="card-soft p-6">
+              <dt className="heading-subsection">A TOC Brazil tem registro no CRP e responsável técnico?</dt>
+              <dd className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Não, e não precisa ter. A TOC Brazil é uma empresa de tecnologia e não presta serviços psicológicos. Quem presta é você: contrata diretamente com o paciente, define seu valor e mantém seus próprios registros.
+              </dd>
+            </div>
+            <div className="card-soft p-6">
+              <dt className="heading-subsection">Quanto a plataforma cobra?</dt>
+              <dd className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Uma taxa fixa em reais por consulta realizada, igual para todos os profissionais, independente do valor que você cobra. Não é comissão nem percentual.
+              </dd>
+            </div>
+          </dl>
+        </div>
       </section>
     </>
   );
