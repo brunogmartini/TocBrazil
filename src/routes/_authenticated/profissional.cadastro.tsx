@@ -104,7 +104,7 @@ function CadastroProfissional() {
   });
   const [aviso, setAviso] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
-  const [tipoDoc, setTipoDoc] = useState(TIPOS_DOCUMENTO[0]!);
+  const [tipoDoc, setTipoDoc] = useState(TIPOS_DOCUMENTO[0] ?? "Documento de identidade");
   const [enviandoDoc, setEnviandoDoc] = useState(false);
 
   useEffect(() => {
@@ -140,8 +140,9 @@ function CadastroProfissional() {
         ferramenta_url_sala: p.ferramenta_url_sala ?? "",
         ferramenta_instrucoes: p.ferramenta_instrucoes ?? "",
       });
-    } else if (dados.data?.email) {
-      setForm((f) => ({ ...f, email_contato: dados.data!.email! }));
+    } else {
+      const email = dados.data?.email;
+      if (email) setForm((f) => ({ ...f, email_contato: email }));
     }
   }, [dados.data]);
 
