@@ -43,6 +43,13 @@
       "when": 1789662881918,
       "tag": "0005_restringir_profissionais_psicologos",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789663357874,
+      "tag": "0006_ajustar_psicologos_taxa_fixa",
+      "breakpoints": true
     }
   ]
 }

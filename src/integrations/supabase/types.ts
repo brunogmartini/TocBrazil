@@ -903,6 +903,7 @@ export type Database = {
           certidao_validade: string | null
           cidade: string | null
           comissao_percent: number
+          cpf: string | null
           created_at: string
           cursos: string[]
           destaque: string | null
@@ -952,6 +953,7 @@ export type Database = {
           certidao_validade?: string | null
           cidade?: string | null
           comissao_percent?: number
+          cpf?: string | null
           created_at?: string
           cursos?: string[]
           destaque?: string | null
@@ -1001,6 +1003,7 @@ export type Database = {
           certidao_validade?: string | null
           cidade?: string | null
           comissao_percent?: number
+          cpf?: string | null
           created_at?: string
           cursos?: string[]
           destaque?: string | null
