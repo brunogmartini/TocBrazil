@@ -190,7 +190,7 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
 
     const { data: existente } = await supabase
       .from("professionals")
-      .select("id, slug, status, foto_caminho")
+      .select("id, slug, status, foto_caminho, perfil_bloqueios_contato")
       .eq("user_id", userId)
       .maybeSingle();
 
@@ -214,8 +214,9 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
           padrao_tipo: deteccao.tipo,
           acao: "bloqueado",
         });
-        await supabaseAdmin.from("professionals").update({ perfil_bloqueios_contato: existente.foto_caminho ? undefined : undefined }).eq("id", existente.id);
-        await supabaseAdmin.rpc("incrementar_bloqueios_perfil", { _professional_id: existente.id });
+        await supabaseAdmin.from("professionals").update({
+          perfil_bloqueios_contato: (existente.perfil_bloqueios_contato ?? 0) + 1,
+        }).eq("id", existente.id);
       }
       return {
         ok: false as const,
