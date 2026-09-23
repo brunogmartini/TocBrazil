@@ -53,6 +53,33 @@ const statusFluxo = [
   { t: "7. Perfil publicado/ativo", d: "Perfil visível na vitrine e recebendo agendamentos." },
 ];
 
+const beneficios = [
+  {
+    t: "Seu valor, suas regras",
+    d: "Você define o seu valor. A taxa da plataforma é fixa: R$ 24 por consulta realizada, igual para todos, qualquer que seja o preço que você cobre.",
+  },
+  {
+    t: "Sem custos recorrentes",
+    d: "Sem comissão, sem percentual, sem mensalidade.",
+  },
+  {
+    t: "Pagamento no agendamento",
+    d: "O paciente paga no agendamento. Sem inadimplência e sem cobrança.",
+  },
+  {
+    t: "Recebimento direto",
+    d: "O dinheiro vai direto para a sua conta de recebimento, sem passar pela TOC Brazil.",
+  },
+  {
+    t: "Sua forma de atender",
+    d: "Você atende na sua própria sala de videochamada, com sua abordagem e seus registros.",
+  },
+  {
+    t: "Liberdade profissional",
+    d: "Sem exclusividade e sem meta. Você atende quando e quanto quiser.",
+  },
+];
+
 function CadastroProfissional() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -88,6 +115,21 @@ function CadastroProfissional() {
         Psicólogos com experiência em TOC. Se você ainda não tem cadastro, comece pelo
         lado esquerdo. Se já é cadastrado, entre pelo lado direito.
       </p>
+
+      <section aria-labelledby="beneficios-profissional" className="mt-10 border-y border-border bg-surface py-8 sm:px-8">
+        <span className="section-label">Por que fazer parte</span>
+        <h2 id="beneficios-profissional" className="heading-section mt-2">
+          Autonomia para cuidar do seu trabalho
+        </h2>
+        <div className="mt-7 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
+          {beneficios.map((beneficio) => (
+            <article key={beneficio.t} className="border-l-2 border-primary pl-4">
+              <h3 className="heading-card">{beneficio.t}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{beneficio.d}</p>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
         <section className="card-soft p-8">
