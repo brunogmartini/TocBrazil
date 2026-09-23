@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { areaDoCaminho, destinoDaArea, INICIO_DA_AREA, ROTULO_DA_AREA, type Area } from "@/lib/areas";
 import { guardarPerfilPretendido, minhaArea } from "@/lib/role-access";
+import { useServerFn } from "@tanstack/react-start";
+import { autorizarTentativaGestor } from "@/lib/auth.functions";
 
 type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
 
@@ -57,6 +59,7 @@ function Auth() {
   const [aviso, setAviso] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(false);
   const [conflito, setConflito] = useState<{ area: Area; email: string | null } | null>(null);
+  const autorizarGestor = useServerFn(autorizarTentativaGestor);
 
   const profissional = search.perfil === "profissional";
   const gestor = search.perfil === "gestor";
@@ -169,6 +172,13 @@ function Auth() {
           return;
         }
       } else {
+        if (gestor) {
+          const limite = await autorizarGestor({ data: { email: email.trim() } });
+          if (!limite.ok) {
+            setErro(limite.erro);
+            return;
+          }
+        }
         const { error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password: senha,
@@ -250,8 +260,8 @@ function Auth() {
               ? "Escolha uma senha nova com pelo menos 8 caracteres."
                : profissional
                 ? "Entre para acessar seu consultório digital: agenda, consultas, financeiro e cadastro."
-                 : gestor
-                   ? "Entre com uma conta autorizada para acessar a gestão da plataforma."
+                  : gestor
+                    ? "Entre com uma conta autorizada e autenticação em duas etapas para acessar a gestão da plataforma."
                 : modo === "cadastro"
                   ? "Cadastre-se para ver os horários disponíveis, os valores e agendar com o profissional que escolher."
                   : "Entre para acessar suas consultas, lembretes e dados de cadastro."}

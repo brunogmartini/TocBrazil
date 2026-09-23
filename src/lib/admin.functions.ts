@@ -103,7 +103,9 @@ export type ProfissionalAdmin = {
   }[];
 };
 
-async function garantirAdmin(context: { supabase: unknown; userId: string }) {
+async function garantirAdmin(context: { supabase: unknown; userId: string; claims?: unknown }) {
+  const aal = (context.claims as { aal?: string } | undefined)?.aal;
+  if (aal !== "aal2") throw new Error("A autenticação em duas etapas é obrigatória para a gestão.");
   const supabase = context.supabase as {
     rpc: (
       fn: string,
