@@ -181,7 +181,7 @@ function Home() {
             <h3 className="heading-section">As etapas do agendamento</h3>
             <ol className="mt-6 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {passos.map((passo, i) => (
-                <li key={passo.titulo} className="flex h-full items-start gap-4 rounded-2xl border border-primary-foreground/30 bg-primary-foreground/10 p-6">
+                <li key={passo.titulo} className="flex h-full items-start gap-4 py-3">
                   <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-foreground font-display text-base text-primary">
                     {i + 1}
                   </span>
