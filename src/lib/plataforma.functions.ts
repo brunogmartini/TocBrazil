@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import { areaDosPapeis, type Papel } from "@/lib/areas";
+import { institucional } from "@/config/institucional";
 
 export type ProfissionalPublico = {
   id: string;
@@ -388,6 +389,9 @@ export const criarAgendamento = createServerFn({ method: "POST" })
     inicio: String(data.inicio),
   }))
   .handler(async ({ data, context }) => {
+    if (!institucional.pagamentosAtivos) {
+      return { ok: false as const, erro: "Os agendamentos estarão disponíveis após a formalização da empresa." };
+    }
     const { supabase, userId } = context;
 
     const { data: prof, error: erroProf } = await supabase
