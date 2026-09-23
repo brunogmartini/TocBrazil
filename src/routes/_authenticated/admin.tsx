@@ -17,6 +17,7 @@ import {
 } from "@/lib/admin.functions";
 import type { ConfiguracoesPlataforma } from "@/lib/plataforma.functions";
 import { EtapasCadastro } from "@/components/professional-nav";
+import { indicadoresGestao } from "@/lib/continuidade.functions";
 import { dataBR, dataHoraBR, moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -76,6 +77,7 @@ function Admin() {
   const mudarPagamento = useServerFn(definirStatusPagamento);
   const mudarConsulta = useServerFn(definirStatusConsultaAdmin);
   const salvarCfg = useServerFn(salvarConfiguracoes);
+  const carregarIndicadores = useServerFn(indicadoresGestao);
 
   const [aba, setAba] = useState<Aba>("visao");
   const [busca, setBusca] = useState("");
@@ -97,6 +99,7 @@ function Admin() {
     queryFn: () => carregarRelatorio({ data: {} }),
     enabled: aba === "relatorio",
   });
+  const indicadores = useQuery({ queryKey: ["admin-indicadores"], queryFn: () => carregarIndicadores(), enabled: aba === "relatorio" });
   const atualizar = () => queryClient.invalidateQueries({ queryKey: ["painel-admin"] });
 
   if (painel.isError) {
@@ -269,6 +272,14 @@ function Admin() {
             Os e-mails acima podem ser usados para comunicações e newsletter, respeitando o consentimento dado no cadastro.
           </p>
         </div>
+      )}
+
+      {aba === "relatorio" && (
+        <section className="card-soft mt-6 overflow-x-auto p-4">
+          <h2 className="text-xl">Indicadores agregados por profissional</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Alertas usam desvio de dois desvios-padrão e servem apenas para revisão operacional.</p>
+          <table className="mt-4 w-full min-w-[52rem] text-sm"><thead><tr className="text-left text-muted-foreground"><th className="p-2">Profissional</th><th className="p-2">Primeiras</th><th className="p-2">Retornos</th><th className="p-2">Taxa</th><th className="p-2">Cancelamentos tardios</th><th className="p-2">Detecções</th><th className="p-2">Continuidade</th><th className="p-2">Alertas</th></tr></thead><tbody>{(indicadores.data?.indicadores ?? []).map((i) => <tr key={i.professional_id} className="border-t border-border/60"><td className="p-2 font-semibold">{i.nome}</td><td className="p-2">{i.pacientes_primeira_consulta}</td><td className="p-2">{i.pacientes_retorno}</td><td className="p-2">{Math.round(Number(i.taxa_retorno) * 100)}%</td><td className="p-2">{i.cancelamentos_tardios}</td><td className="p-2">{i.deteccoes}</td><td className="p-2">{i.continuidades}</td><td className="p-2">{i.alerta_cancelamento || i.alerta_retorno ? "Revisar" : "—"}</td></tr>)}</tbody></table>
+        </section>
       )}
 
       {aba === "profissionais" && (

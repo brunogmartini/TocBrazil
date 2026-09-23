@@ -15,8 +15,8 @@
 
 ## Perfil público e proteções de canal — 23/09/2026
 - [x] Blocos A–B: perfil publicável, antidesvio, auditoria e moderação de foto
-- [ ] Bloco C: reagendamento, recorrência, remarcação, recibo e lembretes
-- [ ] Bloco D: comunicação e cobrança de continuidade fora da plataforma
-- [ ] Bloco E: indicadores agregados e alertas estatísticos
-- [ ] Bloco F: pesquisa pós-consulta agregada
+- [x] Bloco C: reagendamento, recorrência, remarcação, recibo e lembretes
+- [x] Bloco D: comunicação e cobrança de continuidade fora da plataforma
+- [x] Bloco E: indicadores agregados e alertas estatísticos
+- [x] Bloco F: pesquisa pós-consulta agregada
 - [ ] Validação final por bloco, segurança, acessibilidade e mobile
