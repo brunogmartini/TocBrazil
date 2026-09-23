@@ -73,12 +73,14 @@ export const enviarMensagem = createServerFn({ method: "POST" })
     const bloqueio = deteccoes.find((item) => item.bloqueiaChat);
     const advertencia = deteccoes.find((item) => !item.bloqueiaChat);
     const registrar = async (tipo: string, acao: "bloqueado" | "advertido") => {
-      await supabase.rpc("registrar_deteccao_anticontato", {
-        _professional_id: participacao.professionalId,
-        _appointment_id: data.consultaId,
-        _contexto: "chat",
-        _padrao_tipo: tipo,
-        _acao: acao,
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.from("deteccoes_anticontato").insert({
+        professional_id: participacao.professionalId,
+        appointment_id: data.consultaId,
+        ator_id: userId,
+        contexto: "chat",
+        padrao_tipo: tipo,
+        acao,
       });
     };
     if (bloqueio) {
