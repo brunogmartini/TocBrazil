@@ -29,7 +29,7 @@ const avisoSchema = z.object({
 });
 
 function assinaturaValida(request: Request, pagamentoId: string) {
-  const segredo = process.env["MERCADOPAGO_WEBHOOK_SECRET"];
+  const segredo = process.env["MERCADOPAGO_WEBHOOK_SECRET"] ?? process.env["MERCADOPAGO_CLIENT_SECRET"];
   const assinatura = request.headers.get("x-signature");
   const requestId = request.headers.get("x-request-id");
   if (!segredo || !assinatura || !requestId) return false;
