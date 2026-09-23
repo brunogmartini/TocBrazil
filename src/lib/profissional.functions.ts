@@ -181,6 +181,10 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
+    if (data.foto_caminho && !data.foto_caminho.startsWith(`${userId}/`)) {
+      return { ok: false as const, erro: "Arquivo de foto inválido." };
+    }
+
     // Somente contas da área profissional podem criar ou editar um cadastro.
     const { data: papeis } = await supabase.from("user_roles").select("role").eq("user_id", userId);
     const listaPapeis = (papeis ?? []).map((p) => p.role as string);
