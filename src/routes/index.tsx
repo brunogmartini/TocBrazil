@@ -45,10 +45,6 @@ export const Route = createFileRoute("/")({
 
 const passos = [
   {
-    titulo: "Entenda sobre o transtorno",
-    texto: "Acesse conteúdos educativos sobre TOC em linguagem simples.",
-  },
-  {
     titulo: "Encontre um psicólogo",
     texto: "Busque profissionais através de filtros avançados de pesquisa.",
   },
@@ -247,7 +243,7 @@ function Home() {
                 Um psicólogo habilitado pode escutar sua história, avaliar o que vem acontecendo em consulta e lhe auxiliar a melhorar do TOC.
               </p>
               <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                Quem avalia é sempre um psicólogo, em consulta — nenhuma ferramenta substitui essa conversa. A TOC Brazil cuida da parte prática: encontrar profissionais, marcar horários e realização de pagamento.
+                Quem avalia é sempre um psicólogo, em consulta — nenhuma ferramenta substitui essa conversa. Na TOC Brazil você encontra profissionais, marca horários e paga por aqui.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/profissionais" className="btn-base btn-primary">
@@ -283,7 +279,7 @@ function Home() {
             Buscar ajuda pode ser difícil, especialmente quando determinados pensamentos ou comportamentos causam vergonha, medo ou confusão.
           </p>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Na plataforma, você encontra conteúdo educativo e psicólogos cadastrados com informações para comparar antes de agendar.
+            Aqui na TOC Brazil, você encontra conteúdo educativo e psicólogos cadastrados com informações para comparar antes de agendar.
           </p>
           <Link to="/entenda-o-toc" className="mt-8 inline-flex font-semibold text-primary underline underline-offset-4">
             Entender melhor o TOC
@@ -337,7 +333,7 @@ function Home() {
               A TOC Brazil não hospeda a videochamada e não tem acesso ao conteúdo das consultas. A sala é do profissional.
             </li>
             <li className="card-soft p-5">
-              Acesso segmentado por papel: você acessa apenas os seus dados; o profissional acessa apenas o necessário para organizar a consulta. Documentos de verificação ficam restritos à equipe autorizada.
+              Acesso segmentado por papel. O psicólogo com quem você marcou consulta vê apenas seus dados de contato, os agendamentos feitos com ele e o contato de emergência que você informou. Ninguém mais vê seus dados. E ninguém acessa o conteúdo das consultas — elas acontecem fora da plataforma. Os documentos enviados pelos psicólogos no credenciamento ficam restritos a quem faz essa conferência.
             </li>
             <li className="card-soft p-5">
               A plataforma não realiza identificação clínicas e não presta serviço de saúde. A consulta é de responsabilidade do psicólogo habilitado.
