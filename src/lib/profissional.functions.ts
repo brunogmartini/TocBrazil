@@ -207,7 +207,7 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       if (existente) {
         await supabase.rpc("registrar_deteccao_anticontato", {
           _professional_id: existente.id,
-          _appointment_id: null,
+          _appointment_id: null as unknown as string,
           _contexto: "perfil",
           _padrao_tipo: deteccao.tipo,
           _acao: "bloqueado",
