@@ -55,10 +55,6 @@ const statusFluxo = [
 
 const beneficios = [
   {
-    t: "Seu valor, suas regras",
-    d: "Você define o seu valor. A taxa da plataforma é fixa: R$ 24 por consulta realizada, igual para todos, qualquer que seja o preço que você cobre.",
-  },
-  {
     t: "Sem custos recorrentes",
     d: "Sem comissão, sem percentual, sem mensalidade.",
   },
@@ -121,6 +117,15 @@ function CadastroProfissional() {
         <h2 id="beneficios-profissional" className="heading-section mt-2">
           Autonomia para cuidar do seu trabalho
         </h2>
+        <p className="mt-7 max-w-3xl font-semibold text-foreground">
+          Taxa fixa de R$ 27 por consulta realizada, igual para todos os profissionais, qualquer que seja o valor que você cobra
+        </p>
+        <article className="mt-4 max-w-3xl border-l-4 border-primary bg-surface px-6 py-6 sm:px-8">
+          <h3 className="text-base font-semibold text-foreground">Por que existe uma taxa</h3>
+          <p className="mt-3 text-base leading-relaxed text-surface-foreground">
+            A taxa custeia a estrutura que você usa. Plataforma, agenda, processamento de pagamentos, custos contábeis, verificação de registro e proteção de dados. É o que mantém a TOC Brazil funcionando e ao alcance de quem procura ajuda.
+          </p>
+        </article>
         <div className="mt-7 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
           {beneficios.map((beneficio) => (
             <article key={beneficio.t} className="border-l-2 border-primary pl-4">
