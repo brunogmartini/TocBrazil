@@ -121,8 +121,8 @@ function Home() {
           <div className="rise-in">
             <span className="pill">Plataforma de busca, agenda e pagamento</span>
             <h1 className="heading-hero mt-6">
-              Encontre psicólogos{" "}
-              <span className="text-primary">com experiência em TOC</span>{" "}
+              Encontre psicólogos com{" "}
+              <span className="text-primary">experiência em TOC</span>{" "}
               e agende sua consulta online
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
@@ -175,12 +175,14 @@ function Home() {
           </div>
 
           <h3 className="heading-section mt-14">As etapas do agendamento</h3>
-          <ol className="mt-6 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <ol className="mt-6 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {passos.map((passo, i) => (
-              <li key={passo.titulo} className="card-soft card-soft-hover h-full p-6">
-                <span className="step-index">{i + 1}</span>
-                <h4 className="heading-card mt-4">{passo.titulo}</h4>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{passo.texto}</p>
+              <li key={passo.titulo} className="card-soft card-soft-hover flex h-full items-start gap-4 p-6">
+                <span className="step-index shrink-0">{i + 1}</span>
+                <div className="min-w-0 pt-1">
+                  <h4 className="heading-card">{passo.titulo}</h4>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{passo.texto}</p>
+                </div>
               </li>
             ))}
           </ol>
