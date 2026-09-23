@@ -120,6 +120,22 @@ function CadastroProfissional() {
         <p className="mt-7 max-w-3xl font-semibold text-foreground">
           Taxa fixa de R$ 27 por consulta realizada, igual para todos os profissionais, qualquer que seja o valor que você cobra
         </p>
+        <article className="mt-4 max-w-3xl border border-border bg-background px-5 py-6 sm:px-8">
+          <div className="grid gap-4 sm:grid-cols-3 sm:gap-0">
+            {["Sem mensalidade.", "Sem exclusividade.", "Sem meta."].map((item, index) => (
+              <p
+                key={item}
+                className={`flex items-center gap-3 text-lg font-semibold text-foreground ${index > 0 ? "border-t border-border pt-4 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0" : ""}`}
+              >
+                <span aria-hidden="true" className="text-primary">✓</span>
+                <span>{item}</span>
+              </p>
+            ))}
+          </div>
+          <p className="mt-6 text-base leading-relaxed text-muted-foreground">
+            Você só paga quando a consulta acontece — cancelamento com reembolso integral ao paciente não gera taxa.
+          </p>
+        </article>
         <article className="mt-4 max-w-3xl border-l-4 border-primary bg-surface px-6 py-6 sm:px-8">
           <h3 className="text-base font-semibold text-foreground">Por que existe uma taxa</h3>
           <p className="mt-3 text-base leading-relaxed text-surface-foreground">
