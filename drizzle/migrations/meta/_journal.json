@@ -64,6 +64,13 @@
       "when": 1790179296822,
       "tag": "0008_endurecer_controle_acesso_bloco_a",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790179366342,
+      "tag": "0009_separar_acesso_publico_e_autenticado",
+      "breakpoints": true
     }
   ]
 }

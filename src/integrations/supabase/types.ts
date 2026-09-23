@@ -1185,6 +1185,18 @@ export type Database = {
           nome: string
         }[]
       }
+      profissionais_das_minhas_consultas: {
+        Args: never
+        Returns: {
+          ferramenta_instrucoes: string
+          ferramenta_provedor: string
+          id: string
+          nome: string
+          profissao: Database["public"]["Enums"]["profissao"]
+          registro: string
+          slug: string
+        }[]
+      }
       proximos_horarios: {
         Args: { _dias: number; _limite: number }
         Returns: {
