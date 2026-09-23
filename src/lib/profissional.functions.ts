@@ -58,8 +58,7 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
     const { supabase, userId, claims } = context;
     // Telefone e e-mail de contato não são legíveis pelo cliente do usuário; a leitura do
     // próprio cadastro é feita no servidor e sempre restrita ao user_id autenticado.
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: profissional } = await supabaseAdmin
+    const { data: profissional } = await supabase
       .from("professionals")
       .select("*")
       .eq("user_id", userId)
@@ -494,11 +493,7 @@ export const minhaAgendaProfissional = createServerFn({ method: "GET" })
           .eq("professional_id", prof.id),
       ]);
 
-    const ids = [...new Set((consultas ?? []).map((c) => c.patient_id))];
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: perfis } = ids.length
-      ? await supabaseAdmin.from("profiles").select("id, nome, codigo_anonimo").in("id", ids)
-      : { data: [] as { id: string; nome: string | null; codigo_anonimo: string | null }[] };
+    const { data: perfis } = await supabase.rpc("meus_pacientes_agendados");
     const perfilPorId = new Map(
       (perfis ?? []).map((p) => [p.id, { ...p, nome: p.nome?.trim().split(/\s+/)[0] ?? null }]),
     );
@@ -603,11 +598,7 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
       .order("inicio", { ascending: false })
       .limit(300);
 
-    const ids = [...new Set((consultas ?? []).map((c) => c.patient_id))];
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: perfis } = ids.length
-      ? await supabaseAdmin.from("profiles").select("id, nome, codigo_anonimo").in("id", ids)
-      : { data: [] as { id: string; nome: string | null; codigo_anonimo: string | null }[] };
+    const { data: perfis } = await supabase.rpc("meus_pacientes_agendados");
     const perfilPorId = new Map(
       (perfis ?? []).map((p) => [p.id, { ...p, nome: p.nome?.trim().split(/\s+/)[0] ?? null }]),
     );

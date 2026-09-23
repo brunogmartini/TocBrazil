@@ -223,6 +223,13 @@ export const meuContexto = createServerFn({ method: "GET" })
     };
   });
 
+async function profissionaisDasConsultas(
+  supabase: import("@supabase/supabase-js").SupabaseClient<Database>,
+) {
+  const { data } = await supabase.rpc("profissionais_das_minhas_consultas");
+  return new Map((data ?? []).map((p) => [p.id, p]));
+}
+
 export const salvarPerfil = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { nome: string; telefone?: string; data_nascimento?: string | null }) => ({
@@ -288,13 +295,16 @@ export const minhasConsultas = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("appointments")
       .select(
-        "id, inicio, fim, status, payment_status, valor_centavos, taxa_agendamento_centavos, valor_consulta_centavos, duracao_minutos, link_acesso, cancelada_em, professionals(nome, profissao, slug, registro, ferramenta_provedor, ferramenta_instrucoes)",
+        "id, inicio, fim, status, payment_status, valor_centavos, taxa_agendamento_centavos, valor_consulta_centavos, duracao_minutos, link_acesso, cancelada_em, professional_id",
       )
       .eq("patient_id", userId)
       .order("inicio", { ascending: false });
     if (error) throw new Error(error.message);
 
-    const cfg = await carregarConfiguracoesPrivadas();
+    const [cfg, profissionais] = await Promise.all([
+      carregarConfiguracoesPrivadas(),
+      profissionaisDasConsultas(supabase),
+    ]);
     const agora = Date.now();
     const revelados: string[] = [];
     const consultas = (data ?? []).map((c) => {
@@ -306,6 +316,7 @@ export const minhasConsultas = createServerFn({ method: "GET" })
       if (liberado) revelados.push(c.id);
       return {
         ...c,
+        professionals: profissionais.get(c.professional_id) ?? null,
         link_acesso: liberado ? c.link_acesso : null,
         linkLiberado: liberado,
         linkLiberadoEm: new Date(inicio - cfg.antecedenciaLinkMinutos * 60000).toISOString(),
