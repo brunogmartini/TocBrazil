@@ -22,7 +22,7 @@
 - [x] Validação final por bloco, segurança, acessibilidade e mobile
 
 ## Privacidade e comprovação de acesso — 23/09/2026
-- [ ] Etapa 1: publicar somente o texto provisório verdadeiro e a informação de conexão criptografada
+- [x] Etapa 1: publicar somente o texto provisório verdadeiro e a informação de conexão criptografada
 - [ ] Etapa 2A: cabeçalhos de segurança, links do rodapé e confirmação do armazenamento privado
 - [ ] Etapa 2B: consentimento de cookies desativado por padrão e portal “Meus dados”
 - [ ] Etapa 3: executar a matriz de isolamento e registrar TESTES-DE-ACESSO.md com data
