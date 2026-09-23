@@ -1,5 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { primeiraDeteccaoPerfil, ROTULO_ANTICONTATO } from "@/lib/anticontato";
+import {
+  ABORDAGENS_PERFIL,
+  IDIOMAS_PERFIL,
+  TEMAS_TOC_PERFIL,
+  type FormacaoPublica,
+} from "@/lib/perfil-profissional";
 
 function slugificar(nome: string) {
   return nome
@@ -26,14 +33,12 @@ export type CadastroProfissionalEntrada = {
   cpf?: string;
   registro: string;
   uf: string;
-  cidade?: string;
-  telefone?: string;
-  email_contato?: string;
   genero?: string;
-  abordagem?: string;
-  destaque?: string;
-  apresentacao?: string;
-  experiencia_toc?: string;
+  abordagens_publicas?: string[];
+  formacoes_publicas?: FormacaoPublica[];
+  temas_toc_publicos?: string[];
+  biografia_publica?: string;
+  foto_caminho?: string | null;
   experiencia_anos?: number;
   slot_minutos?: number;
   valor_centavos?: number;
@@ -42,11 +47,6 @@ export type CadastroProfissionalEntrada = {
   ferramenta_provedor?: string;
   ferramenta_url_sala?: string;
   ferramenta_instrucoes?: string;
-  graduacao?: string;
-  instituicao?: string;
-  cursos?: string[] | string;
-  formacao?: string[] | string;
-  especializacoes?: string[] | string;
   areas?: string[] | string;
 
   idiomas?: string[] | string;
@@ -106,8 +106,15 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
           .maybeSingle(),
       ]);
 
+    let fotoUrlTemporaria: string | null = null;
+    if (profissional.foto_caminho) {
+      const { data: foto } = await supabase.storage
+        .from("fotos-profissionais")
+        .createSignedUrl(profissional.foto_caminho, 900);
+      fotoUrlTemporaria = foto?.signedUrl ?? null;
+    }
     return {
-      profissional,
+      profissional: { ...profissional, foto_url_temporaria: fotoUrlTemporaria },
       documentos: documentos ?? [],
       regras: regras ?? [],
       bloqueios: bloqueios ?? [],
@@ -126,20 +133,35 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     const uf = String(data.uf ?? "").trim().toUpperCase().slice(0, 2);
     if (uf.length !== 2) throw new Error("Informe a UF do registro.");
     const profissao: "psicologo" = "psicologo";
+    const abordagens = lista(data.abordagens_publicas).filter((item) =>
+      (ABORDAGENS_PERFIL as readonly string[]).includes(item),
+    ).slice(0, 3);
+    const temas = lista(data.temas_toc_publicos).filter((item) =>
+      (TEMAS_TOC_PERFIL as readonly string[]).includes(item),
+    );
+    const idiomas = lista(data.idiomas).filter((item) =>
+      (IDIOMAS_PERFIL as readonly string[]).includes(item),
+    );
+    const formacoes = (Array.isArray(data.formacoes_publicas) ? data.formacoes_publicas : [])
+      .map((item) => ({
+        instituicao: String(item?.instituicao ?? "").trim().slice(0, 160),
+        curso: String(item?.curso ?? "").trim().slice(0, 160),
+        ano: Math.round(Number(item?.ano ?? 0)),
+      }))
+      .filter((item) => item.instituicao && item.curso && item.ano >= 1900 && item.ano <= new Date().getFullYear())
+      .slice(0, 12);
     return {
       nome,
       registro,
       uf,
       profissao,
       cpf: String(data.cpf ?? "").replace(/\D/g, "").slice(0, 11) || null,
-      cidade: String(data.cidade ?? "").trim().slice(0, 80) || null,
-      telefone: String(data.telefone ?? "").trim().slice(0, 30) || null,
-      email_contato: String(data.email_contato ?? "").trim().slice(0, 160) || null,
       genero: String(data.genero ?? "").trim().slice(0, 30) || null,
-      abordagem: String(data.abordagem ?? "").trim().slice(0, 160) || null,
-      destaque: String(data.destaque ?? "").trim().slice(0, 200) || null,
-      apresentacao: String(data.apresentacao ?? "").trim().slice(0, 2000) || null,
-      experiencia_toc: String(data.experiencia_toc ?? "").trim().slice(0, 2000) || null,
+      abordagens_publicas: abordagens,
+      formacoes_publicas: formacoes,
+      temas_toc_publicos: temas,
+      biografia_publica: String(data.biografia_publica ?? "").trim().slice(0, 600) || null,
+      foto_caminho: String(data.foto_caminho ?? "").trim().slice(0, 500) || null,
       experiencia_anos: Math.min(Math.max(Number(data.experiencia_anos ?? 0) || 0, 0), 70),
       slot_minutos: [30, 40, 50, 60].includes(Number(data.slot_minutos))
         ? Number(data.slot_minutos)
@@ -147,14 +169,8 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       // O profissional define o preço da consulta. A plataforma exibe exatamente
       // esse valor ao paciente: nenhuma margem é somada.
       valor_centavos: Math.min(Math.max(Math.round(Number(data.valor_centavos ?? 0) || 0), 0), 500000),
-      graduacao: String(data.graduacao ?? "").trim().slice(0, 160) || null,
-      instituicao: String(data.instituicao ?? "").trim().slice(0, 160) || null,
-      cursos: lista(data.cursos),
-      formacao: lista(data.formacao),
-      especializacoes: lista(data.especializacoes),
-
       areas: lista(data.areas),
-      idiomas: lista(data.idiomas),
+      idiomas,
       certidao_validade: data.certidao_validade ? String(data.certidao_validade).slice(0, 10) : null,
       apolice_validade: data.apolice_validade ? String(data.apolice_validade).slice(0, 10) : null,
       ferramenta_provedor: String(data.ferramenta_provedor ?? "").trim().slice(0, 80) || null,
@@ -174,9 +190,38 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
 
     const { data: existente } = await supabase
       .from("professionals")
-      .select("id, slug, status")
+      .select("id, slug, status, foto_caminho")
       .eq("user_id", userId)
       .maybeSingle();
+
+    const deteccao = primeiraDeteccaoPerfil([
+      data.biografia_publica,
+      ...data.abordagens_publicas,
+      ...data.temas_toc_publicos,
+      ...data.formacoes_publicas.flatMap((item) => [item.instituicao, item.curso]),
+      ...data.areas,
+      ...data.idiomas,
+      data.ferramenta_instrucoes,
+    ]);
+    if (deteccao) {
+      if (existente) {
+        await supabase.rpc("registrar_deteccao_anticontato", {
+          _professional_id: existente.id,
+          _appointment_id: null,
+          _contexto: "perfil",
+          _padrao_tipo: deteccao.tipo,
+          _acao: "bloqueado",
+        });
+      }
+      return {
+        ok: false as const,
+        erro: `Remova ${ROTULO_ANTICONTATO[deteccao.tipo]} do perfil: “${deteccao.trecho}”.`,
+      };
+    }
+
+    if (!data.abordagens_publicas.length || !data.formacoes_publicas.length || !data.temas_toc_publicos.length || !data.biografia_publica || !data.idiomas.length || data.valor_centavos <= 0) {
+      return { ok: false as const, erro: "Preencha todos os campos obrigatórios do perfil público." };
+    }
 
     if (existente) {
       const { error } = await supabase.from("professionals").update(data).eq("id", existente.id);
