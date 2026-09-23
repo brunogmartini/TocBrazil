@@ -1,8 +1,8 @@
-- [ ] Bloco A — Controle de acesso no banco
+- [x] Bloco A — Controle de acesso no banco
   - [x] Inventariar tabelas, políticas, funções privilegiadas e credenciais
-  - [ ] Aplicar políticas mínimas e projeções públicas seguras
-  - [ ] Remover leituras privilegiadas desnecessárias do fluxo profissional
-  - [ ] Registrar acessos administrativos
-  - [ ] Testar anonimato, isolamento entre pacientes, acesso profissional e administração
-  - [ ] Apresentar políticas e resultados antes de continuar
+  - [x] Aplicar políticas mínimas e projeções públicas seguras
+  - [x] Remover leituras privilegiadas desnecessárias do fluxo profissional
+  - [x] Registrar acessos administrativos
+  - [x] Testar anonimato, isolamento entre pacientes, acesso profissional e administração
+  - [x] Apresentar políticas e resultados antes de continuar
 - [ ] Blocos B–Q — aguardando revisão e autorização após o relatório do bloco A
