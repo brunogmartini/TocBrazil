@@ -1158,6 +1158,13 @@ export type Database = {
         }[]
       }
       concluir_consultas_vencidas: { Args: never; Returns: number }
+      contato_emergencia_paciente: {
+        Args: { _patient_id: string }
+        Returns: {
+          nome: string
+          telefone: string
+        }[]
+      }
       cron_token_valido: {
         Args: { _nome: string; _token: string }
         Returns: boolean
@@ -1169,6 +1176,14 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      meus_pacientes_agendados: {
+        Args: never
+        Returns: {
+          codigo_anonimo: string
+          id: string
+          nome: string
+        }[]
       }
       proximos_horarios: {
         Args: { _dias: number; _limite: number }
