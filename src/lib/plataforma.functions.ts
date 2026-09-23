@@ -71,7 +71,13 @@ export const listarProfissionais = createServerFn({ method: "GET" }).handler(asy
     .select(CAMPOS)
     .eq("status", "aprovado")
     .order("nome");
-  if (error) return { profissionais: [] as ProfissionalComHorarios[], erro: error.message };
+  if (error) {
+    console.error("Falha ao listar profissionais", { code: error.code });
+    return {
+      profissionais: [] as ProfissionalComHorarios[],
+      erro: "Não foi possível carregar os profissionais agora.",
+    };
+  }
   const { data: horarios } = await cliente.rpc("proximos_horarios", { _dias: 21, _limite: 5 });
   const porSlug = new Map<string, string[]>();
   for (const h of (horarios ?? []) as { slug: string; inicio: string }[]) {

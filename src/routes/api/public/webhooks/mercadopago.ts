@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { createHmac } from "crypto";
+import { z } from "zod";
 
 type PagamentoMP = {
   id: number;
@@ -21,23 +23,41 @@ const MAPA: Record<string, "pendente" | "aprovado" | "recusado" | "estornado" | 
   charged_back: "estornado",
 };
 
+const avisoSchema = z.object({
+  data: z.object({ id: z.union([z.string(), z.number()]) }),
+  type: z.string().optional(),
+});
+
+function assinaturaValida(request: Request, pagamentoId: string) {
+  const segredo = process.env["MERCADOPAGO_WEBHOOK_SECRET"] ?? process.env["MERCADOPAGO_CLIENT_SECRET"];
+  const assinatura = request.headers.get("x-signature");
+  const requestId = request.headers.get("x-request-id");
+  if (!segredo || !assinatura || !requestId) return false;
+
+  const partes = Object.fromEntries(
+    assinatura.split(",").map((parte) => {
+      const [chave, ...valor] = parte.trim().split("=");
+      return [chave, valor.join("=")];
+    }),
+  );
+  if (!partes.ts || !partes.v1 || !/^\d+$/.test(partes.ts)) return false;
+
+  // Formato oficial da assinatura de Webhooks do Mercado Pago.
+  const manifesto = `id:${pagamentoId};request-id:${requestId};ts:${partes.ts};`;
+  const esperada = createHmac("sha256", segredo).update(manifesto).digest("hex");
+  return esperada === partes.v1;
+}
+
 async function processar(request: Request) {
   const token = process.env["MERCADOPAGO_ACCESS_TOKEN"];
-  if (!token) return new Response("sem configuração", { status: 200 });
+  if (!token) return new Response("indisponível", { status: 503 });
 
-  const url = new URL(request.url);
-  let pagamentoId: string | null =
-    url.searchParams.get("data.id") ?? url.searchParams.get("id") ?? null;
-
-  if (request.method === "POST") {
-    try {
-      const corpo = (await request.json()) as { data?: { id?: string | number }; type?: string };
-      if (corpo.data?.id) pagamentoId = String(corpo.data.id);
-    } catch {
-      /* aviso sem corpo JSON */
-    }
+  const resultado = avisoSchema.safeParse(await request.json().catch(() => null));
+  if (!resultado.success) return new Response("requisição inválida", { status: 400 });
+  const pagamentoId = String(resultado.data.data.id);
+  if (!assinaturaValida(request, pagamentoId)) {
+    return new Response("não autorizado", { status: 401 });
   }
-  if (!pagamentoId) return new Response("ok", { status: 200 });
 
   // A fonte da verdade é sempre a consulta direta ao Mercado Pago.
   const resposta = await fetch(`https://api.mercadopago.com/v1/payments/${pagamentoId}`, {
@@ -145,7 +165,7 @@ export const Route = createFileRoute("/api/public/webhooks/mercadopago")({
   server: {
     handlers: {
       POST: async ({ request }) => processar(request),
-      GET: async ({ request }) => processar(request),
+      GET: async () => new Response("método não permitido", { status: 405 }),
     },
   },
 });
