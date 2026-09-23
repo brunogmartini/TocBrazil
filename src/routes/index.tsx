@@ -166,7 +166,7 @@ function Home() {
             Busca, agendamento e pagamento em uma única plataforma
           </h2>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-            Não somos apenas uma plataforma de consultas online. Somos a primeira plataforma 100% focada em TOC, que reúne profissionais experientes que lhe ajudarão a entender melhor seus sentimentos e pensamentos, numa jornada de cuidado e zelo.
+            Somos a primeira plataforma 100% focada em TOC, que reúne profissionais experientes que lhe ajudarão a entender melhor seus sentimentos e pensamentos, numa jornada de cuidado e zelo.
           </p>
 
           <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
