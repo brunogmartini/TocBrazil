@@ -19,4 +19,4 @@
 - [x] Bloco D: comunicação e cobrança de continuidade fora da plataforma
 - [x] Bloco E: indicadores agregados e alertas estatísticos
 - [x] Bloco F: pesquisa pós-consulta agregada
-- [ ] Validação final por bloco, segurança, acessibilidade e mobile
+- [x] Validação final por bloco, segurança, acessibilidade e mobile
