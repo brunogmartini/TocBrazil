@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { listarProfissionais } from "@/lib/plataforma.functions";
+import { solicitarAvisoDisponibilidade } from "@/lib/avisos.functions";
+import { useServerFn } from "@tanstack/react-start";
+import { Button } from "@/components/ui/button";
 import { track } from "@/lib/analytics";
 import { moeda } from "@/lib/video-sala";
 
@@ -107,6 +110,11 @@ function Busca() {
   const [faixa, setFaixa] = useState(TODOS);
   const [dia, setDia] = useState(TODOS);
   const [turno, setTurno] = useState(TODOS);
+  const [maisFiltros, setMaisFiltros] = useState(false);
+  const [emailAviso, setEmailAviso] = useState("");
+  const [consentimento, setConsentimento] = useState(false);
+  const [estadoAviso, setEstadoAviso] = useState<string | null>(null);
+  const solicitarAviso = useServerFn(solicitarAvisoDisponibilidade);
   const seed = useMemo(() => semente(), []);
 
   const abordagens = useMemo(
@@ -175,13 +183,13 @@ function Busca() {
   return (
     <div className="container-page py-12 lg:py-16">
       <span className="section-label">Profissionais</span>
-      <h1 className="heading-page mt-3">Encontre psicólogo com experiência em TOC</h1>
+      <h1 className="heading-page mt-3">Encontre um psicólogo com experiência em TOC</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
         Profissionais cadastrados, com inscrição no CRP conferida e documentos de formação apresentados. A ordenação mostra primeiro quem tem o horário livre mais próximo, sem destaque pago e sem indicar que um profissional é melhor do que outro.
       </p>
 
 
-      <form
+      {profissionais.length > 0 && <form
         className="card-soft mt-8 grid gap-5 p-6 md:grid-cols-2 lg:grid-cols-4"
         onSubmit={(e) => e.preventDefault()}
       >
@@ -191,31 +199,36 @@ function Busca() {
           onChange={setAbordagem}
           options={abordagens}
         />
-        <Select label="Idioma" value={idioma} onChange={setIdioma} options={idiomas} />
-        <Select
-          label="Gênero (quando informado)"
-          value={genero}
-          onChange={setGenero}
-          options={[TODOS, "Feminino", "Masculino"]}
-        />
         <Select
           label="Faixa de preço"
           value={faixa}
           onChange={setFaixa}
           options={[TODOS, ...FAIXAS.map((f) => f.rotulo)]}
         />
-        <Select label="Dia da semana" value={dia} onChange={setDia} options={[TODOS, ...DIAS]} />
-        <Select
-          label="Turno"
-          value={turno}
-          onChange={setTurno}
-          options={[TODOS, ...TURNOS.map((t) => t.rotulo)]}
-        />
-
-      </form>
+        <Disponibilidade value={`${dia}|${turno}`} onChange={(valor) => {
+          const [novoDia, novoTurno] = valor.split("|");
+          setDia(novoDia ?? TODOS);
+          setTurno(novoTurno ?? TODOS);
+        }} />
+        <div className="flex items-end">
+          <Button type="button" variant="outline" onClick={() => setMaisFiltros((valor) => !valor)} aria-expanded={maisFiltros}>
+            Mais filtros
+          </Button>
+        </div>
+        {maisFiltros && (
+          <div className="grid gap-5 md:col-span-2 md:grid-cols-2 lg:col-span-4">
+            <Select label="Idioma" value={idioma} onChange={setIdioma} options={idiomas} />
+            <Select label="Gênero (quando informado)" value={genero} onChange={setGenero} options={[TODOS, "Feminino", "Masculino"]} />
+          </div>
+        )}
+      </form>}
 
       <p className="mt-8 text-sm text-muted-foreground" role="status">
-        {listaFiltrada.length} psicólogo(s) — todos com consulta online
+        {listaFiltrada.length === 0
+          ? "Nenhum psicólogo encontrado"
+          : listaFiltrada.length === 1
+            ? "1 psicólogo encontrado"
+            : `${listaFiltrada.length} psicólogos encontrados`}
       </p>
 
       <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -260,24 +273,60 @@ function Busca() {
 
       {listaFiltrada.length === 0 && (
         <div className="card-soft mt-5 p-8">
-          <h2 className="text-xl">
-            {profissionais.length === 0
-              ? "Em breve, novos psicólogos com experiência em TOC estarão disponíveis na plataforma."
-              : "Nenhum profissional corresponde a esses filtros no momento."}
-          </h2>
+          <h2 className="text-xl">{profissionais.length === 0 ? "Ainda estamos credenciando psicólogos" : "Nenhum psicólogo com esses filtros"}</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             {profissionais.length === 0
-              ? "Cada perfil passa por conferência de CRP e documentos antes de ser publicado. Assim que a análise for concluída, os psicólogos aparecem aqui."
-              : "Tente remover uma preferência para ampliar a lista."}
+              ? "O credenciamento está em andamento e verificamos a inscrição de cada profissional no Conselho Regional de Psicologia antes de publicar o perfil."
+              : "Limpe os filtros para ver novamente todos os perfis disponíveis."}
           </p>
           {profissionais.length === 0 && (
-            <Link to="/cadastro-profissional" className="btn-base btn-ghost mt-6">
-              Sou psicólogo e quero fazer parte
-            </Link>
+            <div className="mt-6 max-w-xl">
+              <form className="grid gap-3" onSubmit={async (e) => {
+                e.preventDefault();
+                setEstadoAviso(null);
+                const resposta = await solicitarAviso({ data: { email: emailAviso, consentimento } });
+                setEstadoAviso(resposta.ok ? "Pronto. Avisaremos quando houver psicólogos disponíveis." : resposta.erro);
+              }}>
+                <label htmlFor="email-aviso" className="text-sm font-semibold">Avise-me quando houver psicólogos disponíveis</label>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <input id="email-aviso" type="email" required value={emailAviso} onChange={(e) => setEmailAviso(e.target.value)} className="field-base" placeholder="seu@email.com" />
+                  <Button type="submit" disabled={!consentimento}>Quero ser avisado</Button>
+                </div>
+                <label className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <input type="checkbox" checked={consentimento} onChange={(e) => setConsentimento(e.target.checked)} required className="mt-0.5" />
+                  Autorizo o uso deste e-mail para receber este aviso, conforme a Política de Privacidade.
+                </label>
+                {estadoAviso && <p role="status" className="text-sm text-muted-foreground">{estadoAviso}</p>}
+              </form>
+              <Link to="/entenda-o-toc" className="btn-base btn-ghost mt-5">Ver conteúdo educativo</Link>
+            </div>
+          )}
+          {profissionais.length > 0 && (
+            <Button type="button" variant="outline" className="mt-5" onClick={() => {
+              setAbordagem(TODOS); setFaixa(TODOS); setDia(TODOS); setTurno(TODOS); setIdioma(TODOS); setGenero(TODOS);
+            }}>Limpar filtros</Button>
           )}
         </div>
       )}
 
+    </div>
+  );
+}
+
+function Disponibilidade({ value, onChange }: { value: string; onChange: (valor: string) => void }) {
+  const options = [
+    { valor: `${TODOS}|${TODOS}`, rotulo: TODOS },
+    ...DIAS.flatMap((dia) => [
+      { valor: `${dia}|${TODOS}`, rotulo: dia },
+      ...TURNOS.map((turno) => ({ valor: `${dia}|${turno.rotulo}`, rotulo: `${dia} · ${turno.rotulo.split(" (")[0]}` })),
+    ]),
+  ];
+  return (
+    <div>
+      <label htmlFor="disponibilidade" className="section-label">Disponibilidade</label>
+      <select id="disponibilidade" value={value} onChange={(e) => onChange(e.target.value)} className="field-base mt-2">
+        {options.map((option) => <option key={option.valor} value={option.valor}>{option.rotulo}</option>)}
+      </select>
     </div>
   );
 }

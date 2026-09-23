@@ -26,14 +26,12 @@ export const solicitarAvisoDisponibilidade = createServerFn({ method: "POST" })
         },
       },
     });
-    const { error } = await cliente.from("avisos_disponibilidade").upsert(
-      {
-        email: data.email.toLowerCase(),
-        consentimento_em: new Date().toISOString(),
-        politica_versao: institucional.politicaPrivacidadeVersao,
-      },
-      { onConflict: "email", ignoreDuplicates: true },
-    );
+    const { error } = await cliente.from("avisos_disponibilidade").insert({
+      email: data.email.toLowerCase(),
+      consentimento_em: new Date().toISOString(),
+      politica_versao: institucional.politicaPrivacidadeVersao,
+    });
+    if (error?.code === "23505") return { ok: true as const };
     if (error) return { ok: false as const, erro: "Não foi possível registrar seu e-mail agora." };
     return { ok: true as const };
   });

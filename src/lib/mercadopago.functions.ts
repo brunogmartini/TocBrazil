@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { institucional } from "@/config/institucional";
 
 /**
  * Vínculo da conta Mercado Pago de cada profissional.
@@ -55,6 +56,9 @@ export const iniciarVinculoMercadoPago = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { origem: string }) => ({ origem: String(data.origem) }))
   .handler(async ({ data, context }) => {
+    if (!institucional.pagamentosAtivos) {
+      return { ok: false as const, erro: "O recebimento será ativado após a formalização da empresa." };
+    }
     const clientId = process.env["MERCADOPAGO_CLIENT_ID"];
     if (!clientId || !process.env["MERCADOPAGO_CLIENT_SECRET"]) {
       return { ok: false as const, erro: "O recebimento ainda não está configurado." };
