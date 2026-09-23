@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import logoAsset from "@/assets/toc-brazil-logo.png.asset.json";
+import { institucional } from "@/config/institucional";
 
 const colunas = [
   {
@@ -14,9 +15,7 @@ const colunas = [
   {
     titulo: "Profissionais",
     links: [
-      { to: "/cadastro-profissional", label: "Quero fazer parte" },
-      { to: "/para-psicologos", label: "Sou psicólogo" },
-      { to: "/profissional", label: "Área do profissional" },
+      { to: "/cadastro-profissional", label: "Sou psicólogo" },
       { to: "/auth", label: "Entrar" },
     ],
   },
@@ -77,19 +76,19 @@ export function SiteFooter() {
       </div>
 
       <div className="container-page border-t border-border py-6 text-xs leading-relaxed text-muted-foreground">
+        <address className="mb-5 border-b border-border pb-5 not-italic">
+          <p className="font-semibold text-foreground">
+            {institucional.razaoSocial} — CNPJ {institucional.cnpj}
+          </p>
+          <p className="mt-1">{institucional.endereco}</p>
+          <a className="mt-1 inline-block underline underline-offset-4" href={`mailto:${institucional.email}`}>
+            {institucional.email}
+          </a>
+        </address>
         <p>
           Esta plataforma é uma infraestrutura tecnológica e não presta serviço de saúde. Conteúdo educativo não substitui consulta com profissional habilitado. A consulta acontece na sala do próprio psicólogo.
         </p>
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-          <p>© {new Date().getFullYear()} TOC Brazil.</p>
-          <Link
-            to="/auth"
-            search={{ modo: "entrar" as const, perfil: "gestor" as const, redirect: "/admin" }}
-            className="underline underline-offset-4 hover:text-foreground"
-          >
-            Acesso do gestor
-          </Link>
-        </div>
+        <p className="mt-2">© {new Date().getFullYear()} TOC Brazil.</p>
       </div>
     </footer>
   );

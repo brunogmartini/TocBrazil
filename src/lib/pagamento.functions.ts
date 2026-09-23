@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { baseSegura } from "@/lib/origem-segura";
+import { institucional } from "@/config/institucional";
 
 /**
  * Cobrança da consulta: o paciente paga exatamente o preço definido pelo
@@ -14,6 +15,9 @@ export const iniciarPagamento = createServerFn({ method: "POST" })
     origem: String(data.origem),
   }))
   .handler(async ({ data, context }) => {
+    if (!institucional.pagamentosAtivos) {
+      return { ok: false as const, erro: "Os pagamentos estarão disponíveis após a formalização da empresa." };
+    }
     const { supabase, userId } = context;
     const { data: consulta } = await supabase
       .from("appointments")

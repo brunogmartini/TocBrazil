@@ -12,6 +12,7 @@ import { iniciarPagamento } from "@/lib/pagamento.functions";
 import { track } from "@/lib/analytics";
 import { moeda } from "@/lib/video-sala";
 import { exigirAreaPaciente } from "@/lib/role-access";
+import { institucional } from "@/config/institucional";
 
 export const Route = createFileRoute("/_authenticated/agendar/$slug")({
   // Só pacientes agendam consultas.
@@ -104,7 +105,7 @@ function Agendar() {
   }
 
   async function confirmar() {
-    if (!selecionado) return;
+    if (!selecionado || !institucional.pagamentosAtivos) return;
     setErro(null);
     setEnviando(true);
     try {
@@ -211,13 +212,24 @@ function Agendar() {
 
             <button
               type="button"
-              disabled={!selecionado || enviando}
+              disabled={!selecionado || enviando || !institucional.pagamentosAtivos}
               onClick={confirmar}
               className="btn-base btn-primary mt-6 w-full disabled:opacity-50"
             >
-              {enviando ? "Reservando…" : selecionado ? "Reservar e pagar" : "Escolha um horário"}
+              {enviando
+                ? "Reservando…"
+                : !institucional.pagamentosAtivos
+                  ? "Pagamentos temporariamente indisponíveis"
+                  : selecionado
+                    ? "Reservar e pagar"
+                    : "Escolha um horário"}
             </button>
             {erro && <p className="mt-3 text-sm text-destructive">{erro}</p>}
+            {!institucional.pagamentosAtivos && (
+              <p className="mt-3 text-sm text-muted-foreground">
+                O fluxo de pagamento será ativado após a emissão do CNPJ.
+              </p>
+            )}
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
               Este é o valor definido pelo profissional. Ao reservar, o horário fica guardado para
               você por 15 minutos até a aprovação do pagamento. A consulta acontece na sala de
