@@ -97,6 +97,7 @@ function Perfil() {
       <div className="mt-6 grid gap-8 lg:grid-cols-[1.4fr_0.9fr]">
         <div>
           <span className="pill">Psicólogo(a)</span>
+          {p.foto_url && <img src={p.foto_url} alt={`Foto de ${p.nome}`} className="mt-5 aspect-square w-40 rounded-lg object-cover" />}
           <h1 className="mt-4 text-3xl sm:text-4xl">{p.nome}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {crpExibicao(p.registro, p.uf)} · {p.uf} · {p.experiencia_anos} anos de experiência declarados

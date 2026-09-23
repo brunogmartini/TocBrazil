@@ -234,6 +234,7 @@ function Busca() {
       <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {listaFiltrada.map((p) => (
           <article key={p.slug} className="card-soft card-soft-hover flex h-full flex-col p-6">
+            {p.foto_url && <img src={p.foto_url} alt={`Foto de ${p.nome}`} className="mb-4 aspect-square w-24 rounded-lg object-cover" />}
             <span className="pill self-start">Psicólogo(a)</span>
             <h2 className="mt-4 text-lg">{p.nome}</h2>
             <p className="mt-1 text-xs text-muted-foreground">

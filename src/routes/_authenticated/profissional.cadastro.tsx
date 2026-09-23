@@ -17,6 +17,12 @@ import {
 import { ProfessionalNav } from "@/components/professional-nav";
 import { exigirAreaProfissional } from "@/lib/role-access";
 import { moeda } from "@/lib/video-sala";
+import {
+  ABORDAGENS_PERFIL,
+  IDIOMAS_PERFIL,
+  TEMAS_TOC_PERFIL,
+  type FormacaoPublica,
+} from "@/lib/perfil-profissional";
 
 
 export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
@@ -77,25 +83,17 @@ function CadastroProfissional() {
     cpf: "",
     registro: "",
     uf: "",
-    cidade: "",
-    telefone: "",
-    email_contato: "",
     genero: "",
-    abordagem: "",
-    destaque: "",
-    apresentacao: "",
-    experiencia_toc: "",
+    abordagens_publicas: [] as string[],
+    formacoes_publicas: [{ instituicao: "", curso: "Psicologia", ano: new Date().getFullYear() }] as FormacaoPublica[],
+    temas_toc_publicos: [] as string[],
+    biografia_publica: "",
+    foto_caminho: "",
     experiencia_anos: "0",
     slot_minutos: "50",
     valor: "200",
-    graduacao: "",
-    instituicao: "",
-    cursos: "",
-    formacao: "",
-
-    especializacoes: "",
     areas: "",
-    idiomas: "",
+    idiomas: [] as string[],
     certidao_validade: "",
     apolice_validade: "",
     ferramenta_provedor: "",
@@ -106,6 +104,7 @@ function CadastroProfissional() {
   const [erro, setErro] = useState<string | null>(null);
   const [tipoDoc, setTipoDoc] = useState(TIPOS_DOCUMENTO[0] ?? "Documento de identidade");
   const [enviandoDoc, setEnviandoDoc] = useState(false);
+  const [enviandoFoto, setEnviandoFoto] = useState(false);
 
   useEffect(() => {
     const p = dados.data?.profissional;
@@ -115,34 +114,25 @@ function CadastroProfissional() {
         cpf: p.cpf ?? "",
         registro: p.registro ?? "",
         uf: p.uf ?? "",
-        cidade: p.cidade ?? "",
-        telefone: p.telefone ?? "",
-        email_contato: p.email_contato ?? dados.data?.email ?? "",
         genero: p.genero ?? "",
-        abordagem: p.abordagem ?? "",
-        destaque: p.destaque ?? "",
-        apresentacao: p.apresentacao ?? "",
-        experiencia_toc: p.experiencia_toc ?? "",
+        abordagens_publicas: p.abordagens_publicas ?? [],
+        formacoes_publicas: (p.formacoes_publicas as unknown as FormacaoPublica[])?.length
+          ? (p.formacoes_publicas as unknown as FormacaoPublica[])
+          : [{ instituicao: "", curso: "Psicologia", ano: new Date().getFullYear() }],
+        temas_toc_publicos: p.temas_toc_publicos ?? [],
+        biografia_publica: p.biografia_publica ?? "",
+        foto_caminho: p.foto_caminho ?? "",
         experiencia_anos: String(p.experiencia_anos ?? 0),
         slot_minutos: String(p.slot_minutos ?? 50),
         valor: String(Math.round((p.valor_centavos ?? 20000) / 100)),
-        graduacao: p.graduacao ?? "",
-        instituicao: p.instituicao ?? "",
-        cursos: (p.cursos ?? []).join(", "),
-        formacao: (p.formacao ?? []).join(", "),
-
-        especializacoes: (p.especializacoes ?? []).join(", "),
         areas: (p.areas ?? []).join(", "),
-        idiomas: (p.idiomas ?? []).join(", "),
+        idiomas: p.idiomas ?? [],
         certidao_validade: p.certidao_validade ?? "",
         apolice_validade: p.apolice_validade ?? "",
         ferramenta_provedor: p.ferramenta_provedor ?? "",
         ferramenta_url_sala: p.ferramenta_url_sala ?? "",
         ferramenta_instrucoes: p.ferramenta_instrucoes ?? "",
       });
-    } else {
-      const email = dados.data?.email;
-      if (email) setForm((f) => ({ ...f, email_contato: email }));
     }
   }, [dados.data]);
 
@@ -208,6 +198,37 @@ function CadastroProfissional() {
     }
   }
 
+  async function enviarFoto(file: File) {
+    setErro(null);
+    if (!file.type.startsWith("image/")) return setErro("Envie uma imagem JPG, PNG ou WebP.");
+    if (file.size > 5 * 1024 * 1024) return setErro("A foto deve ter no máximo 5 MB.");
+    const dimensoes = await new Promise<{ largura: number; altura: number }>((resolve, reject) => {
+      const imagem = new Image();
+      imagem.onload = () => resolve({ largura: imagem.naturalWidth, altura: imagem.naturalHeight });
+      imagem.onerror = reject;
+      imagem.src = URL.createObjectURL(file);
+    }).catch(() => null);
+    if (!dimensoes || dimensoes.largura < 600 || dimensoes.altura < 600 || dimensoes.largura !== dimensoes.altura) {
+      return setErro("A foto precisa ser quadrada e ter pelo menos 600 × 600 pixels.");
+    }
+    setEnviandoFoto(true);
+    try {
+      const { data: sessao } = await supabase.auth.getUser();
+      const uid = sessao.user?.id;
+      if (!uid) throw new Error("Sessão expirada.");
+      const extensao = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const caminho = `${uid}/perfil-${Date.now()}.${extensao}`;
+      const { error: uploadErro } = await supabase.storage.from("fotos-profissionais").upload(caminho, file);
+      if (uploadErro) throw new Error("Não foi possível enviar a foto.");
+      setForm((atual) => ({ ...atual, foto_caminho: caminho }));
+      setAviso("Foto enviada. Salve o cadastro para encaminhá-la à conferência manual.");
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : "Não foi possível enviar a foto.");
+    } finally {
+      setEnviandoFoto(false);
+    }
+  }
+
   const temCadastro = Boolean(dados.data?.profissional);
   const documentos = dados.data?.documentos ?? [];
 
@@ -252,6 +273,9 @@ function CadastroProfissional() {
 
 
       <form onSubmit={enviarCadastro} className="card-soft mt-8 grid gap-5 p-7 sm:grid-cols-2">
+        <p className="sm:col-span-2 rounded-lg bg-muted p-4 text-sm font-semibold">
+          Não inclua telefone, e-mail, redes sociais ou links. O contato acontece pela plataforma.
+        </p>
         <Campo
           label="Nome completo"
           value={form.nome}
@@ -277,22 +301,12 @@ function CadastroProfissional() {
           onChange={(v) => setForm({ ...form, uf: v.toUpperCase().slice(0, 2) })}
           required
         />
-        <Campo
-          label="Cidade"
-          value={form.cidade}
-          onChange={(v) => setForm({ ...form, cidade: v })}
-        />
-        <Campo
-          label="Telefone (WhatsApp)"
-          value={form.telefone}
-          onChange={(v) => setForm({ ...form, telefone: v })}
-        />
-        <Campo
-          label="E-mail de contato"
-          type="email"
-          value={form.email_contato}
-          onChange={(v) => setForm({ ...form, email_contato: v })}
-        />
+        <div>
+          <label htmlFor="foto-perfil" className="section-label">Foto do perfil</label>
+          <input id="foto-perfil" type="file" accept="image/jpeg,image/png,image/webp" className="field-base mt-2" disabled={enviandoFoto} onChange={(e) => { const arquivo = e.target.files?.[0]; if (arquivo) void enviarFoto(arquivo); e.target.value = ""; }} />
+          <p className="mt-1 text-xs text-muted-foreground">Rosto visível, recente, quadrada e com no mínimo 600 × 600 pixels. A publicação depende de conferência manual.</p>
+          {dados.data?.profissional?.foto_status && <p className="mt-2 text-xs font-semibold">Situação: {dados.data.profissional.foto_status === "aprovada" ? "aprovada" : dados.data.profissional.foto_status === "recusada" ? "requer nova foto" : dados.data.profissional.foto_status === "pendente" ? "em análise" : "não enviada"}</p>}
+        </div>
         <div>
           <label htmlFor="genero" className="section-label">
             Como você se identifica
@@ -346,101 +360,34 @@ function CadastroProfissional() {
             plataforma é cobrada de você por consulta realizada e não entra no preço.
           </p>
         </div>
-        <div>
-          <label htmlFor="abordagem" className="section-label">
-            Abordagem teórica principal
-          </label>
-          <input
-            id="abordagem"
-            list="abordagens-sugeridas"
-            className="field-base mt-2"
-            value={form.abordagem}
-            onChange={(e) => setForm({ ...form, abordagem: e.target.value })}
-          />
-          <datalist id="abordagens-sugeridas">
-            <option value="Exposição e Prevenção de Resposta (EPR)" />
-            <option value="Terapia Cognitivo Comportamental" />
-            <option value="Terapia de Aceitação e Compromisso" />
-            <option value="Terapia Comportamental" />
-            <option value="Psicanálise" />
-            <option value="Humanista" />
-          </datalist>
-        </div>
-
-        <Campo
-          label="Frase de destaque do perfil"
-          value={form.destaque}
-          onChange={(v) => setForm({ ...form, destaque: v })}
-          className="sm:col-span-2"
-        />
-        <Campo
-          label="Graduação"
-          value={form.graduacao}
-          onChange={(v) => setForm({ ...form, graduacao: v })}
-        />
-        <Campo
-          label="Instituição de graduação"
-          value={form.instituicao}
-          onChange={(v) => setForm({ ...form, instituicao: v })}
-        />
-        <Campo
-          label="Formação (separe por vírgula)"
-          value={form.formacao}
-          onChange={(v) => setForm({ ...form, formacao: v })}
-          className="sm:col-span-2"
-        />
-        <Campo
-          label="Cursos relevantes (separe por vírgula)"
-          value={form.cursos}
-          onChange={(v) => setForm({ ...form, cursos: v })}
-          className="sm:col-span-2"
-        />
-
-        <Campo
-          label="Especializações (separe por vírgula)"
-          value={form.especializacoes}
-          onChange={(v) => setForm({ ...form, especializacoes: v })}
-          className="sm:col-span-2"
-        />
+        <fieldset className="sm:col-span-2 rounded-lg border border-border p-4">
+          <legend className="section-label px-1">Abordagens teóricas — escolha até 3</legend>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">{ABORDAGENS_PERFIL.map((item) => <label key={item} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.abordagens_publicas.includes(item)} disabled={!form.abordagens_publicas.includes(item) && form.abordagens_publicas.length >= 3} onChange={(e) => setForm({ ...form, abordagens_publicas: e.target.checked ? [...form.abordagens_publicas, item] : form.abordagens_publicas.filter((valor) => valor !== item) })} />{item}</label>)}</div>
+        </fieldset>
+        <fieldset className="sm:col-span-2 rounded-lg border border-border p-4">
+          <legend className="section-label px-1">Formação declarada</legend>
+          {form.formacoes_publicas.map((item, indice) => <div key={indice} className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_8rem_auto]"><input aria-label={`Instituição ${indice + 1}`} className="field-base" placeholder="Instituição" value={item.instituicao} onChange={(e) => setForm({ ...form, formacoes_publicas: form.formacoes_publicas.map((f, i) => i === indice ? { ...f, instituicao: e.target.value } : f) })} /><input aria-label={`Curso ${indice + 1}`} className="field-base" placeholder="Curso" value={item.curso} onChange={(e) => setForm({ ...form, formacoes_publicas: form.formacoes_publicas.map((f, i) => i === indice ? { ...f, curso: e.target.value } : f) })} /><input aria-label={`Ano ${indice + 1}`} className="field-base" type="number" min="1900" max={new Date().getFullYear()} value={item.ano} onChange={(e) => setForm({ ...form, formacoes_publicas: form.formacoes_publicas.map((f, i) => i === indice ? { ...f, ano: Number(e.target.value) } : f) })} />{form.formacoes_publicas.length > 1 && <button type="button" className="btn-base btn-ghost" onClick={() => setForm({ ...form, formacoes_publicas: form.formacoes_publicas.filter((_, i) => i !== indice) })}>Remover</button>}</div>)}
+          <button type="button" className="btn-base btn-ghost mt-3" onClick={() => setForm({ ...form, formacoes_publicas: [...form.formacoes_publicas, { instituicao: "", curso: "", ano: new Date().getFullYear() }] })}>Adicionar formação</button>
+        </fieldset>
+        <fieldset className="sm:col-span-2 rounded-lg border border-border p-4"><legend className="section-label px-1">Experiência com TOC</legend><div className="mt-2 grid gap-2 sm:grid-cols-2">{TEMAS_TOC_PERFIL.map((item) => <label key={item} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.temas_toc_publicos.includes(item)} onChange={(e) => setForm({ ...form, temas_toc_publicos: e.target.checked ? [...form.temas_toc_publicos, item] : form.temas_toc_publicos.filter((valor) => valor !== item) })} />{item}</label>)}</div></fieldset>
         <div className="sm:col-span-2">
           <label htmlFor="idiomas" className="section-label">Idiomas</label>
-          <input
-            id="idiomas"
-            list="idiomas-sugeridos"
-            className="field-base mt-2"
-            value={form.idiomas}
-            onChange={(e) => setForm({ ...form, idiomas: e.target.value })}
-            placeholder="Português, Espanhol, Inglês"
-          />
-          <datalist id="idiomas-sugeridos">
-            <option value="Português" />
-            <option value="Espanhol" />
-            <option value="Inglês" />
-          </datalist>
+          <div className="mt-2 flex flex-wrap gap-4">{IDIOMAS_PERFIL.map((item) => <label key={item} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.idiomas.includes(item)} onChange={(e) => setForm({ ...form, idiomas: e.target.checked ? [...form.idiomas, item] : form.idiomas.filter((valor) => valor !== item) })} />{item}</label>)}</div>
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="apresentacao" className="section-label">
-            Apresentação para o paciente
+          <label htmlFor="biografia" className="section-label">
+            Biografia
           </label>
           <textarea
-            id="apresentacao"
+            id="biografia"
             rows={5}
             className="field-base mt-2"
-            value={form.apresentacao}
-            onChange={(e) => setForm({ ...form, apresentacao: e.target.value })}
+            maxLength={600}
+            required
+            value={form.biografia_publica}
+            onChange={(e) => setForm({ ...form, biografia_publica: e.target.value })}
           />
-        </div>
-        <div className="sm:col-span-2">
-          <label htmlFor="experiencia_toc" className="section-label">
-            Sua experiência com TOC
-          </label>
-          <textarea
-            id="experiencia_toc"
-            rows={4}
-            className="field-base mt-2"
-            value={form.experiencia_toc}
-            onChange={(e) => setForm({ ...form, experiencia_toc: e.target.value })}
-          />
+          <p className="mt-1 text-right text-xs text-muted-foreground">{form.biografia_publica.length}/600</p>
         </div>
         <Campo
           label="Validade da certidão do CRP"

@@ -44,7 +44,24 @@ function clientePublico() {
 }
 
 const CAMPOS =
-  "id, slug, nome, profissao, registro, uf, foto_url, abordagens_publicas, biografia_publica, temas_toc_publicos, formacoes_publicas, experiencia_anos, areas, idiomas, genero, slot_minutos, valor_centavos";
+  "id, slug, nome, profissao, registro, uf, abordagens_publicas, biografia_publica, temas_toc_publicos, formacoes_publicas, experiencia_anos, areas, idiomas, genero, slot_minutos, valor_centavos";
+
+async function adicionarFotosAprovadas(rows: ProfissionalPublico[]) {
+  if (!rows.length) return rows;
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: fotos } = await supabaseAdmin
+    .from("professionals")
+    .select("id, foto_caminho")
+    .in("id", rows.map((row) => row.id))
+    .eq("foto_status", "aprovada");
+  const urls = new Map<string, string>();
+  for (const foto of fotos ?? []) {
+    if (!foto.foto_caminho) continue;
+    const { data } = await supabaseAdmin.storage.from("fotos-profissionais").createSignedUrl(foto.foto_caminho, 3600);
+    if (data?.signedUrl) urls.set(foto.id, data.signedUrl);
+  }
+  return rows.map((row) => ({ ...row, foto_url: urls.get(row.id) ?? null }));
+}
 
 
 async function expirarReservas() {
@@ -80,7 +97,8 @@ export const listarProfissionais = createServerFn({ method: "GET" }).handler(asy
     lista.push(h.inicio);
     porSlug.set(h.slug, lista);
   }
-  const profissionais = ((data ?? []) as ProfissionalPublico[]).map((p) => ({
+  const comFotos = await adicionarFotosAprovadas((data ?? []) as unknown as ProfissionalPublico[]);
+  const profissionais = comFotos.map((p) => ({
     ...p,
     proximos: porSlug.get(p.slug) ?? [],
   }));
@@ -96,7 +114,9 @@ export const obterProfissional = createServerFn({ method: "GET" })
       .eq("slug", data.slug)
       .eq("status", "aprovado")
       .maybeSingle();
-    return { profissional: (row ?? null) as ProfissionalPublico | null };
+    if (!row) return { profissional: null };
+    const [profissional] = await adicionarFotosAprovadas([row as unknown as ProfissionalPublico]);
+    return { profissional: profissional ?? null };
   });
 
 export const listarHorariosLivres = createServerFn({ method: "GET" })
