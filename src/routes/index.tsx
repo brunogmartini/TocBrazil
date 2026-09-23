@@ -342,13 +342,13 @@ function Home() {
               A TOC Brazil não hospeda a videochamada e não tem acesso ao conteúdo das consultas. A sala é do profissional.
             </li>
             <li className="card-soft p-5">
-              Acesso segmentado por papel. O psicólogo com quem você marcou consulta vê apenas seus dados de contato, os agendamentos feitos com ele e o contato de emergência que você informou. Ninguém mais vê seus dados.
-            </li>
-            <li className="card-soft p-5">
-              E ninguém acessa o conteúdo das consultas — elas acontecem fora da plataforma. Os documentos enviados pelos psicólogos no credenciamento ficam restritos a quem faz essa conferência.
+              O acesso aos dados é segmentado por papel: cada pessoa vê apenas o que lhe cabe. O psicólogo com quem você marcar consulta verá seus dados de contato, os agendamentos feitos com ele e o contato de emergência que você informar. Os documentos enviados pelos psicólogos no credenciamento ficam restritos a quem faz essa conferência.
             </li>
             <li className="card-soft p-5">
               Quem avalia é sempre um psicólogo, em consulta. A TOC Brazil não presta serviço de saúde. A consulta é de responsabilidade do psicólogo habilitado.
+            </li>
+            <li className="card-soft p-5">
+              A conexão com o site é criptografada de ponta a ponta entre o seu navegador e nossos servidores.
             </li>
           </ul>
         </div>
