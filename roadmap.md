@@ -12,3 +12,11 @@
 - [x] Blocos 4–6: estados da busca, mobile e portas profissionais
 - [x] Blocos 7–9: administração, filtros e chamadas de ação
 - [x] Validação final e relatório por bloco
+
+## Perfil público e proteções de canal — 23/09/2026
+- [ ] Blocos A–B: perfil publicável, antidesvio, auditoria e moderação de foto
+- [ ] Bloco C: reagendamento, recorrência, remarcação, recibo e lembretes
+- [ ] Bloco D: comunicação e cobrança de continuidade fora da plataforma
+- [ ] Bloco E: indicadores agregados e alertas estatísticos
+- [ ] Bloco F: pesquisa pós-consulta agregada
+- [ ] Validação final por bloco, segurança, acessibilidade e mobile
