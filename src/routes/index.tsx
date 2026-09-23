@@ -177,11 +177,13 @@ function Home() {
           <h3 className="heading-section mt-14">As etapas do agendamento</h3>
           <ol className="mt-6 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {passos.map((passo, i) => (
-              <li key={passo.titulo} className="card-soft card-soft-hover flex h-full items-start gap-4 p-6">
-                <span className="step-index shrink-0">{i + 1}</span>
+              <li key={passo.titulo} className="flex h-full items-start gap-4 rounded-2xl border border-primary bg-primary p-6 text-primary-foreground shadow-[var(--shadow-soft)]">
+                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-foreground font-display text-base text-primary">
+                  {i + 1}
+                </span>
                 <div className="min-w-0 pt-1">
                   <h4 className="heading-card">{passo.titulo}</h4>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{passo.texto}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-primary-foreground/85">{passo.texto}</p>
                 </div>
               </li>
             ))}
