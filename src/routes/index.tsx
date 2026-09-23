@@ -131,7 +131,7 @@ function Home() {
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link to="/profissionais" className="btn-base btn-primary">
-                Ver psicólogos disponíveis
+                Comparar perfis e horários
               </Link>
               <Link to="/como-funciona" className="btn-base btn-ghost">
                 Como funciona
@@ -247,7 +247,7 @@ function Home() {
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/profissionais" className="btn-base btn-primary">
-                  Ver psicólogos disponíveis
+                  Ver quem está disponível
                 </Link>
                 <Link to="/entenda-o-toc" className="btn-base btn-ghost">
                   Entender melhor o TOC
@@ -307,7 +307,7 @@ function Home() {
               </p>
               <p>Escolha um psicólogo cadastrado na plataforma e veja os horários disponíveis.</p>
               <Link to="/profissionais" className="btn-base mt-2 bg-background text-foreground hover:bg-background/90">
-                Ver psicólogos disponíveis
+                Escolher um psicólogo
               </Link>
             </div>
           </div>
@@ -353,7 +353,7 @@ function Home() {
           </p>
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
             <Link to="/profissionais" className="btn-base btn-primary">
-              Ver psicólogos disponíveis
+              Comparar perfis e horários
             </Link>
             <Link to="/cadastro-profissional" className="btn-base btn-ghost">
               Sou psicólogo
