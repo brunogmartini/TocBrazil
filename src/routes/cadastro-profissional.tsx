@@ -108,19 +108,16 @@ function CadastroProfissional() {
       <span className="section-label">Para profissionais</span>
       <h1 className="heading-page mt-3">Sou profissional</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
-        Psicólogos com experiência em TOC. Se você ainda não tem cadastro, comece pelo
-        lado esquerdo. Se já é cadastrado, entre pelo lado direito.
+        Psicólogo, se você ainda não tem cadastro, comece pelo lado esquerdo. Se já é
+        cadastrado, entre pelo lado direito.
       </p>
 
       <section aria-labelledby="beneficios-profissional" className="mt-10 border-y border-border bg-surface py-8 sm:px-8">
-        <span className="section-label">Por que fazer parte</span>
+        <span className="section-label">Por que fazer parte?</span>
         <h2 id="beneficios-profissional" className="heading-section mt-2">
           Autonomia para cuidar do seu trabalho
         </h2>
-        <p className="mt-7 max-w-3xl font-semibold text-foreground">
-          Taxa fixa de R$ 27 por consulta realizada, igual para todos os profissionais, qualquer que seja o valor que você cobra
-        </p>
-        <article className="mt-4 max-w-3xl border border-border bg-background px-5 py-6 sm:px-8">
+        <article className="mt-7 max-w-3xl border border-border bg-background px-5 py-6 sm:px-8">
           <div className="grid gap-4 sm:grid-cols-3 sm:gap-0">
             {["Sem mensalidade.", "Sem exclusividade.", "Sem meta."].map((item, index) => (
               <p
@@ -136,7 +133,10 @@ function CadastroProfissional() {
             Você só paga quando a consulta acontece — cancelamento com reembolso integral ao paciente não gera taxa.
           </p>
         </article>
-        <article className="mt-4 max-w-3xl border-l-4 border-primary bg-surface px-6 py-6 sm:px-8">
+        <p className="mt-4 max-w-3xl font-semibold text-foreground">
+          Taxa fixa de R$ 27 por consulta realizada, igual para todos os profissionais, qualquer que seja o valor que você cobra
+        </p>
+        <article className="mt-4 max-w-3xl bg-surface px-6 py-6 sm:px-8">
           <h3 className="text-base font-semibold text-foreground">Por que existe uma taxa</h3>
           <p className="mt-3 text-base leading-relaxed text-surface-foreground">
             A taxa custeia a estrutura que você usa. Plataforma, agenda, processamento de pagamentos, custos contábeis, verificação de registro e proteção de dados. É o que mantém a TOC Brazil funcionando e ao alcance de quem procura ajuda.
