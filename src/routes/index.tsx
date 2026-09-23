@@ -162,7 +162,7 @@ function Home() {
             Busca, agendamento e pagamento em uma única plataforma
           </h2>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-            Somos a primeira plataforma 100% focada em TOC, que reúne profissionais experientes que lhe ajudarão a entender melhor seus sentimentos e pensamentos, numa jornada de cuidado e zelo.
+            Plataforma dedicada exclusivamente ao TOC, onde você encontra psicólogos que declaram experiência na área e escolhe com quem quer se consultar.
           </p>
 
           <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -240,7 +240,7 @@ function Home() {
                 Como um psicólogo pode ajudar
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Um psicólogo habilitado pode escutar sua história, avaliar o que vem acontecendo em consulta e lhe auxiliar a melhorar do TOC.
+                Um psicólogo habilitado pode escutar sua história, avaliar o que vem acontecendo e conduzir o acompanhamento que entender indicado.
               </p>
               <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
                 Quem avalia é sempre um psicólogo, em consulta — nenhuma ferramenta substitui essa conversa. Na TOC Brazil você encontra profissionais, marca horários e paga por aqui.
@@ -336,7 +336,7 @@ function Home() {
               Acesso segmentado por papel. O psicólogo com quem você marcou consulta vê apenas seus dados de contato, os agendamentos feitos com ele e o contato de emergência que você informou. Ninguém mais vê seus dados. E ninguém acessa o conteúdo das consultas — elas acontecem fora da plataforma. Os documentos enviados pelos psicólogos no credenciamento ficam restritos a quem faz essa conferência.
             </li>
             <li className="card-soft p-5">
-              A plataforma não realiza identificação clínicas e não presta serviço de saúde. A consulta é de responsabilidade do psicólogo habilitado.
+              Quem avalia é sempre um psicólogo, em consulta. A TOC Brazil não presta serviço de saúde. A consulta é de responsabilidade do psicólogo habilitado.
             </li>
           </ul>
         </div>

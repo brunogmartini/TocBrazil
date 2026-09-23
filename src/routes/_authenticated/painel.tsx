@@ -233,7 +233,7 @@ function Painel() {
                           else setErroPagamento(r.erro);
                         }}
                       >
-                        Pagar pagamento com Mercado Pago
+                        Pagar com Mercado Pago
                       </button>
                       {erroPagamento && <p className="mt-3 text-destructive">{erroPagamento}</p>}
                     </div>

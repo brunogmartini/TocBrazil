@@ -54,7 +54,7 @@ const secoes = [
   {
     t: "5. Uso adequado",
     p: [
-      "É vedado utilizar a plataforma para fins ilícitos, para divulgar informação enganosa em saúde ou para divulgar informação enganosa em saúde ou prometer cura/desfecho.",
+      "É vedado utilizar a plataforma para fins ilícitos, para divulgar informação enganosa em saúde ou para prometer cura/desfecho.",
       "Conteúdos educativos publicados pela TOC Brazil têm finalidade informativa e não substituem consulta com profissional habilitado.",
     ],
   },
