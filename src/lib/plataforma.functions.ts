@@ -13,17 +13,11 @@ export type ProfissionalPublico = {
   registro: string;
   uf: string;
   foto_url: string | null;
-  abordagem: string | null;
-  apresentacao: string | null;
-  experiencia_toc: string | null;
+  abordagens_publicas: string[];
+  biografia_publica: string | null;
+  temas_toc_publicos: string[];
+  formacoes_publicas: Array<{ instituicao: string; curso: string; ano: number }>;
   experiencia_anos: number;
-  cidade: string | null;
-  graduacao: string | null;
-  instituicao: string | null;
-  cursos: string[];
-  formacao: string[];
-
-  especializacoes: string[];
   areas: string[];
   idiomas: string[];
   genero: string | null;
@@ -50,7 +44,7 @@ function clientePublico() {
 }
 
 const CAMPOS =
-  "id, slug, nome, profissao, registro, uf, cidade, foto_url, abordagem, apresentacao, experiencia_toc, experiencia_anos, graduacao, instituicao, cursos, formacao, especializacoes, areas, idiomas, genero, slot_minutos, valor_centavos";
+  "id, slug, nome, profissao, registro, uf, foto_url, abordagens_publicas, biografia_publica, temas_toc_publicos, formacoes_publicas, experiencia_anos, areas, idiomas, genero, slot_minutos, valor_centavos";
 
 
 async function expirarReservas() {

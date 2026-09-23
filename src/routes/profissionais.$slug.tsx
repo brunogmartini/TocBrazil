@@ -6,6 +6,7 @@ import {
 } from "@/lib/plataforma.functions";
 import { moeda } from "@/lib/video-sala";
 import { track } from "@/lib/analytics";
+import { crpExibicao, TEXTO_SELO_VERIFICACAO } from "@/lib/perfil-profissional";
 
 const LABEL_PROFISSAO: Record<string, string> = {
   psicologo: "Psicólogo(a)",
@@ -31,7 +32,7 @@ export const Route = createFileRoute("/profissionais/$slug")({
     }
     const p = loaderData.profissional;
     const titulo = `${p.nome} — Psicólogo(a) online | TOC Brazil`;
-    const desc = `${p.nome} (${p.registro}) atende online. ${p.apresentacao ?? ""}`;
+    const desc = `${p.nome} (${crpExibicao(p.registro, p.uf)}) atende online. ${p.biografia_publica ?? ""}`;
     return {
       meta: [
         { title: titulo },
@@ -98,32 +99,28 @@ function Perfil() {
           <span className="pill">Psicólogo(a)</span>
           <h1 className="mt-4 text-3xl sm:text-4xl">{p.nome}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            {p.registro} · {p.uf} · {p.experiencia_anos} anos de experiência declarados
+            {crpExibicao(p.registro, p.uf)} · {p.uf} · {p.experiencia_anos} anos de experiência declarados
           </p>
           <p
             className="pill mt-4 inline-flex"
-            title="Conferimos a inscrição ativa no CRP e os documentos de formação apresentados. Não avaliamos competência técnica nem fazemos promessa de desfecho."
+            title={TEXTO_SELO_VERIFICACAO}
           >
             Inscrição no CRP conferida e documentos de formação apresentados
           </p>
 
           <div className="card-soft mt-8 p-6">
             <h2 className="text-lg">Apresentação</h2>
-            <p className="mt-3 leading-relaxed text-muted-foreground">{p.apresentacao}</p>
+            <p className="mt-3 leading-relaxed text-muted-foreground">{p.biografia_publica}</p>
           </div>
 
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
             <section className="card-soft p-6">
               <h2 className="text-lg">Formação</h2>
-              {p.graduacao && (
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {p.graduacao}
-                  {p.instituicao ? ` — ${p.instituicao}` : ""}
-                </p>
-              )}
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                {[...p.formacao, ...(p.especializacoes ?? []), ...(p.cursos ?? [])].map((f) => (
-                  <li key={f}>{f}</li>
+                {p.formacoes_publicas.map((f) => (
+                  <li key={`${f.instituicao}-${f.curso}-${f.ano}`}>
+                    {f.curso} — {f.instituicao}, {f.ano}
+                  </li>
                 ))}
               </ul>
             </section>
@@ -131,12 +128,14 @@ function Perfil() {
             <section className="card-soft p-6">
               <h2 className="text-lg">Abordagem</h2>
               <p className="mt-3 text-sm text-muted-foreground">
-                {p.abordagem ?? "Abordagem informada no cadastro."}
+                {p.abordagens_publicas.join(", ")}
               </p>
             </section>
             <section className="card-soft p-6">
               <h2 className="text-lg">Experiência com TOC</h2>
-              <p className="mt-3 text-sm text-muted-foreground">{p.experiencia_toc}</p>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {p.temas_toc_publicos.map((tema) => <li key={tema} className="pill">{tema}</li>)}
+              </ul>
             </section>
             <section className="card-soft p-6">
               <h2 className="text-lg">Áreas de experiência e idiomas</h2>

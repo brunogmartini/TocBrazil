@@ -124,7 +124,7 @@ function Busca() {
         ABORDAGEM_EPR,
         "Terapia Cognitivo Comportamental",
         "Psicanálise",
-        ...profissionais.map((p) => p.abordagem).filter((a): a is string => !!a),
+        ...profissionais.flatMap((p) => p.abordagens_publicas),
       ]),
     ],
     [profissionais],
@@ -152,7 +152,7 @@ function Busca() {
     return profissionais
       .filter(
         (p) =>
-          (abordagem === TODOS || p.abordagem === abordagem) &&
+          (abordagem === TODOS || p.abordagens_publicas.includes(abordagem)) &&
           (idioma === TODOS || p.idiomas.includes(idioma)) &&
           (genero === TODOS || p.genero === genero.toLowerCase()) &&
           (!faixaEscolhida ||
@@ -239,7 +239,9 @@ function Busca() {
             <p className="mt-1 text-xs text-muted-foreground">
               {p.registro} · {p.uf} · {p.experiencia_anos} anos declarados
             </p>
-            {p.abordagem && <p className="mt-4 text-sm">{p.abordagem}</p>}
+            {p.abordagens_publicas.length > 0 && (
+              <p className="mt-4 text-sm">{p.abordagens_publicas.join(" · ")}</p>
+            )}
             <ul className="mt-3 flex flex-wrap gap-2">
               {p.areas.map((a) => (
                 <li key={a} className="pill">
@@ -247,7 +249,7 @@ function Busca() {
                 </li>
               ))}
             </ul>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{p.apresentacao}</p>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{p.biografia_publica}</p>
             <p className="mt-4 text-xs text-muted-foreground">Idiomas: {p.idiomas.join(", ")}</p>
             <p className="mt-4 text-sm font-semibold">
               {moeda(p.valor_centavos)}{" "}
