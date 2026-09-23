@@ -57,6 +57,20 @@
       "when": 1789666597650,
       "tag": "0007_endurecer_avaliacoes_e_funcoes",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790179296822,
+      "tag": "0008_endurecer_controle_acesso_bloco_a",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790179366342,
+      "tag": "0009_separar_acesso_publico_e_autenticado",
+      "breakpoints": true
     }
   ]
 }

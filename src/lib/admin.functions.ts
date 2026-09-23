@@ -117,10 +117,21 @@ async function garantirAdmin(context: { supabase: unknown; userId: string }) {
   if (!data) throw new Error("Acesso restrito ao administrador.");
 }
 
+async function registrarAcessoAdmin(userId: string, recurso: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  await supabaseAdmin.from("eventos_auditoria").insert({
+    tipo: "acesso_administrativo",
+    ator: userId,
+    ator_papel: "admin",
+    metadados: { recurso },
+  });
+}
+
 export const painelAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await garantirAdmin(context);
+    await registrarAcessoAdmin(context.userId, "painel_admin");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin.rpc("concluir_consultas_vencidas");
 
@@ -357,6 +368,7 @@ export const relatorioMetadados = createServerFn({ method: "GET" })
   }))
   .handler(async ({ data, context }) => {
     await garantirAdmin(context);
+    await registrarAcessoAdmin(context.userId, "relatorio_metadados");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin.rpc("concluir_consultas_vencidas");
     const agora = new Date();
