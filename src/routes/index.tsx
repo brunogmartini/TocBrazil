@@ -125,10 +125,8 @@ function Home() {
           <div className="rise-in">
             <span className="pill">Plataforma de busca, agenda e pagamento</span>
             <h1 className="heading-hero mt-6">
-              Encontre{" "}
-              <span className="text-primary">
-                psicólogos com experiência em TOC
-              </span>{" "}
+              Encontre psicólogos{" "}
+              <span className="text-primary">com experiência em TOC</span>{" "}
               e agende sua consulta online
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
