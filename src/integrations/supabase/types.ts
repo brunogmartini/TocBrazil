@@ -1308,6 +1308,10 @@ export type Database = {
           nome: string
         }[]
       }
+      perfil_pronto_para_publicar: {
+        Args: { _professional_id: string }
+        Returns: boolean
+      }
       profissionais_das_minhas_consultas: {
         Args: never
         Returns: {
