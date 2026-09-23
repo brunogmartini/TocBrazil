@@ -9,6 +9,7 @@ import {
   minhasConsultas,
   minhasNotificacoes,
   confirmarRealizacao,
+  listarHorariosLivres,
   salvarPerfil,
 } from "@/lib/plataforma.functions";
 import { CalendarioConsultas, type ItemCalendario } from "@/components/calendario-consultas";
@@ -21,6 +22,7 @@ import { horaDe, rotuloDiaLongo, chaveDia } from "@/lib/agenda-tempo";
 import { exigirAreaPaciente } from "@/lib/role-access";
 import { baixarIcs } from "@/lib/calendario-ics";
 import { institucional } from "@/config/institucional";
+import { criarPreferenciaRecorrencia, remarcarConsulta, responderPesquisaPosConsulta } from "@/lib/continuidade.functions";
 
 export const Route = createFileRoute("/_authenticated/painel")({
   // Área exclusiva do paciente: profissionais e gestores são levados à sua própria área.
@@ -53,6 +55,10 @@ function Painel() {
   const cancelar = useServerFn(cancelarConsulta);
   const confirmarConsulta = useServerFn(confirmarRealizacao);
   const pagar = useServerFn(iniciarPagamento);
+  const pesquisar = useServerFn(responderPesquisaPosConsulta);
+  const recorrencia = useServerFn(criarPreferenciaRecorrencia);
+  const remarcar = useServerFn(remarcarConsulta);
+  const buscarHorarios = useServerFn(listarHorariosLivres);
 
   const contexto = useQuery({ queryKey: ["contexto"], queryFn: () => carregarContexto() });
   const consultas = useQuery({ queryKey: ["consultas"], queryFn: () => carregarConsultas() });
@@ -62,6 +68,8 @@ function Painel() {
   const [selecionada, setSelecionada] = useState<string | null>(null);
   const [erroPagamento, setErroPagamento] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [remarcando, setRemarcando] = useState<{ id: string; slug: string } | null>(null);
+  const [novosHorarios, setNovosHorarios] = useState<{ inicio: string; fim: string }[]>([]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -215,6 +223,11 @@ function Painel() {
                       >
                         Adicionar ao meu calendário
                       </button>
+                      {c.professionals?.slug && <button type="button" className="btn-base btn-ghost" onClick={async () => {
+                        const livres = await buscarHorarios({ data: { slug: c.professionals?.slug ?? "", dias: 60 } });
+                        setNovosHorarios(livres.horarios);
+                        setRemarcando({ id: c.id, slug: c.professionals?.slug ?? "" });
+                      }}>Remarcar</button>}
                     </div>
                   )}
 
@@ -280,6 +293,11 @@ function Painel() {
                           </dd>
                         </div>
                       </dl>
+                      {c.status === "realizada" && <div className="mt-4 border-t border-border/60 pt-4">
+                        <p className="text-sm font-semibold">Você gostaria de continuar com este profissional?</p>
+                        <div className="mt-3 flex flex-wrap gap-2">{([['sim','Sim'],['ainda_nao_sei','Ainda não sei'],['nao','Não']] as const).map(([resposta, rotulo]) => <button key={resposta} type="button" className="pill" onClick={async () => { const r = await pesquisar({ data: { consultaId: c.id, resposta } }); setAviso(r.ok ? "Resposta registrada. Obrigado." : r.erro); }}>{rotulo}</button>)}</div>
+                        <div className="mt-3 flex flex-wrap gap-2"><button type="button" className="btn-base btn-ghost" onClick={async () => { const r = await recorrencia({ data: { consultaId: c.id, frequencia: 'semanal' } }); setAviso(r.ok ? "Preferência semanal registrada. Cada horário exigirá confirmação e pagamento." : r.erro); }}>Preferência semanal</button><button type="button" className="btn-base btn-ghost" onClick={() => window.print()}>Imprimir recibo</button></div>
+                      </div>}
                       {c.status === "confirmada" && new Date(c.fim).getTime() <= agora && (
                         <div className="mt-4 border-t border-border/60 pt-4">
                           <p className="text-xs text-muted-foreground">
@@ -348,6 +366,9 @@ function Painel() {
             setEditandoPerfil(false);
           }}
         />
+      </Modal>
+      <Modal aberto={Boolean(remarcando)} titulo="Escolha o novo horário" onFechar={() => setRemarcando(null)} largura="max-w-lg">
+        <div className="max-h-80 space-y-2 overflow-y-auto">{novosHorarios.slice(0, 40).map((slot) => <button key={slot.inicio} type="button" className="btn-base btn-ghost w-full justify-between" onClick={async () => { if (!remarcando) return; const r = await remarcar({ data: { consultaId: remarcando.id, novoInicio: slot.inicio } }); setAviso(r.ok ? "Consulta remarcada." : r.erro); if (r.ok) { setRemarcando(null); await queryClient.invalidateQueries({ queryKey: ['consultas'] }); } }}>{formatarData(slot.inicio)}</button>)}</div>
       </Modal>
 
       <Modal

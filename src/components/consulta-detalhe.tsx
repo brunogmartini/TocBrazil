@@ -6,6 +6,7 @@ import { ChatAdministrativo } from "@/components/chat-administrativo";
 import { marcarConsultaRealizada, type ConsultaAgenda } from "@/lib/profissional.functions";
 import { chaveDia, horaDe, rotuloDiaLongo } from "@/lib/agenda-tempo";
 import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
+import { registrarContinuidade } from "@/lib/continuidade.functions";
 
 export function ConsultaDetalhe({
   consulta,
@@ -17,6 +18,7 @@ export function ConsultaDetalhe({
   onAtualizado: () => Promise<void> | void;
 }) {
   const atualizar = useServerFn(marcarConsultaRealizada);
+  const registrarInteresse = useServerFn(registrarContinuidade);
   const [erro, setErro] = useState<string | null>(null);
 
   if (!consulta) return null;
@@ -94,6 +96,15 @@ export function ConsultaDetalhe({
           </div>
         )}
         {erro && <p className="text-destructive">{erro}</p>}
+        {c.status === "realizada" && (
+          <div className="border-t border-border/60 pt-4">
+            <p className="text-xs text-muted-foreground">Use somente quando o paciente pediu espontaneamente para continuar com você.</p>
+            <button type="button" className="btn-base btn-ghost mt-3" onClick={async () => {
+              const r = await registrarInteresse({ data: { consultaId: c.id, valorCentavos: c.valor_consulta_centavos } });
+              setErro(r.ok ? "Interesse registrado. A continuidade só será confirmada após novo pagamento do paciente." : r.erro);
+            }}>Registrar interesse do paciente em continuar</button>
+          </div>
+        )}
         <ChatAdministrativo consultaId={c.id} />
 
       </div>

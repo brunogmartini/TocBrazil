@@ -190,7 +190,7 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
 
     const { data: existente } = await supabase
       .from("professionals")
-      .select("id, slug, status, foto_caminho")
+      .select("id, slug, status, foto_caminho, perfil_bloqueios_contato")
       .eq("user_id", userId)
       .maybeSingle();
 
@@ -205,13 +205,18 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     ]);
     if (deteccao) {
       if (existente) {
-        await supabase.rpc("registrar_deteccao_anticontato", {
-          _professional_id: existente.id,
-          _appointment_id: null,
-          _contexto: "perfil",
-          _padrao_tipo: deteccao.tipo,
-          _acao: "bloqueado",
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        await supabaseAdmin.from("deteccoes_anticontato").insert({
+          professional_id: existente.id,
+          appointment_id: null,
+          ator_id: userId,
+          contexto: "perfil",
+          padrao_tipo: deteccao.tipo,
+          acao: "bloqueado",
         });
+        await supabaseAdmin.from("professionals").update({
+          perfil_bloqueios_contato: (existente.perfil_bloqueios_contato ?? 0) + 1,
+        }).eq("id", existente.id);
       }
       return {
         ok: false as const,

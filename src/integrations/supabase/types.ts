@@ -97,6 +97,44 @@ export type Database = {
           },
         ]
       }
+      appointment_series: {
+        Row: {
+          ativa: boolean
+          created_at: string
+          faixa_horario: string
+          frequencia: string
+          id: string
+          patient_id: string
+          professional_id: string
+        }
+        Insert: {
+          ativa?: boolean
+          created_at?: string
+          faixa_horario: string
+          frequencia: string
+          id?: string
+          patient_id: string
+          professional_id: string
+        }
+        Update: {
+          ativa?: boolean
+          created_at?: string
+          faixa_horario?: string
+          frequencia?: string
+          id?: string
+          patient_id?: string
+          professional_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_series_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           cancelada_em: string | null
@@ -116,7 +154,9 @@ export type Database = {
           primeira_consulta: boolean
           professional_id: string
           realizada_em: string | null
+          remarcada_de: string | null
           reserva_expira_em: string | null
+          series_id: string | null
           status: Database["public"]["Enums"]["appointment_status"]
           taxa_agendamento_centavos: number
           taxa_plataforma_centavos: number
@@ -146,7 +186,9 @@ export type Database = {
           primeira_consulta?: boolean
           professional_id: string
           realizada_em?: string | null
+          remarcada_de?: string | null
           reserva_expira_em?: string | null
+          series_id?: string | null
           status?: Database["public"]["Enums"]["appointment_status"]
           taxa_agendamento_centavos?: number
           taxa_plataforma_centavos?: number
@@ -176,7 +218,9 @@ export type Database = {
           primeira_consulta?: boolean
           professional_id?: string
           realizada_em?: string | null
+          remarcada_de?: string | null
           reserva_expira_em?: string | null
+          series_id?: string | null
           status?: Database["public"]["Enums"]["appointment_status"]
           taxa_agendamento_centavos?: number
           taxa_plataforma_centavos?: number
@@ -194,6 +238,20 @@ export type Database = {
             columns: ["professional_id"]
             isOneToOne: false
             referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_remarcada_de_fkey"
+            columns: ["remarcada_de"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_series_id_fkey"
+            columns: ["series_id"]
+            isOneToOne: false
+            referencedRelation: "appointment_series"
             referencedColumns: ["id"]
           },
         ]
@@ -354,6 +412,63 @@ export type Database = {
           politica_versao?: string
         }
         Relationships: []
+      }
+      continuity_requests: {
+        Row: {
+          appointment_id: string
+          created_at: string
+          id: string
+          iniciativa_paciente: boolean
+          manifestacao_em: string
+          pago_em: string | null
+          patient_id: string
+          professional_id: string
+          provider_ref: string | null
+          status: string
+          valor_centavos: number
+        }
+        Insert: {
+          appointment_id: string
+          created_at?: string
+          id?: string
+          iniciativa_paciente: boolean
+          manifestacao_em: string
+          pago_em?: string | null
+          patient_id: string
+          professional_id: string
+          provider_ref?: string | null
+          status?: string
+          valor_centavos: number
+        }
+        Update: {
+          appointment_id?: string
+          created_at?: string
+          id?: string
+          iniciativa_paciente?: boolean
+          manifestacao_em?: string
+          pago_em?: string | null
+          patient_id?: string
+          professional_id?: string
+          provider_ref?: string | null
+          status?: string
+          valor_centavos?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "continuity_requests_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "continuity_requests_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       contratos_profissionais: {
         Row: {
@@ -838,6 +953,48 @@ export type Database = {
         }
         Relationships: []
       }
+      post_consultation_surveys: {
+        Row: {
+          appointment_id: string
+          id: string
+          patient_id: string
+          professional_id: string
+          responded_at: string
+          resposta: string
+        }
+        Insert: {
+          appointment_id: string
+          id?: string
+          patient_id: string
+          professional_id: string
+          responded_at?: string
+          resposta: string
+        }
+        Update: {
+          appointment_id?: string
+          id?: string
+          patient_id?: string
+          professional_id?: string
+          responded_at?: string
+          resposta?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_consultation_surveys_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_consultation_surveys_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_documents: {
         Row: {
           caminho: string
@@ -1299,6 +1456,22 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      indicadores_profissionais: {
+        Args: never
+        Returns: {
+          alerta_cancelamento: boolean
+          alerta_retorno: boolean
+          cancelamentos_tardios: number
+          continuidades: number
+          deteccoes: number
+          nao_comparecimentos: number
+          nome: string
+          pacientes_primeira_consulta: number
+          pacientes_retorno: number
+          professional_id: string
+          taxa_retorno: number
+        }[]
       }
       meus_pacientes_agendados: {
         Args: never

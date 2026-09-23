@@ -76,6 +76,13 @@ export type ProfissionalAdmin = {
   experiencia_toc: string | null;
   experiencia_anos: number;
   foto_url: string | null;
+  foto_status: string;
+  foto_observacao: string | null;
+  perfil_bloqueios_contato: number;
+  abordagens_publicas: string[];
+  biografia_publica: string | null;
+  temas_toc_publicos: string[];
+  formacoes_publicas: Array<{ instituicao: string; curso: string; ano: number }>;
   observacao_admin: string | null;
   validado_em: string | null;
   ferramenta_provedor: string | null;
@@ -271,10 +278,16 @@ export const painelAdmin = createServerFn({ method: "GET" })
       histPorProfissional.set(h.professional_id, lista);
     }
 
-    const listaProfissionais: ProfissionalAdmin[] = (profissionais ?? []).map((p) => {
+    const listaProfissionais: ProfissionalAdmin[] = [];
+    for (const p of profissionais ?? []) {
       const docs = docsPorProfissional.get(p.id) ?? [];
       const stats = consultasPorProfissional.get(p.id);
-      return {
+      let fotoUrl: string | null = null;
+      if (p.foto_caminho) {
+        const { data: foto } = await supabaseAdmin.storage.from("fotos-profissionais").createSignedUrl(p.foto_caminho, 600);
+        fotoUrl = foto?.signedUrl ?? null;
+      }
+      listaProfissionais.push({
         id: p.id,
         user_id: p.user_id,
         nome: p.nome,
@@ -303,7 +316,14 @@ export const painelAdmin = createServerFn({ method: "GET" })
         apresentacao: p.apresentacao,
         experiencia_toc: p.experiencia_toc,
         experiencia_anos: p.experiencia_anos,
-        foto_url: p.foto_url,
+        foto_url: fotoUrl,
+        foto_status: p.foto_status,
+        foto_observacao: p.foto_observacao,
+        perfil_bloqueios_contato: p.perfil_bloqueios_contato,
+        abordagens_publicas: p.abordagens_publicas ?? [],
+        biografia_publica: p.biografia_publica,
+        temas_toc_publicos: p.temas_toc_publicos ?? [],
+        formacoes_publicas: (p.formacoes_publicas ?? []) as Array<{ instituicao: string; curso: string; ano: number }>,
         observacao_admin: p.observacao_admin,
         validado_em: p.validado_em,
         ferramenta_provedor: p.ferramenta_provedor,
@@ -314,8 +334,8 @@ export const painelAdmin = createServerFn({ method: "GET" })
         criadoEm: p.created_at,
         documentos: docs,
         historico: histPorProfissional.get(p.id) ?? [],
-      };
-    });
+      });
+    }
 
     const agora = Date.now();
     const realizadas = listaConsultas.filter((c) => c.status === "realizada");
@@ -324,6 +344,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
       profissionais: listaProfissionais.length,
       profissionaisAtivos: listaProfissionais.filter((p) => p.status === "aprovado").length,
       pendentes: listaProfissionais.filter((p) => p.status === "pendente").length,
+      perfisSinalizados: listaProfissionais.filter((p) => p.perfil_bloqueios_contato > 2).length,
       consultasFuturas: listaConsultas.filter(
         (c) => new Date(c.inicio).getTime() > agora && (c.status === "confirmada" || c.status === "aguardando_pagamento"),
       ).length,
@@ -413,11 +434,10 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     if (data.status === "aprovado") {
-      const { data: prof } = await supabaseAdmin
-        .from("professionals")
-        .select("ferramenta_url_sala, certidao_validade, apolice_validade")
-        .eq("id", data.id)
-        .maybeSingle();
+      const [{ data: prof }, { data: perfilPronto }] = await Promise.all([
+        supabaseAdmin.from("professionals").select("ferramenta_url_sala, certidao_validade, apolice_validade").eq("id", data.id).maybeSingle(),
+        supabaseAdmin.rpc("perfil_pronto_para_publicar", { _professional_id: data.id }),
+      ]);
       const hoje = new Date().toISOString().slice(0, 10);
       if (!prof?.ferramenta_url_sala) {
         return {
@@ -425,6 +445,7 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
           erro: "O profissional ainda não cadastrou a ferramenta de videochamada. O perfil não pode ser publicado.",
         };
       }
+      if (!perfilPronto) return { ok: false as const, erro: "O perfil público ainda está incompleto ou a foto não foi aprovada." };
       if (prof.certidao_validade && prof.certidao_validade < hoje) {
         return { ok: false as const, erro: "A certidão do conselho está vencida." };
       }
@@ -464,6 +485,40 @@ export const definirStatusDocumento = createServerFn({ method: "POST" })
       .update({ status: data.status, observacao_admin: data.observacao })
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível atualizar o documento." };
+    return { ok: true as const };
+  });
+
+export const definirStatusFoto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { id: string; status: "aprovada" | "recusada"; observacao?: string }) => ({
+    id: String(data.id),
+    status: data.status,
+    observacao: String(data.observacao ?? "").trim().slice(0, 500) || null,
+  }))
+  .handler(async ({ data, context }) => {
+    await garantirAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profissional } = await supabaseAdmin
+      .from("professionals")
+      .select("foto_caminho")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!profissional?.foto_caminho) return { ok: false as const, erro: "Nenhuma foto foi enviada." };
+    const { error } = await supabaseAdmin.from("professionals").update({
+      foto_status: data.status,
+      foto_moderada_em: new Date().toISOString(),
+      foto_moderada_por: context.userId,
+      foto_observacao: data.observacao,
+      ...(data.status === "recusada" ? { status: "pendente" as const } : {}),
+    }).eq("id", data.id);
+    if (error) return { ok: false as const, erro: "Não foi possível atualizar a foto." };
+    await supabaseAdmin.from("eventos_auditoria").insert({
+      tipo: "moderacao_foto_perfil",
+      professional_id: data.id,
+      ator: context.userId,
+      ator_papel: "admin",
+      metadados: { status: data.status },
+    });
     return { ok: true as const };
   });
 

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   definirStatusConsultaAdmin,
   definirStatusDocumento,
+  definirStatusFoto,
   definirStatusPagamento,
   definirStatusProfissional,
   editarProfissionalAdmin,
@@ -16,6 +17,7 @@ import {
 } from "@/lib/admin.functions";
 import type { ConfiguracoesPlataforma } from "@/lib/plataforma.functions";
 import { EtapasCadastro } from "@/components/professional-nav";
+import { indicadoresGestao } from "@/lib/continuidade.functions";
 import { dataBR, dataHoraBR, moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -70,10 +72,12 @@ function Admin() {
   const carregarRelatorio = useServerFn(relatorioMetadados);
   const mudarStatusProf = useServerFn(definirStatusProfissional);
   const mudarStatusDoc = useServerFn(definirStatusDocumento);
+  const mudarStatusFoto = useServerFn(definirStatusFoto);
   const editarProf = useServerFn(editarProfissionalAdmin);
   const mudarPagamento = useServerFn(definirStatusPagamento);
   const mudarConsulta = useServerFn(definirStatusConsultaAdmin);
   const salvarCfg = useServerFn(salvarConfiguracoes);
+  const carregarIndicadores = useServerFn(indicadoresGestao);
 
   const [aba, setAba] = useState<Aba>("visao");
   const [busca, setBusca] = useState("");
@@ -95,6 +99,7 @@ function Admin() {
     queryFn: () => carregarRelatorio({ data: {} }),
     enabled: aba === "relatorio",
   });
+  const indicadores = useQuery({ queryKey: ["admin-indicadores"], queryFn: () => carregarIndicadores(), enabled: aba === "relatorio" });
   const atualizar = () => queryClient.invalidateQueries({ queryKey: ["painel-admin"] });
 
   if (painel.isError) {
@@ -203,6 +208,7 @@ function Admin() {
               { rotulo: "Profissionais cadastrados", valor: String(t.profissionais) },
               { rotulo: "Profissionais ativos", valor: String(t.profissionaisAtivos) },
               { rotulo: "Cadastros pendentes", valor: String(t.pendentes), destaque: t.pendentes > 0 },
+              { rotulo: "Perfis sinalizados", valor: String(t.perfisSinalizados), destaque: t.perfisSinalizados > 0 },
               { rotulo: "Consultas futuras", valor: String(t.consultasFuturas) },
               { rotulo: "Consultas realizadas", valor: String(t.consultasRealizadas) },
               { rotulo: "Taxas fixas registradas", valor: moeda(t.taxasRegistradasCentavos) },
@@ -268,6 +274,14 @@ function Admin() {
         </div>
       )}
 
+      {aba === "relatorio" && (
+        <section className="card-soft mt-6 overflow-x-auto p-4">
+          <h2 className="text-xl">Indicadores agregados por profissional</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Alertas usam desvio de dois desvios-padrão e servem apenas para revisão operacional.</p>
+          <table className="mt-4 w-full min-w-[52rem] text-sm"><thead><tr className="text-left text-muted-foreground"><th className="p-2">Profissional</th><th className="p-2">Primeiras</th><th className="p-2">Retornos</th><th className="p-2">Taxa</th><th className="p-2">Cancelamentos tardios</th><th className="p-2">Detecções</th><th className="p-2">Continuidade</th><th className="p-2">Alertas</th></tr></thead><tbody>{(indicadores.data?.indicadores ?? []).map((i) => <tr key={i.professional_id} className="border-t border-border/60"><td className="p-2 font-semibold">{i.nome}</td><td className="p-2">{i.pacientes_primeira_consulta}</td><td className="p-2">{i.pacientes_retorno}</td><td className="p-2">{Math.round(Number(i.taxa_retorno) * 100)}%</td><td className="p-2">{i.cancelamentos_tardios}</td><td className="p-2">{i.deteccoes}</td><td className="p-2">{i.continuidades}</td><td className="p-2">{i.alerta_cancelamento || i.alerta_retorno ? "Revisar" : "—"}</td></tr>)}</tbody></table>
+        </section>
+      )}
+
       {aba === "profissionais" && (
         <>
           <div className="mt-6 flex flex-wrap gap-2">
@@ -299,7 +313,7 @@ function Admin() {
                     <h2 className="text-lg">{p.nome}</h2>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Psicólogo(a) · {p.registro} · {p.uf}
-                      {p.cidade ? ` · ${p.cidade}` : ""} · {p.email_login ?? p.email_contato ?? "sem e-mail"} · cadastro em {dataBR(p.criadoEm)}
+                      · cadastro em {dataBR(p.criadoEm)}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Etapa atual: <strong className="text-foreground">{p.etapa.titulo}</strong> · {p.documentos.filter((d) => d.status === "aprovado").length}/{p.documentos.length} documentos aprovados · {p.consultas} consultas
@@ -326,7 +340,6 @@ function Admin() {
                 {aberto === p.id && (
                   <div className="mt-6 space-y-6">
                     <dl className="grid gap-4 text-sm sm:grid-cols-2">
-                      <Info rotulo="Contato" valor={[p.email_contato, p.telefone].filter(Boolean).join(" · ")} />
                       <Info rotulo="Preço da consulta" valor={moeda(p.valor_centavos)} />
                       <Info
                         rotulo="Ferramenta de videochamada"
@@ -345,17 +358,23 @@ function Admin() {
                         valor={p.apolice_validade ? dataBR(p.apolice_validade) : "—"}
                       />
 
-                      <Info rotulo="Graduação" valor={[p.graduacao, p.instituicao].filter(Boolean).join(" — ")} />
-                      <Info rotulo="Abordagem" valor={p.abordagem} />
-                      <Info rotulo="Formação" valor={p.formacao.join(", ")} />
-                      <Info rotulo="Especializações" valor={p.especializacoes.join(", ")} />
-                      <Info rotulo="Cursos relevantes" valor={p.cursos.join(", ")} />
+                      <Info rotulo="Abordagens" valor={p.abordagens_publicas.join(", ")} />
+                      <Info rotulo="Formação" valor={p.formacoes_publicas.map((f) => `${f.curso} — ${f.instituicao}, ${f.ano}`).join("; ")} />
                       <Info rotulo="Áreas de experiência" valor={p.areas.join(", ")} />
                       <Info rotulo="Idiomas" valor={p.idiomas.join(", ")} />
-                      <Info rotulo="Apresentação" valor={p.apresentacao} />
-                      <Info rotulo="Experiência com TOC" valor={p.experiencia_toc} />
+                      <Info rotulo="Biografia" valor={p.biografia_publica} />
+                      <Info rotulo="Experiência com TOC" valor={p.temas_toc_publicos.join(", ")} />
+                      <Info rotulo="Bloqueios antidesvio" valor={String(p.perfil_bloqueios_contato)} />
                       <Info rotulo="Última validação" valor={p.validado_em ? dataHoraBR(p.validado_em) : "—"} />
                     </dl>
+
+                    <div className="rounded-lg border border-border p-4">
+                      <h3 className="text-base font-semibold">Foto do perfil</h3>
+                      {p.foto_url ? <img src={p.foto_url} alt={`Foto enviada por ${p.nome}`} className="mt-3 aspect-square w-48 rounded-lg object-cover" /> : <p className="mt-2 text-sm text-muted-foreground">Nenhuma foto enviada.</p>}
+                      <p className="mt-2 text-sm">Situação: <strong>{p.foto_status}</strong></p>
+                      <p className="mt-1 text-xs text-muted-foreground">Confira rosto visível, imagem recente e ausência de texto, telefone, arroba ou logotipo.</p>
+                      {p.foto_url && <div className="mt-3 flex gap-2"><button type="button" className="btn-base btn-primary" onClick={async () => { await mudarStatusFoto({ data: { id: p.id, status: "aprovada" } }); await atualizar(); }}>Aprovar foto</button><button type="button" className="btn-base btn-ghost" onClick={async () => { await mudarStatusFoto({ data: { id: p.id, status: "recusada", observacao: "Envie uma foto sem texto, contato, arroba ou logotipo." } }); await atualizar(); }}>Recusar foto</button></div>}
+                    </div>
 
                     <div>
                       <h3 className="text-base font-semibold">Documentos e títulos</h3>
@@ -452,13 +471,6 @@ function Admin() {
                       </div>
                     )}
 
-                    <EdicaoProfissional
-                      profissional={p}
-                      salvar={async (dadosForm) => {
-                        await editarProf({ data: { id: p.id, ...dadosForm } });
-                        await atualizar();
-                      }}
-                    />
                   </div>
                 )}
               </article>
