@@ -26,10 +26,6 @@ export const Route = createFileRoute("/como-funciona")({
 
 const etapas = [
   {
-    t: "Entenda sobre o transtorno",
-    d: "Leia conteúdos educativos sobre TOC. Eles não substituem consulta com profissional habilitado.",
-  },
-  {
     t: "Encontre um psicólogo",
     d: "Compare abordagem, idioma, valor, duração e horários disponíveis em cada perfil.",
   },
@@ -85,13 +81,13 @@ function ComoFunciona() {
         <span className="section-label">Como funciona</span>
         <h1 className="heading-page mt-4">Como funciona</h1>
         <p className="mt-6 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-          A TOC Brazil é uma plataforma de tecnologia para buscar psicólogos com experiência em TOC, agendar consultas online e realizar o pagamento. A consulta acontece fora da plataforma, na sala do próprio psicólogo.
+          A TOC Brazil é uma plataforma de tecnologia que reune psicólogos com experiência em TOC e proporciona o agendamento de consultas online. A consulta acontece fora da plataforma, na sala virtual do próprio psicólogo.
         </p>
       </section>
 
       <section className="border-y border-border bg-surface">
         <div className="container-page py-14 lg:py-20">
-          <ol className="grid items-stretch gap-5 lg:grid-cols-4">
+          <ol className="grid items-stretch gap-5 lg:grid-cols-3">
             {etapas.map((e, i) => (
               <li key={e.t} className="card-soft h-full p-6">
                 <span className="step-index">{i + 1}</span>
