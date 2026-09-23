@@ -72,7 +72,7 @@ function SejaParceiro() {
         </p>
         <div className="mt-9 flex flex-col gap-3 sm:flex-row">
           <Link to="/cadastro-profissional" className="btn-base btn-primary">
-            Quero fazer parte
+            Sou psicólogo
           </Link>
 
           <Link to="/como-funciona" className="btn-base btn-ghost">

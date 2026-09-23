@@ -136,13 +136,13 @@ function Auth() {
     // Com sessão ativa, descobre a área real da conta no servidor e só então encaminha.
     async function encaminhar(session: Session) {
       try {
-        if (gestor && !(await prepararMfaGestor())) return;
         const area = await minhaArea(areaPretendida === "profissional" ? "profissional" : undefined);
         if (cancelado) return;
         if (area !== areaPretendida) {
           setConflito({ area, email: session.user.email ?? null });
           return;
         }
+        if (gestor && !(await prepararMfaGestor())) return;
         navigate({ to: destinoDaArea(area, search.redirect), replace: true });
       } catch {
         if (!cancelado) setErro("Não foi possível identificar sua área de acesso. Tente novamente.");
