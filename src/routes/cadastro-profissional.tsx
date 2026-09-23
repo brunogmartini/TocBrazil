@@ -105,41 +105,25 @@ function CadastroProfissional() {
 
   return (
     <div className="container-page py-12 lg:py-16">
-      <span className="section-label">Para profissionais</span>
-      <h1 className="heading-page mt-3">Sou profissional</h1>
-      <p className="mt-4 max-w-2xl text-muted-foreground">
-        Psicólogo, se você ainda não tem cadastro, comece pelo lado esquerdo. Se já é
-        cadastrado, entre pelo lado direito.
-      </p>
-
-      <section aria-labelledby="beneficios-profissional" className="mt-10 border-y border-border bg-surface py-8 sm:px-8">
+      <section aria-labelledby="beneficios-profissional" className="border-y border-border bg-surface py-8 sm:px-8">
         <span className="section-label">Por que fazer parte?</span>
         <h2 id="beneficios-profissional" className="heading-section mt-2">
           Autonomia para cuidar do seu trabalho
         </h2>
         <article className="mt-7 max-w-3xl border border-border bg-background px-5 py-6 sm:px-8">
-          <div className="grid gap-4 sm:grid-cols-3 sm:gap-0">
-            {["Sem mensalidade.", "Sem exclusividade.", "Sem meta."].map((item, index) => (
+          <div className="grid gap-5 sm:grid-cols-3 sm:gap-0">
+            {["Sem mensalidade", "Sem exclusividade", "Sem meta"].map((item, index) => (
               <p
                 key={item}
-                className={`flex items-center gap-3 text-lg font-semibold text-foreground ${index > 0 ? "border-t border-border pt-4 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0" : ""}`}
+                className={`flex min-h-7 items-center gap-3 text-lg font-semibold text-foreground ${index > 0 ? "border-t border-border pt-5 sm:border-l sm:border-t-0 sm:px-6 sm:pt-0" : "sm:pr-6"}`}
               >
-                <span aria-hidden="true" className="text-primary">✓</span>
+                <span aria-hidden="true" className="shrink-0 text-primary">✓</span>
                 <span>{item}</span>
               </p>
             ))}
           </div>
           <p className="mt-6 text-base leading-relaxed text-muted-foreground">
             Você só paga quando a consulta acontece — cancelamento com reembolso integral ao paciente não gera taxa.
-          </p>
-        </article>
-        <p className="mt-4 max-w-3xl font-semibold text-foreground">
-          Taxa fixa de R$ 27 por consulta realizada, igual para todos os profissionais, qualquer que seja o valor que você cobra
-        </p>
-        <article className="mt-4 max-w-3xl bg-surface px-6 py-6 sm:px-8">
-          <h3 className="text-base font-semibold text-foreground">Por que existe uma taxa</h3>
-          <p className="mt-3 text-base leading-relaxed text-surface-foreground">
-            A taxa custeia a estrutura que você usa. Plataforma, agenda, processamento de pagamentos, custos contábeis, verificação de registro e proteção de dados. É o que mantém a TOC Brazil funcionando e ao alcance de quem procura ajuda.
           </p>
         </article>
         <div className="mt-7 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -149,6 +133,17 @@ function CadastroProfissional() {
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{beneficio.d}</p>
             </article>
           ))}
+        </div>
+        <div className="mt-8 max-w-3xl">
+          <p className="font-semibold leading-relaxed text-foreground">
+            Taxa fixa de R$ 27 por consulta realizada, igual para todos os profissionais, qualquer que seja o valor que você cobra
+          </p>
+          <article className="mt-4 bg-surface py-6">
+            <h3 className="text-base font-semibold text-foreground">Por que existe uma taxa?</h3>
+            <p className="mt-3 text-base leading-relaxed text-surface-foreground">
+              A taxa custeia a estrutura que você usa. Plataforma, agenda, processamento de pagamentos, custos contábeis, verificação de registro e proteção de dados. É o que mantém a TOC Brazil funcionando e ao alcance de quem procura ajuda.
+            </p>
+          </article>
         </div>
         <p className="mt-7 text-sm text-muted-foreground">
           O prazo de liquidação e eventuais retenções de garantia são definidos pelo provedor de pagamento e podem variar conforme o meio escolhido. Consulte os detalhes atuais em{" "}
