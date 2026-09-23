@@ -129,6 +129,12 @@ function CadastroProfissional() {
             </article>
           ))}
         </div>
+        <p className="mt-7 text-sm text-muted-foreground">
+          O prazo de liquidação e eventuais retenções de garantia são definidos pelo provedor de pagamento e podem variar conforme o meio escolhido. Consulte os detalhes atuais em{" "}
+          <a href="https://www.mercadopago.com.br/ajuda" target="_blank" rel="noreferrer" className="font-semibold text-primary underline underline-offset-4">
+            como funciona o repasse
+          </a>.
+        </p>
       </section>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">

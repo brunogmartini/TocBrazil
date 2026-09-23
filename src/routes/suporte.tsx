@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { institucional } from "@/config/institucional";
 
 export const Route = createFileRoute("/suporte")({
   head: () => ({
@@ -44,6 +45,15 @@ function Suporte() {
         Em situação de risco imediato, não use este canal: procure atendimento de urgência na sua
         região.
       </p>
+
+      <section className="mt-8 border-y border-border py-6" aria-labelledby="canal-atendimento">
+        <h2 id="canal-atendimento" className="heading-subsection">Canal de atendimento eletrônico</h2>
+        <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-3">
+          <div><dt className="section-label">E-mail</dt><dd className="mt-1"><a className="underline underline-offset-4" href={`mailto:${institucional.email}`}>{institucional.email}</a></dd></div>
+          <div><dt className="section-label">Horário</dt><dd className="mt-1">{institucional.horarioAtendimento}</dd></div>
+          <div><dt className="section-label">Prazo</dt><dd className="mt-1">{institucional.prazoResposta}</dd></div>
+        </dl>
+      </section>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_1fr]">
         {enviado ? (

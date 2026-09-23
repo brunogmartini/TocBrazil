@@ -127,7 +127,7 @@ function ParaPsicologos() {
             <div className="card-soft p-6">
               <dt className="heading-subsection">Quanto a plataforma cobra?</dt>
               <dd className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Uma taxa fixa em reais por consulta realizada, igual para todos os profissionais, independente do valor que você cobra. Não é comissão nem percentual.
+                Uma taxa fixa em reais por consulta realizada, igual para todos os profissionais, independentemente do valor que você cobra. Não é comissão nem percentual.
               </dd>
             </div>
           </dl>

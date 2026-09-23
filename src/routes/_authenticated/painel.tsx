@@ -20,6 +20,7 @@ import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 import { horaDe, rotuloDiaLongo, chaveDia } from "@/lib/agenda-tempo";
 import { exigirAreaPaciente } from "@/lib/role-access";
 import { baixarIcs } from "@/lib/calendario-ics";
+import { institucional } from "@/config/institucional";
 
 export const Route = createFileRoute("/_authenticated/painel")({
   // Área exclusiva do paciente: profissionais e gestores são levados à sua própria área.
@@ -217,7 +218,7 @@ function Painel() {
                     </div>
                   )}
 
-                  {c.status === "aguardando_pagamento" && (
+                  {c.status === "aguardando_pagamento" && institucional.pagamentosAtivos && (
                     <div className="mt-3 rounded-xl bg-muted p-4 text-sm text-muted-foreground">
                       <p>
                         Seu horário fica reservado por 15 minutos. Para confirmar, pague a consulta
@@ -233,7 +234,7 @@ function Painel() {
                           else setErroPagamento(r.erro);
                         }}
                       >
-                        Pagar pagamento com Mercado Pago
+                        Pagar com Mercado Pago
                       </button>
                       {erroPagamento && <p className="mt-3 text-destructive">{erroPagamento}</p>}
                     </div>

@@ -331,6 +331,30 @@ export type Database = {
           },
         ]
       }
+      avisos_disponibilidade: {
+        Row: {
+          consentimento_em: string
+          created_at: string
+          email: string
+          id: string
+          politica_versao: string
+        }
+        Insert: {
+          consentimento_em?: string
+          created_at?: string
+          email: string
+          id?: string
+          politica_versao?: string
+        }
+        Update: {
+          consentimento_em?: string
+          created_at?: string
+          email?: string
+          id?: string
+          politica_versao?: string
+        }
+        Relationships: []
+      }
       contratos_profissionais: {
         Row: {
           aceite_ip: string | null
@@ -1090,6 +1114,27 @@ export type Database = {
           telefone?: string | null
           uf?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      tentativas_login_gestor: {
+        Row: {
+          created_at: string
+          id: string
+          identificador_hash: string
+          sucesso: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          identificador_hash: string
+          sucesso?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          identificador_hash?: string
+          sucesso?: boolean
         }
         Relationships: []
       }

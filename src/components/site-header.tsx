@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import logoAsset from "@/assets/toc-brazil-logo.png.asset.json";
 import { INICIO_DA_AREA } from "@/lib/areas";
@@ -15,20 +15,8 @@ type Inicio = (typeof INICIO_DA_AREA)[keyof typeof INICIO_DA_AREA];
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const [participar, setParticipar] = useState(false);
-  const [participarMobile, setParticiparMobile] = useState(false);
   const [minhaAreaTo, setMinhaAreaTo] = useState<Inicio | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!participar) return;
-    function fora(e: MouseEvent) {
-      if (!dropdownRef.current?.contains(e.target as Node)) setParticipar(false);
-    }
-    document.addEventListener("mousedown", fora);
-    return () => document.removeEventListener("mousedown", fora);
-  }, [participar]);
 
   useEffect(() => {
     let ativo = true;
@@ -95,47 +83,9 @@ export function SiteHeader() {
           )}
         </nav>
 
-        <div
-          className="relative hidden lg:block"
-          ref={dropdownRef}
-          onMouseEnter={() => setParticipar(true)}
-          onMouseLeave={() => setParticipar(false)}
-        >
-          <button
-            type="button"
-            aria-expanded={participar}
-            aria-haspopup="true"
-            onClick={() => setParticipar((v) => !v)}
-            className="btn-base btn-primary"
-          >
-            Quero fazer parte
-          </button>
-
-          {participar && (
-            <div className="absolute right-0 top-full w-60 pt-2">
-              <ul className="card-soft overflow-hidden p-2">
-                <li>
-                  <Link
-                    to="/auth"
-                    search={{ modo: "cadastro" as const, redirect: undefined }}
-                    onClick={() => setParticipar(false)}
-                    className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
-                  >
-                    Sou paciente
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/cadastro-profissional"
-                    onClick={() => setParticipar(false)}
-                    className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
-                  >
-                    Sou profissional
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          )}
+        <div className="hidden items-center gap-2 lg:flex">
+          <Link to="/cadastro-profissional" className="btn-base btn-ghost">Sou psicólogo</Link>
+          <Link to="/auth" search={{ modo: "entrar" as const, redirect: undefined }} className="btn-base btn-primary">Entrar</Link>
         </div>
 
         <button
@@ -173,33 +123,8 @@ export function SiteHeader() {
               </Link>
             )}
 
-            <button
-              type="button"
-              aria-expanded={participarMobile}
-              onClick={() => setParticiparMobile((v) => !v)}
-              className="btn-base btn-primary mt-3 w-full"
-            >
-              Quero fazer parte
-            </button>
-            {participarMobile && (
-              <div className="mt-2 flex flex-col rounded-2xl bg-muted p-2">
-                <Link
-                  to="/auth"
-                  search={{ modo: "cadastro" as const, redirect: undefined }}
-                  onClick={() => setOpen(false)}
-                  className="rounded-xl px-3 py-3 text-sm font-medium text-foreground"
-                >
-                  Sou paciente
-                </Link>
-                <Link
-                  to="/cadastro-profissional"
-                  onClick={() => setOpen(false)}
-                  className="rounded-xl px-3 py-3 text-sm font-medium text-foreground"
-                >
-                  Sou profissional
-                </Link>
-              </div>
-            )}
+            <Link to="/cadastro-profissional" onClick={() => setOpen(false)} className="rounded-xl px-2 py-3 text-sm font-medium text-foreground">Sou psicólogo</Link>
+            <Link to="/auth" search={{ modo: "entrar" as const, redirect: undefined }} onClick={() => setOpen(false)} className="btn-base btn-primary mt-3 w-full">Entrar</Link>
           </nav>
         </div>
       )}
