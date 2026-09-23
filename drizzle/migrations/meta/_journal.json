@@ -71,6 +71,13 @@
       "when": 1790179366342,
       "tag": "0009_separar_acesso_publico_e_autenticado",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790179712391,
+      "tag": "0010_restringir_leitura_mensagens",
+      "breakpoints": true
     }
   ]
 }
