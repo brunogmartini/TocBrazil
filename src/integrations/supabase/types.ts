@@ -402,6 +402,54 @@ export type Database = {
           },
         ]
       }
+      deteccoes_anticontato: {
+        Row: {
+          acao: string
+          appointment_id: string | null
+          ator_id: string
+          contexto: string
+          id: string
+          ocorrido_em: string
+          padrao_tipo: string
+          professional_id: string | null
+        }
+        Insert: {
+          acao: string
+          appointment_id?: string | null
+          ator_id: string
+          contexto: string
+          id?: string
+          ocorrido_em?: string
+          padrao_tipo: string
+          professional_id?: string | null
+        }
+        Update: {
+          acao?: string
+          appointment_id?: string | null
+          ator_id?: string
+          contexto?: string
+          id?: string
+          ocorrido_em?: string
+          padrao_tipo?: string
+          professional_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deteccoes_anticontato_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deteccoes_anticontato_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       eventos_auditoria: {
         Row: {
           appointment_id: string | null
@@ -919,10 +967,12 @@ export type Database = {
       professionals: {
         Row: {
           abordagem: string | null
+          abordagens_publicas: string[]
           apolice_seguro_url: string | null
           apolice_validade: string | null
           apresentacao: string | null
           areas: string[]
+          biografia_publica: string | null
           certidao_conselho_url: string | null
           certidao_validade: string | null
           cidade: string | null
@@ -940,6 +990,12 @@ export type Database = {
           ferramenta_provedor: string | null
           ferramenta_url_sala: string | null
           formacao: string[]
+          formacoes_publicas: Json
+          foto_caminho: string | null
+          foto_moderada_em: string | null
+          foto_moderada_por: string | null
+          foto_observacao: string | null
+          foto_status: string
           foto_url: string | null
           genero: string | null
           graduacao: string | null
@@ -950,6 +1006,7 @@ export type Database = {
           mp_vinculado_em: string | null
           nome: string
           observacao_admin: string | null
+          perfil_bloqueios_contato: number
           profissao: Database["public"]["Enums"]["profissao"]
           registro: string
           requer_correcao: boolean
@@ -958,6 +1015,7 @@ export type Database = {
           slug: string
           status: Database["public"]["Enums"]["prof_status"]
           telefone: string | null
+          temas_toc_publicos: string[]
           timezone: string
           uf: string
           updated_at: string
@@ -969,10 +1027,12 @@ export type Database = {
         }
         Insert: {
           abordagem?: string | null
+          abordagens_publicas?: string[]
           apolice_seguro_url?: string | null
           apolice_validade?: string | null
           apresentacao?: string | null
           areas?: string[]
+          biografia_publica?: string | null
           certidao_conselho_url?: string | null
           certidao_validade?: string | null
           cidade?: string | null
@@ -990,6 +1050,12 @@ export type Database = {
           ferramenta_provedor?: string | null
           ferramenta_url_sala?: string | null
           formacao?: string[]
+          formacoes_publicas?: Json
+          foto_caminho?: string | null
+          foto_moderada_em?: string | null
+          foto_moderada_por?: string | null
+          foto_observacao?: string | null
+          foto_status?: string
           foto_url?: string | null
           genero?: string | null
           graduacao?: string | null
@@ -1000,6 +1066,7 @@ export type Database = {
           mp_vinculado_em?: string | null
           nome: string
           observacao_admin?: string | null
+          perfil_bloqueios_contato?: number
           profissao: Database["public"]["Enums"]["profissao"]
           registro: string
           requer_correcao?: boolean
@@ -1008,6 +1075,7 @@ export type Database = {
           slug: string
           status?: Database["public"]["Enums"]["prof_status"]
           telefone?: string | null
+          temas_toc_publicos?: string[]
           timezone?: string
           uf: string
           updated_at?: string
@@ -1019,10 +1087,12 @@ export type Database = {
         }
         Update: {
           abordagem?: string | null
+          abordagens_publicas?: string[]
           apolice_seguro_url?: string | null
           apolice_validade?: string | null
           apresentacao?: string | null
           areas?: string[]
+          biografia_publica?: string | null
           certidao_conselho_url?: string | null
           certidao_validade?: string | null
           cidade?: string | null
@@ -1040,6 +1110,12 @@ export type Database = {
           ferramenta_provedor?: string | null
           ferramenta_url_sala?: string | null
           formacao?: string[]
+          formacoes_publicas?: Json
+          foto_caminho?: string | null
+          foto_moderada_em?: string | null
+          foto_moderada_por?: string | null
+          foto_observacao?: string | null
+          foto_status?: string
           foto_url?: string | null
           genero?: string | null
           graduacao?: string | null
@@ -1050,6 +1126,7 @@ export type Database = {
           mp_vinculado_em?: string | null
           nome?: string
           observacao_admin?: string | null
+          perfil_bloqueios_contato?: number
           profissao?: Database["public"]["Enums"]["profissao"]
           registro?: string
           requer_correcao?: boolean
@@ -1058,6 +1135,7 @@ export type Database = {
           slug?: string
           status?: Database["public"]["Enums"]["prof_status"]
           telefone?: string | null
+          temas_toc_publicos?: string[]
           timezone?: string
           uf?: string
           updated_at?: string
@@ -1230,6 +1308,10 @@ export type Database = {
           nome: string
         }[]
       }
+      perfil_pronto_para_publicar: {
+        Args: { _professional_id: string }
+        Returns: boolean
+      }
       profissionais_das_minhas_consultas: {
         Args: never
         Returns: {
@@ -1248,6 +1330,16 @@ export type Database = {
           inicio: string
           slug: string
         }[]
+      }
+      registrar_deteccao_anticontato: {
+        Args: {
+          _acao: string
+          _appointment_id: string
+          _contexto: string
+          _padrao_tipo: string
+          _professional_id: string
+        }
+        Returns: undefined
       }
       relatorio_metadados: {
         Args: { _ate: string; _de: string }

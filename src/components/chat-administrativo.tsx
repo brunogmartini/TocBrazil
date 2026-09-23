@@ -24,6 +24,7 @@ export function ChatAdministrativo({ consultaId }: { consultaId: string }) {
   const [texto, setTexto] = useState("");
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  const [confirmarTermos, setConfirmarTermos] = useState(false);
 
   const chave = ["mensagens", consultaId];
   const consulta = useQuery({
@@ -41,13 +42,15 @@ export function ChatAdministrativo({ consultaId }: { consultaId: string }) {
     if (!corpo || enviando) return;
     setEnviando(true);
     setErro(null);
-    const r = await enviar({ data: { consultaId, corpo } });
+    const r = await enviar({ data: { consultaId, corpo, confirmarTermos } });
     setEnviando(false);
     if (!r.ok) {
       setErro(r.erro);
+      if ("requerConfirmacao" in r && r.requerConfirmacao) setConfirmarTermos(true);
       return;
     }
     setTexto("");
+    setConfirmarTermos(false);
     await queryClient.invalidateQueries({ queryKey: chave });
   }
 
@@ -55,8 +58,7 @@ export function ChatAdministrativo({ consultaId }: { consultaId: string }) {
     <section className="rounded-xl border border-border/60 p-4">
       <h3 className="text-sm font-semibold">Mensagens</h3>
       <p className="mt-2 rounded-lg bg-muted p-3 text-xs text-muted-foreground">
-        Este canal é apenas para assuntos administrativos. Não compartilhe informações de saúde
-        por aqui.
+        Este canal é apenas para assuntos administrativos e não permite dados de contato. Não compartilhe informações de saúde por aqui.
       </p>
 
       <div className="mt-3 max-h-64 space-y-2 overflow-y-auto" aria-live="polite">
@@ -92,7 +94,7 @@ export function ChatAdministrativo({ consultaId }: { consultaId: string }) {
         <textarea
           id={`msg-${consultaId}`}
           value={texto}
-          onChange={(e) => setTexto(e.target.value)}
+          onChange={(e) => { setTexto(e.target.value); setConfirmarTermos(false); setErro(null); }}
           maxLength={1000}
           rows={3}
           placeholder="Ex.: preciso remarcar para outro dia."
@@ -100,7 +102,7 @@ export function ChatAdministrativo({ consultaId }: { consultaId: string }) {
         />
         {erro && <p className="text-xs text-destructive">{erro}</p>}
         <button type="submit" className="btn-base btn-primary" disabled={enviando || !texto.trim()}>
-          {enviando ? "Enviando…" : "Enviar mensagem"}
+          {enviando ? "Enviando…" : confirmarTermos ? "Enviar mesmo assim" : "Enviar mensagem"}
         </button>
       </form>
     </section>
