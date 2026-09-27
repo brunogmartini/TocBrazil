@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 import { MobileCta } from "../components/mobile-cta";
+import { CookieNotice } from "../components/cookie-notice";
 
 function NotFoundComponent() {
   return (
@@ -135,6 +136,7 @@ function RootComponent() {
           <Outlet />
         </main>
         <MobileCta />
+        <CookieNotice />
         <UrgencyFooter />
         <SiteFooter />
       </div>
