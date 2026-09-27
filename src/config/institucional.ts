@@ -1,8 +1,9 @@
 export const institucional = {
-  razaoSocial: "[RAZÃO SOCIAL]",
-  cnpj: "[00.000.000/0001-00]",
-  endereco: "[Endereço completo, cidade/UF, CEP]",
-  email: "contato@tocbrazil.com.br",
+  razaoSocial: "NEW TECH PLATAFORMAS DE TECNOLOGIA LTDA",
+  cnpj: "69.340.866/0001-48",
+  endereco: "Rua Gonzaga, nº 106, São Leopoldo/RS, CEP 93020-040",
+  email: "contatotocbrazil@gmail.com",
+  encarregado: "Eduardo Bastos Hansen",
   horarioAtendimento: "[HORÁRIO DE ATENDIMENTO]",
   pagamentosAtivos: false,
   prazoResposta: "Respondemos em até 5 dias úteis",
