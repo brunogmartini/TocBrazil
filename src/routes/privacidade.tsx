@@ -40,7 +40,7 @@ const secoes = [
   {
     t: "Consentimento",
     p: [
-      "O agendamento revela que você procurou atendimento psicológico e, por isso, é tratado como dado pessoal sensível referente à saúde. A base legal é o seu consentimento específico e destacado, nos termos do art. 11, inciso I, da LGPD, colhido separadamente do aceite dos Termos de Uso e revogável a qualquer momento.",
+      "O agendamento revela que você procurou atendimento psicológico e pode envolver dado pessoal sensível referente à saúde. O tratamento desse dado requer uma base legal adequada e medidas específicas de proteção.",
       "Você pode revogar consentimentos de comunicação a qualquer momento, sem prejuízo dos registros exigidos por obrigação legal.",
     ],
   },
