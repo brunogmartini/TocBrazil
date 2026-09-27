@@ -18,7 +18,7 @@
 
 ## 2. A divisão de papéis — e por que ela importa para você
 
-2.1. A TOC Brazil é controladora dos dados de cadastro, agendamento, pagamento e navegação tratados na plataforma.
+2.1. A TOC Brazil é controladora dos dados de cadastro e navegação tratados na plataforma. Quando o agendamento e o pagamento forem disponibilizados, esta política será atualizada.
 
 2.2. O PSICÓLOGO é controlador dos dados de saúde produzidos no atendimento — o que você conta na sessão, as anotações dele, o registro documental e o prontuário. Esses dados nunca passam pela TOC Brazil.
 
@@ -59,34 +59,35 @@ Não coletamos, não solicitamos e não armazenamos: sintomas, queixas, diagnós
 - com o provedor de meios de pagamento, para processar a transação;
 - com fornecedores de infraestrutura, hospedagem, envio de e-mails e suporte, que atuam como operadores, mediante contrato e apenas conforme nossas instruções;
 - com autoridades públicas, quando houver requisição legal ou ordem judicial.
+
 Não vendemos seus dados, não os cedemos para publicidade de terceiros e não os utilizamos para treinar sistemas de inteligência artificial.
 
 
-## 8. Seus direitos
+## 6. Seus direitos
 
-8.1. Nos termos do art. 18 da LGPD, você pode solicitar: confirmação da existência de tratamento; acesso aos dados; correção de dados incompletos ou desatualizados; anonimização, bloqueio ou eliminação de dados desnecessários ou tratados em desconformidade; portabilidade; informação sobre compartilhamento; informação sobre a possibilidade de não consentir e suas consequências; e revogação do consentimento.
+Nos termos do art. 18 da LGPD, você pode solicitar: confirmação da existência de tratamento; acesso aos dados; correção de dados incompletos ou desatualizados; anonimização, bloqueio ou eliminação de dados desnecessários ou tratados em desconformidade; portabilidade; informação sobre compartilhamento; informação sobre a possibilidade de não consentir e suas consequências; e revogação do consentimento.
 
 
 
 Para exercer esses direitos, escreva para contatotocbrazil@gmail.com. Pedidos relativos aos dados do atendimento devem ser dirigidos ao psicólogo, responsável por esses dados. Você também pode apresentar reclamação à Autoridade Nacional de Proteção de Dados.
 
 
-## 9. Cookies
+## 7. Cookies
 
-9.1. Utilizamos cookies necessários ao funcionamento da plataforma — autenticação, segurança e manutenção da sessão —, que não dependem de consentimento. No momento, não utilizamos cookies opcionais.
-
-
-9.3. Não utilizamos cookies de publicidade comportamental.
+Utilizamos cookies necessários ao funcionamento da plataforma — autenticação, segurança e manutenção da sessão —, que não dependem de consentimento. No momento, não utilizamos cookies opcionais.
 
 
-## 10. Segurança
+Não utilizamos cookies de publicidade comportamental.
+
+
+## 8. Segurança
 
 Adotamos medidas de proteção, incluindo conexão criptografada entre o navegador e nossos servidores e acesso segmentado por papel.
 
 
-10.2. Nenhum sistema é absolutamente seguro. Ocorrendo incidente que possa acarretar risco ou dano relevante, comunicaremos você e a Autoridade Nacional de Proteção de Dados na forma do art. 48 da LGPD.
+Nenhum sistema é absolutamente seguro. Ocorrendo incidente que possa acarretar risco ou dano relevante, comunicaremos você e a Autoridade Nacional de Proteção de Dados na forma do art. 48 da LGPD.
 
 
-## 13. Contato
+## 9. Contato
 
 Dúvidas sobre esta Política ou sobre o tratamento dos seus dados: contatotocbrazil@gmail.com. NEW TECH PLATAFORMAS DE TECNOLOGIA LTDA (nome fantasia NEW TECH), operadora da plataforma TOC Brazil, CNPJ 69.340.866/0001-48, Rua Gonzaga, nº 106, São Leopoldo/RS, CEP 93020-040.

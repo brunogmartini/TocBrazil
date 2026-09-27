@@ -13,7 +13,7 @@
 
 1.1. A plataforma TOC Brazil é operada por NEW TECH PLATAFORMAS DE TECNOLOGIA LTDA, CNPJ nº 69.340.866/0001-48, com sede na Rua Gonzaga, nº 106, São Leopoldo/RS, CEP 93020-040, empresa de tecnologia que desenvolve e mantém o sítio tocbrazil.com.br.
 
-1.2. Estes Termos regulam a relação entre a TOC Brazil e você, Usuário que utiliza a plataforma para encontrar profissionais, agendar consultas e efetuar pagamentos.
+1.2. Estes Termos regulam a relação entre a TOC Brazil e você, Usuário que utiliza a plataforma para encontrar profissionais e consultar suas informações.
 
 
 
@@ -49,10 +49,10 @@
 5.1. Para usar os recursos de cadastro, é necessário criar uma conta com informações verdadeiras e mantê-las atualizadas. A conta é pessoal e intransferível.
 
 
-5.3. No cadastro solicitamos um contato de emergência. Ele é um dado administrativo de segurança, disponibilizado apenas ao psicólogo com quem você tenha consulta marcada, e poderá ser acionado por ele em situação que, a critério técnico dele, assim o exija.
+5.2. No cadastro solicitamos um contato de emergência. Ele é um dado administrativo de segurança, disponibilizado apenas ao psicólogo com quem você tenha consulta marcada, e poderá ser acionado por ele em situação que, a critério técnico dele, assim o exija.
 
 
-## 6. Agendamento, valores e pagamento
+## 6. Valores e pagamento
 
 6.1. O valor da consulta é definido livremente pelo psicólogo e informado no perfil dele. A TOC Brazil não define, não sugere e não acrescenta margem a esse valor.
 
@@ -82,8 +82,7 @@
 
 ## 10. Avaliações
 
-
-10.2. As avaliações passam por moderação, são exibidas de forma anônima e não podem mencionar diagnóstico, conduta terapêutica ou resultado de tratamento, em proteção à sua própria privacidade.
+10.1. As avaliações passam por moderação, são exibidas de forma anônima e não podem mencionar diagnóstico, conduta terapêutica ou resultado de tratamento, em proteção à sua própria privacidade.
 
 
 ## 11. Uso adequado da plataforma
@@ -114,7 +113,7 @@
 Nosso canal de atendimento é contatotocbrazil@gmail.com.
 
 
-14. Reclamações sobre a conduta profissional do psicólogo podem ser registradas conosco, para as providências administrativas cabíveis, e devem ser levadas ao Conselho Regional de Psicologia, competente para apurá-las.
+14.1. Reclamações sobre a conduta profissional do psicólogo podem ser registradas conosco, para as providências administrativas cabíveis, e devem ser levadas ao Conselho Regional de Psicologia, competente para apurá-las.
 
 
 ## 15. Alterações
