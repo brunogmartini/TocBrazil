@@ -30,7 +30,8 @@
 
 ## Correções legais e de segurança — 27/09/2026
 - [x] Atualizar identificação e contato no rodapé e em todo o site
-- [ ] Substituir Termos e Privacidade pelos anexos definitivos (aguardando arquivos)
+- [x] Substituir as páginas resumidas por textos baseados nos anexos, em versão provisória sem promessas não verificadas
+- [ ] Liberar os textos definitivos integrais somente após testar pagamentos, consentimento, direitos, cookies e prazos declarados
 - [ ] Corrigir afirmações e documentos na página profissional e base legal na privacidade (texto do consentimento destacado aguarda fluxo separado verificável; demais correções feitas)
 - [ ] Aplicar e verificar cabeçalhos de segurança e investigar cookie de sessão (proteção contra iframe ativa; CSP ampla em relatório até ajustar scripts inline; cookie session-id não é emitido pelo app)
 - [x] Exibir aviso informativo de cookies essenciais
