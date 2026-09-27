@@ -1,12 +1,12 @@
 # TERMOS DE USO
 
 
-# TOC BRAZIL
+**TOC BRAZIL**
 
 *Texto em revisão — baseado no documento enviado em 27/09/2026 — tocbrazil.com.br*
 
 
-> **EM RESUMO. A TOC Brazil é uma plataforma de tecnologia: você encontra psicólogos com experiência em TOC e compara seus perfis e horários. O agendamento com pagamento ainda não está disponível. A consulta acontece na sala de videochamada do próprio psicólogo, e quem presta o atendimento é ele — não a TOC Brazil. A plataforma não avalia, não diagnostica, não trata e não garante resultado. Não somos um serviço de urgência: em caso de crise, ligue 188 (CVV) ou 192 (SAMU).**
+> **EM RESUMO. A TOC Brazil é uma plataforma de tecnologia: você encontra psicólogos com experiência em TOC e compara seus perfis e horários. O agendamento com pagamento ainda não está disponível. Quando houver consulta, ela acontece na sala de videochamada do próprio psicólogo, e quem presta o atendimento é ele — não a TOC Brazil. A plataforma não avalia, não diagnostica, não trata e não garante resultado. Não somos um serviço de urgência: em caso de crise, ligue 188 (CVV) ou 192 (SAMU).**
 
 
 ## 1. Quem somos e o que este documento regula
@@ -62,74 +62,74 @@
 
 
 
-## 8. Situações de urgência
+## 7. Situações de urgência
 
 
 > **8.1. A TOC BRAZIL NÃO É UM SERVIÇO DE URGÊNCIA OU EMERGÊNCIA. Não temos equipe de plantão, não monitoramos atendimentos e não conseguimos ajudar em situações de crise. Se você ou alguém próximo precisar de ajuda imediata, ligue 188 (CVV, gratuito, 24 horas) ou 192 (SAMU). Em caso de violência contra criança ou adolescente, ligue 100; contra a mulher, 180.**
 
 
 
-## 9. Privacidade e sigilo
+## 8. Privacidade e sigilo
 
-9.1. O tratamento dos seus dados é descrito na Política de Privacidade.
+8.1. O tratamento dos seus dados é descrito na Política de Privacidade.
 
-9.2. A TOC Brazil não tem acesso ao conteúdo das consultas e não armazena prontuários, anotações clínicas ou qualquer registro do atendimento.
+8.2. A TOC Brazil não tem acesso ao conteúdo das consultas e não armazena prontuários, anotações clínicas ou qualquer registro do atendimento.
 
-9.3. O canal de mensagens da plataforma é destinado exclusivamente a assuntos administrativos. Não compartilhe informações sobre sua saúde por esse canal.
+8.3. O canal de mensagens da plataforma é destinado exclusivamente a assuntos administrativos. Não compartilhe informações sobre sua saúde por esse canal.
 
-9.4. É vedada a gravação da consulta, por qualquer das partes, sem consentimento expresso e documentado.
-
-
-## 10. Avaliações
-
-10.1. As avaliações passam por moderação, são exibidas de forma anônima e não podem mencionar diagnóstico, conduta terapêutica ou resultado de tratamento, em proteção à sua própria privacidade.
+8.4. É vedada a gravação da consulta, por qualquer das partes, sem consentimento expresso e documentado.
 
 
-## 11. Uso adequado da plataforma
+## 9. Avaliações
 
-11.1. É vedado: fornecer informações falsas; usar a conta de terceiro ou permitir que terceiro use a sua; tentar obter acesso não autorizado a sistemas ou a dados; extrair dados da plataforma por meios automatizados; e praticar qualquer conduta ofensiva, discriminatória ou ilícita contra profissionais ou contra nossa equipe.
+9.1. As avaliações passam por moderação, são exibidas de forma anônima e não podem mencionar diagnóstico, conduta terapêutica ou resultado de tratamento, em proteção à sua própria privacidade.
 
 
+## 10. Uso adequado da plataforma
 
-## 12. Propriedade intelectual
-
-12.1. A marca, o software, os conteúdos e a identidade visual da plataforma pertencem à TOC Brazil. O acesso não transfere a você qualquer direito sobre eles.
+10.1. É vedado: fornecer informações falsas; usar a conta de terceiro ou permitir que terceiro use a sua; tentar obter acesso não autorizado a sistemas ou a dados; extrair dados da plataforma por meios automatizados; e praticar qualquer conduta ofensiva, discriminatória ou ilícita contra profissionais ou contra nossa equipe.
 
 
 
-## 13. Responsabilidades
+## 11. Propriedade intelectual
 
-13.1. A TOC Brazil responde pelo funcionamento da plataforma que disponibiliza, nos limites da lei e destes Termos.
-
-13.2. O psicólogo responde pelo atendimento que presta, incluindo conduta técnica, sigilo, registros e desfechos.
-
-13.3. A TOC Brazil não responde pelo funcionamento da ferramenta de videochamada contratada pelo psicólogo, nem por falhas de conexão, energia ou equipamentos do seu lado ou do dele.
-
-13.4. Nenhuma disposição destes Termos afasta direitos que a lei assegura a você como consumidor.
+11.1. A marca, o software, os conteúdos e a identidade visual da plataforma pertencem à TOC Brazil. O acesso não transfere a você qualquer direito sobre eles.
 
 
-## 14. Suporte
+
+## 12. Responsabilidades
+
+12.1. A TOC Brazil responde pelo funcionamento da plataforma que disponibiliza, nos limites da lei e destes Termos.
+
+12.2. O psicólogo responde pelo atendimento que presta, incluindo conduta técnica, sigilo, registros e desfechos.
+
+12.3. A TOC Brazil não responde pelo funcionamento da ferramenta de videochamada contratada pelo psicólogo, nem por falhas de conexão, energia ou equipamentos do seu lado ou do dele.
+
+12.4. Nenhuma disposição destes Termos afasta direitos que a lei assegura a você como consumidor.
+
+
+## 13. Suporte
 
 Nosso canal de atendimento é contatotocbrazil@gmail.com.
 
 
-14.1. Reclamações sobre a conduta profissional do psicólogo podem ser registradas conosco, para as providências administrativas cabíveis, e devem ser levadas ao Conselho Regional de Psicologia, competente para apurá-las.
+13.1. Reclamações sobre a conduta profissional do psicólogo podem ser registradas conosco, para as providências administrativas cabíveis, e devem ser levadas ao Conselho Regional de Psicologia, competente para apurá-las.
 
 
-## 15. Alterações
+## 14. Alterações
 
 Estes Termos podem ser alterados. Consulte esta página para verificar o texto em vigor.
 
 
 
 
-## 16. Lei aplicável e foro
+## 15. Lei aplicável e foro
 
-16.1. Aplica-se a lei brasileira, em especial o Código de Defesa do Consumidor e o Marco Civil da Internet.
+15.1. Aplica-se a lei brasileira, em especial o Código de Defesa do Consumidor e o Marco Civil da Internet.
 
-16.2. Fica assegurado a você, nos termos do art. 101, I, do Código de Defesa do Consumidor, o direito de propor eventual demanda no foro do seu domicílio.
+15.2. Fica assegurado a você, nos termos do art. 101, I, do Código de Defesa do Consumidor, o direito de propor eventual demanda no foro do seu domicílio.
 
 
-## 17. Contato
+## 16. Contato
 
 NEW TECH PLATAFORMAS DE TECNOLOGIA LTDA (nome fantasia NEW TECH), operadora da plataforma TOC Brazil — CNPJ 69.340.866/0001-48 — Rua Gonzaga, nº 106, São Leopoldo/RS, CEP 93020-040 — contatotocbrazil@gmail.com — Encarregado pelo tratamento de dados: Eduardo Bastos Hansen, contatotocbrazil@gmail.com.
