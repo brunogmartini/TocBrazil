@@ -35,13 +35,13 @@ const etapas = [
   { t: "Perfil publicado", d: "Depois da aprovação, seu perfil fica visível e pronto para receber agendamentos." },
 ];
 
-const documentos = [
+const documentosObrigatorios = [
   "Documento de identidade com foto",
   "Certidão de regularidade do CRP com validade",
   "Apólice de seguro de responsabilidade civil profissional com validade",
   "Diploma de graduação",
-  "Certificados de especialização e cursos em TOC/TCC/EPR",
 ];
+const documentosOpcionais = ["Certificados de especialização e cursos em TOC, TCC ou EPR"];
 
 const statusFluxo = [
   { t: "1. Cadastro iniciado", d: "Conta criada, dados profissionais ainda não preenchidos." },
@@ -60,7 +60,7 @@ const beneficios = [
   },
   {
     t: "Pagamento no agendamento",
-    d: "O paciente paga no agendamento. Sem inadimplência e sem cobrança.",
+    d: "O paciente paga no momento do agendamento, antes da consulta.",
   },
   {
     t: "Recebimento direto",
@@ -146,10 +146,7 @@ function CadastroProfissional() {
           </article>
         </div>
         <p className="mt-7 text-sm text-muted-foreground">
-          O prazo de liquidação e eventuais retenções de garantia são definidos pelo provedor de pagamento e podem variar conforme o meio escolhido. Consulte os detalhes atuais em{" "}
-          <a href="https://www.mercadopago.com.br/ajuda" target="_blank" rel="noreferrer" className="font-semibold text-primary underline underline-offset-4">
-            como funciona o repasse
-          </a>.
+          O prazo de liquidação é definido pelo provedor de meios de pagamento. A TOC Brazil pode reter até 10% dos valores sob sua gestão pelo prazo de 90 dias, exclusivamente para cobrir estornos, chargebacks e reembolsos, liberando o saldo ao final do período (Cláusula 7.4 do contrato).
         </p>
       </section>
 
@@ -170,13 +167,21 @@ function CadastroProfissional() {
           </ol>
 
           <h3 className="heading-subsection mt-8">Documentos e títulos necessários</h3>
+          <h4 className="mt-4 text-sm font-semibold">Obrigatórios</h4>
           <ul className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-            {documentos.map((d) => (
+            {documentosObrigatorios.map((d) => (
               <li key={d} className="rounded-xl bg-muted px-4 py-3">
                 {d}
               </li>
             ))}
           </ul>
+          <h4 className="mt-5 text-sm font-semibold">Opcionais</h4>
+          <ul className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+            {documentosOpcionais.map((d) => (
+              <li key={d} className="rounded-xl bg-muted px-4 py-3">{d}</li>
+            ))}
+          </ul>
+          <p className="mt-3 text-xs text-muted-foreground">O título de especialista só pode ser divulgado no perfil quando registrado no Conselho.</p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link

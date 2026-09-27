@@ -40,7 +40,7 @@ const secoes = [
   {
     t: "Consentimento",
     p: [
-      "Dados sensíveis, quando necessários, são tratados com base legal adequada e consentimento explícito quando aplicável.",
+      "O agendamento revela que você procurou atendimento psicológico e pode envolver dado pessoal sensível referente à saúde. O tratamento desse dado requer uma base legal adequada e medidas específicas de proteção.",
       "Você pode revogar consentimentos de comunicação a qualquer momento, sem prejuízo dos registros exigidos por obrigação legal.",
     ],
   },

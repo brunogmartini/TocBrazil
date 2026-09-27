@@ -27,3 +27,10 @@
 - [ ] Etapa 2B: consentimento de cookies desativado por padrão e portal “Meus dados”
 - [ ] Etapa 3: executar a matriz de isolamento e registrar TESTES-DE-ACESSO.md com data
 - [ ] Etapa 4: liberar cada texto definitivo somente após seu teste correspondente passar
+
+## Correções legais e de segurança — 27/09/2026
+- [x] Atualizar identificação e contato no rodapé e em todo o site
+- [ ] Substituir Termos e Privacidade pelos anexos definitivos (aguardando arquivos)
+- [ ] Corrigir afirmações e documentos na página profissional e base legal na privacidade (texto do consentimento destacado aguarda fluxo separado verificável; demais correções feitas)
+- [ ] Aplicar e verificar cabeçalhos de segurança e investigar cookie de sessão (proteção contra iframe ativa; CSP ampla em relatório até ajustar scripts inline; cookie session-id não é emitido pelo app)
+- [x] Exibir aviso informativo de cookies essenciais
