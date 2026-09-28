@@ -83,12 +83,6 @@ export function SiteFooter() {
           <a className="mt-1 inline-block underline underline-offset-4" href={`mailto:${institucional.email}`}>
             {institucional.email}
           </a>
-          <p className="mt-2">
-            Encarregado pelo tratamento de dados pessoais: {institucional.encarregado} —{" "}
-            <a className="underline underline-offset-4" href={`mailto:${institucional.email}`}>
-              {institucional.email}
-            </a>
-          </p>
         </address>
         <p>
           Esta plataforma é uma infraestrutura tecnológica e não presta serviço de saúde. Conteúdo educativo não substitui consulta com profissional habilitado. A consulta acontece na sala do próprio psicólogo.
