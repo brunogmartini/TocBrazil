@@ -1125,6 +1125,7 @@ export type Database = {
         Row: {
           abordagem: string | null
           abordagens_publicas: string[]
+          apolice_numero: string | null
           apolice_seguro_url: string | null
           apolice_validade: string | null
           apresentacao: string | null
@@ -1133,6 +1134,7 @@ export type Database = {
           certidao_conselho_url: string | null
           certidao_validade: string | null
           cidade: string | null
+          cnpj: string | null
           comissao_percent: number
           cpf: string | null
           created_at: string
@@ -1168,6 +1170,7 @@ export type Database = {
           registro: string
           requer_correcao: boolean
           rqe: string | null
+          seguradora_nome: string | null
           slot_minutos: number
           slug: string
           status: Database["public"]["Enums"]["prof_status"]
@@ -1180,11 +1183,13 @@ export type Database = {
           validado_em: string | null
           validado_por: string | null
           valor_centavos: number
+          valor_liquido_centavos: number | null
           verificado_em_doc: string | null
         }
         Insert: {
           abordagem?: string | null
           abordagens_publicas?: string[]
+          apolice_numero?: string | null
           apolice_seguro_url?: string | null
           apolice_validade?: string | null
           apresentacao?: string | null
@@ -1193,6 +1198,7 @@ export type Database = {
           certidao_conselho_url?: string | null
           certidao_validade?: string | null
           cidade?: string | null
+          cnpj?: string | null
           comissao_percent?: number
           cpf?: string | null
           created_at?: string
@@ -1228,6 +1234,7 @@ export type Database = {
           registro: string
           requer_correcao?: boolean
           rqe?: string | null
+          seguradora_nome?: string | null
           slot_minutos?: number
           slug: string
           status?: Database["public"]["Enums"]["prof_status"]
@@ -1240,11 +1247,13 @@ export type Database = {
           validado_em?: string | null
           validado_por?: string | null
           valor_centavos?: number
+          valor_liquido_centavos?: number | null
           verificado_em_doc?: string | null
         }
         Update: {
           abordagem?: string | null
           abordagens_publicas?: string[]
+          apolice_numero?: string | null
           apolice_seguro_url?: string | null
           apolice_validade?: string | null
           apresentacao?: string | null
@@ -1253,6 +1262,7 @@ export type Database = {
           certidao_conselho_url?: string | null
           certidao_validade?: string | null
           cidade?: string | null
+          cnpj?: string | null
           comissao_percent?: number
           cpf?: string | null
           created_at?: string
@@ -1288,6 +1298,7 @@ export type Database = {
           registro?: string
           requer_correcao?: boolean
           rqe?: string | null
+          seguradora_nome?: string | null
           slot_minutos?: number
           slug?: string
           status?: Database["public"]["Enums"]["prof_status"]
@@ -1300,6 +1311,7 @@ export type Database = {
           validado_em?: string | null
           validado_por?: string | null
           valor_centavos?: number
+          valor_liquido_centavos?: number | null
           verificado_em_doc?: string | null
         }
         Relationships: []
