@@ -256,6 +256,42 @@ export type Database = {
           },
         ]
       }
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_role: string
+          created_at: string
+          entity: string
+          entity_id: string | null
+          id: string
+          ip: string | null
+          metadata: Json
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_role: string
+          created_at?: string
+          entity: string
+          entity_id?: string | null
+          id?: string
+          ip?: string | null
+          metadata?: Json
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_role?: string
+          created_at?: string
+          entity?: string
+          entity_id?: string | null
+          id?: string
+          ip?: string | null
+          metadata?: Json
+        }
+        Relationships: []
+      }
       availability_blocks: {
         Row: {
           created_at: string
