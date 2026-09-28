@@ -5,8 +5,8 @@ import { institucional } from "@/config/institucional";
 /**
  * Vínculo da conta Mercado Pago de cada profissional.
  * O profissional autoriza a plataforma (OAuth do Mercado Pago) e passa a
- * receber o valor da consulta direto na própria conta, com a taxa fixa da
- * plataforma retida automaticamente (marketplace_fee).
+ * receber o valor líquido da consulta direto na própria conta, com a taxa fixa
+ * da plataforma separada automaticamente (marketplace_fee).
  */
 
 export function urlRetornoVinculo(origem: string) {

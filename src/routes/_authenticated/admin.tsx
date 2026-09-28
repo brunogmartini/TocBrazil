@@ -742,7 +742,7 @@ function FormularioConfiguracoes({
       }}
     >
       <h2 className="text-xl sm:col-span-2">Regras financeiras e operacionais</h2>
-      {num("taxaPorConsultaCentavos", "Taxa fixa por consulta realizada (R$)", "Cobrada do profissional, igual para todos, sem alterar o preço visto pelo paciente.", 100)}
+      {num("taxaPorConsultaCentavos", "Taxa fixa por consulta realizada (R$)", "Incluída no preço público e separada no pagamento, igual para todos.", 100)}
       {num("duracaoPadraoMinutos", "Duração padrão (minutos)", "Usada quando o profissional não define outra.")}
       {num("cancelamentoHoras", "Cancelamento sem custo até (horas antes)", "Prazo para o paciente cancelar com direito a estorno do pagamento.")}
       {num("remarcacaoHoras", "Remarcação até (horas antes)", "Prazo mínimo para remarcar.")}

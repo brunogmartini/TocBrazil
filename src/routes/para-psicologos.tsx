@@ -14,7 +14,7 @@ export const Route = createFileRoute("/para-psicologos")({
       {
         property: "og:description",
         content:
-          "CRP conferido, agenda própria, checkout para o paciente e extrato de taxa fixa por consulta realizada."
+          "CRP conferido, agenda própria, checkout para o paciente e extrato financeiro por consulta realizada."
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

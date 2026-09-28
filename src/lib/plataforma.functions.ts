@@ -140,7 +140,7 @@ export const listarHorariosLivres = createServerFn({ method: "GET" })
   });
 
 export type ConfiguracoesPlataforma = {
-  /** Taxa fixa em centavos cobrada do profissional por consulta realizada. */
+  /** Taxa fixa em centavos incluída no preço público por consulta realizada. */
   taxaPorConsultaCentavos: number;
   janelaCancelamentoHoras: number;
   antecedenciaLinkMinutos: number;
@@ -543,7 +543,7 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
     const dentroDoPrazo = horasAntes >= cfg.cancelamentoHoras;
 
     // Cancelamento tardio de consulta já paga conta como não comparecimento e
-    // gera a taxa fixa devida pelo profissional, conforme as regras da plataforma.
+    // registra a parcela fixa da plataforma já incluída no preço público.
     const novoStatus =
       !dentroDoPrazo && consulta.status === "confirmada" ? "nao_compareceu" : "cancelada";
 
