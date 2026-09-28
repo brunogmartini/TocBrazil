@@ -171,6 +171,9 @@ function Auth() {
   async function sairDaContaAtual() {
     setCarregando(true);
     try {
+      if (conflito) {
+        await registrarAuth({ data: { evento: "logout", papel: conflito.area === "gestor" ? "admin" : conflito.area } });
+      }
       await supabase.auth.signOut();
       setConflito(null);
       setAviso(null);
@@ -340,7 +343,7 @@ function Auth() {
           {modo === "recuperar"
             ? "Informe o e-mail da sua conta. Enviaremos um link para você criar uma nova senha."
             : modo === "nova-senha"
-              ? "Escolha uma senha nova com pelo menos 8 caracteres."
+              ? "Escolha uma senha nova com pelo menos 10 caracteres."
                : profissional
                 ? "Entre para acessar seu consultório digital: agenda, consultas, financeiro e cadastro."
                   : gestor
@@ -433,7 +436,7 @@ function Auth() {
                 className="field-base mt-1"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
-                minLength={8}
+                minLength={10}
                 maxLength={72}
                 autoComplete={modo === "entrar" ? "current-password" : "new-password"}
                 required
