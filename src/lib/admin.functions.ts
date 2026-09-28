@@ -54,11 +54,13 @@ export type ProfissionalAdmin = {
   profissao: string;
   registro: string;
   uf: string;
+  cnpj: string | null;
   cidade: string | null;
   status: string;
   requer_correcao: boolean;
   etapa: EtapaCadastro;
   valor_centavos: number;
+  valor_liquido_centavos: number | null;
   consultas: number;
   consultasRealizadas: number;
   telefone: string | null;
@@ -89,6 +91,8 @@ export type ProfissionalAdmin = {
   ferramenta_url_sala: string | null;
   certidao_validade: string | null;
   apolice_validade: string | null;
+  seguradora_nome: string | null;
+  apolice_numero: string | null;
   temAgenda: boolean;
   criadoEm: string;
   documentos: {
@@ -295,11 +299,13 @@ export const painelAdmin = createServerFn({ method: "GET" })
         profissao: p.profissao as string,
         registro: p.registro,
         uf: p.uf,
+        cnpj: p.cnpj,
         cidade: p.cidade,
         status: p.status as string,
         requer_correcao: Boolean(p.requer_correcao),
         etapa: calcularEtapa(p, docs, comAgenda.has(p.id)),
         valor_centavos: p.valor_centavos,
+        valor_liquido_centavos: p.valor_liquido_centavos,
         consultas: stats?.total ?? 0,
         consultasRealizadas: stats?.realizadas ?? 0,
         telefone: p.telefone,
@@ -330,6 +336,8 @@ export const painelAdmin = createServerFn({ method: "GET" })
         ferramenta_url_sala: p.ferramenta_url_sala,
         certidao_validade: p.certidao_validade,
         apolice_validade: p.apolice_validade,
+        seguradora_nome: p.seguradora_nome,
+        apolice_numero: p.apolice_numero,
         temAgenda: comAgenda.has(p.id),
         criadoEm: p.created_at,
         documentos: docs,
@@ -435,10 +443,13 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
 
     if (data.status === "aprovado") {
       const [{ data: prof }, { data: perfilPronto }] = await Promise.all([
-        supabaseAdmin.from("professionals").select("ferramenta_url_sala, certidao_validade, apolice_validade").eq("id", data.id).maybeSingle(),
+        supabaseAdmin.from("professionals").select("cnpj, ferramenta_url_sala, certidao_validade").eq("id", data.id).maybeSingle(),
         supabaseAdmin.rpc("perfil_pronto_para_publicar", { _professional_id: data.id }),
       ]);
       const hoje = new Date().toISOString().slice(0, 10);
+      if (!prof?.cnpj || prof.cnpj.length !== 14) {
+        return { ok: false as const, erro: "O CNPJ do profissional ainda não foi informado." };
+      }
       if (!prof?.ferramenta_url_sala) {
         return {
           ok: false as const,
@@ -449,8 +460,14 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
       if (prof.certidao_validade && prof.certidao_validade < hoje) {
         return { ok: false as const, erro: "A certidão do conselho está vencida." };
       }
-      if (prof.apolice_validade && prof.apolice_validade < hoje) {
-        return { ok: false as const, erro: "A apólice de seguro está vencida." };
+      const { data: documentosObrigatorios } = await supabaseAdmin
+        .from("professional_documents")
+        .select("tipo, status")
+        .eq("professional_id", data.id)
+        .eq("status", "aprovado");
+      const tiposAprovados = new Set((documentosObrigatorios ?? []).map((doc) => doc.tipo));
+      if (!tiposAprovados.has("Carteirinha profissional do CRP") || !tiposAprovados.has("Diploma de graduação")) {
+        return { ok: false as const, erro: "A carteirinha do CRP e o diploma precisam estar aprovados." };
       }
     }
 

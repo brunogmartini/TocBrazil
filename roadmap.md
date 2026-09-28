@@ -37,10 +37,10 @@
 - [x] Exibir aviso informativo de cookies essenciais
 
 ## Ajustes no cadastro de psicólogos — 28/09/2026
-- [ ] Simplificar a apresentação pública e remover taxa/documentos da primeira etapa
-- [ ] Exigir CNPJ e salvar valor líquido com preço público acrescido de R$ 27
-- [ ] Posicionar uploads de CRP, formação e seguro opcional junto aos respectivos campos
-- [ ] Encerrar o cadastro inicial com a situação de análise e manter contrato aguardando texto final
-- [ ] Remover endereço do rodapé e corrigir sobreposição da faixa de urgência
-- [ ] Atualizar cálculos e textos afetados pela nova composição do preço
+- [x] Simplificar a apresentação pública e remover taxa/documentos da primeira etapa
+- [x] Exigir CNPJ e salvar valor líquido com preço público acrescido de R$ 27
+- [x] Posicionar uploads de CRP, formação e seguro opcional junto aos respectivos campos
+- [x] Encerrar o cadastro inicial com a situação de análise e manter contrato aguardando texto final
+- [x] Remover endereço do rodapé e corrigir sobreposição da faixa de urgência
+- [x] Atualizar cálculos e textos afetados pela nova composição do preço
 - [ ] Validar desktop, 375 px, documentos privados e cálculo financeiro

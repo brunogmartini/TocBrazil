@@ -17,6 +17,7 @@ import {
 import { ProfessionalNav } from "@/components/professional-nav";
 import { exigirAreaProfissional } from "@/lib/role-access";
 import { moeda } from "@/lib/video-sala";
+import { TAXA_FIXA_CENTAVOS } from "@/lib/precos";
 import {
   ABORDAGENS_PERFIL,
   IDIOMAS_PERFIL,
@@ -47,14 +48,6 @@ export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
   component: CadastroProfissional,
 });
 
-const TIPOS_DOCUMENTO = [
-  "Documento de identidade",
-  "Certidão de regularidade do CRP",
-  "Apólice de seguro de responsabilidade civil profissional",
-  "Diploma de graduação",
-  "Certificado de formação",
-];
-
 const rotuloDoc: Record<string, string> = {
   enviado: "Em análise",
   aprovado: "Aprovado",
@@ -81,6 +74,7 @@ function CadastroProfissional() {
   const [form, setForm] = useState({
     nome: "",
     cpf: "",
+    cnpj: "",
     registro: "",
     uf: "",
     genero: "",
@@ -91,20 +85,22 @@ function CadastroProfissional() {
     foto_caminho: "",
     experiencia_anos: "0",
     slot_minutos: "50",
-    valor: "200",
+    valor_liquido: "200",
     areas: "",
     idiomas: [] as string[],
     certidao_validade: "",
     apolice_validade: "",
+    seguradora_nome: "",
+    apolice_numero: "",
     ferramenta_provedor: "",
     ferramenta_url_sala: "",
     ferramenta_instrucoes: "",
   });
   const [aviso, setAviso] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
-  const [tipoDoc, setTipoDoc] = useState(TIPOS_DOCUMENTO[0] ?? "Documento de identidade");
   const [enviandoDoc, setEnviandoDoc] = useState(false);
   const [enviandoFoto, setEnviandoFoto] = useState(false);
+  const [cadastroFinalizado, setCadastroFinalizado] = useState(false);
 
   useEffect(() => {
     const p = dados.data?.profissional;
@@ -112,6 +108,7 @@ function CadastroProfissional() {
       setForm({
         nome: p.nome ?? "",
         cpf: p.cpf ?? "",
+        cnpj: p.cnpj ?? "",
         registro: p.registro ?? "",
         uf: p.uf ?? "",
         genero: p.genero ?? "",
@@ -124,11 +121,13 @@ function CadastroProfissional() {
         foto_caminho: p.foto_caminho ?? "",
         experiencia_anos: String(p.experiencia_anos ?? 0),
         slot_minutos: String(p.slot_minutos ?? 50),
-        valor: String(Math.round((p.valor_centavos ?? 20000) / 100)),
+        valor_liquido: String(Math.round((p.valor_liquido_centavos ?? Math.max((p.valor_centavos ?? 22700) - TAXA_FIXA_CENTAVOS, 0)) / 100)),
         areas: (p.areas ?? []).join(", "),
         idiomas: p.idiomas ?? [],
         certidao_validade: p.certidao_validade ?? "",
         apolice_validade: p.apolice_validade ?? "",
+        seguradora_nome: p.seguradora_nome ?? "",
+        apolice_numero: p.apolice_numero ?? "",
         ferramenta_provedor: p.ferramenta_provedor ?? "",
         ferramenta_url_sala: p.ferramenta_url_sala ?? "",
         ferramenta_instrucoes: p.ferramenta_instrucoes ?? "",
@@ -151,28 +150,29 @@ function CadastroProfissional() {
     setErro(null);
     setAviso(null);
     try {
-      const { valor, ...restoForm } = form;
+      const { valor_liquido, ...restoForm } = form;
       const r = await salvar({
         data: {
           ...restoForm,
           profissao: "psicologo",
           experiencia_anos: Number(form.experiencia_anos) || 0,
           slot_minutos: Number(form.slot_minutos) || 50,
-          valor_centavos: Math.round((Number(valor) || 0) * 100),
+          valor_liquido_centavos: Math.round((Number(valor_liquido) || 0) * 100),
         },
       });
       if (!r.ok) {
         setErro(r.erro);
         return;
       }
-      setAviso("Cadastro salvo.");
+      setAviso("Recebemos seu cadastro. Ele está aguardando a validação da equipe e o perfil ainda não aparece publicamente.");
+      setCadastroFinalizado(true);
       await queryClient.invalidateQueries();
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Não foi possível salvar agora.");
     }
   }
 
-  async function enviarArquivo(file: File) {
+  async function enviarArquivo(file: File, tipo: string) {
     setErro(null);
     setEnviandoDoc(true);
     try {
@@ -186,7 +186,7 @@ function CadastroProfissional() {
         .upload(caminho, file, { upsert: false });
       if (erroUpload) throw new Error("Não foi possível enviar o arquivo.");
       const r = await registrar({
-        data: { tipo: tipoDoc, nome_arquivo: file.name, caminho },
+        data: { tipo, nome_arquivo: file.name, caminho },
       });
       if (!r.ok) throw new Error(r.erro);
       setAviso("Documento enviado para análise.");
@@ -231,6 +231,36 @@ function CadastroProfissional() {
 
   const temCadastro = Boolean(dados.data?.profissional);
   const documentos = dados.data?.documentos ?? [];
+  const status = dados.data?.profissional?.status;
+
+  function DocumentoCampo({ tipo, titulo, descricao }: { tipo: string; titulo: string; descricao?: string }) {
+    const enviados = documentos.filter((documento) => documento.tipo === tipo);
+    return (
+      <div className="rounded-lg border border-border bg-background p-4">
+        <label className="section-label">
+          {titulo}
+          <input
+            type="file"
+            accept="application/pdf,image/*"
+            className="field-base mt-2"
+            disabled={enviandoDoc}
+            onChange={(e) => {
+              const arquivo = e.target.files?.[0];
+              if (arquivo) void enviarArquivo(arquivo, tipo);
+              e.target.value = "";
+            }}
+          />
+        </label>
+        {descricao && <p className="mt-2 text-xs text-muted-foreground">{descricao}</p>}
+        {enviados.map((documento) => (
+          <div key={documento.id} className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span>{documento.nome_arquivo} · {rotuloDoc[documento.status] ?? documento.status}</span>
+            <button type="button" className="underline underline-offset-4" onClick={async () => { await remover({ data: { id: documento.id } }); await queryClient.invalidateQueries({ queryKey: ["cadastro-profissional"] }); }}>Remover</button>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="professional-workspace py-12 lg:py-16">
@@ -238,12 +268,12 @@ function CadastroProfissional() {
       <div className="professional-heading p-6 sm:p-8">
         <span className="professional-label">Consultório digital</span>
         <h1 className="mt-3 text-3xl sm:text-4xl">
-          {temCadastro ? "Atualizar meus dados" : "Meu cadastro profissional"}
+          {temCadastro ? "Seu cadastro profissional" : "Comece seu cadastro"}
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           {temCadastro
-            ? "Seus dados já estão salvos. Edite aqui apenas o que precisar alterar: perfil público, valor da consulta, documentos e dados de recebimento."
-            : "Estas informações formam o seu perfil público. Os documentos são usados apenas para verificação e ficam visíveis somente para você e para a equipe da plataforma."}
+            ? "Seus dados essenciais foram recebidos. Complete abaixo as informações e os comprovantes necessários para a conferência."
+            : "Comece com seus dados essenciais. Depois de salvar, você poderá completar o perfil e enviar os comprovantes em uma área privada."}
         </p>
       </div>
       <ProfessionalNav ativo="/profissional/cadastro" />
@@ -252,14 +282,17 @@ function CadastroProfissional() {
         <div className="card-soft mt-6 p-5">
           <p className="section-label">Situação do seu cadastro</p>
           <p className="mt-2 text-sm font-semibold">
-            {dados.data.profissional.status === "aprovado"
-              ? "Aprovado — seu perfil está publicado na página pública de profissionais."
+             {dados.data.profissional.status === "aprovado"
+               ? "Cadastro aprovado. Seu perfil está publicado na página pública de profissionais."
               : dados.data.profissional.status === "rejeitado"
                 ? "Cadastro rejeitado. Veja a observação da equipe, ajuste os dados e salve novamente."
                 : dados.data.profissional.status === "suspenso"
                   ? "Perfil suspenso temporariamente. Fale com a equipe da plataforma."
                   : "Recebemos seu cadastro. Ele está aguardando a validação da equipe e o perfil ainda não aparece publicamente."}
           </p>
+          {dados.data.profissional.status === "aprovado" && (
+            <p className="mt-2 text-sm text-muted-foreground">O contrato para assinatura online será disponibilizado aqui após a conclusão do texto definitivo.</p>
+          )}
           {dados.data.profissional.observacao_admin && (
             <p className="mt-2 text-sm text-muted-foreground">
               Observação da equipe: {dados.data.profissional.observacao_admin}
@@ -272,7 +305,11 @@ function CadastroProfissional() {
       {erro && <p className="mt-6 text-sm font-semibold text-destructive">{erro}</p>}
 
 
-      <form onSubmit={enviarCadastro} className="card-soft mt-8 grid gap-5 p-7 sm:grid-cols-2">
+      {cadastroFinalizado && !temCadastro ? null : <form onSubmit={enviarCadastro} className="card-soft mt-8 grid gap-5 p-7 sm:grid-cols-2">
+        <div className="sm:col-span-2">
+          <span className="professional-label">Etapa {temCadastro ? "2" : "1"}</span>
+          <h2 className="heading-section mt-2">{temCadastro ? "Complete seu perfil e a verificação" : "Dados essenciais"}</h2>
+        </div>
         <p className="sm:col-span-2 rounded-lg bg-muted p-4 text-sm font-semibold">
           Não inclua telefone, e-mail, redes sociais ou links. O contato acontece pela plataforma.
         </p>
@@ -289,6 +326,13 @@ function CadastroProfissional() {
           onChange={(v) => setForm({ ...form, cpf: v.replace(/\D/g, "").slice(0, 11) })}
           required
         />
+        {temCadastro && <div className="sm:col-span-2"><DocumentoCampo tipo="Documento de identidade" titulo="Documento de identidade com foto" /></div>}
+        <Campo
+          label="CNPJ"
+          value={form.cnpj}
+          onChange={(v) => setForm({ ...form, cnpj: v.replace(/\D/g, "").slice(0, 14) })}
+          required
+        />
         <Campo
           label="Registro profissional (CRP)"
           value={form.registro}
@@ -301,6 +345,23 @@ function CadastroProfissional() {
           onChange={(v) => setForm({ ...form, uf: v.toUpperCase().slice(0, 2) })}
           required
         />
+        {temCadastro && <div className="sm:col-span-2"><DocumentoCampo tipo="Carteirinha profissional do CRP" titulo="Carteirinha profissional do CRP" descricao="Envie uma imagem ou PDF legível para conferência do registro." /></div>}
+
+        {!temCadastro && (
+          <>
+            <Campo
+              label="Anos de experiência"
+              type="number"
+              value={form.experiencia_anos}
+              onChange={(v) => setForm({ ...form, experiencia_anos: v })}
+            />
+            <div>
+              <Campo label="Quanto você quer receber por consulta? Informe o valor líquido desejado" type="number" value={form.valor_liquido} onChange={(v) => setForm({ ...form, valor_liquido: v })} required />
+              <p className="mt-2 text-xs text-muted-foreground">O valor divulgado ao paciente será {moeda(Math.round((Number(form.valor_liquido) || 0) * 100) + TAXA_FIXA_CENTAVOS)}.</p>
+            </div>
+          </>
+        )}
+        {temCadastro && <>
         <div>
           <label htmlFor="foto-perfil" className="section-label">Foto do perfil</label>
           <input id="foto-perfil" type="file" accept="image/jpeg,image/png,image/webp" className="field-base mt-2" disabled={enviandoFoto} onChange={(e) => { const arquivo = e.target.files?.[0]; if (arquivo) void enviarFoto(arquivo); e.target.value = ""; }} />
@@ -340,24 +401,16 @@ function CadastroProfissional() {
             ))}
           </select>
         </div>
-        <Campo
-          label="Anos de experiência"
-          type="number"
-          value={form.experiencia_anos}
-          onChange={(v) => setForm({ ...form, experiencia_anos: v })}
-        />
         <div>
           <Campo
-            label="Preço da sua consulta (R$)"
+            label="Quanto você quer receber por consulta? Informe o valor líquido desejado"
             type="number"
-            value={form.valor}
-            onChange={(v) => setForm({ ...form, valor: v })}
+            value={form.valor_liquido}
+            onChange={(v) => setForm({ ...form, valor_liquido: v })}
             required
           />
           <p className="mt-1 text-xs text-muted-foreground">
-            O paciente vê exatamente este valor:{" "}
-            <strong>{moeda(Math.round((Number(form.valor) || 0) * 100))}</strong>. A taxa fixa da
-            plataforma é cobrada de você por consulta realizada e não entra no preço.
+            Valor que será divulgado ao paciente: <strong>{moeda(Math.round((Number(form.valor_liquido) || 0) * 100) + TAXA_FIXA_CENTAVOS)}</strong>.
           </p>
         </div>
         <fieldset className="sm:col-span-2 rounded-lg border border-border p-4">
@@ -366,7 +419,7 @@ function CadastroProfissional() {
         </fieldset>
         <fieldset className="sm:col-span-2 rounded-lg border border-border p-4">
           <legend className="section-label px-1">Formação declarada</legend>
-          {form.formacoes_publicas.map((item, indice) => <div key={indice} className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_8rem_auto]"><input aria-label={`Instituição ${indice + 1}`} className="field-base" placeholder="Instituição" value={item.instituicao} onChange={(e) => setForm({ ...form, formacoes_publicas: form.formacoes_publicas.map((f, i) => i === indice ? { ...f, instituicao: e.target.value } : f) })} /><input aria-label={`Curso ${indice + 1}`} className="field-base" placeholder="Curso" value={item.curso} onChange={(e) => setForm({ ...form, formacoes_publicas: form.formacoes_publicas.map((f, i) => i === indice ? { ...f, curso: e.target.value } : f) })} /><input aria-label={`Ano ${indice + 1}`} className="field-base" type="number" min="1900" max={new Date().getFullYear()} value={item.ano} onChange={(e) => setForm({ ...form, formacoes_publicas: form.formacoes_publicas.map((f, i) => i === indice ? { ...f, ano: Number(e.target.value) } : f) })} />{form.formacoes_publicas.length > 1 && <button type="button" className="btn-base btn-ghost" onClick={() => setForm({ ...form, formacoes_publicas: form.formacoes_publicas.filter((_, i) => i !== indice) })}>Remover</button>}</div>)}
+          {form.formacoes_publicas.map((item, indice) => <div key={indice} className="mt-4 rounded-lg border border-border p-4"><div className="grid gap-3 sm:grid-cols-[1fr_1fr_8rem_auto]"><input aria-label={`Instituição ${indice + 1}`} className="field-base" placeholder="Instituição" value={item.instituicao} onChange={(e) => setForm({ ...form, formacoes_publicas: form.formacoes_publicas.map((f, i) => i === indice ? { ...f, instituicao: e.target.value } : f) })} /><input aria-label={`Curso ${indice + 1}`} className="field-base" placeholder="Curso" value={item.curso} onChange={(e) => setForm({ ...form, formacoes_publicas: form.formacoes_publicas.map((f, i) => i === indice ? { ...f, curso: e.target.value } : f) })} /><input aria-label={`Ano ${indice + 1}`} className="field-base" type="number" min="1900" max={new Date().getFullYear()} value={item.ano} onChange={(e) => setForm({ ...form, formacoes_publicas: form.formacoes_publicas.map((f, i) => i === indice ? { ...f, ano: Number(e.target.value) } : f) })} />{form.formacoes_publicas.length > 1 && <button type="button" className="btn-base btn-ghost" onClick={() => setForm({ ...form, formacoes_publicas: form.formacoes_publicas.filter((_, i) => i !== indice) })}>Remover</button>}</div><div className="mt-3"><DocumentoCampo tipo={indice === 0 ? "Diploma de graduação" : `Comprovante de formação ${indice + 1}`} titulo="Documento comprobatório" /></div></div>)}
           <button type="button" className="btn-base btn-ghost mt-3" onClick={() => setForm({ ...form, formacoes_publicas: [...form.formacoes_publicas, { instituicao: "", curso: "", ano: new Date().getFullYear() }] })}>Adicionar formação</button>
         </fieldset>
         <fieldset className="sm:col-span-2 rounded-lg border border-border p-4"><legend className="section-label px-1">Experiência com TOC</legend><div className="mt-2 grid gap-2 sm:grid-cols-2">{TEMAS_TOC_PERFIL.map((item) => <label key={item} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.temas_toc_publicos.includes(item)} onChange={(e) => setForm({ ...form, temas_toc_publicos: e.target.checked ? [...form.temas_toc_publicos, item] : form.temas_toc_publicos.filter((valor) => valor !== item) })} />{item}</label>)}</div></fieldset>
@@ -395,12 +448,16 @@ function CadastroProfissional() {
           value={form.certidao_validade}
           onChange={(v) => setForm({ ...form, certidao_validade: v })}
         />
-        <Campo
-          label="Validade da apólice de seguro"
-          type="date"
-          value={form.apolice_validade}
-          onChange={(v) => setForm({ ...form, apolice_validade: v })}
-        />
+        <div><DocumentoCampo tipo="Certidão de regularidade do CRP" titulo="Certidão de regularidade do CRP" /></div>
+        <fieldset className="sm:col-span-2 rounded-lg border border-border p-4">
+          <legend className="section-label px-1">Seguro de responsabilidade civil (opcional)</legend>
+          <div className="mt-3 grid gap-5 sm:grid-cols-3">
+            <Campo label="Seguradora" value={form.seguradora_nome} onChange={(v) => setForm({ ...form, seguradora_nome: v })} />
+            <Campo label="Número da apólice" value={form.apolice_numero} onChange={(v) => setForm({ ...form, apolice_numero: v })} />
+            <Campo label="Validade da apólice" type="date" value={form.apolice_validade} onChange={(v) => setForm({ ...form, apolice_validade: v })} />
+          </div>
+          <div className="mt-4"><DocumentoCampo tipo="Apólice de seguro de responsabilidade civil profissional" titulo="Anexar apólice" /></div>
+        </fieldset>
         <fieldset className="sm:col-span-2 rounded-xl border border-border p-5">
           <legend className="section-label px-1">Ferramenta de videochamada</legend>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -433,90 +490,11 @@ function CadastroProfissional() {
             </div>
           </div>
         </fieldset>
+        </>}
         <button type="submit" className="btn-base btn-primary sm:col-span-2">
-          Salvar cadastro
+          {temCadastro ? "Salvar atualizações" : "Finalizar cadastro inicial"}
         </button>
-      </form>
-      <section className="mt-12">
-        <h2 className="text-2xl">Documentos para verificação</h2>
-        {!temCadastro ? (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Salve seu cadastro acima para liberar o envio de documentos.
-          </p>
-        ) : (
-          <div className="card-soft mt-5 p-7">
-            <div className="grid gap-5 sm:grid-cols-2">
-              <div>
-                <label htmlFor="tipo-doc" className="section-label">
-                  Tipo de documento
-                </label>
-                <select
-                  id="tipo-doc"
-                  className="field-base mt-2"
-                  value={tipoDoc}
-                  onChange={(e) => setTipoDoc(e.target.value)}
-                >
-                  {TIPOS_DOCUMENTO.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="arquivo" className="section-label">
-                  Arquivo (PDF ou imagem, até 10 MB)
-                </label>
-                <input
-                  id="arquivo"
-                  type="file"
-                  accept="application/pdf,image/*"
-                  className="field-base mt-2"
-                  disabled={enviandoDoc}
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) void enviarArquivo(f);
-                    e.target.value = "";
-                  }}
-                />
-              </div>
-            </div>
-            {enviandoDoc && <p className="mt-4 text-sm text-muted-foreground">Enviando…</p>}
-
-            <ul className="mt-6 space-y-3">
-              {documentos.length === 0 ? (
-                <li className="text-sm text-muted-foreground">Nenhum documento enviado ainda.</li>
-              ) : (
-                documentos.map((d) => (
-                  <li
-                    key={d.id}
-                    className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3 text-sm"
-                  >
-                    <span>
-                      <strong className="font-semibold">{d.tipo}</strong> · {d.nome_arquivo}
-                    </span>
-                    <span className="flex items-center gap-4">
-                      <span className="pill">{rotuloDoc[d.status] ?? d.status}</span>
-                      <button
-                        type="button"
-                        className="text-sm underline underline-offset-4"
-                        onClick={async () => {
-                          await remover({ data: { id: d.id } });
-                          await queryClient.invalidateQueries({
-                            queryKey: ["cadastro-profissional"],
-                          });
-                        }}
-                      >
-                        Remover
-                      </button>
-                    </span>
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
-        )}
-      </section>
+      </form>}
 
       <section className="mt-12">
         <h2 className="text-2xl">Receber direto na sua conta Mercado Pago</h2>

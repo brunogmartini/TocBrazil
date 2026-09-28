@@ -231,7 +231,7 @@ function Agendar() {
               </p>
             )}
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-              Este é o valor definido pelo profissional. Ao reservar, o horário fica guardado para
+               Este é o valor total da consulta. Ao reservar, o horário fica guardado para
               você por 15 minutos até a aprovação do pagamento. A consulta acontece na sala de
               videochamada do próprio profissional, e o endereço da sala aparece na sua área pouco
               antes do horário.

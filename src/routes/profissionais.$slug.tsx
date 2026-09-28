@@ -163,7 +163,7 @@ function Perfil() {
           <div className="card-soft p-6">
             <p className="text-2xl font-semibold">{moeda(p.valor_centavos)}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Sessão de {p.slot_minutos} minutos, online. Este é o valor definido pelo profissional.
+              Sessão de {p.slot_minutos} minutos, online. Este é o valor total pago pelo paciente.
             </p>
             <div className="mt-5">
               <p className="section-label">Próximos horários</p>

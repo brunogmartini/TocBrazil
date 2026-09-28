@@ -14,7 +14,7 @@ export const Route = createFileRoute("/para-psicologos")({
       {
         property: "og:description",
         content:
-          "CRP conferido, agenda própria, checkout para o paciente e extrato de taxa fixa por consulta realizada."
+          "CRP conferido, agenda própria, checkout para o paciente e extrato financeiro por consulta realizada."
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -33,7 +33,7 @@ const etapas = [
   "Abordagem",
   "Experiência em TOC",
   "Documentos para validação",
-  "Preço da consulta",
+  "Valor líquido desejado",
   "Disponibilidade",
   "Dados de recebimento",
   "Aguardar aprovação",
@@ -96,7 +96,7 @@ function ParaPsicologos() {
             { t: "Agenda", d: "Dias, horários, recorrências, bloqueios, duração e intervalos." },
             { t: "Consultas", d: "Próximas consultas, histórico, status e reagendamentos." },
             { t: "Sua videochamada", d: "Informe a URL da sala contratada e mantida por você." },
-            { t: "Financeiro", d: "Extrato de consultas realizadas e taxa fixa por consulta." },
+            { t: "Financeiro", d: "Extrato de consultas realizadas, valor líquido e pagamentos." },
             { t: "Perfil", d: "Apresentação, abordagem, experiência em TOC, idiomas e valores." },
             {
               t: "Segurança",
@@ -109,9 +109,7 @@ function ParaPsicologos() {
             </article>
           ))}
         </div>
-        <p className="mt-8 max-w-3xl text-xs leading-relaxed text-muted-foreground">
-          A TOC Brazil atua como infraestrutura tecnológica e cobra uma taxa fixa em reais por consulta realizada, igual para todos os profissionais. A consulta permanece sob responsabilidade do psicólogo habilitado, conforme as normas do CFP.
-        </p>
+        <p className="mt-8 max-w-3xl text-xs leading-relaxed text-muted-foreground">A TOC Brazil atua como infraestrutura tecnológica. A consulta permanece sob responsabilidade do psicólogo habilitado, conforme as normas do CFP.</p>
       </section>
 
       <section className="border-t border-border bg-surface">
@@ -122,12 +120,6 @@ function ParaPsicologos() {
               <dt className="heading-subsection">A TOC Brazil tem registro no CRP e responsável técnico?</dt>
               <dd className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 Não, e não precisa ter. A TOC Brazil é uma empresa de tecnologia e não presta serviços psicológicos. Quem presta é você: contrata diretamente com o paciente, define seu valor e mantém seus próprios registros.
-              </dd>
-            </div>
-            <div className="card-soft p-6">
-              <dt className="heading-subsection">Quanto a plataforma cobra?</dt>
-              <dd className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Uma taxa fixa em reais por consulta realizada, igual para todos os profissionais, independentemente do valor que você cobra. Não é comissão nem percentual.
               </dd>
             </div>
           </dl>

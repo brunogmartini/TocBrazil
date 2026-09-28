@@ -70,9 +70,8 @@ function Financeiro() {
           <span className="professional-label">Consultório digital</span>
           <h1 className="mt-3 text-3xl sm:text-4xl">Financeiro</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Você recebe integralmente o preço que definiu para a consulta. A plataforma cobra de você
-            uma taxa fixa de {moeda(taxaFixa)} por consulta realizada — ela não aparece para o paciente
-            e não altera o preço.
+            Você informa quanto deseja receber. O preço pago pelo paciente inclui esse valor líquido
+            e a taxa fixa de {moeda(taxaFixa)} por consulta realizada.
           </p>
         </div>
 

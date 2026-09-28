@@ -75,12 +75,11 @@ export function SiteFooter() {
         ))}
       </div>
 
-      <div className="container-page border-t border-border py-6 text-xs leading-relaxed text-muted-foreground">
+      <div className="container-page border-t border-border pb-16 pt-6 text-xs leading-relaxed text-muted-foreground lg:pb-14">
         <address className="mb-5 border-b border-border pb-5 text-sm not-italic text-foreground">
           <p className="font-semibold text-foreground">
             {institucional.razaoSocial} — CNPJ {institucional.cnpj}
           </p>
-          <p className="mt-1">{institucional.endereco}</p>
           <a className="mt-1 inline-block underline underline-offset-4" href={`mailto:${institucional.email}`}>
             {institucional.email}
           </a>

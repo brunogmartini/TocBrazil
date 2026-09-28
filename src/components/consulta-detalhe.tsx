@@ -46,11 +46,11 @@ export function ConsultaDetalhe({
 
         <dl className="grid gap-3 rounded-xl bg-muted p-4 sm:grid-cols-3">
           <div>
-            <dt className="text-xs text-muted-foreground">Preço que você definiu</dt>
-            <dd className="font-semibold">{moeda(c.valor_consulta_centavos)}</dd>
+            <dt className="text-xs text-muted-foreground">Valor líquido para você</dt>
+            <dd className="font-semibold">{moeda(c.valor_profissional_centavos)}</dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">Taxa fixa da plataforma</dt>
+            <dt className="text-xs text-muted-foreground">Taxa incluída no preço público</dt>
             <dd className="font-semibold">{moeda(c.taxa_plataforma_centavos)}</dd>
           </div>
           <div>

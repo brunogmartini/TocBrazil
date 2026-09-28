@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import { areaDosPapeis, type Papel } from "@/lib/areas";
 import { institucional } from "@/config/institucional";
+import { TAXA_FIXA_CENTAVOS } from "@/lib/precos";
 
 export type ProfissionalPublico = {
   id: string;
@@ -139,7 +140,7 @@ export const listarHorariosLivres = createServerFn({ method: "GET" })
   });
 
 export type ConfiguracoesPlataforma = {
-  /** Taxa fixa em centavos cobrada do profissional por consulta realizada. */
+  /** Taxa fixa em centavos incluída no preço público por consulta realizada. */
   taxaPorConsultaCentavos: number;
   janelaCancelamentoHoras: number;
   antecedenciaLinkMinutos: number;
@@ -154,7 +155,7 @@ export function mapearConfiguracoes(rows: { chave: string; valor: unknown }[] | 
   const mapa: Record<string, unknown> = {};
   for (const row of rows ?? []) mapa[row.chave] = row.valor;
   const cfg: ConfiguracoesPlataforma = {
-    taxaPorConsultaCentavos: Number(mapa["taxa_por_consulta_centavos"] ?? 2900),
+    taxaPorConsultaCentavos: Number(mapa["taxa_por_consulta_centavos"] ?? TAXA_FIXA_CENTAVOS),
     janelaCancelamentoHoras: Number(mapa["janela_cancelamento_horas"] ?? 24),
     antecedenciaLinkMinutos: Number(mapa["antecedencia_link_minutos"] ?? 15),
     janelaConfirmacaoHoras: Number(mapa["janela_confirmacao_horas"] ?? 24),
@@ -431,8 +432,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
 
     const cfg = await carregarConfiguracoesPrivadas();
 
-    // O paciente paga exatamente o preço definido pelo profissional. A taxa fixa
-    // da plataforma é cobrada do profissional e não compõe o preço.
+    // O preço público já contém o líquido desejado pelo profissional e a taxa fixa.
     const valorConsulta = Number(prof.valor_centavos ?? 0);
     const taxaFixa = cfg.taxaPorConsultaCentavos;
     const duracao = prof.slot_minutos || cfg.duracaoPadraoMinutos;
@@ -458,7 +458,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
         valor_consulta_centavos: valorConsulta,
         comissao_percent: 0,
         valor_plataforma_centavos: 0,
-        valor_profissional_centavos: valorConsulta,
+        valor_profissional_centavos: Math.max(valorConsulta - taxaFixa, 0),
         taxa_plataforma_centavos: taxaFixa,
         link_acesso: linkAcesso,
         video_url: linkAcesso,
@@ -543,7 +543,7 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
     const dentroDoPrazo = horasAntes >= cfg.cancelamentoHoras;
 
     // Cancelamento tardio de consulta já paga conta como não comparecimento e
-    // gera a taxa fixa devida pelo profissional, conforme as regras da plataforma.
+    // registra a parcela fixa da plataforma já incluída no preço público.
     const novoStatus =
       !dentroDoPrazo && consulta.status === "confirmada" ? "nao_compareceu" : "cancelada";
 

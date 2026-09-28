@@ -28,20 +28,12 @@ export const Route = createFileRoute("/cadastro-profissional")({
 
 const etapas = [
   { t: "Crie sua conta", d: "E-mail e senha ou Google. Leva menos de um minuto." },
-  { t: "Preencha seu cadastro", d: "CRP, formação, abordagens, experiência com TOC, idiomas e valor da consulta." },
-  { t: "Envie seus documentos", d: "Documento de identidade, certidão de regularidade do CRP, apólice de seguro profissional e documentos de formação." },
+  { t: "Preencha seu cadastro inicial", d: "Conte quem você é e apresente sua experiência profissional." },
+  { t: "Complete a verificação", d: "Depois do cadastro inicial, envie os comprovantes necessários em sua área." },
   { t: "Conferência documental", d: "Conferimos inscrição ativa no CRP e documentos apresentados. Se algo precisar de correção, avisamos na sua área." },
   { t: "Configure sua agenda", d: "Defina sua disponibilidade recorrente e bloqueie exceções direto no calendário." },
   { t: "Perfil publicado", d: "Depois da aprovação, seu perfil fica visível e pronto para receber agendamentos." },
 ];
-
-const documentosObrigatorios = [
-  "Documento de identidade com foto",
-  "Certidão de regularidade do CRP com validade",
-  "Apólice de seguro de responsabilidade civil profissional com validade",
-  "Diploma de graduação",
-];
-const documentosOpcionais = ["Certificados de especialização e cursos em TOC, TCC ou EPR"];
 
 const statusFluxo = [
   { t: "1. Cadastro iniciado", d: "Conta criada, dados profissionais ainda não preenchidos." },
@@ -122,9 +114,7 @@ function CadastroProfissional() {
               </p>
             ))}
           </div>
-          <p className="mt-6 text-base leading-relaxed text-muted-foreground">
-            Você só paga quando a consulta acontece — cancelamento com reembolso integral ao paciente não gera taxa.
-          </p>
+          <p className="mt-6 text-base leading-relaxed text-muted-foreground">Uma estrutura simples para você manter autonomia sobre sua rotina profissional.</p>
         </article>
         <div className="mt-7 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
           {beneficios.map((beneficio) => (
@@ -134,26 +124,13 @@ function CadastroProfissional() {
             </article>
           ))}
         </div>
-        <div className="mt-8 max-w-3xl">
-          <p className="font-semibold leading-relaxed text-foreground">
-            Taxa fixa de R$ 27 por consulta realizada, igual para todos os profissionais, qualquer que seja o valor que você cobra
-          </p>
-          <article className="mt-4 bg-surface py-6">
-            <h3 className="text-base font-semibold text-foreground">Por que existe uma taxa?</h3>
-            <p className="mt-3 text-base leading-relaxed text-surface-foreground">
-              A taxa custeia a estrutura que você usa. Plataforma, agenda, processamento de pagamentos, custos contábeis, verificação de registro e proteção de dados. É o que mantém a TOC Brazil funcionando e ao alcance de quem procura ajuda.
-            </p>
-          </article>
-        </div>
-        <p className="mt-7 text-sm text-muted-foreground">
-          O prazo de liquidação é definido pelo provedor de meios de pagamento. A TOC Brazil pode reter até 10% dos valores sob sua gestão pelo prazo de 90 dias, exclusivamente para cobrir estornos, chargebacks e reembolsos, liberando o saldo ao final do período (Cláusula 7.4 do contrato).
-        </p>
       </section>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
         <section className="card-soft p-8">
           <span className="section-label">Profissional novo</span>
-          <h2 className="heading-section mt-2">Quero me cadastrar como profissional</h2>
+          <h2 className="heading-section mt-2">Comece com seus dados essenciais</h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">Primeiro, crie sua conta. Depois você completa o perfil e envia os comprovantes para conferência em um ambiente privado.</p>
           <ol className="mt-6 space-y-4">
             {etapas.map((e, i) => (
               <li key={e.t} className="flex gap-4">
@@ -165,23 +142,6 @@ function CadastroProfissional() {
               </li>
             ))}
           </ol>
-
-          <h3 className="heading-subsection mt-8">Documentos e títulos necessários</h3>
-          <h4 className="mt-4 text-sm font-semibold">Obrigatórios</h4>
-          <ul className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-            {documentosObrigatorios.map((d) => (
-              <li key={d} className="rounded-xl bg-muted px-4 py-3">
-                {d}
-              </li>
-            ))}
-          </ul>
-          <h4 className="mt-5 text-sm font-semibold">Opcionais</h4>
-          <ul className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-            {documentosOpcionais.map((d) => (
-              <li key={d} className="rounded-xl bg-muted px-4 py-3">{d}</li>
-            ))}
-          </ul>
-          <p className="mt-3 text-xs text-muted-foreground">O título de especialista só pode ser divulgado no perfil quando registrado no Conselho.</p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
