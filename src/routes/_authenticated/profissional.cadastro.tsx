@@ -531,10 +531,12 @@ function CadastroProfissional() {
                 <form className="mt-6 space-y-4" onSubmit={async (event) => {
                   event.preventDefault();
                   setErro(null);
+                  const contratoDisponivel = contrato.data;
+                  if (!contratoDisponivel?.disponivel) return;
                   const resultado = await assinarContrato({ data: {
-                    nome_assinatura: contrato.data.identidade.nome,
-                    documento: contrato.data.identidade.cpf,
-                    versao_id: contrato.data.versao.id,
+                    nome_assinatura: contratoDisponivel.identidade.nome,
+                    documento: contratoDisponivel.identidade.cpf,
+                    versao_id: contratoDisponivel.versao.id,
                     confirmou: confirmouContrato,
                   } });
                   if (!resultado.ok) return setErro(resultado.erro);
