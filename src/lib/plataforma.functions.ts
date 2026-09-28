@@ -269,6 +269,8 @@ export const salvarPerfil = createServerFn({ method: "POST" })
       data_nascimento: data.data_nascimento,
     });
     if (error) throw new Error(error.message);
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({ actorId: userId, actorRole: "paciente", action: "profile_data_changed", entity: "profile", entityId: userId, metadata: { fields: ["nome", "telefone", "data_nascimento"] } });
     return { ok: true };
   });
 
@@ -387,6 +389,8 @@ export const confirmarRealizacao = createServerFn({ method: "POST" })
       })
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível confirmar agora." };
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({ actorId: userId, actorRole: "paciente", action: "appointment_status_changed", entity: "appointment", entityId: consulta.id, metadata: { status: "realizada" } });
     await registrarEvento({
       tipo: "realizacao_confirmada",
       appointmentId: consulta.id,
@@ -556,6 +560,8 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
       })
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível cancelar agora." };
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({ actorId: userId, actorRole: "paciente", action: "appointment_status_changed", entity: "appointment", entityId: consulta.id, metadata: { status: novoStatus } });
 
     // Estorno pelo provedor quando o cancelamento é dentro do prazo e já houve pagamento.
     let estornado = false;

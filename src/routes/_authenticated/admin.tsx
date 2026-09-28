@@ -11,6 +11,7 @@ import {
   definirStatusProfissional,
   conferirCadastroProfissional,
   editarProfissionalAdmin,
+  obterDocumentoCredenciamento,
   painelAdmin,
   relatorioMetadados,
   salvarConfiguracoes,
@@ -76,6 +77,7 @@ function Admin() {
   const mudarStatusDoc = useServerFn(definirStatusDocumento);
   const mudarStatusFoto = useServerFn(definirStatusFoto);
   const editarProf = useServerFn(editarProfissionalAdmin);
+  const abrirDocumento = useServerFn(obterDocumentoCredenciamento);
   const mudarPagamento = useServerFn(definirStatusPagamento);
   const mudarConsulta = useServerFn(definirStatusConsultaAdmin);
   const salvarCfg = useServerFn(salvarConfiguracoes);
@@ -395,11 +397,11 @@ function Admin() {
                               </p>
                             </div>
                             <div className="flex flex-wrap gap-2">
-                              {d.url && (
-                                <a href={d.url} target="_blank" rel="noreferrer" className="btn-base btn-ghost px-4 py-2">
-                                  Abrir documento
-                                </a>
-                              )}
+                              <button type="button" className="btn-base btn-ghost px-4 py-2" onClick={async () => {
+                                const resultado = await abrirDocumento({ data: { id: d.id } });
+                                if (resultado.ok) window.open(resultado.url, "_blank", "noopener,noreferrer");
+                                else setAviso(resultado.erro);
+                              }}>Abrir documento</button>
                               <select
                                 className="field-base"
                                 aria-label={`Situação do documento ${d.nome_arquivo}`}

@@ -6,7 +6,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { areaDoCaminho, destinoDaArea, INICIO_DA_AREA, ROTULO_DA_AREA, type Area } from "@/lib/areas";
 import { guardarPerfilPretendido, minhaArea } from "@/lib/role-access";
 import { useServerFn } from "@tanstack/react-start";
-import { autorizarTentativaGestor } from "@/lib/auth.functions";
+import { autorizarTentativaLogin } from "@/lib/auth.functions";
 
 type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
 type MfaPendente = { factorId: string; qrCode?: string; secret?: string };
@@ -62,7 +62,7 @@ function Auth() {
   const [conflito, setConflito] = useState<{ area: Area; email: string | null } | null>(null);
   const [mfa, setMfa] = useState<MfaPendente | null>(null);
   const [codigoMfa, setCodigoMfa] = useState("");
-  const autorizarGestor = useServerFn(autorizarTentativaGestor);
+  const autorizarLogin = useServerFn(autorizarTentativaLogin);
 
   const profissional = search.perfil === "profissional";
   const gestor = search.perfil === "gestor";
@@ -192,8 +192,8 @@ function Auth() {
         setAviso("Se este e-mail tiver conta, você receberá um link para criar uma nova senha.");
         return;
       }
-      if (senha.length < 8) {
-        setErro("A senha precisa ter pelo menos 8 caracteres.");
+      if (senha.length < 10) {
+        setErro("A senha precisa ter pelo menos 10 caracteres.");
         return;
       }
       if (modo === "nova-senha") {
@@ -225,12 +225,10 @@ function Auth() {
           return;
         }
       } else {
-        if (gestor) {
-          const limite = await autorizarGestor({ data: { email: email.trim() } });
-          if (!limite.ok) {
-            setErro(limite.erro);
-            return;
-          }
+        const limite = await autorizarLogin({ data: { email: email.trim() } });
+        if (!limite.ok) {
+          setErro(limite.erro);
+          return;
         }
         const { error } = await supabase.auth.signInWithPassword({
           email: email.trim(),

@@ -52,3 +52,12 @@
 - [x] Separar conferência cadastral de publicação e exigir contrato ativo aceito
 - [ ] Anexar e ativar o PDF definitivo fornecido pela responsável
 - [ ] Conectar o provedor externo escolhido e validar seu comprovante de integridade
+
+## Segurança — Anexo III — 28/09/2026
+- [x] Reforçar RLS nas 29 tabelas e bloquear estruturas clínicas legadas
+- [x] Restringir documentos de credenciamento e emitir URL assinada de 60 segundos sob demanda
+- [x] Criar log de auditoria imutável e conectar eventos operacionais exigidos
+- [x] Elevar senha para 10 caracteres e ampliar bloqueio temporário a todos os logins por senha
+- [ ] Adicionar TOTP opcional na área do psicólogo
+- [ ] Validar cabeçalhos, cookies, bundle, desktop e 375 px; emitir relatório final
+- [ ] Separar banco de prévia e produção (depende de infraestrutura externa)

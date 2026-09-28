@@ -61,6 +61,9 @@ const cspReportOnly = [
 
 function withSecurityHeaders(response: Response): Response {
   const headers = new Headers(response.headers);
+  headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   headers.set("Content-Security-Policy", "frame-ancestors 'none'; base-uri 'self'; object-src 'none'");
   headers.set("Content-Security-Policy-Report-Only", cspReportOnly);
   headers.set("X-Frame-Options", "DENY");

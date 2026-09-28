@@ -5,7 +5,7 @@ import { z } from "zod";
 
 const tentativaSchema = z.object({ email: z.string().trim().email().max(255) });
 
-export const autorizarTentativaGestor = createServerFn({ method: "POST" })
+export const autorizarTentativaLogin = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => tentativaSchema.parse(data))
   .handler(async ({ data }) => {
     const request = getRequest();
@@ -25,4 +25,15 @@ export const autorizarTentativaGestor = createServerFn({ method: "POST" })
     }
     await supabaseAdmin.from("tentativas_login_gestor").insert({ identificador_hash: identificadorHash });
     return { ok: true as const };
+  });
+
+export const registrarEventoAutenticacao = createServerFn({ method: "POST" })
+  .inputValidator((data: { evento: "login" | "logout"; papel: "paciente" | "profissional" | "admin" }) => ({
+    evento: data.evento,
+    papel: data.papel,
+  }))
+  .handler(async ({ data }) => {
+    const { requireSupabaseAuth } = await import("@/integrations/supabase/auth-middleware");
+    void requireSupabaseAuth;
+    return { ok: false as const };
   });
