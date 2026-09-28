@@ -431,8 +431,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
 
     const cfg = await carregarConfiguracoesPrivadas();
 
-    // O paciente paga exatamente o preço definido pelo profissional. A taxa fixa
-    // da plataforma é cobrada do profissional e não compõe o preço.
+    // O preço público já contém o líquido desejado pelo profissional e a taxa fixa.
     const valorConsulta = Number(prof.valor_centavos ?? 0);
     const taxaFixa = cfg.taxaPorConsultaCentavos;
     const duracao = prof.slot_minutos || cfg.duracaoPadraoMinutos;
@@ -458,7 +457,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
         valor_consulta_centavos: valorConsulta,
         comissao_percent: 0,
         valor_plataforma_centavos: 0,
-        valor_profissional_centavos: valorConsulta,
+        valor_profissional_centavos: Math.max(valorConsulta - taxaFixa, 0),
         taxa_plataforma_centavos: taxaFixa,
         link_acesso: linkAcesso,
         video_url: linkAcesso,

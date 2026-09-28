@@ -7,6 +7,7 @@ import {
   TEMAS_TOC_PERFIL,
   type FormacaoPublica,
 } from "@/lib/perfil-profissional";
+import { precoPublicoCentavos } from "@/lib/precos";
 
 function slugificar(nome: string) {
   return nome
@@ -31,6 +32,7 @@ export type CadastroProfissionalEntrada = {
   nome: string;
   profissao: "psicologo";
   cpf?: string;
+  cnpj?: string;
   registro: string;
   uf: string;
   genero?: string;
@@ -42,8 +44,11 @@ export type CadastroProfissionalEntrada = {
   experiencia_anos?: number;
   slot_minutos?: number;
   valor_centavos?: number;
+  valor_liquido_centavos?: number;
   certidao_validade?: string | null;
   apolice_validade?: string | null;
+  seguradora_nome?: string | null;
+  apolice_numero?: string | null;
   ferramenta_provedor?: string;
   ferramenta_url_sala?: string;
   ferramenta_instrucoes?: string;
@@ -133,6 +138,12 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     const uf = String(data.uf ?? "").trim().toUpperCase().slice(0, 2);
     if (uf.length !== 2) throw new Error("Informe a UF do registro.");
     const profissao: "psicologo" = "psicologo";
+    const cnpj = String(data.cnpj ?? "").replace(/\D/g, "").slice(0, 14);
+    if (cnpj.length !== 14) throw new Error("Informe um CNPJ válido com 14 dígitos.");
+    const valorLiquidoCentavos = Math.min(
+      Math.max(Math.round(Number(data.valor_liquido_centavos ?? 0) || 0), 0),
+      500000,
+    );
     const abordagens = lista(data.abordagens_publicas).filter((item) =>
       (ABORDAGENS_PERFIL as readonly string[]).includes(item),
     ).slice(0, 3);
@@ -156,6 +167,7 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       uf,
       profissao,
       cpf: String(data.cpf ?? "").replace(/\D/g, "").slice(0, 11) || null,
+      cnpj,
       genero: String(data.genero ?? "").trim().slice(0, 30) || null,
       abordagens_publicas: abordagens,
       formacoes_publicas: formacoes,
@@ -166,13 +178,14 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       slot_minutos: [30, 40, 50, 60].includes(Number(data.slot_minutos))
         ? Number(data.slot_minutos)
         : 50,
-      // O profissional define o preço da consulta. A plataforma exibe exatamente
-      // esse valor ao paciente: nenhuma margem é somada.
-      valor_centavos: Math.min(Math.max(Math.round(Number(data.valor_centavos ?? 0) || 0), 0), 500000),
+      valor_liquido_centavos: valorLiquidoCentavos,
+      valor_centavos: precoPublicoCentavos(valorLiquidoCentavos),
       areas: lista(data.areas),
       idiomas,
       certidao_validade: data.certidao_validade ? String(data.certidao_validade).slice(0, 10) : null,
       apolice_validade: data.apolice_validade ? String(data.apolice_validade).slice(0, 10) : null,
+      seguradora_nome: String(data.seguradora_nome ?? "").trim().slice(0, 120) || null,
+      apolice_numero: String(data.apolice_numero ?? "").trim().slice(0, 80) || null,
       ferramenta_provedor: String(data.ferramenta_provedor ?? "").trim().slice(0, 80) || null,
       ferramenta_url_sala: String(data.ferramenta_url_sala ?? "").trim().slice(0, 500) || null,
       ferramenta_instrucoes: String(data.ferramenta_instrucoes ?? "").trim().slice(0, 1000) || null,
@@ -228,7 +241,7 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       };
     }
 
-    if (!data.abordagens_publicas.length || !data.formacoes_publicas.length || !data.temas_toc_publicos.length || !data.biografia_publica || !data.idiomas.length || data.valor_centavos <= 0) {
+    if (!data.abordagens_publicas.length || !data.formacoes_publicas.length || !data.temas_toc_publicos.length || !data.biografia_publica || !data.idiomas.length || data.valor_liquido_centavos <= 0) {
       return { ok: false as const, erro: "Preencha todos os campos obrigatórios do perfil público." };
     }
 
@@ -660,7 +673,7 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
       // Taxa da plataforma: valor fixo em reais por consulta, igual para todos.
       const bruto = c.valor_consulta_centavos ?? 0;
       const plataforma = c.taxa_plataforma_centavos ?? cfg.taxaPorConsultaCentavos;
-      const liquido = bruto;
+      const liquido = c.valor_profissional_centavos ?? Math.max(bruto - plataforma, 0);
       let situacao: LancamentoFinanceiro["situacao"] = "agendada";
       if (c.status === "aguardando_pagamento") situacao = "aguardando_pagamento";
       else if (c.status === "cancelada") situacao = "cancelada";

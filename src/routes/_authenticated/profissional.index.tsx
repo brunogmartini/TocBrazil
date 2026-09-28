@@ -98,7 +98,7 @@ function PainelProfissional() {
                 {etapa.titulo}
               </span>
               <span>
-                consultas de {prof.slot_minutos} min · {moeda(prof.valor_centavos ?? 0)} por consulta
+                consultas de {prof.slot_minutos} min · {moeda(Math.max((prof.valor_centavos ?? 0) - 2700, 0))} líquidos por consulta
               </span>
             </p>
           </div>
@@ -161,8 +161,7 @@ function PainelProfissional() {
             <p className="professional-label">Já recebido</p>
             <p className="mt-2 font-display text-2xl">{moeda(resumo?.recebido ?? 0)}</p>
             <p className="mt-2 text-xs text-muted-foreground">
-              você recebe o preço integral e paga {moeda(resumo?.taxaFixaCentavos ?? 0)} de taxa fixa
-              por consulta realizada
+               valor líquido após a taxa fixa incluída no preço público
             </p>
           </div>
         </div>

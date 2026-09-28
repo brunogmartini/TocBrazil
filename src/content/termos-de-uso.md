@@ -54,9 +54,9 @@
 
 ## 6. Valores e pagamento
 
-6.1. O valor da consulta é definido livremente pelo psicólogo e informado no perfil dele. A TOC Brazil não define, não sugere e não acrescenta margem a esse valor.
+6.1. O psicólogo informa o valor líquido que deseja receber. O preço total informado no perfil inclui esse valor e a taxa fixa da plataforma.
 
-6.2. A TOC Brazil é remunerada por uma taxa fixa paga pelo PSICÓLOGO pelo uso da plataforma. Essa taxa não é cobrada de você e não compõe o preço da consulta.
+6.2. A TOC Brazil é remunerada por uma taxa fixa em reais por consulta realizada, incluída no preço total informado antes do agendamento.
 
 
 

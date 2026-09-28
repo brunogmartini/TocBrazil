@@ -2,8 +2,8 @@
  * Camada de pagamentos com o provedor abstraído.
  *
  * Regras da plataforma:
- * - O paciente paga exatamente o preço definido pelo profissional.
- * - A taxa fixa da plataforma é cobrada do profissional (split), nunca somada ao preço.
+ * - O profissional informa o valor líquido desejado.
+ * - O paciente paga esse valor líquido acrescido da taxa fixa da plataforma.
  * - O dinheiro do profissional não transita por conta da plataforma: a cobrança é
  *   liquidada na conta de recebimento dele no provedor.
  * - Não existe carteira, saldo interno nem transferência manual de valores.
@@ -16,9 +16,9 @@ export type StatusCobranca = "pendente" | "aprovado" | "recusado" | "estornado" 
 export type DadosCobranca = {
   /** Identificador da consulta (external reference no provedor). */
   referencia: string;
-  /** Preço do profissional, em centavos — é o que o paciente paga. */
+  /** Preço público total, em centavos — é o que o paciente paga. */
   valorCentavos: number;
-  /** Taxa fixa da plataforma, em centavos, descontada do profissional. */
+  /** Taxa fixa da plataforma, em centavos, incluída no preço público. */
   taxaPlataformaCentavos: number;
   descricao: string;
   metodos?: MetodoPagamento[];
