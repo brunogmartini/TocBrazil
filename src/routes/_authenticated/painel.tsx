@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { registrarEventoAutenticacao } from "@/lib/auth.functions";
 import {
   cancelarConsulta,
   meuContexto,
@@ -46,6 +47,7 @@ function formatarData(iso: string) {
 }
 
 function Painel() {
+  const registrarAuth = useServerFn(registrarEventoAutenticacao);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const carregarContexto = useServerFn(meuContexto);
@@ -82,6 +84,7 @@ function Painel() {
   async function sair() {
     await queryClient.cancelQueries();
     queryClient.clear();
+    await registrarAuth({ data: { evento: "logout", papel: "paciente" } });
     await supabase.auth.signOut();
     navigate({ to: "/auth", search: { modo: "entrar" as const, redirect: undefined }, replace: true });
   }

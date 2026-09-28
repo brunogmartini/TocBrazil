@@ -6,7 +6,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { areaDoCaminho, destinoDaArea, INICIO_DA_AREA, ROTULO_DA_AREA, type Area } from "@/lib/areas";
 import { guardarPerfilPretendido, minhaArea } from "@/lib/role-access";
 import { useServerFn } from "@tanstack/react-start";
-import { autorizarTentativaLogin } from "@/lib/auth.functions";
+import { autorizarTentativaLogin, registrarEventoAutenticacao } from "@/lib/auth.functions";
 
 type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
 type MfaPendente = { factorId: string; qrCode?: string; secret?: string };
@@ -63,6 +63,7 @@ function Auth() {
   const [mfa, setMfa] = useState<MfaPendente | null>(null);
   const [codigoMfa, setCodigoMfa] = useState("");
   const autorizarLogin = useServerFn(autorizarTentativaLogin);
+  const registrarAuth = useServerFn(registrarEventoAutenticacao);
 
   const profissional = search.perfil === "profissional";
   const gestor = search.perfil === "gestor";
@@ -230,11 +231,15 @@ function Auth() {
           setErro(limite.erro);
           return;
         }
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data: login, error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password: senha,
         });
         if (error) throw error;
+        if (login.session) {
+          const papel = areaPretendida === "gestor" ? "admin" : areaPretendida;
+          await registrarAuth({ data: { evento: "login", papel } });
+        }
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Não foi possível continuar.";
