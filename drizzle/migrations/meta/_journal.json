@@ -141,6 +141,13 @@
       "when": 1790611953861,
       "tag": "0019_harden_security_audit_and_private_documents",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1790612106179,
+      "tag": "0020_restrict_audit_log_privileges",
+      "breakpoints": true
     }
   ]
 }
