@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   meuCadastroProfissional,
+  contratoAtualProfissional,
+  assinarContratoProfissional,
   registrarDocumento,
   removerDocumento,
   salvarCadastroProfissional,
@@ -63,12 +65,15 @@ function CadastroProfissional() {
   const statusVinculo = useServerFn(statusVinculoMercadoPago);
   const iniciarVinculo = useServerFn(iniciarVinculoMercadoPago);
   const desvincular = useServerFn(desvincularMercadoPago);
+  const carregarContrato = useServerFn(contratoAtualProfissional);
+  const assinarContrato = useServerFn(assinarContratoProfissional);
 
   const dados = useQuery({ queryKey: ["cadastro-profissional"], queryFn: () => carregar() });
   const vinculo = useQuery({
     queryKey: ["vinculo-mercadopago"],
     queryFn: () => statusVinculo(),
   });
+  const contrato = useQuery({ queryKey: ["contrato-profissional"], queryFn: () => carregarContrato() });
 
 
   const [form, setForm] = useState({
@@ -101,6 +106,7 @@ function CadastroProfissional() {
   const [enviandoDoc, setEnviandoDoc] = useState(false);
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [cadastroFinalizado, setCadastroFinalizado] = useState(false);
+  const [confirmouContrato, setConfirmouContrato] = useState(false);
 
   useEffect(() => {
     const p = dados.data?.profissional;
@@ -290,9 +296,7 @@ function CadastroProfissional() {
                   ? "Perfil suspenso temporariamente. Fale com a equipe da plataforma."
                   : "Recebemos seu cadastro. Ele está aguardando a validação da equipe e o perfil ainda não aparece publicamente."}
           </p>
-          {dados.data.profissional.status === "aprovado" && (
-            <p className="mt-2 text-sm text-muted-foreground">O contrato para assinatura online será disponibilizado aqui após a conclusão do texto definitivo.</p>
-          )}
+           {dados.data.profissional.status === "aprovado" && <p className="mt-2 text-sm text-muted-foreground">Cadastro aprovado e contrato vigente aceito.</p>}
           {dados.data.profissional.observacao_admin && (
             <p className="mt-2 text-sm text-muted-foreground">
               Observação da equipe: {dados.data.profissional.observacao_admin}
@@ -495,6 +499,67 @@ function CadastroProfissional() {
           {temCadastro ? "Salvar atualizações" : "Finalizar cadastro inicial"}
         </button>
       </form>}
+
+      {temCadastro && (
+        <section className="mt-12" aria-labelledby="contrato-profissional-titulo">
+          <h2 id="contrato-profissional-titulo" className="text-2xl">Contrato profissional</h2>
+          {!contrato.data?.disponivel && (
+            <div className="card-soft mt-5 p-7">
+              <p className="font-semibold">
+                {contrato.data?.motivo === "cadastro_em_analise" ? "Seu cadastro ainda está em conferência." : "O contrato definitivo ainda não está disponível."}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">Quando a conferência terminar e o PDF for ativado, ele aparecerá aqui para leitura e assinatura.</p>
+            </div>
+          )}
+          {contrato.data?.disponivel && contrato.data.aceite && (
+            <div className="card-soft mt-5 p-7">
+              <p className="font-semibold">Contrato {contrato.data.versao.versao} assinado eletronicamente.</p>
+              <p className="mt-2 text-sm text-muted-foreground">Aceite registrado em {new Date(contrato.data.aceite.aceito_em).toLocaleString("pt-BR")}.</p>
+              {contrato.data.versao.url && <a className="btn-base btn-ghost mt-4" href={contrato.data.versao.url} target="_blank" rel="noreferrer">Abrir contrato aceito</a>}
+            </div>
+          )}
+          {contrato.data?.disponivel && !contrato.data.aceite && (
+            <div className="card-soft mt-5 p-7">
+              <h3 className="text-lg">{contrato.data.versao.titulo}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">Versão {contrato.data.versao.versao}</p>
+              {contrato.data.versao.url ? (
+                <a className="btn-base btn-ghost mt-4" href={contrato.data.versao.url} target="_blank" rel="noreferrer">Ler o contrato em PDF</a>
+              ) : <p className="mt-3 text-sm text-destructive">O arquivo não pôde ser aberto. Tente novamente mais tarde.</p>}
+              {contrato.data.versao.modo_assinatura === "provedor" ? (
+                <p className="mt-5 text-sm text-muted-foreground">A assinatura será concluída pelo provedor {contrato.data.versao.provedor}.</p>
+              ) : (
+                <form className="mt-6 space-y-4" onSubmit={async (event) => {
+                  event.preventDefault();
+                  setErro(null);
+                  const contratoDisponivel = contrato.data;
+                  if (!contratoDisponivel?.disponivel) return;
+                  const resultado = await assinarContrato({ data: {
+                    nome_assinatura: contratoDisponivel.identidade.nome,
+                    documento: contratoDisponivel.identidade.cpf,
+                    versao_id: contratoDisponivel.versao.id,
+                    confirmou: confirmouContrato,
+                  } });
+                  if (!resultado.ok) return setErro(resultado.erro);
+                  setAviso("Aceite eletrônico registrado com sucesso.");
+                  setConfirmouContrato(false);
+                  await queryClient.invalidateQueries({ queryKey: ["contrato-profissional"] });
+                }}>
+                  <dl className="grid gap-3 rounded-lg border border-border bg-background p-4 text-sm sm:grid-cols-2">
+                    <div><dt className="text-muted-foreground">Nome</dt><dd className="font-semibold">{contrato.data.identidade.nome}</dd></div>
+                    <div><dt className="text-muted-foreground">CRP</dt><dd className="font-semibold">{contrato.data.identidade.crp} · {contrato.data.identidade.uf}</dd></div>
+                  </dl>
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{contrato.data.textoAceite}</p>
+                  <label className="flex items-start gap-3 text-sm">
+                    <input className="mt-1" type="checkbox" checked={confirmouContrato} onChange={(event) => setConfirmouContrato(event.target.checked)} />
+                    <span>Li o contrato em PDF e aceito integralmente seus termos. Confirmo que os dados acima me identificam.</span>
+                  </label>
+                  <button type="submit" disabled={!confirmouContrato || !contrato.data.versao.url} className="btn-base btn-primary disabled:opacity-50">Aceitar e assinar eletronicamente</button>
+                </form>
+              )}
+            </div>
+          )}
+        </section>
+      )}
 
       <section className="mt-12">
         <h2 className="text-2xl">Receber direto na sua conta Mercado Pago</h2>

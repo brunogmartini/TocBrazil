@@ -44,3 +44,11 @@
 - [x] Remover endereço do rodapé e corrigir sobreposição da faixa de urgência
 - [x] Atualizar cálculos e textos afetados pela nova composição do preço
 - [ ] Validar desktop, 375 px, documentos privados e cálculo financeiro
+
+## Aceite eletrônico do contrato — 28/09/2026
+- [x] Criar versões privadas de PDF e registros imutáveis de aceite
+- [x] Registrar identidade, CRP, data/hora, IP, localização aproximada e identificador protegido do dispositivo
+- [x] Preparar os modos de assinatura interna e por provedor externo
+- [x] Separar conferência cadastral de publicação e exigir contrato ativo aceito
+- [ ] Anexar e ativar o PDF definitivo fornecido pela responsável
+- [ ] Conectar o provedor externo escolhido e validar seu comprovante de integridade

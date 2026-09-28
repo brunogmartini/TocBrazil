@@ -120,6 +120,20 @@
       "when": 1790603588896,
       "tag": "0016_campos_cadastro_profissional_cnpj_preco_liquido_seguro",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790611446186,
+      "tag": "0017_prepare_electronic_contract_acceptance",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1790611467023,
+      "tag": "0018_secure_professional_contract_files",
+      "breakpoints": true
     }
   ]
 }

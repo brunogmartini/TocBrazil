@@ -1,4 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
+import { createHash, randomUUID } from "crypto";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { primeiraDeteccaoPerfil, ROTULO_ANTICONTATO } from "@/lib/anticontato";
 import {
@@ -8,6 +10,9 @@ import {
   type FormacaoPublica,
 } from "@/lib/perfil-profissional";
 import { precoPublicoCentavos } from "@/lib/precos";
+
+export const TEXTO_ACEITE_ELETRONICO =
+  "Assinatura eletrônica: ao aceitar, ficam registrados nome completo, CPF, número de inscrição no CRP,\n\ndata, hora, endereço IP, geolocalização aproximada e identificador do dispositivo. É dispensada a\n\nassinatura de testemunhas quando a integridade do documento for conferida por provedor de assinatura\n\n(art. 784, § 4º, do Código de Processo Civil).";
 
 function slugificar(nome: string) {
   return nome
@@ -104,7 +109,7 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
           .order("inicio"),
         supabase
           .from("contratos_profissionais")
-          .select("id, versao, nome_assinatura, aceito_em")
+          .select("id, versao, nome_assinatura, aceito_em, modo_assinatura, status_assinatura")
           .eq("professional_id", profissional.id)
           .order("aceito_em", { ascending: false })
           .limit(1)
@@ -366,17 +371,125 @@ export const registrarDocumento = createServerFn({ method: "POST" })
 
 export const assinarContratoProfissional = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { nome_assinatura: string; documento: string }) => {
+  .inputValidator((data: { nome_assinatura: string; documento: string; versao_id: string; confirmou: boolean }) => {
     const nome = String(data.nome_assinatura ?? "").trim().slice(0, 120);
     if (nome.split(/\s+/).filter(Boolean).length < 2) {
       throw new Error("Digite seu nome completo para assinar.");
     }
     const documento = String(data.documento ?? "").replace(/\D/g, "").slice(0, 20);
     if (documento.length < 11) throw new Error("Informe um CPF válido (11 dígitos).");
-    return { nome_assinatura: nome, documento };
+    const versaoId = String(data.versao_id ?? "");
+    if (!versaoId) throw new Error("Contrato inválido.");
+    if (data.confirmou !== true) throw new Error("Confirme o aceite eletrônico para continuar.");
+    return { nome_assinatura: nome, documento, versao_id: versaoId };
   })
-  .handler(async () => {
-    return { ok: false as const, erro: "O aceite contratual será habilitado em uma etapa futura." };
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const [{ data: profissional }, { data: versao }] = await Promise.all([
+      supabase
+        .from("professionals")
+        .select("id, nome, cpf, registro, uf, cadastro_conferido_em")
+        .eq("user_id", userId)
+        .maybeSingle(),
+      supabase
+        .from("contrato_versoes")
+        .select("id, versao, arquivo_sha256, modo_assinatura, provedor, ativo")
+        .eq("id", data.versao_id)
+        .eq("ativo", true)
+        .maybeSingle(),
+    ]);
+    if (!profissional?.cadastro_conferido_em) {
+      return { ok: false as const, erro: "Seu cadastro ainda precisa ser conferido pela equipe." };
+    }
+    if (!versao) return { ok: false as const, erro: "Este contrato não está disponível para assinatura." };
+    if (versao.modo_assinatura !== "interno") {
+      return { ok: false as const, erro: "Esta versão deve ser assinada pelo provedor indicado." };
+    }
+    const cpfCadastro = String(profissional.cpf ?? "").replace(/\D/g, "");
+    if (data.nome_assinatura.toLocaleLowerCase("pt-BR") !== profissional.nome.trim().toLocaleLowerCase("pt-BR") || data.documento !== cpfCadastro) {
+      return { ok: false as const, erro: "O nome e o CPF devem ser iguais aos dados conferidos no cadastro." };
+    }
+
+    const request = getRequest();
+    const ip = request?.headers.get("cf-connecting-ip")
+      ?? request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      ?? "não disponível";
+    const userAgent = request?.headers.get("user-agent")?.slice(0, 500) ?? null;
+    const geolocalizacao = {
+      cidade: request?.headers.get("cf-ipcity") ?? null,
+      regiao: request?.headers.get("cf-region") ?? null,
+      pais: request?.headers.get("cf-ipcountry") ?? null,
+    };
+    const identificadorDispositivo = createHash("sha256")
+      .update(`${userId}|${versao.id}|${userAgent ?? ""}|${randomUUID()}`)
+      .digest("hex");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: existente } = await supabaseAdmin
+      .from("contratos_profissionais")
+      .select("id")
+      .eq("professional_id", profissional.id)
+      .eq("versao", versao.versao)
+      .maybeSingle();
+    if (existente) return { ok: false as const, erro: "Esta versão do contrato já foi aceita." };
+
+    const { error } = await supabaseAdmin.from("contratos_profissionais").insert({
+      professional_id: profissional.id,
+      contrato_versao_id: versao.id,
+      versao: versao.versao,
+      arquivo_sha256: versao.arquivo_sha256,
+      nome_assinatura: profissional.nome,
+      documento: cpfCadastro,
+      crp: profissional.registro,
+      crp_uf: profissional.uf,
+      aceite_ip: ip,
+      user_agent: userAgent,
+      geolocalizacao_aproximada: geolocalizacao,
+      identificador_dispositivo: identificadorDispositivo,
+      modo_assinatura: "interno",
+      texto_aceite: TEXTO_ACEITE_ELETRONICO,
+      status_assinatura: "aceita",
+    });
+    if (error) return { ok: false as const, erro: "Não foi possível registrar o aceite agora." };
+    return { ok: true as const };
+  });
+
+export const contratoAtualProfissional = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: profissional } = await supabase
+      .from("professionals")
+      .select("id, nome, cpf, registro, uf, cadastro_conferido_em")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!profissional?.cadastro_conferido_em) return { disponivel: false as const, motivo: "cadastro_em_analise" as const };
+    const { data: versao } = await supabase
+      .from("contrato_versoes")
+      .select("id, versao, titulo, caminho, arquivo_sha256, modo_assinatura, provedor")
+      .eq("ativo", true)
+      .maybeSingle();
+    if (!versao) return { disponivel: false as const, motivo: "aguardando_pdf" as const };
+    const { data: aceite } = await supabase
+      .from("contratos_profissionais")
+      .select("id, aceito_em, status_assinatura, modo_assinatura")
+      .eq("professional_id", profissional.id)
+      .eq("versao", versao.versao)
+      .maybeSingle();
+    const { data: arquivo } = await supabase.storage
+      .from("contratos-profissionais")
+      .createSignedUrl(versao.caminho, 600);
+    return {
+      disponivel: true as const,
+      versao: { ...versao, url: arquivo?.signedUrl ?? null },
+      aceite: aceite ?? null,
+      identidade: {
+        nome: profissional.nome,
+        cpf: profissional.cpf ?? "",
+        crp: profissional.registro,
+        uf: profissional.uf,
+      },
+      textoAceite: TEXTO_ACEITE_ELETRONICO,
+    };
   });
 
 

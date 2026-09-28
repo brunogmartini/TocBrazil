@@ -470,15 +470,66 @@ export type Database = {
           },
         ]
       }
+      contrato_versoes: {
+        Row: {
+          arquivo_sha256: string
+          ativo: boolean
+          caminho: string
+          created_at: string
+          id: string
+          modo_assinatura: string
+          provedor: string | null
+          publicado_em: string
+          titulo: string
+          versao: string
+        }
+        Insert: {
+          arquivo_sha256: string
+          ativo?: boolean
+          caminho: string
+          created_at?: string
+          id?: string
+          modo_assinatura?: string
+          provedor?: string | null
+          publicado_em?: string
+          titulo: string
+          versao: string
+        }
+        Update: {
+          arquivo_sha256?: string
+          ativo?: boolean
+          caminho?: string
+          created_at?: string
+          id?: string
+          modo_assinatura?: string
+          provedor?: string | null
+          publicado_em?: string
+          titulo?: string
+          versao?: string
+        }
+        Relationships: []
+      }
       contratos_profissionais: {
         Row: {
           aceite_ip: string | null
           aceito_em: string
+          arquivo_sha256: string | null
+          contrato_versao_id: string | null
           created_at: string
+          crp: string | null
+          crp_uf: string | null
           documento: string
+          geolocalizacao_aproximada: Json | null
           id: string
+          identificador_dispositivo: string | null
+          modo_assinatura: string
           nome_assinatura: string
           professional_id: string
+          provedor: string | null
+          provedor_evidencia: Json | null
+          provedor_referencia: string | null
+          status_assinatura: string
+          texto_aceite: string | null
           updated_at: string
           user_agent: string | null
           versao: string
@@ -486,11 +537,23 @@ export type Database = {
         Insert: {
           aceite_ip?: string | null
           aceito_em?: string
+          arquivo_sha256?: string | null
+          contrato_versao_id?: string | null
           created_at?: string
+          crp?: string | null
+          crp_uf?: string | null
           documento: string
+          geolocalizacao_aproximada?: Json | null
           id?: string
+          identificador_dispositivo?: string | null
+          modo_assinatura?: string
           nome_assinatura: string
           professional_id: string
+          provedor?: string | null
+          provedor_evidencia?: Json | null
+          provedor_referencia?: string | null
+          status_assinatura?: string
+          texto_aceite?: string | null
           updated_at?: string
           user_agent?: string | null
           versao: string
@@ -498,16 +561,35 @@ export type Database = {
         Update: {
           aceite_ip?: string | null
           aceito_em?: string
+          arquivo_sha256?: string | null
+          contrato_versao_id?: string | null
           created_at?: string
+          crp?: string | null
+          crp_uf?: string | null
           documento?: string
+          geolocalizacao_aproximada?: Json | null
           id?: string
+          identificador_dispositivo?: string | null
+          modo_assinatura?: string
           nome_assinatura?: string
           professional_id?: string
+          provedor?: string | null
+          provedor_evidencia?: Json | null
+          provedor_referencia?: string | null
+          status_assinatura?: string
+          texto_aceite?: string | null
           updated_at?: string
           user_agent?: string | null
           versao?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "contratos_profissionais_contrato_versao_id_fkey"
+            columns: ["contrato_versao_id"]
+            isOneToOne: false
+            referencedRelation: "contrato_versoes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "contratos_profissionais_professional_id_fkey"
             columns: ["professional_id"]
@@ -1131,6 +1213,8 @@ export type Database = {
           apresentacao: string | null
           areas: string[]
           biografia_publica: string | null
+          cadastro_conferido_em: string | null
+          cadastro_conferido_por: string | null
           certidao_conselho_url: string | null
           certidao_validade: string | null
           cidade: string | null
@@ -1195,6 +1279,8 @@ export type Database = {
           apresentacao?: string | null
           areas?: string[]
           biografia_publica?: string | null
+          cadastro_conferido_em?: string | null
+          cadastro_conferido_por?: string | null
           certidao_conselho_url?: string | null
           certidao_validade?: string | null
           cidade?: string | null
@@ -1259,6 +1345,8 @@ export type Database = {
           apresentacao?: string | null
           areas?: string[]
           biografia_publica?: string | null
+          cadastro_conferido_em?: string | null
+          cadastro_conferido_por?: string | null
           certidao_conselho_url?: string | null
           certidao_validade?: string | null
           cidade?: string | null
@@ -1494,6 +1582,10 @@ export type Database = {
         }[]
       }
       perfil_pronto_para_publicar: {
+        Args: { _professional_id: string }
+        Returns: boolean
+      }
+      professional_tem_contrato_ativo_aceito: {
         Args: { _professional_id: string }
         Returns: boolean
       }

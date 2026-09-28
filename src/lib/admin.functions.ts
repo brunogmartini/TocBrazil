@@ -87,6 +87,9 @@ export type ProfissionalAdmin = {
   formacoes_publicas: Array<{ instituicao: string; curso: string; ano: number }>;
   observacao_admin: string | null;
   validado_em: string | null;
+  cadastro_conferido_em: string | null;
+  contrato_aceito_em: string | null;
+  contrato_versao: string | null;
   ferramenta_provedor: string | null;
   ferramenta_url_sala: string | null;
   certidao_validade: string | null;
@@ -243,7 +246,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
       }));
 
     const idsProfissionais = (profissionais ?? []).map((p) => p.id);
-    const [{ data: documentos }, { data: historico }] = idsProfissionais.length
+    const [{ data: documentos }, { data: historico }, { data: contratos }] = idsProfissionais.length
       ? await Promise.all([
           supabaseAdmin
             .from("professional_documents")
@@ -255,8 +258,14 @@ export const painelAdmin = createServerFn({ method: "GET" })
             .select("id, professional_id, status_anterior, status_novo, requer_correcao, observacao, created_at")
             .in("professional_id", idsProfissionais)
             .order("created_at", { ascending: false }),
+          supabaseAdmin
+            .from("contratos_profissionais")
+            .select("professional_id, versao, aceito_em, status_assinatura")
+            .in("professional_id", idsProfissionais)
+            .eq("status_assinatura", "aceita")
+            .order("aceito_em", { ascending: false }),
         ])
-      : [{ data: [] }, { data: [] }];
+      : [{ data: [] }, { data: [] }, { data: [] }];
 
     const docsPorProfissional = new Map<string, ProfissionalAdmin["documentos"]>();
     for (const doc of documentos ?? []) {
@@ -281,11 +290,18 @@ export const painelAdmin = createServerFn({ method: "GET" })
       lista.push(h);
       histPorProfissional.set(h.professional_id, lista);
     }
+    const contratoPorProfissional = new Map<string, { versao: string; aceito_em: string }>();
+    for (const contrato of contratos ?? []) {
+      if (!contratoPorProfissional.has(contrato.professional_id)) {
+        contratoPorProfissional.set(contrato.professional_id, contrato);
+      }
+    }
 
     const listaProfissionais: ProfissionalAdmin[] = [];
     for (const p of profissionais ?? []) {
       const docs = docsPorProfissional.get(p.id) ?? [];
       const stats = consultasPorProfissional.get(p.id);
+      const contrato = contratoPorProfissional.get(p.id);
       let fotoUrl: string | null = null;
       if (p.foto_caminho) {
         const { data: foto } = await supabaseAdmin.storage.from("fotos-profissionais").createSignedUrl(p.foto_caminho, 600);
@@ -332,6 +348,9 @@ export const painelAdmin = createServerFn({ method: "GET" })
         formacoes_publicas: (p.formacoes_publicas ?? []) as Array<{ instituicao: string; curso: string; ano: number }>,
         observacao_admin: p.observacao_admin,
         validado_em: p.validado_em,
+        cadastro_conferido_em: p.cadastro_conferido_em,
+        contrato_aceito_em: contrato?.aceito_em ?? null,
+        contrato_versao: contrato?.versao ?? null,
         ferramenta_provedor: p.ferramenta_provedor,
         ferramenta_url_sala: p.ferramenta_url_sala,
         certidao_validade: p.certidao_validade,
@@ -469,6 +488,12 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
       if (!tiposAprovados.has("Carteirinha profissional do CRP") || !tiposAprovados.has("Diploma de graduação")) {
         return { ok: false as const, erro: "A carteirinha do CRP e o diploma precisam estar aprovados." };
       }
+      const { data: contratoAceito } = await supabaseAdmin.rpc("professional_tem_contrato_ativo_aceito", {
+        _professional_id: data.id,
+      });
+      if (!contratoAceito) {
+        return { ok: false as const, erro: "O profissional ainda não aceitou a versão ativa do contrato." };
+      }
     }
 
     const { error } = await supabaseAdmin
@@ -482,6 +507,41 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
       })
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível atualizar." };
+    return { ok: true as const };
+  });
+
+export const conferirCadastroProfissional = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { id: string; observacao?: string }) => ({
+    id: String(data.id),
+    observacao: String(data.observacao ?? "").trim().slice(0, 1000) || null,
+  }))
+  .handler(async ({ data, context }) => {
+    await garantirAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [{ data: prof }, { data: perfilPronto }, { data: documentos }] = await Promise.all([
+      supabaseAdmin.from("professionals").select("cnpj, ferramenta_url_sala, certidao_validade").eq("id", data.id).maybeSingle(),
+      supabaseAdmin.rpc("perfil_pronto_para_publicar", { _professional_id: data.id }),
+      supabaseAdmin.from("professional_documents").select("tipo, status").eq("professional_id", data.id).eq("status", "aprovado"),
+    ]);
+    const hoje = new Date().toISOString().slice(0, 10);
+    const tipos = new Set((documentos ?? []).map((doc) => doc.tipo));
+    if (!prof?.cnpj || prof.cnpj.length !== 14) return { ok: false as const, erro: "O CNPJ do profissional ainda não foi informado." };
+    if (!prof.ferramenta_url_sala) return { ok: false as const, erro: "A ferramenta de videochamada ainda não foi cadastrada." };
+    if (!perfilPronto) return { ok: false as const, erro: "O perfil público ainda está incompleto ou a foto não foi aprovada." };
+    if (prof.certidao_validade && prof.certidao_validade < hoje) return { ok: false as const, erro: "A certidão do conselho está vencida." };
+    if (!tipos.has("Carteirinha profissional do CRP") || !tipos.has("Diploma de graduação")) {
+      return { ok: false as const, erro: "A carteirinha do CRP e o diploma precisam estar aprovados." };
+    }
+    const { error } = await supabaseAdmin.from("professionals").update({
+      cadastro_conferido_em: new Date().toISOString(),
+      cadastro_conferido_por: context.userId,
+      observacao_admin: data.observacao,
+      status: "pendente",
+      validado_em: new Date().toISOString(),
+      validado_por: context.userId,
+    }).eq("id", data.id);
+    if (error) return { ok: false as const, erro: "Não foi possível concluir a conferência." };
     return { ok: true as const };
   });
 
