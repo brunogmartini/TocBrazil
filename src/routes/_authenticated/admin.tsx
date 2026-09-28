@@ -9,6 +9,7 @@ import {
   definirStatusFoto,
   definirStatusPagamento,
   definirStatusProfissional,
+  conferirCadastroProfissional,
   editarProfissionalAdmin,
   painelAdmin,
   relatorioMetadados,
@@ -71,6 +72,7 @@ function Admin() {
   const carregar = useServerFn(painelAdmin);
   const carregarRelatorio = useServerFn(relatorioMetadados);
   const mudarStatusProf = useServerFn(definirStatusProfissional);
+  const conferirCadastro = useServerFn(conferirCadastroProfissional);
   const mudarStatusDoc = useServerFn(definirStatusDocumento);
   const mudarStatusFoto = useServerFn(definirStatusFoto);
   const editarProf = useServerFn(editarProfissionalAdmin);
@@ -365,6 +367,8 @@ function Admin() {
                       <Info rotulo="Experiência com TOC" valor={p.temas_toc_publicos.join(", ")} />
                       <Info rotulo="Bloqueios antidesvio" valor={String(p.perfil_bloqueios_contato)} />
                       <Info rotulo="Última validação" valor={p.validado_em ? dataHoraBR(p.validado_em) : "—"} />
+                      <Info rotulo="Conferência cadastral" valor={p.cadastro_conferido_em ? dataHoraBR(p.cadastro_conferido_em) : "Pendente"} />
+                      <Info rotulo="Contrato" valor={p.contrato_aceito_em ? `${p.contrato_versao} · aceito em ${dataHoraBR(p.contrato_aceito_em)}` : "Aguardando aceite"} />
                     </dl>
 
                     <div className="rounded-lg border border-border p-4">
@@ -429,8 +433,13 @@ function Admin() {
                     </div>
 
                     <div className="flex flex-wrap gap-3">
+                      {!p.cadastro_conferido_em && <button type="button" className="btn-base btn-primary" onClick={async () => {
+                        const resultado = await conferirCadastro({ data: { id: p.id, observacao: observacao[p.id] ?? p.observacao_admin ?? "" } });
+                        setAviso(resultado.ok ? "Cadastro conferido. O contrato será liberado quando houver uma versão ativa." : resultado.erro);
+                        await atualizar();
+                      }}>Concluir conferência</button>}
                       <button type="button" className="btn-base btn-primary" onClick={() => aplicarStatus(p, "aprovado")}>
-                        Aprovar e publicar
+                        Publicar após assinatura
                       </button>
                       <button type="button" className="btn-base btn-ghost" onClick={() => aplicarStatus(p, "pendente", true)}>
                         Solicitar correção
