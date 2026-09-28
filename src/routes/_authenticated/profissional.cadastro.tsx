@@ -17,6 +17,7 @@ import {
 import { ProfessionalNav } from "@/components/professional-nav";
 import { exigirAreaProfissional } from "@/lib/role-access";
 import { moeda } from "@/lib/video-sala";
+import { TAXA_FIXA_CENTAVOS } from "@/lib/precos";
 import {
   ABORDAGENS_PERFIL,
   IDIOMAS_PERFIL,
@@ -47,14 +48,6 @@ export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
   component: CadastroProfissional,
 });
 
-const TIPOS_DOCUMENTO = [
-  "Documento de identidade",
-  "Certidão de regularidade do CRP",
-  "Apólice de seguro de responsabilidade civil profissional",
-  "Diploma de graduação",
-  "Certificado de formação",
-];
-
 const rotuloDoc: Record<string, string> = {
   enviado: "Em análise",
   aprovado: "Aprovado",
@@ -81,6 +74,7 @@ function CadastroProfissional() {
   const [form, setForm] = useState({
     nome: "",
     cpf: "",
+    cnpj: "",
     registro: "",
     uf: "",
     genero: "",
@@ -91,18 +85,19 @@ function CadastroProfissional() {
     foto_caminho: "",
     experiencia_anos: "0",
     slot_minutos: "50",
-    valor: "200",
+    valor_liquido: "200",
     areas: "",
     idiomas: [] as string[],
     certidao_validade: "",
     apolice_validade: "",
+    seguradora_nome: "",
+    apolice_numero: "",
     ferramenta_provedor: "",
     ferramenta_url_sala: "",
     ferramenta_instrucoes: "",
   });
   const [aviso, setAviso] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
-  const [tipoDoc, setTipoDoc] = useState(TIPOS_DOCUMENTO[0] ?? "Documento de identidade");
   const [enviandoDoc, setEnviandoDoc] = useState(false);
   const [enviandoFoto, setEnviandoFoto] = useState(false);
 
@@ -112,6 +107,7 @@ function CadastroProfissional() {
       setForm({
         nome: p.nome ?? "",
         cpf: p.cpf ?? "",
+        cnpj: p.cnpj ?? "",
         registro: p.registro ?? "",
         uf: p.uf ?? "",
         genero: p.genero ?? "",
@@ -124,11 +120,13 @@ function CadastroProfissional() {
         foto_caminho: p.foto_caminho ?? "",
         experiencia_anos: String(p.experiencia_anos ?? 0),
         slot_minutos: String(p.slot_minutos ?? 50),
-        valor: String(Math.round((p.valor_centavos ?? 20000) / 100)),
+        valor_liquido: String(Math.round((p.valor_liquido_centavos ?? Math.max((p.valor_centavos ?? 22700) - TAXA_FIXA_CENTAVOS, 0)) / 100)),
         areas: (p.areas ?? []).join(", "),
         idiomas: p.idiomas ?? [],
         certidao_validade: p.certidao_validade ?? "",
         apolice_validade: p.apolice_validade ?? "",
+        seguradora_nome: p.seguradora_nome ?? "",
+        apolice_numero: p.apolice_numero ?? "",
         ferramenta_provedor: p.ferramenta_provedor ?? "",
         ferramenta_url_sala: p.ferramenta_url_sala ?? "",
         ferramenta_instrucoes: p.ferramenta_instrucoes ?? "",
@@ -151,28 +149,28 @@ function CadastroProfissional() {
     setErro(null);
     setAviso(null);
     try {
-      const { valor, ...restoForm } = form;
+      const { valor_liquido, ...restoForm } = form;
       const r = await salvar({
         data: {
           ...restoForm,
           profissao: "psicologo",
           experiencia_anos: Number(form.experiencia_anos) || 0,
           slot_minutos: Number(form.slot_minutos) || 50,
-          valor_centavos: Math.round((Number(valor) || 0) * 100),
+          valor_liquido_centavos: Math.round((Number(valor_liquido) || 0) * 100),
         },
       });
       if (!r.ok) {
         setErro(r.erro);
         return;
       }
-      setAviso("Cadastro salvo.");
+      setAviso("Recebemos seu cadastro. Ele está aguardando a validação da equipe e o perfil ainda não aparece publicamente.");
       await queryClient.invalidateQueries();
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Não foi possível salvar agora.");
     }
   }
 
-  async function enviarArquivo(file: File) {
+  async function enviarArquivo(file: File, tipo: string) {
     setErro(null);
     setEnviandoDoc(true);
     try {
@@ -186,7 +184,7 @@ function CadastroProfissional() {
         .upload(caminho, file, { upsert: false });
       if (erroUpload) throw new Error("Não foi possível enviar o arquivo.");
       const r = await registrar({
-        data: { tipo: tipoDoc, nome_arquivo: file.name, caminho },
+        data: { tipo, nome_arquivo: file.name, caminho },
       });
       if (!r.ok) throw new Error(r.erro);
       setAviso("Documento enviado para análise.");
