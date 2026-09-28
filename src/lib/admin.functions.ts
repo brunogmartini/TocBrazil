@@ -690,7 +690,7 @@ export const editarProfissionalAdmin = createServerFn({ method: "POST" })
       action: "profile_data_changed",
       entity: "professional",
       entityId: id,
-      metadata: { fields: [...Object.keys(resto), ...(nome ? ["nome"] : []), ...(voltarParaAnalise ? ["status"] : []) },
+      metadata: { fields: [...Object.keys(resto), ...(nome ? ["nome"] : []), ...(voltarParaAnalise ? ["status"] : [])] },
     });
     return { ok: true as const };
   });
@@ -715,8 +715,6 @@ export const definirStatusPagamento = createServerFn({ method: "POST" })
       )
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível atualizar." };
-    const { writeAuditEvent } = await import("@/lib/audit.server");
-    await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "appointment_status_changed", entity: "appointment", entityId: data.id, metadata: { status: data.status } });
     return { ok: true as const };
   });
 
@@ -740,6 +738,8 @@ export const definirStatusConsultaAdmin = createServerFn({ method: "POST" })
       .update({ status: data.status, ...extra })
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível atualizar." };
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "appointment_status_changed", entity: "appointment", entityId: data.id, metadata: { status: data.status } });
     return { ok: true as const };
   });
 
