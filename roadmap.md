@@ -33,7 +33,7 @@
 - [x] Substituir as páginas resumidas por textos baseados nos anexos, em versão provisória sem promessas não verificadas
 - [ ] Liberar os textos definitivos integrais somente após testar pagamentos, consentimento, direitos, cookies e prazos declarados
 - [ ] Corrigir afirmações e documentos na página profissional e base legal na privacidade (texto do consentimento destacado aguarda fluxo separado verificável; demais correções feitas)
-- [ ] Aplicar e verificar cabeçalhos de segurança e investigar cookie de sessão (proteção contra iframe ativa; CSP ampla em relatório até ajustar scripts inline; cookie session-id não é emitido pelo app)
+- [x] Aplicar e verificar cabeçalhos de segurança e investigar cookie de sessão (proteção contra iframe ativa; CSP ampla em relatório até ajustar scripts inline; cookie session-id não é emitido pelo app)
 - [x] Exibir aviso informativo de cookies essenciais
 
 ## Ajustes no cadastro de psicólogos — 28/09/2026
@@ -58,6 +58,6 @@
 - [x] Restringir documentos de credenciamento e emitir URL assinada de 60 segundos sob demanda
 - [x] Criar log de auditoria imutável e conectar eventos operacionais exigidos
 - [x] Elevar senha para 10 caracteres e ampliar bloqueio temporário a todos os logins por senha
-- [ ] Adicionar TOTP opcional na área do psicólogo
-- [ ] Validar cabeçalhos, cookies, bundle, desktop e 375 px; emitir relatório final
+- [x] Adicionar TOTP opcional na área do psicólogo
+- [x] Validar cabeçalhos, cookies, bundle, desktop e 375 px; emitir relatório final
 - [ ] Separar banco de prévia e produção (depende de infraestrutura externa)

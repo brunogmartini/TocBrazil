@@ -158,6 +158,10 @@ function Auth() {
       }
       if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
         if (modo === "nova-senha" || window.location.hash.includes("type=recovery")) return;
+        if (event === "SIGNED_IN") {
+          const papel = areaPretendida === "gestor" ? "admin" : areaPretendida;
+          void registrarAuth({ data: { evento: "login", papel } });
+        }
         void encaminhar(session);
       }
     });
@@ -239,10 +243,7 @@ function Auth() {
           password: senha,
         });
         if (error) throw error;
-        if (login.session) {
-          const papel = areaPretendida === "gestor" ? "admin" : areaPretendida;
-          await registrarAuth({ data: { evento: "login", papel } });
-        }
+        if (!login.session) throw new Error("Não foi possível iniciar a sessão.");
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Não foi possível continuar.";
