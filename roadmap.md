@@ -35,3 +35,12 @@
 - [ ] Corrigir afirmações e documentos na página profissional e base legal na privacidade (texto do consentimento destacado aguarda fluxo separado verificável; demais correções feitas)
 - [ ] Aplicar e verificar cabeçalhos de segurança e investigar cookie de sessão (proteção contra iframe ativa; CSP ampla em relatório até ajustar scripts inline; cookie session-id não é emitido pelo app)
 - [x] Exibir aviso informativo de cookies essenciais
+
+## Ajustes no cadastro de psicólogos — 28/09/2026
+- [ ] Simplificar a apresentação pública e remover taxa/documentos da primeira etapa
+- [ ] Exigir CNPJ e salvar valor líquido com preço público acrescido de R$ 27
+- [ ] Posicionar uploads de CRP, formação e seguro opcional junto aos respectivos campos
+- [ ] Encerrar o cadastro inicial com a situação de análise e manter contrato aguardando texto final
+- [ ] Remover endereço do rodapé e corrigir sobreposição da faixa de urgência
+- [ ] Atualizar cálculos e textos afetados pela nova composição do preço
+- [ ] Validar desktop, 375 px, documentos privados e cálculo financeiro
