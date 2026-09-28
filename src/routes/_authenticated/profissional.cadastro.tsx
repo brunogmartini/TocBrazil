@@ -326,6 +326,7 @@ function CadastroProfissional() {
           onChange={(v) => setForm({ ...form, cpf: v.replace(/\D/g, "").slice(0, 11) })}
           required
         />
+        {temCadastro && <div className="sm:col-span-2"><DocumentoCampo tipo="Documento de identidade" titulo="Documento de identidade com foto" /></div>}
         <Campo
           label="CNPJ"
           value={form.cnpj}
@@ -447,6 +448,7 @@ function CadastroProfissional() {
           value={form.certidao_validade}
           onChange={(v) => setForm({ ...form, certidao_validade: v })}
         />
+        <div><DocumentoCampo tipo="Certidão de regularidade do CRP" titulo="Certidão de regularidade do CRP" /></div>
         <fieldset className="sm:col-span-2 rounded-lg border border-border p-4">
           <legend className="section-label px-1">Seguro de responsabilidade civil (opcional)</legend>
           <div className="mt-3 grid gap-5 sm:grid-cols-3">
@@ -488,7 +490,7 @@ function CadastroProfissional() {
             </div>
           </div>
         </fieldset>
-        </>
+        </>}
         <button type="submit" className="btn-base btn-primary sm:col-span-2">
           {temCadastro ? "Salvar atualizações" : "Finalizar cadastro inicial"}
         </button>

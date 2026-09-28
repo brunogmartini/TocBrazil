@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import { areaDosPapeis, type Papel } from "@/lib/areas";
 import { institucional } from "@/config/institucional";
+import { TAXA_FIXA_CENTAVOS } from "@/lib/precos";
 
 export type ProfissionalPublico = {
   id: string;
@@ -154,7 +155,7 @@ export function mapearConfiguracoes(rows: { chave: string; valor: unknown }[] | 
   const mapa: Record<string, unknown> = {};
   for (const row of rows ?? []) mapa[row.chave] = row.valor;
   const cfg: ConfiguracoesPlataforma = {
-    taxaPorConsultaCentavos: Number(mapa["taxa_por_consulta_centavos"] ?? 2900),
+    taxaPorConsultaCentavos: Number(mapa["taxa_por_consulta_centavos"] ?? TAXA_FIXA_CENTAVOS),
     janelaCancelamentoHoras: Number(mapa["janela_cancelamento_horas"] ?? 24),
     antecedenciaLinkMinutos: Number(mapa["antecedencia_link_minutos"] ?? 15),
     janelaConfirmacaoHoras: Number(mapa["janela_confirmacao_horas"] ?? 24),

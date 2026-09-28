@@ -62,7 +62,7 @@ const perguntas = [
   },
   {
     q: "Como funciona o pagamento da consulta?",
-    a: "O paciente paga exatamente o valor definido pelo psicólogo. A taxa da plataforma é fixa em reais por consulta realizada e é paga pelo profissional.",
+    a: "O psicólogo informa quanto deseja receber. O preço mostrado ao paciente inclui esse valor líquido e a taxa fixa da plataforma.",
   },
   {
     q: "Posso remarcar ou cancelar?",

@@ -8,6 +8,7 @@ import { EtapasCadastro, ProfessionalNav } from "@/components/professional-nav";
 import { chaveDia, hoje, horaDe, rotuloDiaLongo } from "@/lib/agenda-tempo";
 import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 import { exigirAreaProfissional } from "@/lib/role-access";
+import { TAXA_FIXA_CENTAVOS } from "@/lib/precos";
 
 export const Route = createFileRoute("/_authenticated/profissional/")({
   beforeLoad: () => exigirAreaProfissional(),
@@ -98,7 +99,7 @@ function PainelProfissional() {
                 {etapa.titulo}
               </span>
               <span>
-                consultas de {prof.slot_minutos} min · {moeda(Math.max((prof.valor_centavos ?? 0) - 2700, 0))} líquidos por consulta
+                consultas de {prof.slot_minutos} min · {moeda(Math.max((prof.valor_centavos ?? 0) - TAXA_FIXA_CENTAVOS, 0))} líquidos por consulta
               </span>
             </p>
           </div>
