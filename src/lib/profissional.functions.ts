@@ -269,6 +269,15 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       .single();
     if (error) return { ok: false as const, erro: "Não foi possível criar seu cadastro agora." };
 
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({
+      actorId: userId,
+      actorRole: "profissional",
+      action: "profile_data_changed",
+      entity: "professional",
+      entityId: criado.id,
+      metadata: { fields: Object.keys(data), created: true },
+    });
     return { ok: true as const, id: criado.id, slug: criado.slug };
   });
 
