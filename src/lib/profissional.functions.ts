@@ -249,6 +249,8 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     if (existente) {
       const { error } = await supabase.from("professionals").update(data).eq("id", existente.id);
       if (error) return { ok: false as const, erro: "Não foi possível salvar seus dados agora." };
+      const { writeAuditEvent } = await import("@/lib/audit.server");
+      await writeAuditEvent({ actorId: userId, actorRole: "profissional", action: "profile_data_changed", entity: "professional", entityId: existente.id, metadata: { fields: Object.keys(data) } });
       return { ok: true as const, id: existente.id, slug: existente.slug };
     }
 
@@ -267,6 +269,15 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       .single();
     if (error) return { ok: false as const, erro: "Não foi possível criar seu cadastro agora." };
 
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({
+      actorId: userId,
+      actorRole: "profissional",
+      action: "profile_data_changed",
+      entity: "professional",
+      entityId: criado.id,
+      metadata: { fields: Object.keys(data), created: true },
+    });
     return { ok: true as const, id: criado.id, slug: criado.slug };
   });
 
@@ -721,6 +732,8 @@ export const marcarConsultaRealizada = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .eq("professional_id", prof.id);
     if (error) return { ok: false as const, erro: "Não foi possível atualizar a consulta." };
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({ actorId: context.userId, actorRole: "profissional", action: "appointment_status_changed", entity: "appointment", entityId: data.id, metadata: { status: data.status } });
     const { registrarEvento } = await import("@/lib/plataforma.functions");
     await registrarEvento({
       tipo: data.status === "cancelada" ? "cancelamento_profissional" : `status_${data.status}`,

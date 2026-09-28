@@ -2,10 +2,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { createHash } from "crypto";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const tentativaSchema = z.object({ email: z.string().trim().email().max(255) });
 
-export const autorizarTentativaGestor = createServerFn({ method: "POST" })
+export const autorizarTentativaLogin = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => tentativaSchema.parse(data))
   .handler(async ({ data }) => {
     const request = getRequest();
@@ -24,5 +25,21 @@ export const autorizarTentativaGestor = createServerFn({ method: "POST" })
       return { ok: false as const, erro: "Muitas tentativas. Aguarde 15 minutos para tentar novamente." };
     }
     await supabaseAdmin.from("tentativas_login_gestor").insert({ identificador_hash: identificadorHash });
+    return { ok: true as const };
+  });
+
+export const registrarEventoAutenticacao = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { evento: "login" | "logout"; papel: "paciente" | "profissional" | "admin" }) => ({
+    evento: data.evento,
+    papel: data.papel,
+  }))
+  .handler(async ({ data, context }) => {
+    const { data: papeis } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId);
+    const papeisPermitidos = new Set((papeis ?? []).map((item) => item.role as string));
+    const papel = data.papel === "admin" ? "admin" : data.papel;
+    if (!papeisPermitidos.has(papel)) return { ok: false as const };
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({ actorId: context.userId, actorRole: papel, action: data.evento, entity: "auth_session", entityId: context.userId });
     return { ok: true as const };
   });

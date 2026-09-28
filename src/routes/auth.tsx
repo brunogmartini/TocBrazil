@@ -6,7 +6,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { areaDoCaminho, destinoDaArea, INICIO_DA_AREA, ROTULO_DA_AREA, type Area } from "@/lib/areas";
 import { guardarPerfilPretendido, minhaArea } from "@/lib/role-access";
 import { useServerFn } from "@tanstack/react-start";
-import { autorizarTentativaGestor } from "@/lib/auth.functions";
+import { autorizarTentativaLogin, registrarEventoAutenticacao } from "@/lib/auth.functions";
 
 type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
 type MfaPendente = { factorId: string; qrCode?: string; secret?: string };
@@ -62,7 +62,8 @@ function Auth() {
   const [conflito, setConflito] = useState<{ area: Area; email: string | null } | null>(null);
   const [mfa, setMfa] = useState<MfaPendente | null>(null);
   const [codigoMfa, setCodigoMfa] = useState("");
-  const autorizarGestor = useServerFn(autorizarTentativaGestor);
+  const autorizarLogin = useServerFn(autorizarTentativaLogin);
+  const registrarAuth = useServerFn(registrarEventoAutenticacao);
 
   const profissional = search.perfil === "profissional";
   const gestor = search.perfil === "gestor";
@@ -170,6 +171,9 @@ function Auth() {
   async function sairDaContaAtual() {
     setCarregando(true);
     try {
+      if (conflito) {
+        await registrarAuth({ data: { evento: "logout", papel: conflito.area === "gestor" ? "admin" : conflito.area } });
+      }
       await supabase.auth.signOut();
       setConflito(null);
       setAviso(null);
@@ -192,8 +196,8 @@ function Auth() {
         setAviso("Se este e-mail tiver conta, você receberá um link para criar uma nova senha.");
         return;
       }
-      if (senha.length < 8) {
-        setErro("A senha precisa ter pelo menos 8 caracteres.");
+      if (senha.length < 10) {
+        setErro("A senha precisa ter pelo menos 10 caracteres.");
         return;
       }
       if (modo === "nova-senha") {
@@ -225,18 +229,20 @@ function Auth() {
           return;
         }
       } else {
-        if (gestor) {
-          const limite = await autorizarGestor({ data: { email: email.trim() } });
-          if (!limite.ok) {
-            setErro(limite.erro);
-            return;
-          }
+        const limite = await autorizarLogin({ data: { email: email.trim() } });
+        if (!limite.ok) {
+          setErro(limite.erro);
+          return;
         }
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data: login, error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password: senha,
         });
         if (error) throw error;
+        if (login.session) {
+          const papel = areaPretendida === "gestor" ? "admin" : areaPretendida;
+          await registrarAuth({ data: { evento: "login", papel } });
+        }
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Não foi possível continuar.";
@@ -337,7 +343,7 @@ function Auth() {
           {modo === "recuperar"
             ? "Informe o e-mail da sua conta. Enviaremos um link para você criar uma nova senha."
             : modo === "nova-senha"
-              ? "Escolha uma senha nova com pelo menos 8 caracteres."
+              ? "Escolha uma senha nova com pelo menos 10 caracteres."
                : profissional
                 ? "Entre para acessar seu consultório digital: agenda, consultas, financeiro e cadastro."
                   : gestor
@@ -430,7 +436,7 @@ function Auth() {
                 className="field-base mt-1"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
-                minLength={8}
+                minLength={10}
                 maxLength={72}
                 autoComplete={modo === "entrar" ? "current-password" : "new-password"}
                 required

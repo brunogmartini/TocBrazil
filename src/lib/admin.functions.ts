@@ -105,7 +105,6 @@ export type ProfissionalAdmin = {
     status: string;
     observacao_admin: string | null;
     created_at: string;
-    url: string | null;
   }[];
   historico: {
     id: string;
@@ -269,9 +268,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
 
     const docsPorProfissional = new Map<string, ProfissionalAdmin["documentos"]>();
     for (const doc of documentos ?? []) {
-      const { data: assinado } = await supabaseAdmin.storage
-        .from("documentos-profissionais")
-        .createSignedUrl(doc.caminho, 600);
       const lista = docsPorProfissional.get(doc.professional_id) ?? [];
       lista.push({
         id: doc.id,
@@ -280,7 +276,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
         status: doc.status as string,
         observacao_admin: doc.observacao_admin,
         created_at: doc.created_at,
-        url: assinado?.signedUrl ?? null,
       });
       docsPorProfissional.set(doc.professional_id, lista);
     }
@@ -507,6 +502,15 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
       })
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível atualizar." };
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({
+      actorId: context.userId,
+      actorRole: "admin",
+      action: "professional_registration_reviewed",
+      entity: "professional",
+      entityId: data.id,
+      metadata: { status: data.status, correction_required: data.requerCorrecao },
+    });
     return { ok: true as const };
   });
 
@@ -542,7 +546,28 @@ export const conferirCadastroProfissional = createServerFn({ method: "POST" })
       validado_por: context.userId,
     }).eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível concluir a conferência." };
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "professional_registration_reviewed", entity: "professional", entityId: data.id, metadata: { status: "checked" } });
     return { ok: true as const };
+  });
+
+export const obterDocumentoCredenciamento = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { id: string }) => ({ id: String(data.id) }))
+  .handler(async ({ data, context }) => {
+    await garantirAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: documento } = await supabaseAdmin
+      .from("professional_documents")
+      .select("id, professional_id, caminho")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!documento) return { ok: false as const, erro: "Documento não encontrado." };
+    const { data: arquivo } = await supabaseAdmin.storage.from("documentos-profissionais").createSignedUrl(documento.caminho, 60);
+    if (!arquivo?.signedUrl) return { ok: false as const, erro: "Não foi possível abrir o documento." };
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "credential_document_accessed", entity: "professional_document", entityId: documento.id, metadata: { professional_id: documento.professional_id } });
+    return { ok: true as const, url: arquivo.signedUrl, expiresInSeconds: 60 };
   });
 
 export const definirStatusDocumento = createServerFn({ method: "POST" })
@@ -658,6 +683,15 @@ export const editarProfissionalAdmin = createServerFn({ method: "POST" })
       })
       .eq("id", id);
     if (error) return { ok: false as const, erro: "Não foi possível salvar as alterações." };
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({
+      actorId: context.userId,
+      actorRole: "admin",
+      action: "profile_data_changed",
+      entity: "professional",
+      entityId: id,
+      metadata: { fields: [...Object.keys(resto), ...(nome ? ["nome"] : []), ...(voltarParaAnalise ? ["status"] : [])] },
+    });
     return { ok: true as const };
   });
 
@@ -704,6 +738,8 @@ export const definirStatusConsultaAdmin = createServerFn({ method: "POST" })
       .update({ status: data.status, ...extra })
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível atualizar." };
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "appointment_status_changed", entity: "appointment", entityId: data.id, metadata: { status: data.status } });
     return { ok: true as const };
   });
 

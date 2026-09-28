@@ -107,6 +107,32 @@ function CadastroProfissional() {
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [cadastroFinalizado, setCadastroFinalizado] = useState(false);
   const [confirmouContrato, setConfirmouContrato] = useState(false);
+  const [mfaProfissional, setMfaProfissional] = useState<{ id: string; qr: string; secret: string } | null>(null);
+  const [codigoMfa, setCodigoMfa] = useState("");
+
+  async function prepararMfaProfissional() {
+    setErro(null);
+    const { data: fatores, error: erroFatores } = await supabase.auth.mfa.listFactors();
+    if (erroFatores) return setErro("Não foi possível consultar a proteção em duas etapas.");
+    if (fatores.totp.some((fator) => fator.status === "verified")) {
+      setAviso("A autenticação em duas etapas já está ativa nesta conta.");
+      return;
+    }
+    const { data: inscricao, error: erroInscricao } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyName: "Profissional TOC Brazil" });
+    if (erroInscricao) return setErro("Não foi possível iniciar a configuração agora.");
+    setMfaProfissional({ id: inscricao.id, qr: inscricao.totp.qr_code, secret: inscricao.totp.secret });
+  }
+
+  async function confirmarMfaProfissional() {
+    if (!mfaProfissional || codigoMfa.length !== 6) return;
+    const { data: desafio, error: erroDesafio } = await supabase.auth.mfa.challenge({ factorId: mfaProfissional.id });
+    if (erroDesafio) return setErro("Não foi possível validar o código agora.");
+    const { error: erroVerificacao } = await supabase.auth.mfa.verify({ factorId: mfaProfissional.id, challengeId: desafio.id, code: codigoMfa });
+    if (erroVerificacao) return setErro("Código inválido ou expirado.");
+    setMfaProfissional(null);
+    setCodigoMfa("");
+    setAviso("Autenticação em duas etapas ativada.");
+  }
 
   useEffect(() => {
     const p = dados.data?.profissional;
@@ -560,6 +586,25 @@ function CadastroProfissional() {
           )}
         </section>
       )}
+
+      <section className="mt-12" aria-labelledby="seguranca-conta">
+        <h2 id="seguranca-conta" className="text-2xl">Segurança da conta</h2>
+        <div className="card-soft mt-5 p-7">
+          <p className="max-w-2xl text-sm text-muted-foreground">Você pode proteger seu acesso com um aplicativo autenticador.</p>
+          {!mfaProfissional ? (
+            <button type="button" className="btn-base btn-ghost mt-4" onClick={prepararMfaProfissional}>Configurar autenticação em duas etapas</button>
+          ) : (
+            <div className="mt-5 max-w-md space-y-4">
+              <img src={mfaProfissional.qr} alt="Código QR para configurar o aplicativo autenticador" className="size-52" />
+              <p className="break-all text-xs text-muted-foreground">Chave manual: {mfaProfissional.secret}</p>
+              <label className="block text-sm">Código de seis dígitos
+                <input className="field-base mt-2" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={codigoMfa} onChange={(e) => setCodigoMfa(e.target.value.replace(/\D/g, ""))} />
+              </label>
+              <button type="button" className="btn-base btn-primary" disabled={codigoMfa.length !== 6} onClick={confirmarMfaProfissional}>Ativar proteção</button>
+            </div>
+          )}
+        </div>
+      </section>
 
       <section className="mt-12">
         <h2 className="text-2xl">Receber direto na sua conta Mercado Pago</h2>

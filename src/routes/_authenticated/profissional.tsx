@@ -1,6 +1,8 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { registrarEventoAutenticacao } from "@/lib/auth.functions";
 import { exigirAreaProfissional } from "@/lib/role-access";
 
 /**
@@ -35,10 +37,12 @@ function CascaProfissional() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const registrarAuth = useServerFn(registrarEventoAutenticacao);
 
   async function sair() {
     await queryClient.cancelQueries();
     queryClient.clear();
+    await registrarAuth({ data: { evento: "logout", papel: "profissional" } });
     await supabase.auth.signOut();
     navigate({ to: "/auth", search: { modo: "entrar", perfil: "profissional", redirect: undefined }, replace: true });
   }
