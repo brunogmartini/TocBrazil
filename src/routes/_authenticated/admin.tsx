@@ -341,6 +341,8 @@ function Admin() {
                   <div className="mt-6 space-y-6">
                     <dl className="grid gap-4 text-sm sm:grid-cols-2">
                       <Info rotulo="Preço da consulta" valor={moeda(p.valor_centavos)} />
+                      <Info rotulo="Valor líquido desejado" valor={moeda(p.valor_liquido_centavos ?? Math.max(p.valor_centavos - 2700, 0))} />
+                      <Info rotulo="CNPJ" valor={p.cnpj ?? "—"} />
                       <Info
                         rotulo="Ferramenta de videochamada"
                         valor={
@@ -353,10 +355,7 @@ function Admin() {
                         rotulo="Certidão do conselho (validade)"
                         valor={p.certidao_validade ? dataBR(p.certidao_validade) : "—"}
                       />
-                      <Info
-                        rotulo="Apólice de seguro (validade)"
-                        valor={p.apolice_validade ? dataBR(p.apolice_validade) : "—"}
-                      />
+                      <Info rotulo="Seguro opcional" valor={[p.seguradora_nome, p.apolice_numero, p.apolice_validade ? dataBR(p.apolice_validade) : null].filter(Boolean).join(" · ") || "Não informado"} />
 
                       <Info rotulo="Abordagens" valor={p.abordagens_publicas.join(", ")} />
                       <Info rotulo="Formação" valor={p.formacoes_publicas.map((f) => `${f.curso} — ${f.instituicao}, ${f.ano}`).join("; ")} />

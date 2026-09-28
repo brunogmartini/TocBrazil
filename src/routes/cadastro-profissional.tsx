@@ -114,9 +114,7 @@ function CadastroProfissional() {
               </p>
             ))}
           </div>
-          <p className="mt-6 text-base leading-relaxed text-muted-foreground">
-            Você só paga quando a consulta acontece — cancelamento com reembolso integral ao paciente não gera taxa.
-          </p>
+          <p className="mt-6 text-base leading-relaxed text-muted-foreground">Uma estrutura simples para você manter autonomia sobre sua rotina profissional.</p>
         </article>
         <div className="mt-7 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
           {beneficios.map((beneficio) => (
@@ -131,7 +129,8 @@ function CadastroProfissional() {
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
         <section className="card-soft p-8">
           <span className="section-label">Profissional novo</span>
-          <h2 className="heading-section mt-2">Quero me cadastrar como profissional</h2>
+          <h2 className="heading-section mt-2">Comece com seus dados essenciais</h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">Primeiro, crie sua conta. Depois você completa o perfil e envia os comprovantes para conferência em um ambiente privado.</p>
           <ol className="mt-6 space-y-4">
             {etapas.map((e, i) => (
               <li key={e.t} className="flex gap-4">

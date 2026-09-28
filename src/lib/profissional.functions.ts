@@ -241,10 +241,6 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       };
     }
 
-    if (!data.abordagens_publicas.length || !data.formacoes_publicas.length || !data.temas_toc_publicos.length || !data.biografia_publica || !data.idiomas.length || data.valor_liquido_centavos <= 0) {
-      return { ok: false as const, erro: "Preencha todos os campos obrigatórios do perfil público." };
-    }
-
     if (existente) {
       const { error } = await supabase.from("professionals").update(data).eq("id", existente.id);
       if (error) return { ok: false as const, erro: "Não foi possível salvar seus dados agora." };
