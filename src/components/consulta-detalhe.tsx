@@ -50,7 +50,7 @@ export function ConsultaDetalhe({
             <dd className="font-semibold">{moeda(c.valor_profissional_centavos)}</dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">Taxa incluída no preço público</dt>
+            <dt className="text-xs text-muted-foreground">Taxa fixa descontada</dt>
             <dd className="font-semibold">{moeda(c.taxa_plataforma_centavos)}</dd>
           </div>
           <div>

@@ -347,7 +347,7 @@ function Admin() {
                   <div className="mt-6 space-y-6">
                     <dl className="grid gap-4 text-sm sm:grid-cols-2">
                       <Info rotulo="Preço da consulta" valor={moeda(p.valor_centavos)} />
-                      <Info rotulo="Valor líquido desejado" valor={moeda(p.valor_liquido_centavos ?? Math.max(p.valor_centavos - 2700, 0))} />
+                      <Info rotulo="Valor do profissional" valor={moeda(Math.max(p.valor_centavos - 2700, 0))} />
                       <Info rotulo="CNPJ" valor={p.cnpj ?? "—"} />
                       <Info
                         rotulo="Ferramenta de videochamada"
@@ -757,7 +757,7 @@ function FormularioConfiguracoes({
       }}
     >
       <h2 className="text-xl sm:col-span-2">Regras financeiras e operacionais</h2>
-      {num("taxaPorConsultaCentavos", "Taxa fixa por consulta realizada (R$)", "Incluída no preço público e separada no pagamento, igual para todos.", 100)}
+      {num("taxaPorConsultaCentavos", "Taxa fixa por consulta realizada (R$)", "Descontada do valor da consulta e devida pelo profissional, igual para todos.", 100)}
       {num("duracaoPadraoMinutos", "Duração padrão (minutos)", "Usada quando o profissional não define outra.")}
       {num("cancelamentoHoras", "Cancelamento sem custo até (horas antes)", "Prazo para o paciente cancelar com direito a estorno do pagamento.")}
       {num("remarcacaoHoras", "Remarcação até (horas antes)", "Prazo mínimo para remarcar.")}

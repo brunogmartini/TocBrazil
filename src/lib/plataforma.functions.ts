@@ -140,7 +140,7 @@ export const listarHorariosLivres = createServerFn({ method: "GET" })
   });
 
 export type ConfiguracoesPlataforma = {
-  /** Taxa fixa em centavos incluída no preço público por consulta realizada. */
+  /** Taxa fixa em centavos descontada do valor do profissional por consulta realizada. */
   taxaPorConsultaCentavos: number;
   janelaCancelamentoHoras: number;
   antecedenciaLinkMinutos: number;
@@ -439,7 +439,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
 
     const cfg = await carregarConfiguracoesPrivadas();
 
-    // O preço público já contém o líquido desejado pelo profissional e a taxa fixa.
+    // O preço público é exatamente o valor definido pelo profissional.
     const valorConsulta = Number(prof.valor_centavos ?? 0);
     const taxaFixa = cfg.taxaPorConsultaCentavos;
     const duracao = prof.slot_minutos || cfg.duracaoPadraoMinutos;
@@ -550,7 +550,7 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
     const dentroDoPrazo = horasAntes >= cfg.cancelamentoHoras;
 
     // Cancelamento tardio de consulta já paga conta como não comparecimento e
-    // registra a parcela fixa da plataforma já incluída no preço público.
+    // registra a taxa fixa devida pelo profissional, sem alterar o preço pago pelo paciente.
     const novoStatus =
       !dentroDoPrazo && consulta.status === "confirmada" ? "nao_compareceu" : "cancelada";
 
