@@ -512,7 +512,7 @@ function CadastroProfissional() {
         <h2 className="text-2xl">Receber direto pela sua conta Asaas</h2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
           A plataforma cria sua subconta de recebimento no Asaas após a conferência cadastral. O split
-          separa automaticamente o seu valor líquido da taxa fixa da plataforma.
+          separa automaticamente a taxa fixa da plataforma do valor que vai para você.
         </p>
         <div className="card-soft mt-5 p-7">
           {vinculo.data?.ativo ? (
