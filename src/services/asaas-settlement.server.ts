@@ -40,12 +40,14 @@ export async function settleAsaasAppointment(appointmentId: string, outcome: Out
       payment_status: captured > 0 ? "aprovado" : "cancelado",
     }).eq("id", appointmentId);
     const { writeAuditEvent } = await import("@/lib/audit.server");
-    await writeAuditEvent({ actorId, actorRole, action: captured > 0 ? "payment_captured" : "payment_authorization_canceled", entity: "appointment", entityId: appointmentId, metadata: { outcome, portions: [...capturePortions] } });
+    await writeAuditEvent({ actorId: actorId ?? null, actorRole, action: captured > 0 ? "payment_captured" : "payment_authorization_canceled", entity: "appointment", entityId: appointmentId, metadata: { outcome, portions: [...capturePortions] } });
     return { ok: true as const, capturedCentavos: captured };
   } catch (error) {
     console.error("Asaas settlement failed", { appointmentId, code: error instanceof Error ? error.message : "UNKNOWN" });
     await db.from("appointments").update({ settlement_status: "FALHOU" }).eq("id", appointmentId);
-    await db.from("notifications").insert({ user_id: actorId ?? "00000000-0000-0000-0000-000000000000", appointment_id: appointmentId, tipo: "falha_liquidacao", canal: "interno", titulo: "Falha na liquidação", corpo: "A administração deve revisar a liquidação deste agendamento." }).then(() => undefined);
+    if (actorId) {
+      await db.from("notifications").insert({ user_id: actorId, appointment_id: appointmentId, tipo: "falha_liquidacao", canal: "interno", titulo: "Falha na liquidação", corpo: "A administração deve revisar a liquidação deste agendamento." }).then(() => undefined);
+    }
     return { ok: false as const, erro: "A liquidação precisa de revisão da administração." };
   }
 }

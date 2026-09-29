@@ -41,11 +41,15 @@ async function processWebhook(request: Request) {
       await supabaseAdmin.from("asaas_webhook_events").update({ status: "ignorado", processed_at: new Date().toISOString() }).eq("environment", config.environment).eq("event_id", parsed.data.id);
       return new Response("ok", { status: 200 });
     }
-    const patch: Record<string, string | null> = { provider_status: payment.status, status: payment.status };
-    if (payment.status === "AUTHORIZED") patch.authorized_at = new Date().toISOString();
-    if (["CONFIRMED", "RECEIVED"].includes(payment.status)) patch.captured_at = new Date().toISOString();
-    if (["DELETED", "CANCELLED"].includes(payment.status)) patch.canceled_at = new Date().toISOString();
-    if (["REFUNDED", "REFUND_REQUESTED"].includes(payment.status)) patch.refunded_at = new Date().toISOString();
+    const agora = new Date().toISOString();
+    const patch = {
+      provider_status: payment.status,
+      status: payment.status,
+      authorized_at: payment.status === "AUTHORIZED" ? agora : undefined,
+      captured_at: ["CONFIRMED", "RECEIVED"].includes(payment.status) ? agora : undefined,
+      canceled_at: ["DELETED", "CANCELLED"].includes(payment.status) ? agora : undefined,
+      refunded_at: ["REFUNDED", "REFUND_REQUESTED"].includes(payment.status) ? agora : undefined,
+    };
     await supabaseAdmin.from("asaas_payment_authorizations").update(patch).eq("id", authorization.id);
     await supabaseAdmin.from("appointments").update(authorization.portion === "A" ? { auth_status_a: payment.status } : { auth_status_b: payment.status }).eq("id", authorization.appointment_id);
     await supabaseAdmin.from("asaas_webhook_events").update({ status: "processado", processed_at: new Date().toISOString() }).eq("environment", config.environment).eq("event_id", parsed.data.id);
