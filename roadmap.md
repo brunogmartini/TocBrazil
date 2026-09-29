@@ -88,3 +88,12 @@
 - [x] Executar scanner do banco, dependências, acesso anônimo, métodos HTTP e revisão estática
 - [x] Registrar resultados e limites em `REVISAO-DE-SEGURANCA-2026-09-29.md`
 - [ ] Executar pentest independente certificado antes da abertura pública dos pagamentos
+
+## Contrato profissional v6.2 — 29/09/2026
+- [x] Conferir e cadastrar os cinco PDFs originais com seus SHA-256
+- [x] Manter os arquivos privados e servi-los por links temporários
+- [x] Criar leitura pública dos cinco documentos sem exigir cadastro
+- [x] Exigir conferência, rolagem, quatro acessos e sete declarações no aceite
+- [x] Tornar acessos e aceites imutáveis e gravados somente pelo servidor
+- [x] Travar agenda e publicação até contrato, recebimento e disponibilidade
+- [x] Recolocar taxa, explicação e pagamento garantido; remover pedido de seguro

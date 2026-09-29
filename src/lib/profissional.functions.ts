@@ -51,9 +51,6 @@ export type CadastroProfissionalEntrada = {
   valor_centavos?: number;
   valor_liquido_centavos?: number;
   certidao_validade?: string | null;
-  apolice_validade?: string | null;
-  seguradora_nome?: string | null;
-  apolice_numero?: string | null;
   ferramenta_provedor?: string;
   ferramenta_url_sala?: string;
   ferramenta_instrucoes?: string;
@@ -188,9 +185,6 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       areas: lista(data.areas),
       idiomas,
       certidao_validade: data.certidao_validade ? String(data.certidao_validade).slice(0, 10) : null,
-      apolice_validade: data.apolice_validade ? String(data.apolice_validade).slice(0, 10) : null,
-      seguradora_nome: String(data.seguradora_nome ?? "").trim().slice(0, 120) || null,
-      apolice_numero: String(data.apolice_numero ?? "").trim().slice(0, 80) || null,
       ferramenta_provedor: String(data.ferramenta_provedor ?? "").trim().slice(0, 80) || null,
       ferramenta_url_sala: String(data.ferramenta_url_sala ?? "").trim().slice(0, 500) || null,
       ferramenta_instrucoes: String(data.ferramenta_instrucoes ?? "").trim().slice(0, 1000) || null,
