@@ -5,14 +5,13 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   meuCadastroProfissional,
-  contratoAtualProfissional,
-  assinarContratoProfissional,
   registrarDocumento,
   removerDocumento,
   salvarCadastroProfissional,
 } from "@/lib/profissional.functions";
 import { statusRecebimentoAsaas } from "@/lib/asaas.functions";
 import { ProfessionalNav } from "@/components/professional-nav";
+import { ContractAcceptance } from "@/components/contract-acceptance";
 import { exigirAreaProfissional } from "@/lib/role-access";
 import { moeda } from "@/lib/video-sala";
 import { TAXA_FIXA_CENTAVOS } from "@/lib/precos";
@@ -59,15 +58,12 @@ function CadastroProfissional() {
   const registrar = useServerFn(registrarDocumento);
   const remover = useServerFn(removerDocumento);
   const statusVinculo = useServerFn(statusRecebimentoAsaas);
-  const carregarContrato = useServerFn(contratoAtualProfissional);
-  const assinarContrato = useServerFn(assinarContratoProfissional);
 
   const dados = useQuery({ queryKey: ["cadastro-profissional"], queryFn: () => carregar() });
   const vinculo = useQuery({
     queryKey: ["vinculo-asaas"],
     queryFn: () => statusVinculo(),
   });
-  const contrato = useQuery({ queryKey: ["contrato-profissional"], queryFn: () => carregarContrato() });
 
 
   const [form, setForm] = useState({
@@ -100,7 +96,6 @@ function CadastroProfissional() {
   const [enviandoDoc, setEnviandoDoc] = useState(false);
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [cadastroFinalizado, setCadastroFinalizado] = useState(false);
-  const [confirmouContrato, setConfirmouContrato] = useState(false);
   const [mfaProfissional, setMfaProfissional] = useState<{ id: string; qr: string; secret: string } | null>(null);
   const [codigoMfa, setCodigoMfa] = useState("");
 
@@ -463,15 +458,6 @@ function CadastroProfissional() {
           onChange={(v) => setForm({ ...form, certidao_validade: v })}
         />
         <div><DocumentoCampo tipo="Certidão de regularidade do CRP" titulo="Certidão de regularidade do CRP" /></div>
-        <fieldset className="sm:col-span-2 rounded-lg border border-border p-4">
-          <legend className="section-label px-1">Seguro de responsabilidade civil (opcional)</legend>
-          <div className="mt-3 grid gap-5 sm:grid-cols-3">
-            <Campo label="Seguradora" value={form.seguradora_nome} onChange={(v) => setForm({ ...form, seguradora_nome: v })} />
-            <Campo label="Número da apólice" value={form.apolice_numero} onChange={(v) => setForm({ ...form, apolice_numero: v })} />
-            <Campo label="Validade da apólice" type="date" value={form.apolice_validade} onChange={(v) => setForm({ ...form, apolice_validade: v })} />
-          </div>
-          <div className="mt-4"><DocumentoCampo tipo="Apólice de seguro de responsabilidade civil profissional" titulo="Anexar apólice" /></div>
-        </fieldset>
         <fieldset className="sm:col-span-2 rounded-xl border border-border p-5">
           <legend className="section-label px-1">Ferramenta de videochamada</legend>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -513,61 +499,7 @@ function CadastroProfissional() {
       {temCadastro && (
         <section className="mt-12" aria-labelledby="contrato-profissional-titulo">
           <h2 id="contrato-profissional-titulo" className="text-2xl">Contrato profissional</h2>
-          {!contrato.data?.disponivel && (
-            <div className="card-soft mt-5 p-7">
-              <p className="font-semibold">
-                {contrato.data?.motivo === "cadastro_em_analise" ? "Seu cadastro ainda está em conferência." : "O contrato definitivo ainda não está disponível."}
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground">Quando a conferência terminar e o PDF for ativado, ele aparecerá aqui para leitura e assinatura.</p>
-            </div>
-          )}
-          {contrato.data?.disponivel && contrato.data.aceite && (
-            <div className="card-soft mt-5 p-7">
-              <p className="font-semibold">Contrato {contrato.data.versao.versao} assinado eletronicamente.</p>
-              <p className="mt-2 text-sm text-muted-foreground">Aceite registrado em {new Date(contrato.data.aceite.aceito_em).toLocaleString("pt-BR")}.</p>
-              {contrato.data.versao.url && <a className="btn-base btn-ghost mt-4" href={contrato.data.versao.url} target="_blank" rel="noreferrer">Abrir contrato aceito</a>}
-            </div>
-          )}
-          {contrato.data?.disponivel && !contrato.data.aceite && (
-            <div className="card-soft mt-5 p-7">
-              <h3 className="text-lg">{contrato.data.versao.titulo}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">Versão {contrato.data.versao.versao}</p>
-              {contrato.data.versao.url ? (
-                <a className="btn-base btn-ghost mt-4" href={contrato.data.versao.url} target="_blank" rel="noreferrer">Ler o contrato em PDF</a>
-              ) : <p className="mt-3 text-sm text-destructive">O arquivo não pôde ser aberto. Tente novamente mais tarde.</p>}
-              {contrato.data.versao.modo_assinatura === "provedor" ? (
-                <p className="mt-5 text-sm text-muted-foreground">A assinatura será concluída pelo provedor {contrato.data.versao.provedor}.</p>
-              ) : (
-                <form className="mt-6 space-y-4" onSubmit={async (event) => {
-                  event.preventDefault();
-                  setErro(null);
-                  const contratoDisponivel = contrato.data;
-                  if (!contratoDisponivel?.disponivel) return;
-                  const resultado = await assinarContrato({ data: {
-                    nome_assinatura: contratoDisponivel.identidade.nome,
-                    documento: contratoDisponivel.identidade.cpf,
-                    versao_id: contratoDisponivel.versao.id,
-                    confirmou: confirmouContrato,
-                  } });
-                  if (!resultado.ok) return setErro(resultado.erro);
-                  setAviso("Aceite eletrônico registrado com sucesso.");
-                  setConfirmouContrato(false);
-                  await queryClient.invalidateQueries({ queryKey: ["contrato-profissional"] });
-                }}>
-                  <dl className="grid gap-3 rounded-lg border border-border bg-background p-4 text-sm sm:grid-cols-2">
-                    <div><dt className="text-muted-foreground">Nome</dt><dd className="font-semibold">{contrato.data.identidade.nome}</dd></div>
-                    <div><dt className="text-muted-foreground">CRP</dt><dd className="font-semibold">{contrato.data.identidade.crp} · {contrato.data.identidade.uf}</dd></div>
-                  </dl>
-                  <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{contrato.data.textoAceite}</p>
-                  <label className="flex items-start gap-3 text-sm">
-                    <input className="mt-1" type="checkbox" checked={confirmouContrato} onChange={(event) => setConfirmouContrato(event.target.checked)} />
-                    <span>Li o contrato em PDF e aceito integralmente seus termos. Confirmo que os dados acima me identificam.</span>
-                  </label>
-                  <button type="submit" disabled={!confirmouContrato || !contrato.data.versao.url} className="btn-base btn-primary disabled:opacity-50">Aceitar e assinar eletronicamente</button>
-                </form>
-              )}
-            </div>
-          )}
+          <ContractAcceptance />
         </section>
       )}
 
