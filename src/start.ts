@@ -40,16 +40,30 @@ function readCookie(cookieHeader: string | null, name: string) {
   return null;
 }
 
+function secureSessionCookie(value: string) {
+  const parts = value.split(";").map((part) => part.trim()).filter(Boolean);
+  const [pair, ...attributes] = parts;
+  if (!pair || !pair.toLowerCase().startsWith("session-id=")) return value;
+  const retained = attributes.filter((attribute) => {
+    const name = attribute.split("=", 1)[0]?.toLowerCase();
+    return name !== "httponly" && name !== "secure" && name !== "samesite";
+  });
+  return [pair, ...retained, "HttpOnly", "Secure", "SameSite=Lax"].join("; ");
+}
+
 const secureSessionCookieMiddleware = createMiddleware().server(async ({ next, request }) => {
   const response = await next();
   const sessionId = readCookie(request.headers.get("cookie"), "session-id");
-  if (!sessionId) return response;
-
   const headers = new Headers(response.headers);
-  headers.append(
-    "set-cookie",
-    `session-id=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Lax`,
-  );
+  const setCookies = typeof headers.getSetCookie === "function" ? headers.getSetCookie() : [];
+  if (setCookies.length > 0) {
+    headers.delete("set-cookie");
+    for (const cookie of setCookies) headers.append("set-cookie", secureSessionCookie(cookie));
+  } else if (sessionId) {
+    headers.append("set-cookie", `session-id=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Lax`);
+  } else {
+    return response;
+  }
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
