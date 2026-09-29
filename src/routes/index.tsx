@@ -252,7 +252,7 @@ function Home() {
                 Um psicólogo habilitado pode escutar sua história, avaliar o que vem acontecendo e conduzir o acompanhamento que entender indicado.
               </p>
               <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                Quem avalia é sempre um psicólogo, em consulta — nenhuma ferramenta substitui essa conversa. Na TOC Brazil você encontra profissionais, marca horários, agenda e paga por aqui — o valor é reservado no seu cartão na véspera e cobrado só depois da consulta.
+                Quem avalia é sempre um psicólogo, em consulta — nenhuma ferramenta substitui essa conversa. Na TOC Brazil você encontra profissionais, agenda e paga por aqui — o valor é reservado no seu cartão na véspera e cobrado só depois da consulta.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/profissionais" className="btn-base btn-primary">
