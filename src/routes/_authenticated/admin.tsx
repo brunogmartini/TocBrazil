@@ -21,6 +21,7 @@ import type { ConfiguracoesPlataforma } from "@/lib/plataforma.functions";
 import { EtapasCadastro } from "@/components/professional-nav";
 import { indicadoresGestao } from "@/lib/continuidade.functions";
 import { dataBR, dataHoraBR, moeda, rotuloStatusConsulta } from "@/lib/video-sala";
+import { AsaasAdminLab } from "@/components/asaas-admin-lab";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   // Área exclusiva do gestor: qualquer outra conta é levada de volta à sua própria área.
@@ -64,7 +65,7 @@ const rotuloDoc: Record<string, string> = {
   recusado: "Recusado",
 };
 
-type Aba = "visao" | "pacientes" | "profissionais" | "consultas" | "financeiro" | "relatorio" | "configuracoes";
+type Aba = "visao" | "pacientes" | "profissionais" | "consultas" | "financeiro" | "asaas" | "relatorio" | "configuracoes";
 type FiltroProf = "todos" | "pendente" | "aprovado" | "rejeitado" | "suspenso";
 type FiltroPagamento = "pendente" | "aprovado" | "todos";
 
@@ -160,6 +161,7 @@ function Admin() {
     ["profissionais", `Profissionais${t?.pendentes ? ` (${t.pendentes})` : ""}`],
     ["consultas", "Consultas"],
     ["financeiro", "Extrato financeiro"],
+    ["asaas", "Testes Asaas"],
     ["relatorio", "Relatório"],
     ["configuracoes", "Configurações"],
   ];
@@ -635,6 +637,8 @@ function Admin() {
           </div>
         </>
       )}
+
+      {aba === "asaas" && <AsaasAdminLab />}
 
       {aba === "relatorio" && (
         <section className="mt-6">

@@ -79,6 +79,7 @@ async function request<T>(path: string, init: RequestInit = {}, apiKeyOverride?:
     console.error("Asaas request failed", { path, status: response.status, code });
     throw new Error(`ASAAS_${code}`);
   }
+  if (response.status === 204) return { status: "DELETED" } as T;
   return response.json() as Promise<T>;
 }
 
