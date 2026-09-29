@@ -483,12 +483,18 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
       if (!tiposAprovados.has("Carteirinha profissional do CRP") || !tiposAprovados.has("Diploma de graduação")) {
         return { ok: false as const, erro: "A carteirinha do CRP e o diploma precisam estar aprovados." };
       }
-      const { data: contratoAceito } = await supabaseAdmin.rpc("professional_tem_contrato_ativo_aceito", {
+      const { data: contratoAceito } = await supabaseAdmin.rpc("professional_contract_ready", {
         _professional_id: data.id,
       });
       if (!contratoAceito) {
         return { ok: false as const, erro: "O profissional ainda não aceitou a versão ativa do contrato." };
       }
+      const [{ data: conta }, { data: agenda }] = await Promise.all([
+        supabaseAdmin.from("asaas_professional_accounts").select("wallet_id, status").eq("professional_id", data.id).eq("status", "ativa").maybeSingle(),
+        supabaseAdmin.from("availability_rules").select("id").eq("professional_id", data.id).limit(1),
+      ]);
+      if (!conta?.wallet_id) return { ok: false as const, erro: "A conta de recebimento ainda não está ativa." };
+      if (!agenda?.length) return { ok: false as const, erro: "O profissional ainda não configurou a agenda." };
     }
 
     const { error } = await supabaseAdmin

@@ -23,7 +23,7 @@ export function ContractAcceptance() {
   const opened = new Set(state.data.openedAnnexes);
   const complete = scrollCompleted && annexes.every((document) => opened.has(document.key)) && checks.every(Boolean);
 
-  if (state.data.acceptance) return <div className="card-soft mt-5 p-7"><p className="font-semibold">Contrato {state.data.version} assinado eletronicamente.</p><p className="mt-2 text-sm text-muted-foreground">Aceite registrado em {new Date(state.data.acceptance.accepted_at).toLocaleString("pt-BR")}.</p></div>;
+  if (state.data.acceptance) return <div className="card-soft mt-5 p-7"><p className="font-semibold">Contrato {state.data.version} assinado eletronicamente.</p><p className="mt-2 text-sm text-muted-foreground">Aceite registrado em {new Date(state.data.acceptance.accepted_at).toLocaleString("pt-BR")}.</p>{!state.data.receivingActive && <p className="mt-5 border-t border-border pt-5 text-sm leading-relaxed">Credenciamento aprovado. Estamos finalizando a integração de pagamentos e avisaremos assim que seu perfil for publicado.</p>}</div>;
 
   return <div className="card-soft mt-5 p-5 sm:p-7">
     <p className="text-sm font-semibold">Versão {state.data.version}</p>
@@ -48,7 +48,7 @@ export function ContractAcceptance() {
       }}><span>{document.name}</span><span aria-hidden="true">{opened.has(document.key) ? "✓" : "↗"}</span></a>)}</div>
     </div>
 
-    <fieldset className="mt-7 border-t border-border pt-6"><legend className="text-lg font-semibold">Declarações de aceite</legend><div className="mt-4 space-y-3">{state.data.declarations.map((declaration, index) => <label key={declaration} className={`flex items-start gap-3 border p-4 text-sm leading-relaxed ${index === 2 || index === 6 ? "border-primary bg-primary/5" : "border-border"}`}><input className="mt-1" type="checkbox" checked={checks[index]} onChange={(event) => setChecks(checks.map((value, itemIndex) => itemIndex === index ? event.target.checked : value))} /><span>{declaration}</span></label>)}</div></fieldset>
+    <fieldset className="mt-7 border-t border-border pt-6"><legend className="text-lg font-semibold">Declarações de aceite</legend>{!scrollCompleted && <p className="mt-3 text-sm text-muted-foreground">Role o contrato até o fim para habilitar o aceite.</p>}<div className="mt-4 space-y-3">{state.data.declarations.map((declaration, index) => <label key={declaration} className={`flex items-start gap-3 border p-4 text-sm leading-relaxed ${index === 2 || index === 6 ? "border-primary bg-primary/5" : "border-border"}`}><input className="mt-1" type="checkbox" disabled={!scrollCompleted} checked={checks[index]} onChange={(event) => setChecks(checks.map((value, itemIndex) => itemIndex === index ? event.target.checked : value))} /><span>{declaration}</span></label>)}</div></fieldset>
     <dl className="mt-7 grid gap-3 border border-border bg-background p-4 text-sm sm:grid-cols-3"><div><dt className="text-muted-foreground">Nome</dt><dd className="font-semibold">{state.data.identity.name}</dd></div><div><dt className="text-muted-foreground">CPF</dt><dd className="font-semibold">{state.data.identity.cpf}</dd></div><div><dt className="text-muted-foreground">CRP</dt><dd className="font-semibold">{state.data.identity.crp} · {state.data.identity.uf}</dd></div></dl>
     <p className="mt-5 text-sm leading-relaxed text-muted-foreground">{state.data.signatureNotice}</p>
     {message && <p className="mt-4 text-sm text-destructive" role="alert">{message}</p>}

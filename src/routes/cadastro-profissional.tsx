@@ -51,8 +51,8 @@ const beneficios = [
     d: "Sem comissão, sem percentual, sem mensalidade.",
   },
   {
-    t: "Pagamento no agendamento",
-    d: "O paciente paga no momento do agendamento, antes da consulta.",
+    t: "Pagamento garantido",
+    d: "O valor é reservado no cartão do paciente 36 horas antes da consulta e cobrado depois dela. Você não corre risco de atendimento sem pagamento.",
   },
   {
     t: "Recebimento direto",
@@ -114,7 +114,11 @@ function CadastroProfissional() {
               </p>
             ))}
           </div>
-          <p className="mt-6 text-base leading-relaxed text-muted-foreground">Uma estrutura simples para você manter autonomia sobre sua rotina profissional.</p>
+          <p className="mt-6 text-lg font-semibold leading-relaxed">Taxa fixa de R$ 27 por consulta realizada, igual para todos os profissionais, qualquer que seja o valor que você cobra.</p>
+          <div className="mt-5 border-t border-border pt-5">
+            <h3 className="heading-card">Por que existe uma taxa?</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">A taxa custeia a estrutura que você usa. Plataforma, agenda, processamento de pagamentos, custos contábeis, verificação de registro e proteção de dados. É o que mantém a TOC Brazil funcionando e ao alcance de quem procura ajuda.</p>
+          </div>
         </article>
         <div className="mt-7 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
           {beneficios.map((beneficio) => (

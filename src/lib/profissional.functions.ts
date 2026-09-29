@@ -51,9 +51,6 @@ export type CadastroProfissionalEntrada = {
   valor_centavos?: number;
   valor_liquido_centavos?: number;
   certidao_validade?: string | null;
-  apolice_validade?: string | null;
-  seguradora_nome?: string | null;
-  apolice_numero?: string | null;
   ferramenta_provedor?: string;
   ferramenta_url_sala?: string;
   ferramenta_instrucoes?: string;
@@ -188,9 +185,6 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       areas: lista(data.areas),
       idiomas,
       certidao_validade: data.certidao_validade ? String(data.certidao_validade).slice(0, 10) : null,
-      apolice_validade: data.apolice_validade ? String(data.apolice_validade).slice(0, 10) : null,
-      seguradora_nome: String(data.seguradora_nome ?? "").trim().slice(0, 120) || null,
-      apolice_numero: String(data.apolice_numero ?? "").trim().slice(0, 80) || null,
       ferramenta_provedor: String(data.ferramenta_provedor ?? "").trim().slice(0, 80) || null,
       ferramenta_url_sala: String(data.ferramenta_url_sala ?? "").trim().slice(0, 500) || null,
       ferramenta_instrucoes: String(data.ferramenta_instrucoes ?? "").trim().slice(0, 1000) || null,
@@ -557,6 +551,7 @@ export function calcularEtapa(
     apresentacao?: string | null;
     areas?: string[] | null;
     valor_centavos?: number | null;
+    cadastro_conferido_em?: string | null;
   } | null,
   documentos: { status: string }[],
   temAgenda: boolean,
@@ -574,6 +569,9 @@ export function calcularEtapa(
     return temAgenda
       ? { chave: "publicado", titulo: "Perfil publicado", descricao: "Seu perfil está visível e recebe agendamentos.", indice: 6 }
       : { chave: "aprovado", titulo: "Cadastro aprovado", descricao: "Defina sua disponibilidade para receber agendamentos.", indice: 5 };
+  }
+  if (prof.cadastro_conferido_em) {
+    return { chave: "aprovado", titulo: "Aceite do contrato", descricao: "Leia o contrato e os anexos para prosseguir.", indice: 4 };
   }
   if (prof.requer_correcao) {
     return { chave: "correcao", titulo: "Necessita correção", descricao: "Ajuste o que foi pedido e reenvie.", indice: 4 };
@@ -628,7 +626,7 @@ async function profissionalDoUsuario(context: { supabase: unknown; userId: strin
   >;
   const { data } = await supabase
     .from("professionals")
-    .select("id, nome, slug, status, slot_minutos, valor_centavos, requer_correcao, observacao_admin, graduacao, apresentacao, areas")
+    .select("id, nome, slug, status, slot_minutos, valor_centavos, requer_correcao, observacao_admin, graduacao, apresentacao, areas, cadastro_conferido_em")
     .eq("user_id", context.userId)
     .maybeSingle();
   return { supabase, prof: data };
