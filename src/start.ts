@@ -30,7 +30,34 @@ const csrfMiddleware = createCsrfMiddleware({
   filter: (ctx) => ctx.handlerType === "serverFn",
 });
 
+function readCookie(cookieHeader: string | null, name: string) {
+  if (!cookieHeader) return null;
+  for (const entry of cookieHeader.split(";")) {
+    const separator = entry.indexOf("=");
+    if (separator < 0 || entry.slice(0, separator).trim() !== name) continue;
+    return entry.slice(separator + 1).trim();
+  }
+  return null;
+}
+
+const secureSessionCookieMiddleware = createMiddleware().server(async ({ next, request }) => {
+  const response = await next();
+  const sessionId = readCookie(request.headers.get("cookie"), "session-id");
+  if (!sessionId) return response;
+
+  const headers = new Headers(response.headers);
+  headers.append(
+    "set-cookie",
+    `session-id=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Lax`,
+  );
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+});
+
 export const startInstance = createStart(() => ({
   functionMiddleware: [attachSupabaseAuth],
-  requestMiddleware: [errorMiddleware, csrfMiddleware],
+  requestMiddleware: [errorMiddleware, secureSessionCookieMiddleware, csrfMiddleware],
 }));

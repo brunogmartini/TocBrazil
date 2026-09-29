@@ -252,7 +252,7 @@ function Home() {
                 Um psicólogo habilitado pode escutar sua história, avaliar o que vem acontecendo e conduzir o acompanhamento que entender indicado.
               </p>
               <p className="mt-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                Quem avalia é sempre um psicólogo, em consulta — nenhuma ferramenta substitui essa conversa. Na TOC Brazil você encontra profissionais, marca horários e paga por aqui.
+                Quem avalia é sempre um psicólogo, em consulta — nenhuma ferramenta substitui essa conversa. Na TOC Brazil você encontra profissionais, marca horários, agenda e paga por aqui — o valor é reservado no seu cartão na véspera e cobrado só depois da consulta.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/profissionais" className="btn-base btn-primary">
@@ -348,7 +348,7 @@ function Home() {
               Quem avalia é sempre um psicólogo, em consulta. A TOC Brazil não presta serviço de saúde. A consulta é de responsabilidade do psicólogo habilitado.
             </li>
             <li className="card-soft p-5">
-              A conexão com o site é criptografada de ponta a ponta entre o seu navegador e nossos servidores.
+              A conexão com o site é criptografada entre o seu navegador e nossos servidores.
             </li>
           </ul>
         </div>

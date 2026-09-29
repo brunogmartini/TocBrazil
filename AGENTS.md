@@ -11,7 +11,7 @@
 
 - Apply frame protection at the server response boundary and keep the broader CSP in report-only until inline hydration scripts can be nonce-protected; enforcing an untested script restriction would break the app.
 - Keep the essential-cookie notice as an acknowledgement in browser storage, not consent; necessary cookies do not require opt-in.
-- Keep uploaded legal documents as versioned source text and render their public provisional variants as Markdown; restore omitted service promises only after testing the corresponding feature, to avoid false consumer claims.
+- Keep uploaded legal documents as versioned source text and render the official v1.3 documents integrally as Markdown; legal pages must never summarize or rewrite them.
 - Treat `professionals.valor_liquido_centavos` as the professional's desired net amount and `professionals.valor_centavos` as the public patient price (net + fixed platform fee), so listings and bookings share one price source.
 - Keep professional contract PDFs versioned in private storage and acceptance records immutable; profile publication requires acceptance of the active PDF version so legal evidence cannot be changed retroactively.
 - Keep credentialing files private and issue 60-second signed URLs only after an MFA-authenticated admin action; why: each access must be authorized and auditable.

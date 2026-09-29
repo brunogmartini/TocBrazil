@@ -23,7 +23,7 @@ export function AsaasCardForm({ consultaId, onSuccess }: { consultaId: string; o
         setEnviando(false);
       }
     }}>
-      <p className="text-sm text-muted-foreground">O valor é reservado no seu cartão agora e cobrado depois da consulta.</p>
+      <p className="text-sm text-muted-foreground">Você informa o cartão agora. O valor é reservado 36 horas antes da consulta e cobrado somente depois dela.</p>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Nome no cartão" value={form.nomeTitular} onChange={(v) => update("nomeTitular", v)} className="sm:col-span-2" autoComplete="cc-name" />
         <Field label="Número do cartão" value={form.numero} onChange={(v) => update("numero", v.replace(/\D/g, "").slice(0, 19))} className="sm:col-span-2" inputMode="numeric" autoComplete="cc-number" />
