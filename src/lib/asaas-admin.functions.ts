@@ -38,7 +38,8 @@ export const criarSubcontaTesteAsaas = createServerFn({ method: "POST" }).middle
   const { createSandboxSubaccount } = await import("@/services/asaas.server");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   try {
-    const account = await createSandboxSubaccount({ ...data, complement: data.complement ?? null });
+    const { label, ...accountInput } = data;
+    const account = await createSandboxSubaccount({ ...accountInput, complement: data.complement ?? null });
     const { data: run, error } = await supabaseAdmin.from("asaas_sandbox_test_runs").insert({ created_by: context.userId, label: data.label, subaccount_id: account.id, wallet_id: account.walletId, last_action: "subconta_criada" }).select("id, wallet_id").single();
     if (error || !run) return { ok: false as const, erro: "A subconta foi criada, mas o teste não pôde ser registrado." };
     await supabaseAdmin.from("audit_log").insert({ actor_id: context.userId, actor_role: "admin", action: "asaas_sandbox_subaccount_created", entity: "asaas_sandbox_test", entity_id: run.id, metadata: { environment: "sandbox" } });

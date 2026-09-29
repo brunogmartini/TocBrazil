@@ -37,7 +37,8 @@ export function AsaasAdminLab() {
           const result = await createAccount({ data: { ...account, incomeValue: Number(account.incomeValue) } });
           if (result.ok) { setSelected(result.runId); setMessage(`Subconta criada. walletId: ${result.walletId}`); await refresh(); }
           else setMessage(result.erro);
-        } finally { setBusy(false); }
+        } catch (error) { setMessage(error instanceof Error ? error.message : "Não foi possível executar o teste."); }
+        finally { setBusy(false); }
       }}>
         <h3 className="text-lg">1. Criar subconta de teste</h3>
         <p className="mt-1 text-xs text-muted-foreground">O limite diário do Asaas Sandbox também se aplica.</p>
@@ -64,7 +65,8 @@ export function AsaasAdminLab() {
           const totalCentavos = Math.round(Number(payment.total.replace(".", "").replace(",", ".")) * 100);
           const result = await authorize({ data: { runId: run.id, totalCentavos, ...payment } });
           setMessage(result.ok ? "Autorizações A e B criadas com split no Sandbox." : result.erro); await refresh();
-        } finally { setBusy(false); }
+        } catch (error) { setMessage(error instanceof Error ? error.message : "Não foi possível executar o teste."); }
+        finally { setBusy(false); }
       }}>
         <h3 className="text-lg">2. Testar autorizações e split</h3>
         <p className="mt-1 text-xs text-muted-foreground">A: R$ 50,00 e split R$ 10,00. B: restante e split R$ 17,00.</p>
@@ -97,7 +99,7 @@ export function AsaasAdminLab() {
           <div className="mt-4 grid gap-3 sm:grid-cols-2">{(["A", "B"] as const).map((portion) => {
             const paymentId = portion === "A" ? item.payment_id_a : item.payment_id_b;
             const status = portion === "A" ? item.status_a : item.status_b;
-            return <div key={portion} className="border-t border-border pt-3"><p className="text-sm font-semibold">Autorização {portion}: {status ?? "não criada"}</p><div className="mt-2 flex flex-wrap gap-2">{(["refresh", "capture", "cancel"] as const).map((action) => <button key={action} type="button" disabled={!paymentId || busy} className="btn-base btn-ghost px-3 py-2 text-xs" onClick={async () => { setBusy(true); const result = await runAction({ data: { runId: item.id, portion, action } }); setMessage(result.ok ? `Autorização ${portion}: ${result.status}.` : result.erro); await refresh(); setBusy(false); }}>{action === "refresh" ? "Atualizar" : action === "capture" ? "Capturar" : "Cancelar"}</button>)}</div></div>;
+            return <div key={portion} className="border-t border-border pt-3"><p className="text-sm font-semibold">Autorização {portion}: {status ?? "não criada"}</p><div className="mt-2 flex flex-wrap gap-2">{(["refresh", "capture", "cancel"] as const).map((action) => <button key={action} type="button" disabled={!paymentId || busy} className="btn-base btn-ghost px-3 py-2 text-xs" onClick={async () => { setBusy(true); try { const result = await runAction({ data: { runId: item.id, portion, action } }); setMessage(result.ok ? `Autorização ${portion}: ${result.status}.` : result.erro); await refresh(); } catch (error) { setMessage(error instanceof Error ? error.message : "Não foi possível executar o teste."); } finally { setBusy(false); } }}>{action === "refresh" ? "Atualizar" : action === "capture" ? "Capturar" : "Cancelar"}</button>)}</div></div>;
           })}</div>
         </article>)}
         {!query.isLoading && !query.data?.runs.length && <p className="text-sm text-muted-foreground">Nenhum teste executado ainda.</p>}
