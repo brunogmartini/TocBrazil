@@ -484,7 +484,7 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
         _decided_by: context.userId,
         _decision: data.status === "rejeitado" ? "rejected" : "correction_requested",
         _checklist: {},
-        _reason: data.observacao,
+        _reason: data.observacao ?? "",
       });
       if (decisionError) return { ok: false as const, erro: "Não foi possível registrar a decisão." };
       const { writeAuditEvent } = await import("@/lib/audit.server");
