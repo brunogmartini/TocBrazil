@@ -435,22 +435,6 @@ export const relatorioMetadados = createServerFn({ method: "GET" })
     await registrarAcessoAdmin(context.userId, "relatorio_metadados");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    if ((data.status === "rejeitado" || data.requerCorrecao) && !data.observacao) {
-      return { ok: false as const, erro: "Informe o motivo antes de continuar." };
-    }
-    if (data.status === "rejeitado" || data.requerCorrecao) {
-      const { error: decisionError } = await supabaseAdmin.rpc("record_professional_review_decision", {
-        _professional_id: data.id,
-        _decided_by: context.userId,
-        _decision: data.status === "rejeitado" ? "rejected" : "correction_requested",
-        _checklist: {},
-        _reason: data.observacao,
-      });
-      if (decisionError) return { ok: false as const, erro: "Não foi possível registrar a decisão." };
-      const { writeAuditEvent } = await import("@/lib/audit.server");
-      await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "professional_registration_reviewed", entity: "professional", entityId: data.id, metadata: { status: data.status, correction_required: data.requerCorrecao } });
-      return { ok: true as const };
-    }
     await supabaseAdmin.rpc("concluir_consultas_vencidas");
     const agora = new Date();
     const de = data.de ? new Date(data.de) : new Date(agora.getFullYear(), agora.getMonth() - 2, 1);
@@ -490,6 +474,23 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await garantirAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    if ((data.status === "rejeitado" || data.requerCorrecao) && !data.observacao) {
+      return { ok: false as const, erro: "Informe o motivo antes de continuar." };
+    }
+    if (data.status === "rejeitado" || data.requerCorrecao) {
+      const { error: decisionError } = await supabaseAdmin.rpc("record_professional_review_decision", {
+        _professional_id: data.id,
+        _decided_by: context.userId,
+        _decision: data.status === "rejeitado" ? "rejected" : "correction_requested",
+        _checklist: {},
+        _reason: data.observacao,
+      });
+      if (decisionError) return { ok: false as const, erro: "Não foi possível registrar a decisão." };
+      const { writeAuditEvent } = await import("@/lib/audit.server");
+      await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "professional_registration_reviewed", entity: "professional", entityId: data.id, metadata: { status: data.status, correction_required: data.requerCorrecao } });
+      return { ok: true as const };
+    }
 
     if (data.status === "aprovado") {
       const [{ data: prof }, { data: perfilPronto }] = await Promise.all([
@@ -588,7 +589,7 @@ export const conferirCadastroProfissional = createServerFn({ method: "POST" })
     if (!tipos.has("Carteirinha profissional do CRP") || !tipos.has("Diploma de graduação")) {
       return { ok: false as const, erro: "A carteirinha do CRP e o diploma precisam estar aprovados." };
     }
-    const { error: decisionError } = await supabaseAdmin.rpc("record_professional_review_decision", { _professional_id: data.id, _decided_by: context.userId, _decision: "approved", _checklist: data.checklist, _reason: undefined });
+    const { error: decisionError } = await supabaseAdmin.rpc("record_professional_review_decision", { _professional_id: data.id, _decided_by: context.userId, _decision: "approved", _checklist: data.checklist, _reason: "" });
     if (decisionError) return { ok: false as const, erro: "Não foi possível registrar a decisão de aprovação." };
     const { writeAuditEvent } = await import("@/lib/audit.server");
     await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "professional_registration_reviewed", entity: "professional", entityId: data.id, metadata: { status: "checked" } });

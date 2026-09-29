@@ -453,7 +453,7 @@ function Admin() {
                     <div className="flex flex-wrap gap-3">
                       {!p.cadastro_conferido_em && <button type="button" className="btn-base btn-primary" onClick={async () => {
                         const checklist = checklists[p.id] ?? {};
-                        const resultado = await conferirCadastro({ data: { id: p.id, checklist: { identity_matches: checklist.identity_matches === true, crp_active: checklist.crp_active === true, certificate_valid: checklist.certificate_valid === true, diploma_matches: checklist.diploma_matches === true, annex_v_compliant: checklist.annex_v_compliant === true } } });
+                        const resultado = await conferirCadastro({ data: { id: p.id, checklist: { identity_matches: checklist["identity_matches"] === true, crp_active: checklist["crp_active"] === true, certificate_valid: checklist["certificate_valid"] === true, diploma_matches: checklist["diploma_matches"] === true, annex_v_compliant: checklist["annex_v_compliant"] === true } } });
                         setAviso(resultado.ok ? "Cadastro aprovado. O contrato foi liberado para aceite." : resultado.erro);
                         await atualizar();
                       }} disabled={!itensConferencia.every(([chave]) => checklists[p.id]?.[chave])}>Aprovar e liberar contrato</button>}
