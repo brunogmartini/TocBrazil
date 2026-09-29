@@ -19,4 +19,5 @@
 - Write required security events to immutable `audit_log` with metadata keys only, never values containing messages or health information; why: preserve accountability without creating sensitive replicas.
 - Keep Asaas fail-closed and server-only; its admin lab is sandbox-only and detached from real users/appointments; why: prevent real test charges.
 - Use two Asaas card pre-authorizations for booking outcomes and limit bookable slots to the provider's three-day authorization window; why: partial capture is not relied upon.
-- Keep explicit restrictive deny policies on server-only tables even when client grants are revoked; why: access must remain fail-closed if privileges change later.
+- Keep explicit deny policies on server-only tables; why: access stays fail-closed.
+- Keep managed auth emails and signup resend support; why: confirmation is recoverable.

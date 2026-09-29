@@ -58,6 +58,7 @@ function Auth() {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [confirmacaoPendente, setConfirmacaoPendente] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [conflito, setConflito] = useState<{ area: Area; email: string | null } | null>(null);
   const [mfa, setMfa] = useState<MfaPendente | null>(null);
@@ -190,6 +191,7 @@ function Auth() {
     e.preventDefault();
     setErro(null);
     setAviso(null);
+    setConfirmacaoPendente(false);
     setCarregando(true);
     try {
       if (modo === "recuperar") {
@@ -228,8 +230,13 @@ function Auth() {
           },
         });
         if (error) throw error;
+        if (data.user?.identities?.length === 0) {
+          setAviso("Este e-mail já tem conta. Entre com sua senha ou use “Esqueci minha senha”.");
+          return;
+        }
         if (!data.session) {
           setAviso("Enviamos um e-mail de confirmação. Confirme para acessar sua conta.");
+          setConfirmacaoPendente(true);
           return;
         }
       } else {
@@ -254,6 +261,25 @@ function Auth() {
             ? "Este e-mail já tem conta. Escolha “Entrar”."
             : msg,
       );
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  async function reenviarConfirmacao() {
+    setErro(null);
+    setAviso(null);
+    setCarregando(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: email.trim(),
+        options: { emailRedirectTo: window.location.origin + inicioPretendido },
+      });
+      if (error) throw error;
+      setAviso("E-mail de confirmação reenviado. Verifique também a caixa de spam.");
+    } catch {
+      setErro("Não foi possível reenviar agora. Aguarde alguns minutos e tente novamente.");
     } finally {
       setCarregando(false);
     }
@@ -447,6 +473,16 @@ function Auth() {
 
           {erro && <p className="text-sm text-destructive">{erro}</p>}
           {aviso && <p className="text-sm text-foreground">{aviso}</p>}
+          {confirmacaoPendente && (
+            <button
+              type="button"
+              onClick={reenviarConfirmacao}
+              disabled={carregando}
+              className="text-sm font-semibold text-primary underline underline-offset-4 disabled:opacity-60"
+            >
+              Reenviar e-mail de confirmação
+            </button>
+          )}
 
           <button type="submit" disabled={carregando} className="btn-base btn-primary w-full disabled:opacity-60">
             {carregando
