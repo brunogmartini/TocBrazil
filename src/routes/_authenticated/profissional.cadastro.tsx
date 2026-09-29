@@ -11,11 +11,7 @@ import {
   removerDocumento,
   salvarCadastroProfissional,
 } from "@/lib/profissional.functions";
-import {
-  desvincularMercadoPago,
-  iniciarVinculoMercadoPago,
-  statusVinculoMercadoPago,
-} from "@/lib/mercadopago.functions";
+import { statusRecebimentoAsaas } from "@/lib/asaas.functions";
 import { ProfessionalNav } from "@/components/professional-nav";
 import { exigirAreaProfissional } from "@/lib/role-access";
 import { moeda } from "@/lib/video-sala";
@@ -62,15 +58,13 @@ function CadastroProfissional() {
   const salvar = useServerFn(salvarCadastroProfissional);
   const registrar = useServerFn(registrarDocumento);
   const remover = useServerFn(removerDocumento);
-  const statusVinculo = useServerFn(statusVinculoMercadoPago);
-  const iniciarVinculo = useServerFn(iniciarVinculoMercadoPago);
-  const desvincular = useServerFn(desvincularMercadoPago);
+  const statusVinculo = useServerFn(statusRecebimentoAsaas);
   const carregarContrato = useServerFn(contratoAtualProfissional);
   const assinarContrato = useServerFn(assinarContratoProfissional);
 
   const dados = useQuery({ queryKey: ["cadastro-profissional"], queryFn: () => carregar() });
   const vinculo = useQuery({
-    queryKey: ["vinculo-mercadopago"],
+    queryKey: ["vinculo-asaas"],
     queryFn: () => statusVinculo(),
   });
   const contrato = useQuery({ queryKey: ["contrato-profissional"], queryFn: () => carregarContrato() });
@@ -166,16 +160,6 @@ function CadastroProfissional() {
       });
     }
   }, [dados.data]);
-
-  useEffect(() => {
-    const situacao = new URLSearchParams(window.location.search).get("recebimento");
-    if (!situacao) return;
-    if (situacao === "ok") setAviso("Conta Mercado Pago ligada com sucesso.");
-    else if (situacao === "cancelado") setAviso("A autorização no Mercado Pago foi cancelada.");
-    else setAviso("Não conseguimos ligar sua conta Mercado Pago. Tente novamente.");
-    window.history.replaceState(null, "", window.location.pathname);
-  }, []);
-
 
   async function enviarCadastro(e: React.FormEvent) {
     e.preventDefault();
@@ -607,17 +591,13 @@ function CadastroProfissional() {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-2xl">Receber direto na sua conta Mercado Pago</h2>
+        <h2 className="text-2xl">Receber direto pela sua conta Asaas</h2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          Ao ligar sua conta Mercado Pago, o valor de cada consulta cai direto na sua conta e a
-          plataforma retém apenas a taxa fixa combinada, de forma automática.
+          A plataforma cria sua subconta de recebimento no Asaas após a conferência cadastral. O split
+          separa automaticamente o seu valor líquido da taxa fixa da plataforma.
         </p>
         <div className="card-soft mt-5 p-7">
-          {!vinculo.data?.configurado ? (
-            <p className="text-sm text-muted-foreground">
-              O recebimento direto ainda está sendo configurado. Assim que estiver disponível, você poderá ligar sua conta Mercado Pago aqui.
-            </p>
-          ) : vinculo.data.vinculado ? (
+          {vinculo.data?.ativo ? (
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold">Conta ligada</p>
@@ -625,38 +605,10 @@ function CadastroProfissional() {
                   Conta preparada para split: taxa fixa em reais por consulta realizada.
                 </p>
               </div>
-              <button
-                type="button"
-                className="btn-base btn-ghost"
-                onClick={async () => {
-                  await desvincular();
-                  vinculo.refetch();
-                  setAviso("Conta Mercado Pago desligada.");
-                }}
-              >
-                Desligar conta
-              </button>
+               <span className="pill">Ambiente de teste ativo</span>
             </div>
           ) : (
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <p className="max-w-xl text-sm text-muted-foreground">
-                {vinculo.data.temCadastro
-                  ? "Sua conta ainda não está ligada. Você será levado ao Mercado Pago para autorizar o recebimento."
-                  : "Salve seus dados profissionais acima antes de ligar a conta."}
-              </p>
-              <button
-                type="button"
-                disabled={!vinculo.data.temCadastro}
-                className="btn-base btn-primary disabled:opacity-50"
-                onClick={async () => {
-                  const r = await iniciarVinculo({ data: { origem: window.location.origin } });
-                  if (r.ok) window.location.href = r.link;
-                  else setAviso(r.erro);
-                }}
-              >
-                Ligar conta Mercado Pago
-              </button>
-            </div>
+            <p className="max-w-xl text-sm text-muted-foreground">{vinculo.data?.temCadastro ? "Sua subconta Asaas será criada pela equipe depois da conferência dos dados necessários para recebimento." : "Salve seus dados profissionais acima para iniciar a preparação do recebimento."}</p>
           )}
         </div>
       </section>

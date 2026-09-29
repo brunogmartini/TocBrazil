@@ -123,7 +123,7 @@ export const obterProfissional = createServerFn({ method: "GET" })
 export const listarHorariosLivres = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string; dias?: number }) => ({
     slug: String(data.slug),
-    dias: Math.min(Math.max(Number(data.dias ?? 21), 1), 60),
+      dias: Math.min(Math.max(Number(data.dias ?? 3), 1), 3),
   }))
   .handler(async ({ data }) => {
     const cliente = clientePublico();
@@ -319,7 +319,7 @@ export const minhasConsultas = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("appointments")
       .select(
-        "id, inicio, fim, status, payment_status, valor_centavos, taxa_agendamento_centavos, valor_consulta_centavos, duracao_minutos, link_acesso, cancelada_em, professional_id",
+        "id, inicio, fim, status, payment_status, valor_centavos, taxa_agendamento_centavos, valor_consulta_centavos, duracao_minutos, link_acesso, cancelada_em, professional_id, auth_status_a, auth_status_b, settlement_status, amount_captured_centavos",
       )
       .eq("patient_id", userId)
       .order("inicio", { ascending: false });
@@ -398,6 +398,9 @@ export const confirmarRealizacao = createServerFn({ method: "POST" })
       ator: userId,
       atorPapel: "paciente",
     });
+    const { settleAsaasAppointment } = await import("@/services/asaas-settlement.server");
+    const settlement = await settleAsaasAppointment(consulta.id, "REALIZADA", userId, "paciente");
+    if (!settlement.ok) return { ok: false as const, erro: settlement.erro };
     return { ok: true as const };
   });
 
@@ -424,7 +427,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
 
     const { data: livres } = await supabase.rpc("slots_disponiveis", {
       _slug: data.slug,
-      _dias: 60,
+      _dias: 3,
     });
     const inicioIso = new Date(data.inicio).toISOString();
     const disponivel = (livres ?? []).some(
@@ -563,37 +566,12 @@ export const cancelarConsulta = createServerFn({ method: "POST" })
     const { writeAuditEvent } = await import("@/lib/audit.server");
     await writeAuditEvent({ actorId: userId, actorRole: "paciente", action: "appointment_status_changed", entity: "appointment", entityId: consulta.id, metadata: { status: novoStatus } });
 
-    // Estorno pelo provedor quando o cancelamento é dentro do prazo e já houve pagamento.
+    // Libera ou captura as autorizações de acordo com a antecedência do cancelamento.
     let estornado = false;
-    if (dentroDoPrazo && consulta.payment_status === "aprovado" && cfg.reembolsoTaxaNoPrazo) {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: pg } = await supabaseAdmin
-        .from("payments")
-        .select("id, provider_ref")
-        .eq("appointment_id", consulta.id)
-        .eq("status", "aprovado")
-        .maybeSingle();
-      if (pg?.provider_ref) {
-        const { provedorPagamento } = await import("@/services/payments.server");
-        const respostaEstorno = await provedorPagamento().refund(pg.provider_ref);
-        if (respostaEstorno.ok) {
-          estornado = true;
-          await supabaseAdmin
-            .from("payments")
-            .update({ status: "estornado" })
-            .eq("id", pg.id);
-          await supabaseAdmin
-            .from("appointments")
-            .update({ payment_status: "estornado" })
-            .eq("id", consulta.id);
-          await registrarEvento({
-            tipo: "estorno_realizado",
-            appointmentId: consulta.id,
-            ator: userId,
-            atorPapel: "paciente",
-          });
-        }
-      }
+    if (consulta.payment_status === "aprovado") {
+      const { settleAsaasAppointment } = await import("@/services/asaas-settlement.server");
+      const settlement = await settleAsaasAppointment(consulta.id, dentroDoPrazo ? "CANCELADA_COM_ANTECEDENCIA" : "CANCELADA_TARDIA", userId, "paciente");
+      estornado = settlement.ok && dentroDoPrazo;
     }
 
 

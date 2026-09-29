@@ -137,6 +137,13 @@ export type Database = {
       }
       appointments: {
         Row: {
+          amount_captured_centavos: number
+          asaas_payment_id_a: string | null
+          asaas_payment_id_b: string | null
+          auth_expires_at: string | null
+          auth_status_a: string | null
+          auth_status_b: string | null
+          authorized_at: string | null
           cancelada_em: string | null
           cancelada_por: string | null
           comissao_percent: number
@@ -149,14 +156,19 @@ export type Database = {
           inicio: string
           link_acesso: string | null
           observacoes: string | null
+          outcome: string | null
           patient_id: string
           payment_status: Database["public"]["Enums"]["payment_status"]
+          platform_amount_centavos: number
           primeira_consulta: boolean
+          professional_amount_centavos: number
           professional_id: string
           realizada_em: string | null
           remarcada_de: string | null
           reserva_expira_em: string | null
           series_id: string | null
+          settled_at: string | null
+          settlement_status: string
           status: Database["public"]["Enums"]["appointment_status"]
           taxa_agendamento_centavos: number
           taxa_plataforma_centavos: number
@@ -169,6 +181,13 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          amount_captured_centavos?: number
+          asaas_payment_id_a?: string | null
+          asaas_payment_id_b?: string | null
+          auth_expires_at?: string | null
+          auth_status_a?: string | null
+          auth_status_b?: string | null
+          authorized_at?: string | null
           cancelada_em?: string | null
           cancelada_por?: string | null
           comissao_percent?: number
@@ -181,14 +200,19 @@ export type Database = {
           inicio: string
           link_acesso?: string | null
           observacoes?: string | null
+          outcome?: string | null
           patient_id: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
+          platform_amount_centavos?: number
           primeira_consulta?: boolean
+          professional_amount_centavos?: number
           professional_id: string
           realizada_em?: string | null
           remarcada_de?: string | null
           reserva_expira_em?: string | null
           series_id?: string | null
+          settled_at?: string | null
+          settlement_status?: string
           status?: Database["public"]["Enums"]["appointment_status"]
           taxa_agendamento_centavos?: number
           taxa_plataforma_centavos?: number
@@ -201,6 +225,13 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          amount_captured_centavos?: number
+          asaas_payment_id_a?: string | null
+          asaas_payment_id_b?: string | null
+          auth_expires_at?: string | null
+          auth_status_a?: string | null
+          auth_status_b?: string | null
+          authorized_at?: string | null
           cancelada_em?: string | null
           cancelada_por?: string | null
           comissao_percent?: number
@@ -213,14 +244,19 @@ export type Database = {
           inicio?: string
           link_acesso?: string | null
           observacoes?: string | null
+          outcome?: string | null
           patient_id?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
+          platform_amount_centavos?: number
           primeira_consulta?: boolean
+          professional_amount_centavos?: number
           professional_id?: string
           realizada_em?: string | null
           remarcada_de?: string | null
           reserva_expira_em?: string | null
           series_id?: string | null
+          settled_at?: string | null
+          settlement_status?: string
           status?: Database["public"]["Enums"]["appointment_status"]
           taxa_agendamento_centavos?: number
           taxa_plataforma_centavos?: number
@@ -255,6 +291,187 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      asaas_customers: {
+        Row: {
+          asaas_customer_id: string
+          created_at: string
+          environment: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          asaas_customer_id: string
+          created_at?: string
+          environment?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          asaas_customer_id?: string
+          created_at?: string
+          environment?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      asaas_payment_authorizations: {
+        Row: {
+          amount_centavos: number
+          appointment_id: string
+          authorized_at: string | null
+          canceled_at: string | null
+          captured_at: string | null
+          created_at: string
+          environment: string
+          expires_at: string | null
+          failure_code: string | null
+          id: string
+          idempotency_key: string
+          platform_amount_centavos: number
+          portion: string
+          professional_amount_centavos: number
+          provider_payment_id: string
+          provider_status: string | null
+          refunded_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_centavos: number
+          appointment_id: string
+          authorized_at?: string | null
+          canceled_at?: string | null
+          captured_at?: string | null
+          created_at?: string
+          environment?: string
+          expires_at?: string | null
+          failure_code?: string | null
+          id?: string
+          idempotency_key: string
+          platform_amount_centavos: number
+          portion: string
+          professional_amount_centavos: number
+          provider_payment_id: string
+          provider_status?: string | null
+          refunded_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_centavos?: number
+          appointment_id?: string
+          authorized_at?: string | null
+          canceled_at?: string | null
+          captured_at?: string | null
+          created_at?: string
+          environment?: string
+          expires_at?: string | null
+          failure_code?: string | null
+          id?: string
+          idempotency_key?: string
+          platform_amount_centavos?: number
+          portion?: string
+          professional_amount_centavos?: number
+          provider_payment_id?: string
+          provider_status?: string | null
+          refunded_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asaas_payment_authorizations_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      asaas_professional_accounts: {
+        Row: {
+          api_key_ciphertext: string | null
+          asaas_account_id: string | null
+          created_at: string
+          environment: string
+          failure_code: string | null
+          professional_id: string
+          status: string
+          updated_at: string
+          wallet_id: string | null
+        }
+        Insert: {
+          api_key_ciphertext?: string | null
+          asaas_account_id?: string | null
+          created_at?: string
+          environment?: string
+          failure_code?: string | null
+          professional_id: string
+          status?: string
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Update: {
+          api_key_ciphertext?: string | null
+          asaas_account_id?: string | null
+          created_at?: string
+          environment?: string
+          failure_code?: string | null
+          professional_id?: string
+          status?: string
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asaas_professional_accounts_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: true
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      asaas_webhook_events: {
+        Row: {
+          environment: string
+          event_id: string
+          event_type: string
+          failure_code: string | null
+          id: string
+          processed_at: string | null
+          provider_payment_id: string | null
+          received_at: string
+          status: string
+        }
+        Insert: {
+          environment: string
+          event_id: string
+          event_type: string
+          failure_code?: string | null
+          id?: string
+          processed_at?: string | null
+          provider_payment_id?: string | null
+          received_at?: string
+          status?: string
+        }
+        Update: {
+          environment?: string
+          event_id?: string
+          event_type?: string
+          failure_code?: string | null
+          id?: string
+          processed_at?: string | null
+          provider_payment_id?: string | null
+          received_at?: string
+          status?: string
+        }
+        Relationships: []
       }
       audit_log: {
         Row: {
@@ -1446,6 +1663,7 @@ export type Database = {
           codigo_anonimo: string | null
           contato_emergencia_nome: string | null
           contato_emergencia_telefone: string | null
+          cpf: string | null
           created_at: string
           data_nascimento: string | null
           email: string | null
@@ -1461,6 +1679,7 @@ export type Database = {
           codigo_anonimo?: string | null
           contato_emergencia_nome?: string | null
           contato_emergencia_telefone?: string | null
+          cpf?: string | null
           created_at?: string
           data_nascimento?: string | null
           email?: string | null
@@ -1476,6 +1695,7 @@ export type Database = {
           codigo_anonimo?: string | null
           contato_emergencia_nome?: string | null
           contato_emergencia_telefone?: string | null
+          cpf?: string | null
           created_at?: string
           data_nascimento?: string | null
           email?: string | null

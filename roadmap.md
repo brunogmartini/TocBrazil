@@ -61,3 +61,11 @@
 - [x] Adicionar TOTP opcional na área do psicólogo
 - [x] Validar cabeçalhos, cookies, bundle, desktop e 375 px; emitir relatório final
 - [ ] Separar banco de prévia e produção (depende de infraestrutura externa)
+
+## Pagamentos Asaas — 29/09/2026
+- [x] Criar estrutura privada para subcontas, clientes, autorizações A/B e webhooks
+- [x] Isolar sandbox e produção por chave e endereço da API
+- [ ] Conectar formulário de reserva no cartão e estados do paciente
+- [ ] Conectar criação de subconta e estado de recebimento do psicólogo
+- [ ] Conectar captura/cancelamento aos desfechos da consulta
+- [ ] Validar no sandbox autorização A/B, cancelamento imediato, split e webhook
