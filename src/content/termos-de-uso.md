@@ -1,25 +1,27 @@
+
 # TERMOS DE USO
 
 
-**TOC BRAZIL**
+# TOC BRAZIL
 
-*Texto em revisão — baseado no documento enviado em 27/09/2026 — tocbrazil.com.br*
+*Versão 1.3 — vigente a partir de 28/09/2026*
 
 
-> **EM RESUMO. A TOC Brazil é uma plataforma de tecnologia: você encontra psicólogos com experiência em TOC e compara seus perfis e horários. O agendamento com pagamento ainda não está disponível. Quando houver consulta, ela acontece na sala de videochamada do próprio psicólogo, e quem presta o atendimento é ele — não a TOC Brazil. A plataforma não avalia, não diagnostica, não trata e não garante resultado. Não somos um serviço de urgência: em caso de crise, ligue 188 (CVV) ou 192 (SAMU).**
+> **EM RESUMO. A TOC Brazil é uma plataforma de tecnologia: você encontra psicólogos com experiência em TOC, escolhe um, agenda e paga por aqui — o valor é reservado no seu cartão na véspera e cobrado só depois da consulta. A consulta acontece na sala de videochamada do próprio psicólogo, e quem presta o atendimento é ele — não a TOC Brazil. A plataforma não avalia, não diagnostica, não trata e não garante resultado. Não somos um serviço de urgência: em caso de crise, ligue 188 (CVV) ou 192 (SAMU).**
 
 
 ## 1. Quem somos e o que este documento regula
 
 1.1. A plataforma TOC Brazil é operada por NEW TECH PLATAFORMAS DE TECNOLOGIA LTDA, CNPJ nº 69.340.866/0001-48, com sede na Rua Gonzaga, nº 106, São Leopoldo/RS, CEP 93020-040, empresa de tecnologia que desenvolve e mantém o sítio tocbrazil.com.br.
 
-1.2. Estes Termos regulam a relação entre a TOC Brazil e você, Usuário que utiliza a plataforma para encontrar profissionais e consultar suas informações.
+1.2. Estes Termos regulam a relação entre a TOC Brazil e você, Usuário que utiliza a plataforma para encontrar profissionais, agendar consultas e efetuar pagamentos.
 
+1.3. Ao criar uma conta ou realizar um agendamento, você declara ter lido e aceito estes Termos e a Política de Privacidade.
 
 
 ## 2. O que a TOC Brazil faz — e o que não faz
 
-2.1. A TOC Brazil oferece busca de psicólogos por filtros que você mesmo escolhe, exibição de perfis e agenda. O agendamento com pagamento ainda não está disponível.
+2.1. A TOC Brazil oferece: busca de psicólogos por filtros que você mesmo escolhe; exibição de perfis; agenda e agendamento; processamento do pagamento; e transmissão, no horário marcado, do endereço da sala de videochamada informado pelo psicólogo.
 
 2.2. A TOC Brazil NÃO presta serviços de saúde. Não realiza avaliação, triagem, diagnóstico, indicação de tratamento, prescrição ou acompanhamento clínico, e não interfere na conduta técnica do profissional.
 
@@ -46,90 +48,115 @@
 
 ## 5. Cadastro
 
-5.1. Para usar os recursos de cadastro, é necessário criar uma conta com informações verdadeiras e mantê-las atualizadas. A conta é pessoal e intransferível.
+5.1. Para agendar, é necessário criar uma conta com informações verdadeiras e mantê-las atualizadas. A conta é pessoal e intransferível.
+
+5.2. É preciso ter 18 anos ou mais para criar conta. O agendamento para criança ou adolescente deve ser feito por seu responsável legal, que declara essa condição e responde pelas informações prestadas.
+
+5.3. No cadastro solicitamos um contato de emergência. Ele é um dado administrativo de segurança, disponibilizado apenas ao psicólogo com quem você tenha consulta marcada, e poderá ser acionado por ele em situação que, a critério técnico dele, assim o exija.
 
 
-5.2. No cadastro solicitamos um contato de emergência. Ele é um dado administrativo de segurança, disponibilizado apenas ao psicólogo com quem você tenha consulta marcada, e poderá ser acionado por ele em situação que, a critério técnico dele, assim o exija.
+## 6. Agendamento, valores e pagamento
+
+6.1. O valor da consulta é definido livremente pelo psicólogo e informado no perfil dele. A TOC Brazil não define, não sugere e não acrescenta margem a esse valor.
+
+6.2. A TOC Brazil é remunerada por uma taxa fixa paga pelo PSICÓLOGO pelo uso da plataforma. Essa taxa não é cobrada de você e não compõe o preço da consulta.
+
+6.3. No agendamento, você informa os dados do cartão e nada é debitado nem reservado. A reserva do valor da consulta acontece 36 horas antes do horário marcado — e mesmo aí nada é cobrado, apenas reservado no limite do cartão. A cobrança acontece depois da consulta, e só do valor efetivamente devido. O pagamento é processado por provedor de meios de pagamento e destinado ao psicólogo, que emite o documento fiscal.
+
+6.4. Confirmada a reserva, você recebe a confirmação por e-mail. O endereço da sala de videochamada fica disponível na plataforma a partir de 15 (quinze) minutos antes do horário marcado.
+
+6.5. Enviamos lembretes por e-mail 24 (vinte e quatro) horas e 15 (quinze) minutos antes da consulta.
 
 
-## 6. Valores e pagamento
+## 7. Cancelamento, remarcação e reembolso
 
-6.1. O psicólogo informa o valor líquido que deseja receber. O preço total informado no perfil inclui esse valor e a taxa fixa da plataforma.
+7.1. O valor é reservado no seu cartão 36 horas antes da consulta e cobrado somente depois dela. Você pode cancelar ou remarcar pela plataforma até 24 (vinte e quatro) horas antes do horário agendado: a reserva é integralmente liberada e nada é cobrado de você.
 
-6.2. A TOC Brazil é remunerada por uma taxa fixa em reais por consulta realizada, incluída no preço total informado antes do agendamento.
+7.1.1. Cancelando com menos de 24 horas de antecedência, não comparecendo, ou atrasando mais de 15 (quinze) minutos, é cobrada apenas a quantia de R$ 50,00 (cinquenta reais) e o restante da reserva é liberado. Desse valor, R$ 40,00 remuneram o psicólogo pelo horário que ele reservou e manteve à sua disposição, e R$ 10,00 remuneram a plataforma pelo uso da estrutura. Se a consulta custar menos de R$ 50,00, a cobrança fica limitada ao valor reservado.
+
+7.1.2. Se o psicólogo não comparecer, ou atrasar mais de 15 (quinze) minutos, a reserva é integralmente liberada e nada é cobrado de você. Você pode remarcar, se preferir.
+
+7.2. A liberação da reserva é solicitada ao provedor assim que o desfecho é definido. O prazo para o limite voltar a aparecer no seu cartão depende do banco emissor. Se não for possível reservar o valor — por limite insuficiente, cartão vencido ou recusa —, avisamos você e o agendamento é cancelado sem qualquer custo.
+
+7.3. Se a consulta não puder ocorrer por falha atribuível ao psicólogo, a reserva é integralmente liberada e você pode remarcar, à sua escolha.
+
+7.4. Havendo cobrança indevida, o estorno é processado pelo mesmo meio de pagamento utilizado, nos prazos do provedor.
+
+7.5. Nos termos do art. 49 do Código de Defesa do Consumidor, você pode desistir da contratação em até 7 (sete) dias contados do agendamento, desde que a consulta ainda não tenha ocorrido, com devolução integral dos valores pagos.
 
 
-
-
-
-## 7. Situações de urgência
+## 8. Situações de urgência
 
 
 > **8.1. A TOC BRAZIL NÃO É UM SERVIÇO DE URGÊNCIA OU EMERGÊNCIA. Não temos equipe de plantão, não monitoramos atendimentos e não conseguimos ajudar em situações de crise. Se você ou alguém próximo precisar de ajuda imediata, ligue 188 (CVV, gratuito, 24 horas) ou 192 (SAMU). Em caso de violência contra criança ou adolescente, ligue 100; contra a mulher, 180.**
 
+8.2. Se você entrar em contato conosco em situação de crise, nossa equipe — que não é formada por profissionais de saúde — irá apenas indicar esses serviços e avisar o psicólogo com quem você tenha vínculo.
 
 
-## 8. Privacidade e sigilo
+## 9. Privacidade e sigilo
 
-8.1. O tratamento dos seus dados é descrito na Política de Privacidade.
+9.1. O tratamento dos seus dados é descrito na Política de Privacidade, que integra estes Termos.
 
-8.2. A TOC Brazil não tem acesso ao conteúdo das consultas e não armazena prontuários, anotações clínicas ou qualquer registro do atendimento.
+9.2. A TOC Brazil não tem acesso ao conteúdo das consultas e não armazena prontuários, anotações clínicas ou qualquer registro do atendimento.
 
-8.3. O canal de mensagens da plataforma é destinado exclusivamente a assuntos administrativos. Não compartilhe informações sobre sua saúde por esse canal.
+9.3. O canal de mensagens da plataforma é destinado exclusivamente a assuntos administrativos. Não compartilhe informações sobre sua saúde por esse canal.
 
-8.4. É vedada a gravação da consulta, por qualquer das partes, sem consentimento expresso e documentado.
-
-
-## 9. Avaliações
-
-9.1. As avaliações passam por moderação, são exibidas de forma anônima e não podem mencionar diagnóstico, conduta terapêutica ou resultado de tratamento, em proteção à sua própria privacidade.
+9.4. É vedada a gravação da consulta, por qualquer das partes, sem consentimento expresso e documentado.
 
 
-## 10. Uso adequado da plataforma
+## 10. Avaliações
 
-10.1. É vedado: fornecer informações falsas; usar a conta de terceiro ou permitir que terceiro use a sua; tentar obter acesso não autorizado a sistemas ou a dados; extrair dados da plataforma por meios automatizados; e praticar qualquer conduta ofensiva, discriminatória ou ilícita contra profissionais ou contra nossa equipe.
+10.1. Após a consulta, você pode avaliar aspectos administrativos do atendimento — pontualidade, clareza das informações e cordialidade.
 
-
-
-## 11. Propriedade intelectual
-
-11.1. A marca, o software, os conteúdos e a identidade visual da plataforma pertencem à TOC Brazil. O acesso não transfere a você qualquer direito sobre eles.
+10.2. As avaliações passam por moderação, são exibidas de forma anônima e não podem mencionar diagnóstico, conduta terapêutica ou resultado de tratamento, em proteção à sua própria privacidade.
 
 
+## 11. Uso adequado da plataforma
 
-## 12. Responsabilidades
+11.1. É vedado: fornecer informações falsas; usar a conta de terceiro ou permitir que terceiro use a sua; tentar obter acesso não autorizado a sistemas ou a dados; extrair dados da plataforma por meios automatizados; e praticar qualquer conduta ofensiva, discriminatória ou ilícita contra profissionais ou contra nossa equipe.
 
-12.1. A TOC Brazil responde pelo funcionamento da plataforma que disponibiliza, nos limites da lei e destes Termos.
-
-12.2. O psicólogo responde pelo atendimento que presta, incluindo conduta técnica, sigilo, registros e desfechos.
-
-12.3. A TOC Brazil não responde pelo funcionamento da ferramenta de videochamada contratada pelo psicólogo, nem por falhas de conexão, energia ou equipamentos do seu lado ou do dele.
-
-12.4. Nenhuma disposição destes Termos afasta direitos que a lei assegura a você como consumidor.
+11.2. O descumprimento pode levar à suspensão ou ao encerramento da conta, sem prejuízo das medidas legais cabíveis.
 
 
-## 13. Suporte
+## 12. Propriedade intelectual
 
-Nosso canal de atendimento é contatotocbrazil@gmail.com.
+12.1. A marca, o software, os conteúdos e a identidade visual da plataforma pertencem à TOC Brazil. O acesso não transfere a você qualquer direito sobre eles.
 
-
-13.1. Reclamações sobre a conduta profissional do psicólogo podem ser registradas conosco, para as providências administrativas cabíveis, e devem ser levadas ao Conselho Regional de Psicologia, competente para apurá-las.
-
-
-## 14. Alterações
-
-Estes Termos podem ser alterados. Consulte esta página para verificar o texto em vigor.
+12.2. Os conteúdos educativos publicados têm caráter exclusivamente informativo, são de autoria dos profissionais que os assinam e não substituem avaliação individual.
 
 
+## 13. Responsabilidades
+
+13.1. A TOC Brazil responde pelo funcionamento da plataforma que disponibiliza, nos limites da lei e destes Termos.
+
+13.2. O psicólogo responde pelo atendimento que presta, incluindo conduta técnica, sigilo, registros e desfechos.
+
+13.3. A TOC Brazil não responde pelo funcionamento da ferramenta de videochamada contratada pelo psicólogo, nem por falhas de conexão, energia ou equipamentos do seu lado ou do dele.
+
+13.4. Nenhuma disposição destes Termos afasta direitos que a lei assegura a você como consumidor.
 
 
-## 15. Lei aplicável e foro
+## 14. Suporte
 
-15.1. Aplica-se a lei brasileira, em especial o Código de Defesa do Consumidor e o Marco Civil da Internet.
+14.1. Nosso canal de atendimento é contatotocbrazil@gmail.com, com resposta em até 48 (quarenta e oito) horas úteis.
 
-15.2. Fica assegurado a você, nos termos do art. 101, I, do Código de Defesa do Consumidor, o direito de propor eventual demanda no foro do seu domicílio.
+14.2. Reclamações sobre a conduta profissional do psicólogo podem ser registradas conosco, para as providências administrativas cabíveis, e devem ser levadas ao Conselho Regional de Psicologia, competente para apurá-las.
 
 
-## 16. Contato
+## 15. Alterações
+
+15.1. Estes Termos podem ser alterados. Comunicaremos as mudanças relevantes com antecedência mínima de 30 (trinta) dias, por e-mail e na plataforma.
+
+15.2. Agendamentos já confirmados permanecem regidos pela versão vigente na data da contratação.
+
+
+## 16. Lei aplicável e foro
+
+16.1. Aplica-se a lei brasileira, em especial o Código de Defesa do Consumidor e o Marco Civil da Internet.
+
+16.2. Fica assegurado a você, nos termos do art. 101, I, do Código de Defesa do Consumidor, o direito de propor eventual demanda no foro do seu domicílio.
+
+
+## 17. Contato
 
 NEW TECH PLATAFORMAS DE TECNOLOGIA LTDA (nome fantasia NEW TECH), operadora da plataforma TOC Brazil — CNPJ 69.340.866/0001-48 — Rua Gonzaga, nº 106, São Leopoldo/RS, CEP 93020-040 — contatotocbrazil@gmail.com — Encarregado pelo tratamento de dados: Eduardo Bastos Hansen, contatotocbrazil@gmail.com.

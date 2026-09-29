@@ -72,3 +72,9 @@
 - [x] Criar laboratório administrativo isolado para subconta, split, captura e cancelamento no Sandbox
 - [ ] Executar ciclo financeiro completo no laboratório com dados e cartão oficiais de teste do Asaas
 - [x] Reforçar webhook Asaas com token, validação, deduplicação atômica e registro seguro
+
+## Documentos oficiais e fluxo seguro de cartão — 29/09/2026
+- [x] Publicar integralmente Termos de Uso e Política de Privacidade oficiais v1.3
+- [x] Corrigir as três frases divergentes na home e no formulário de cartão
+- [x] Reemitir `session-id` como HttpOnly, Secure e SameSite=Lax quando presente
+- [ ] Substituir a coleta direta de cartão por fluxo oficial do Asaas sem trânsito de PAN/CCV pelo servidor da TOC Brazil
