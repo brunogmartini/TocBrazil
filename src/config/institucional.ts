@@ -5,7 +5,7 @@ export const institucional = {
   email: "contatotocbrazil@gmail.com",
   encarregado: "Eduardo Bastos Hansen",
   horarioAtendimento: "[HORÁRIO DE ATENDIMENTO]",
-  pagamentosAtivos: false,
+  pagamentosAtivos: true,
   prazoResposta: "Respondemos em até 5 dias úteis",
   politicaPrivacidadeVersao: "2026-09-23",
 } as const;
