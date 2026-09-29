@@ -82,6 +82,33 @@ async function request<T>(path: string, init: RequestInit = {}, apiKeyOverride?:
   return response.json() as Promise<T>;
 }
 
+function sandboxCredentials() {
+  const apiKey = process.env["ASAAS_API_KEY_SANDBOX"];
+  if (!apiKey) throw new Error("Chave Asaas Sandbox não configurada.");
+  return { apiKey, baseUrl: "https://api-sandbox.asaas.com/v3" } as const;
+}
+
+async function sandboxRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const config = sandboxCredentials();
+  const response = await fetch(`${config.baseUrl}${path}`, {
+    ...init,
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      "user-agent": "TOC-Brazil-Sandbox-Lab/1.0",
+      access_token: config.apiKey,
+      ...(init.headers ?? {}),
+    },
+  });
+  if (!response.ok) {
+    const body = (await response.json().catch(() => null)) as AsaasError | null;
+    const code = body?.errors?.[0]?.code ?? `HTTP_${response.status}`;
+    console.error("Asaas sandbox request failed", { path, status: response.status, code });
+    throw new Error(`ASAAS_SANDBOX_${code}`);
+  }
+  return response.json() as Promise<T>;
+}
+
 export async function createCustomer(input: {
   name: string;
   cpfCnpj: string;
@@ -171,6 +198,70 @@ export async function createSubaccount(input: {
     method: "POST",
     body: JSON.stringify({ ...input, companyType: "INDIVIDUAL" }),
   });
+}
+
+export async function createSandboxSubaccount(input: {
+  name: string;
+  email: string;
+  cpfCnpj: string;
+  birthDate: string;
+  mobilePhone: string;
+  incomeValue: number;
+  postalCode: string;
+  address: string;
+  addressNumber: string;
+  province: string;
+  complement?: string | null;
+}) {
+  return sandboxRequest<{ id: string; walletId: string; apiKey?: string }>("/accounts", {
+    method: "POST",
+    body: JSON.stringify({ ...input, companyType: input.cpfCnpj.length === 14 ? "LIMITED" : "INDIVIDUAL" }),
+  });
+}
+
+export async function createSandboxCustomer(input: {
+  name: string;
+  cpfCnpj: string;
+  email: string;
+  phone: string;
+  externalReference: string;
+}) {
+  return sandboxRequest<{ id: string }>("/customers", {
+    method: "POST",
+    body: JSON.stringify({ name: input.name, cpfCnpj: input.cpfCnpj, email: input.email, mobilePhone: input.phone, externalReference: input.externalReference, notificationDisabled: true }),
+  });
+}
+
+export async function createSandboxAuthorizedPayment(input: AuthorizationInput) {
+  return sandboxRequest<AsaasPayment>("/payments", {
+    method: "POST",
+    headers: { "asaas-idempotency-key": `sandbox-test:${input.appointmentId}:${input.portion}` },
+    body: JSON.stringify({
+      customer: input.customerId,
+      billingType: "CREDIT_CARD",
+      value: input.amountCentavos / 100,
+      dueDate: new Date().toISOString().slice(0, 10),
+      description: `Teste administrativo TOC Brazil · autorização ${input.portion}`,
+      externalReference: `sandbox-test:${input.appointmentId}:${input.portion}`,
+      authorizeOnly: true,
+      creditCard: { holderName: input.card.holderName, number: input.card.number, expiryMonth: input.card.expiryMonth, expiryYear: input.card.expiryYear, ccv: input.card.ccv },
+      creditCardHolderInfo: input.card.holder,
+      remoteIp: input.card.remoteIp,
+      split: [{ walletId: input.professionalWalletId, fixedValue: input.professionalCentavos / 100 }],
+    }),
+  });
+}
+
+export async function getSandboxPayment(paymentId: string) {
+  return sandboxRequest<AsaasPayment>(`/payments/${encodeURIComponent(paymentId)}`);
+}
+
+export async function captureSandboxPayment(paymentId: string) {
+  return sandboxRequest<AsaasPayment>(`/payments/${encodeURIComponent(paymentId)}/captureAuthorizedPayment`, { method: "POST" });
+}
+
+export async function cancelSandboxPayment(paymentId: string) {
+  return sandboxRequest<AsaasPayment>(`/payments/${encodeURIComponent(paymentId)}`, { method: "DELETE" });
 }
 
 export type AdminClient = import("@supabase/supabase-js").SupabaseClient<Database>;
