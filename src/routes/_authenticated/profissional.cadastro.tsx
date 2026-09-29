@@ -592,7 +592,11 @@ function ValorConsultaCampo({ valor, onChange }: { valor: string; onChange: (val
         required
         className="field-base mt-2"
         value={valor}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          e.target.setCustomValidity("");
+          onChange(e.target.value);
+        }}
+        onInvalid={(e) => e.currentTarget.setCustomValidity("O valor da consulta precisa ser maior que R$ 27,00.")}
         aria-describedby="valor-consulta-apoio valor-consulta-recebimento valor-consulta-erro"
         aria-invalid={invalido}
       />

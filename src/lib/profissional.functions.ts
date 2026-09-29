@@ -49,7 +49,6 @@ export type CadastroProfissionalEntrada = {
   experiencia_anos?: number;
   slot_minutos?: number;
   valor_centavos?: number;
-  valor_centavos?: number;
   certidao_validade?: string | null;
   ferramenta_provedor?: string;
   ferramenta_url_sala?: string;
