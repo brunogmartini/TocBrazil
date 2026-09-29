@@ -97,3 +97,9 @@
 - [x] Tornar acessos e aceites imutáveis e gravados somente pelo servidor
 - [x] Travar agenda e publicação até contrato, recebimento e disponibilidade
 - [x] Recolocar taxa, explicação e pagamento garantido; remover pedido de seguro
+
+## Correção contratual do valor da consulta — 29/09/2026
+- [x] Inventariar cadastros existentes sem converter valores automaticamente
+- [x] Trocar o campo para o preço integral definido pelo profissional
+- [x] Deduzir R$ 27 do profissional sem somar a taxa ao preço do paciente
+- [ ] Validar cadastro, financeiro, desktop e 375 px

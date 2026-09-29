@@ -33,7 +33,7 @@ const etapas = [
   "Abordagem",
   "Experiência em TOC",
   "Documentos para validação",
-  "Valor líquido desejado",
+  "Valor da consulta",
   "Disponibilidade",
   "Dados de recebimento",
   "Aguardar aprovação",

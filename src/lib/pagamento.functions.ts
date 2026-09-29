@@ -4,9 +4,8 @@ import { baseSegura } from "@/lib/origem-segura";
 import { institucional } from "@/config/institucional";
 
 /**
- * Cobrança da consulta: o paciente paga o valor líquido desejado pelo
- * profissional acrescido da taxa fixa. O split envia o líquido ao profissional
- * e a taxa à plataforma.
+ * Cobrança da consulta: o paciente paga exatamente o valor definido pelo
+ * profissional. O split desconta desse valor a taxa fixa devida à plataforma.
  */
 export const iniciarPagamento = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

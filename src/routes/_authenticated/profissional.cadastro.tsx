@@ -14,7 +14,7 @@ import { ProfessionalNav } from "@/components/professional-nav";
 import { ContractAcceptance } from "@/components/contract-acceptance";
 import { exigirAreaProfissional } from "@/lib/role-access";
 import { moeda } from "@/lib/video-sala";
-import { TAXA_FIXA_CENTAVOS } from "@/lib/precos";
+import { TAXA_FIXA_CENTAVOS, valorProfissionalCentavos } from "@/lib/precos";
 import {
   ABORDAGENS_PERFIL,
   IDIOMAS_PERFIL,
@@ -80,7 +80,7 @@ function CadastroProfissional() {
     foto_caminho: "",
     experiencia_anos: "0",
     slot_minutos: "50",
-    valor_liquido: "200",
+    valor_consulta: "200",
     areas: "",
     idiomas: [] as string[],
     certidao_validade: "",
@@ -139,7 +139,7 @@ function CadastroProfissional() {
         foto_caminho: p.foto_caminho ?? "",
         experiencia_anos: String(p.experiencia_anos ?? 0),
         slot_minutos: String(p.slot_minutos ?? 50),
-        valor_liquido: String(Math.round((p.valor_liquido_centavos ?? Math.max((p.valor_centavos ?? 22700) - TAXA_FIXA_CENTAVOS, 0)) / 100)),
+        valor_consulta: String((p.valor_centavos ?? 20000) / 100),
         areas: (p.areas ?? []).join(", "),
         idiomas: p.idiomas ?? [],
         certidao_validade: p.certidao_validade ?? "",
@@ -155,14 +155,19 @@ function CadastroProfissional() {
     setErro(null);
     setAviso(null);
     try {
-      const { valor_liquido, ...restoForm } = form;
+      const { valor_consulta, ...restoForm } = form;
+      const valorConsultaCentavos = Math.round((Number(valor_consulta) || 0) * 100);
+      if (valorConsultaCentavos <= TAXA_FIXA_CENTAVOS) {
+        setErro("O valor da consulta precisa ser maior que R$ 27,00.");
+        return;
+      }
       const r = await salvar({
         data: {
           ...restoForm,
           profissao: "psicologo",
           experiencia_anos: Number(form.experiencia_anos) || 0,
           slot_minutos: Number(form.slot_minutos) || 50,
-          valor_liquido_centavos: Math.round((Number(valor_liquido) || 0) * 100),
+          valor_centavos: valorConsultaCentavos,
         },
       });
       if (!r.ok) {
@@ -358,10 +363,7 @@ function CadastroProfissional() {
               value={form.experiencia_anos}
               onChange={(v) => setForm({ ...form, experiencia_anos: v })}
             />
-            <div>
-              <Campo label="Quanto você quer receber por consulta? Informe o valor líquido desejado" type="number" value={form.valor_liquido} onChange={(v) => setForm({ ...form, valor_liquido: v })} required />
-              <p className="mt-2 text-xs text-muted-foreground">O valor divulgado ao paciente será {moeda(Math.round((Number(form.valor_liquido) || 0) * 100) + TAXA_FIXA_CENTAVOS)}.</p>
-            </div>
+            <ValorConsultaCampo valor={form.valor_consulta} onChange={(valor_consulta) => setForm({ ...form, valor_consulta })} />
           </>
         )}
         {temCadastro && <>
@@ -404,18 +406,7 @@ function CadastroProfissional() {
             ))}
           </select>
         </div>
-        <div>
-          <Campo
-            label="Quanto você quer receber por consulta? Informe o valor líquido desejado"
-            type="number"
-            value={form.valor_liquido}
-            onChange={(v) => setForm({ ...form, valor_liquido: v })}
-            required
-          />
-          <p className="mt-1 text-xs text-muted-foreground">
-            Valor que será divulgado ao paciente: <strong>{moeda(Math.round((Number(form.valor_liquido) || 0) * 100) + TAXA_FIXA_CENTAVOS)}</strong>.
-          </p>
-        </div>
+        <ValorConsultaCampo valor={form.valor_consulta} onChange={(valor_consulta) => setForm({ ...form, valor_consulta })} />
         <fieldset className="sm:col-span-2 rounded-lg border border-border p-4">
           <legend className="section-label px-1">Abordagens teóricas — escolha até 3</legend>
           <div className="mt-2 grid gap-2 sm:grid-cols-2">{ABORDAGENS_PERFIL.map((item) => <label key={item} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.abordagens_publicas.includes(item)} disabled={!form.abordagens_publicas.includes(item) && form.abordagens_publicas.length >= 3} onChange={(e) => setForm({ ...form, abordagens_publicas: e.target.checked ? [...form.abordagens_publicas, item] : form.abordagens_publicas.filter((valor) => valor !== item) })} />{item}</label>)}</div>
@@ -582,6 +573,36 @@ function Campo({
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
+    </div>
+  );
+}
+
+function ValorConsultaCampo({ valor, onChange }: { valor: string; onChange: (valor: string) => void }) {
+  const valorCentavos = Math.round((Number(valor) || 0) * 100);
+  const invalido = valor !== "" && valorCentavos <= TAXA_FIXA_CENTAVOS;
+  return (
+    <div>
+      <label htmlFor="valor-da-consulta" className="section-label">Valor da sua consulta</label>
+      <input
+        id="valor-da-consulta"
+        type="number"
+        inputMode="decimal"
+        min="27.01"
+        step="0.01"
+        required
+        className="field-base mt-2"
+        value={valor}
+        onChange={(e) => onChange(e.target.value)}
+        aria-describedby="valor-consulta-apoio valor-consulta-recebimento valor-consulta-erro"
+        aria-invalid={invalido}
+      />
+      <p id="valor-consulta-apoio" className="mt-2 text-xs text-muted-foreground">
+        Este é o valor que o paciente vê e paga. Você define livremente.
+      </p>
+      <p id="valor-consulta-recebimento" className="mt-1 text-xs text-muted-foreground">
+        Você recebe {moeda(valorProfissionalCentavos(valorCentavos))} por consulta realizada. A taxa fixa de R$ 27 é sua obrigação com a TOC Brazil e não é somada ao preço que o paciente paga.
+      </p>
+      {invalido && <p id="valor-consulta-erro" className="mt-1 text-xs font-semibold text-destructive">O valor da consulta precisa ser maior que R$ 27,00.</p>}
     </div>
   );
 }

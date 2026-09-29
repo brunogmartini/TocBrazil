@@ -160,7 +160,7 @@ function PainelProfissional() {
             <p className="professional-label">Já recebido</p>
             <p className="mt-2 font-display text-2xl">{moeda(resumo?.recebido ?? 0)}</p>
             <p className="mt-2 text-xs text-muted-foreground">
-               valor líquido após a taxa fixa incluída no preço público
+               valor recebido após a dedução da taxa fixa da plataforma
             </p>
           </div>
         </div>

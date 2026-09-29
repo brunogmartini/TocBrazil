@@ -9,7 +9,7 @@ import {
   TEMAS_TOC_PERFIL,
   type FormacaoPublica,
 } from "@/lib/perfil-profissional";
-import { precoPublicoCentavos } from "@/lib/precos";
+import { TAXA_FIXA_CENTAVOS, valorProfissionalCentavos } from "@/lib/precos";
 
 export const TEXTO_ACEITE_ELETRONICO =
   "Assinatura eletrônica: ao aceitar, ficam registrados nome completo, CPF, número de inscrição no CRP,\n\ndata, hora, endereço IP, geolocalização aproximada e identificador do dispositivo. É dispensada a\n\nassinatura de testemunhas quando a integridade do documento for conferida por provedor de assinatura\n\n(art. 784, § 4º, do Código de Processo Civil).";
@@ -49,7 +49,7 @@ export type CadastroProfissionalEntrada = {
   experiencia_anos?: number;
   slot_minutos?: number;
   valor_centavos?: number;
-  valor_liquido_centavos?: number;
+  valor_centavos?: number;
   certidao_validade?: string | null;
   ferramenta_provedor?: string;
   ferramenta_url_sala?: string;
@@ -142,10 +142,13 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     const profissao: "psicologo" = "psicologo";
     const cnpj = String(data.cnpj ?? "").replace(/\D/g, "").slice(0, 14);
     if (cnpj.length !== 14) throw new Error("Informe um CNPJ válido com 14 dígitos.");
-    const valorLiquidoCentavos = Math.min(
-      Math.max(Math.round(Number(data.valor_liquido_centavos ?? 0) || 0), 0),
+    const valorConsultaCentavos = Math.min(
+      Math.max(Math.round(Number(data.valor_centavos ?? 0) || 0), 0),
       500000,
     );
+    if (valorConsultaCentavos <= TAXA_FIXA_CENTAVOS) {
+      throw new Error("O valor da consulta precisa ser maior que R$ 27,00.");
+    }
     const abordagens = lista(data.abordagens_publicas).filter((item) =>
       (ABORDAGENS_PERFIL as readonly string[]).includes(item),
     ).slice(0, 3);
@@ -180,8 +183,8 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       slot_minutos: [30, 40, 50, 60].includes(Number(data.slot_minutos))
         ? Number(data.slot_minutos)
         : 50,
-      valor_liquido_centavos: valorLiquidoCentavos,
-      valor_centavos: precoPublicoCentavos(valorLiquidoCentavos),
+      valor_centavos: valorConsultaCentavos,
+      valor_liquido_centavos: valorProfissionalCentavos(valorConsultaCentavos),
       areas: lista(data.areas),
       idiomas,
       certidao_validade: data.certidao_validade ? String(data.certidao_validade).slice(0, 10) : null,
