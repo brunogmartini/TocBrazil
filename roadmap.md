@@ -78,3 +78,13 @@
 - [x] Corrigir as três frases divergentes na home e no formulário de cartão
 - [x] Reemitir `session-id` como HttpOnly, Secure e SameSite=Lax quando presente
 - [ ] Substituir a coleta direta de cartão por fluxo oficial do Asaas sem trânsito de PAN/CCV pelo servidor da TOC Brazil
+
+## Revisão e reforço de segurança — 29/09/2026
+- [x] Confirmar RLS e FORCE RLS nas 35 tabelas dos esquemas da aplicação
+- [x] Adicionar políticas explícitas de negação às sete tabelas exclusivas do servidor
+- [x] Confirmar os três buckets privados e seus limites de arquivo
+- [x] Validar cabeçalhos no domínio público e na prévia local
+- [x] Confirmar imutabilidade, privilégios e ausência de conteúdo sensível no log de auditoria
+- [x] Executar scanner do banco, dependências, acesso anônimo, métodos HTTP e revisão estática
+- [x] Registrar resultados e limites em `REVISAO-DE-SEGURANCA-2026-09-29.md`
+- [ ] Executar pentest independente certificado antes da abertura pública dos pagamentos
