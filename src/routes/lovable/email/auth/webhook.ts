@@ -28,7 +28,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           sendUrl: process.env['LOVABLE_SEND_URL'],
           emails: {
             signup: {
-              subject: 'Confirm your email',
+              subject: 'Confirme seu cadastro na TOC Brazil',
               render: (data) =>
                 React.createElement(SignupEmail, {
                   siteName: SITE_NAME,
