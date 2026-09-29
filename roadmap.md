@@ -71,3 +71,4 @@
 - [ ] Validar no sandbox autorização A/B, cancelamento imediato, split e webhook
 - [x] Criar laboratório administrativo isolado para subconta, split, captura e cancelamento no Sandbox
 - [ ] Executar ciclo financeiro completo no laboratório com dados e cartão oficiais de teste do Asaas
+- [x] Reforçar webhook Asaas com token, validação, deduplicação atômica e registro seguro

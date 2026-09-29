@@ -16,30 +16,32 @@ function tokenMatches(received: string, expected: string) {
 
 async function processWebhook(request: Request) {
   const expected = process.env["ASAAS_WEBHOOK_TOKEN"];
-  const received = request.headers.get("asaas-access-token") ?? "";
-  if (!expected || !tokenMatches(received, expected)) return new Response("não autorizado", { status: 401 });
+  const received = request.headers.get("asaas-access-token");
+  if (!expected || !received || !tokenMatches(received, expected)) return new Response(null, { status: 401 });
   const parsed = webhookSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return new Response("requisição inválida", { status: 400 });
 
   const { asaasConfig, getPayment } = await import("@/services/asaas.server");
   const config = asaasConfig();
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: known } = await supabaseAdmin.from("asaas_webhook_events").select("id").eq("environment", config.environment).eq("event_id", parsed.data.id).maybeSingle();
-  if (known) return new Response("ok", { status: 200 });
-
-  await supabaseAdmin.from("asaas_webhook_events").insert({
+  const { error: claimError } = await supabaseAdmin.from("asaas_webhook_events").insert({
     environment: config.environment,
     event_id: parsed.data.id,
     event_type: parsed.data.event,
     provider_payment_id: parsed.data.payment.id,
   });
+  if (claimError?.code === "23505") return new Response(null, { status: 204 });
+  if (claimError) {
+    console.error("Asaas webhook event claim failed", { eventId: parsed.data.id, code: claimError.code });
+    return new Response("falha temporária", { status: 503 });
+  }
   try {
     const payment = await getPayment(parsed.data.payment.id);
     const { data: authorization } = await supabaseAdmin.from("asaas_payment_authorizations")
       .select("id, appointment_id, portion").eq("environment", config.environment).eq("provider_payment_id", payment.id).maybeSingle();
     if (!authorization) {
       await supabaseAdmin.from("asaas_webhook_events").update({ status: "ignorado", processed_at: new Date().toISOString() }).eq("environment", config.environment).eq("event_id", parsed.data.id);
-      return new Response("ok", { status: 200 });
+      return new Response(null, { status: 204 });
     }
     const agora = new Date().toISOString();
     const patch = {
@@ -52,13 +54,14 @@ async function processWebhook(request: Request) {
     };
     await supabaseAdmin.from("asaas_payment_authorizations").update(patch).eq("id", authorization.id);
     await supabaseAdmin.from("appointments").update(authorization.portion === "A" ? { auth_status_a: payment.status } : { auth_status_b: payment.status }).eq("id", authorization.appointment_id);
-    await supabaseAdmin.from("asaas_webhook_events").update({ status: "processado", processed_at: new Date().toISOString() }).eq("environment", config.environment).eq("event_id", parsed.data.id);
+    await supabaseAdmin.from("asaas_webhook_events").update({ status: "processado", processed_at: new Date().toISOString(), failure_code: null, error_message: null }).eq("environment", config.environment).eq("event_id", parsed.data.id);
   } catch (error) {
-    console.error("Asaas webhook processing failed", { eventId: parsed.data.id, code: error instanceof Error ? error.message : "UNKNOWN" });
-    await supabaseAdmin.from("asaas_webhook_events").update({ status: "falhou", failure_code: "PROVIDER_LOOKUP_FAILED" }).eq("environment", config.environment).eq("event_id", parsed.data.id);
+    const code = error instanceof Error ? error.message.slice(0, 80) : "UNKNOWN";
+    console.error("Asaas webhook processing failed", { eventId: parsed.data.id, code });
+    await supabaseAdmin.from("asaas_webhook_events").update({ status: "falhou", failure_code: "PROVIDER_LOOKUP_FAILED", error_message: "Não foi possível confirmar o pagamento diretamente no Asaas.", processed_at: new Date().toISOString() }).eq("environment", config.environment).eq("event_id", parsed.data.id);
     return new Response("falha temporária", { status: 503 });
   }
-  return new Response("ok", { status: 200 });
+  return new Response(null, { status: 204 });
 }
 
 export const Route = createFileRoute("/api/public/webhooks/asaas")({
