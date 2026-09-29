@@ -2117,6 +2117,16 @@ export type Database = {
           slug: string
         }[]
       }
+      record_professional_review_decision: {
+        Args: {
+          _checklist: Json
+          _decided_by: string
+          _decision: string
+          _professional_id: string
+          _reason: string
+        }
+        Returns: undefined
+      }
       registrar_deteccao_anticontato: {
         Args: {
           _acao: string
