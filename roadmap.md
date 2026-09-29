@@ -102,4 +102,4 @@
 - [x] Inventariar cadastros existentes sem converter valores automaticamente
 - [x] Trocar o campo para o preço integral definido pelo profissional
 - [x] Deduzir R$ 27 do profissional sem somar a taxa ao preço do paciente
-- [ ] Validar cadastro, financeiro, desktop e 375 px
+- [x] Validar cadastro, financeiro, desktop e 375 px
