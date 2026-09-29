@@ -51,8 +51,9 @@ function secureSessionCookie(value: string) {
   return [pair, ...retained, "HttpOnly", "Secure", "SameSite=Lax"].join("; ");
 }
 
-const secureSessionCookieMiddleware = createMiddleware().server(async ({ next, request }) => {
-  const response = await next();
+const secureSessionCookieMiddleware = createMiddleware({ type: "request" }).server(async ({ next, request }) => {
+  const result = await next();
+  const response = result.response;
   const sessionId = readCookie(request.headers.get("cookie"), "session-id");
   const headers = new Headers(response.headers);
   const setCookies = typeof headers.getSetCookie === "function" ? headers.getSetCookie() : [];
@@ -62,13 +63,13 @@ const secureSessionCookieMiddleware = createMiddleware().server(async ({ next, r
   } else if (sessionId) {
     headers.append("set-cookie", `session-id=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Lax`);
   } else {
-    return response;
+    return result;
   }
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
+  return { ...result, response: new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    }) };
 });
 
 export const startInstance = createStart(() => ({
