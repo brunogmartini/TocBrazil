@@ -12,6 +12,11 @@ type AuditAction =
   | "payment_authorization_canceled"
   | "payment_refunded"
   | "payment_failed";
+  | "asaas_sandbox_subaccount_created"
+  | "asaas_sandbox_authorizations_created"
+  | "asaas_sandbox_refresh"
+  | "asaas_sandbox_capture"
+  | "asaas_sandbox_cancel";
 
 type AuditRole = "paciente" | "profissional" | "admin" | "sistema" | "anonimo";
 
