@@ -6,7 +6,12 @@ type AuditAction =
   | "appointment_status_changed"
   | "credential_document_accessed"
   | "professional_registration_reviewed"
-  | "profile_data_changed";
+  | "profile_data_changed"
+  | "payment_authorized"
+  | "payment_captured"
+  | "payment_authorization_canceled"
+  | "payment_refunded"
+  | "payment_failed";
 
 type AuditRole = "paciente" | "profissional" | "admin" | "sistema" | "anonimo";
 
