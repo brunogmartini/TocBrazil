@@ -108,7 +108,7 @@ export const acceptProfessionalContract = createServerFn({ method: "POST" })
     const acceptedAt = new Date().toISOString();
     const metadata = requestMetadata();
     const evidence = createHash("sha256").update(JSON.stringify({ userId: context.userId, professionalId: professional.id, version: CONTRACT_VERSION, contract: contract.sha256, annexes: annexHashes, declarations: [...CONTRACT_DECLARATIONS], acceptedAt })).digest("hex");
-    const { error } = await supabaseAdmin.from("document_acceptances").insert({
+    const { error } = await context.supabase.from("document_acceptances").insert({
       user_id: context.userId, professional_id: professional.id, contract_version: CONTRACT_VERSION, contract_sha256: contract.sha256,
       accepted_at: acceptedAt, scroll_completed_at: acceptedAt, declarations: [...CONTRACT_DECLARATIONS], annex_hashes: annexHashes,
       ip: metadata.ip, user_agent: metadata.userAgent, geo_country: metadata.country, geo_region: metadata.region, geo_city: metadata.city, evidence_sha256: evidence,
