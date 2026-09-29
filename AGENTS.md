@@ -13,7 +13,7 @@
 - Keep the essential-cookie notice as an acknowledgement in browser storage, not consent; necessary cookies do not require opt-in.
 - Keep uploaded legal documents as versioned source text and render the official v1.3 documents integrally as Markdown; legal pages must never summarize or rewrite them.
 - Treat `professionals.valor_centavos` as the exact public price freely set by the professional; derive `valor_liquido_centavos` as that price minus the fixed platform fee, because the fee is the professional's obligation and never increases the patient's price.
-- Keep contract PDFs byte-identical in private versioned storage; serve signed links and record annex reads/seven-clause acceptance server-side and immutably before publication.
+- Keep contract PDFs byte-identical in private versioned storage; release them only after the latest immutable review approves, record annex reads/seven-clause acceptance server-side, and require active receiving plus availability before publication.
 - Keep credentialing files private and issue 60-second signed URLs only after an MFA-authenticated admin action; why: each access must be authorized and auditable.
 - Keep clinical-content legacy tables and fields locked and deprecated, never use them in application code; why: consultations occur outside the platform.
 - Write required security events to immutable `audit_log` with metadata keys only, never values containing messages or health information; why: preserve accountability without creating sensitive replicas.

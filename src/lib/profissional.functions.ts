@@ -86,6 +86,7 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       { data: regras },
       { data: bloqueios },
       { data: contrato },
+      { data: contaRecebimento },
     ] = await Promise.all([
         supabase
           .from("professional_documents")
@@ -110,6 +111,11 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
           .order("aceito_em", { ascending: false })
           .limit(1)
           .maybeSingle(),
+        (await import("@/integrations/supabase/client.server")).supabaseAdmin
+          .from("asaas_professional_accounts")
+          .select("status, wallet_id")
+          .eq("professional_id", profissional.id)
+          .maybeSingle(),
       ]);
 
     let fotoUrlTemporaria: string | null = null;
@@ -125,6 +131,8 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       regras: regras ?? [],
       bloqueios: bloqueios ?? [],
       contrato: contrato ?? null,
+      recebimentoAtivo: Boolean(contaRecebimento?.wallet_id && contaRecebimento.status === "ativa"),
+      etapa: calcularEtapa(profissional, documentos ?? [], (regras ?? []).length > 0, Boolean(contrato), Boolean(contaRecebimento?.wallet_id && contaRecebimento.status === "ativa")),
       email: (claims as { email?: string }).email ?? null,
     };
   });
@@ -557,6 +565,8 @@ export function calcularEtapa(
   } | null,
   documentos: { status: string }[],
   temAgenda: boolean,
+  temContrato = false,
+  recebimentoAtivo = false,
 ): EtapaCadastro {
   if (!prof) {
     return { chave: "iniciado", titulo: "Cadastro iniciado", descricao: "Preencha seus dados profissionais.", indice: 0 };
@@ -573,7 +583,9 @@ export function calcularEtapa(
       : { chave: "aprovado", titulo: "Cadastro aprovado", descricao: "Defina sua disponibilidade para receber agendamentos.", indice: 5 };
   }
   if (prof.cadastro_conferido_em) {
-    return { chave: "aprovado", titulo: "Aceite do contrato", descricao: "Leia o contrato e os anexos para prosseguir.", indice: 4 };
+    if (!temContrato) return { chave: "aprovado", titulo: "Aceite do contrato", descricao: "Leia o contrato e os anexos para prosseguir.", indice: 4 };
+    if (!recebimentoAtivo) return { chave: "aprovado", titulo: "Integração de pagamentos", descricao: "Credenciamento aprovado. Estamos finalizando a integração de pagamentos e avisaremos assim que seu perfil for publicado.", indice: 5 };
+    return { chave: "aprovado", titulo: "Configurar agenda", descricao: "Defina ao menos um horário para concluir a publicação.", indice: 5 };
   }
   if (prof.requer_correcao) {
     return { chave: "correcao", titulo: "Necessita correção", descricao: "Ajuste o que foi pedido e reenvie.", indice: 4 };

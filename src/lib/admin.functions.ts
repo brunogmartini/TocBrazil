@@ -439,14 +439,17 @@ export const relatorioMetadados = createServerFn({ method: "GET" })
       return { ok: false as const, erro: "Informe o motivo antes de continuar." };
     }
     if (data.status === "rejeitado" || data.requerCorrecao) {
-      const { error: decisionError } = await supabaseAdmin.from("professional_review_decisions").insert({
-        professional_id: data.id,
-        decided_by: context.userId,
-        decision: data.status === "rejeitado" ? "rejected" : "correction_requested",
-        checklist: {},
-        reason: data.observacao,
+      const { error: decisionError } = await supabaseAdmin.rpc("record_professional_review_decision", {
+        _professional_id: data.id,
+        _decided_by: context.userId,
+        _decision: data.status === "rejeitado" ? "rejected" : "correction_requested",
+        _checklist: {},
+        _reason: data.observacao,
       });
       if (decisionError) return { ok: false as const, erro: "Não foi possível registrar a decisão." };
+      const { writeAuditEvent } = await import("@/lib/audit.server");
+      await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "professional_registration_reviewed", entity: "professional", entityId: data.id, metadata: { status: data.status, correction_required: data.requerCorrecao } });
+      return { ok: true as const };
     }
     await supabaseAdmin.rpc("concluir_consultas_vencidas");
     const agora = new Date();
@@ -585,17 +588,8 @@ export const conferirCadastroProfissional = createServerFn({ method: "POST" })
     if (!tipos.has("Carteirinha profissional do CRP") || !tipos.has("Diploma de graduação")) {
       return { ok: false as const, erro: "A carteirinha do CRP e o diploma precisam estar aprovados." };
     }
-    const { error: decisionError } = await supabaseAdmin.from("professional_review_decisions").insert({ professional_id: data.id, decided_by: context.userId, decision: "approved", checklist: data.checklist, reason: null });
+    const { error: decisionError } = await supabaseAdmin.rpc("record_professional_review_decision", { _professional_id: data.id, _decided_by: context.userId, _decision: "approved", _checklist: data.checklist, _reason: undefined });
     if (decisionError) return { ok: false as const, erro: "Não foi possível registrar a decisão de aprovação." };
-    const { error } = await supabaseAdmin.from("professionals").update({
-      cadastro_conferido_em: new Date().toISOString(),
-      cadastro_conferido_por: context.userId,
-      observacao_admin: null,
-      status: "pendente",
-      validado_em: new Date().toISOString(),
-      validado_por: context.userId,
-    }).eq("id", data.id);
-    if (error) return { ok: false as const, erro: "Não foi possível concluir a conferência." };
     const { writeAuditEvent } = await import("@/lib/audit.server");
     await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "professional_registration_reviewed", entity: "professional", entityId: data.id, metadata: { status: "checked" } });
     return { ok: true as const };
