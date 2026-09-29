@@ -35,7 +35,7 @@ export function AsaasCardForm({ consultaId, onSuccess }: { consultaId: string; o
         <Field label="Número do endereço" value={form.numeroEndereco} onChange={(v) => update("numeroEndereco", v)} autoComplete="address-line2" />
         <Field label="Telefone" value={form.telefone} onChange={(v) => update("telefone", v.replace(/\D/g, "").slice(0, 13))} inputMode="tel" autoComplete="tel" />
       </div>
-      <p className="text-xs leading-relaxed text-muted-foreground">Os dados do cartão são enviados diretamente ao Asaas e não ficam armazenados na TOC Brazil.</p>
+      <p className="text-xs leading-relaxed text-muted-foreground">Os dados do cartão são enviados com conexão segura ao Asaas e não ficam armazenados na TOC Brazil.</p>
       {erro && <p className="text-sm text-destructive" role="alert">{erro}</p>}
       <button className="btn-base btn-primary w-full" type="submit" disabled={enviando}>{enviando ? "Reservando…" : "Reservar horário"}</button>
     </form>
