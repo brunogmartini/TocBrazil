@@ -24,6 +24,7 @@ import {
 } from "@/lib/agenda-tempo";
 import { dataHoraBR } from "@/lib/video-sala";
 import { exigirAreaProfissional } from "@/lib/role-access";
+import { professionalContractState } from "@/lib/contract.functions";
 
 export const Route = createFileRoute("/_authenticated/profissional/agenda")({
   beforeLoad: () => exigirAreaProfissional(),
@@ -50,6 +51,7 @@ function PaginaAgenda() {
   const salvar = useServerFn(salvarDisponibilidade);
   const bloquear = useServerFn(criarBloqueio);
   const desbloquear = useServerFn(removerBloqueio);
+  const carregarContrato = useServerFn(professionalContractState);
 
   const [visao, setVisao] = useState<Visao>("semana");
   const [dia, setDia] = useState(hoje());
@@ -64,6 +66,7 @@ function PaginaAgenda() {
     refetchIntervalInBackground: true,
     refetchOnWindowFocus: true,
   });
+  const contrato = useQuery({ queryKey: ["professional-contract-v62"], queryFn: () => carregarContrato() });
 
   const [consulta, setConsulta] = useState<ConsultaAgenda | null>(null);
   const [bloqueioSel, setBloqueioSel] = useState<Bloqueio | null>(null);
@@ -107,6 +110,10 @@ function PaginaAgenda() {
         </Link>
       </div>
     );
+  }
+
+  if (!contrato.isLoading && (!contrato.data?.available || !contrato.data.acceptance)) {
+    return <div className="professional-workspace container-page py-16"><h1 className="text-3xl">Agenda bloqueada</h1><p className="mt-4 max-w-xl text-muted-foreground">{contrato.data?.available ? "Leia e aceite o contrato e os quatro anexos antes de configurar sua agenda." : "Documentos em análise. A agenda será liberada depois da conferência e do aceite do contrato."}</p><Link to="/profissional/cadastro" className="btn-base btn-primary mt-8">Ir para o contrato</Link></div>;
   }
 
   const regras = dados.data?.regras ?? [];

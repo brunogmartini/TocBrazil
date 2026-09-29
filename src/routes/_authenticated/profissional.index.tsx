@@ -104,9 +104,7 @@ function PainelProfissional() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link to="/profissional/agenda" className="btn-base btn-primary">
-              Abrir agenda
-            </Link>
+            {etapa.chave === "publicado" ? <Link to="/profissional/agenda" className="btn-base btn-primary">Abrir agenda</Link> : <Link to="/profissional/cadastro" className="btn-base btn-primary">Continuar credenciamento</Link>}
             <Link to="/profissional/financeiro" className="btn-base btn-ghost">
               Financeiro
             </Link>
@@ -128,10 +126,10 @@ function PainelProfissional() {
                 )}
               </div>
               <Link
-                to={etapa.chave === "aprovado" ? "/profissional/agenda" : "/profissional/cadastro"}
+                 to="/profissional/cadastro"
                 className="btn-base btn-ghost"
               >
-                {etapa.chave === "aprovado" ? "Definir disponibilidade" : "Ver cadastro"}
+                 {etapa.chave === "aprovado" ? "Ler contrato" : "Ver cadastro"}
               </Link>
             </div>
             <div className="mt-5">

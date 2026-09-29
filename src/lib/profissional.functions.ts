@@ -632,7 +632,7 @@ async function profissionalDoUsuario(context: { supabase: unknown; userId: strin
   >;
   const { data } = await supabase
     .from("professionals")
-    .select("id, nome, slug, status, slot_minutos, valor_centavos, requer_correcao, observacao_admin, graduacao, apresentacao, areas")
+    .select("id, nome, slug, status, slot_minutos, valor_centavos, requer_correcao, observacao_admin, graduacao, apresentacao, areas, cadastro_conferido_em")
     .eq("user_id", context.userId)
     .maybeSingle();
   return { supabase, prof: data };
