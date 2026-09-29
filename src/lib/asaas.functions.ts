@@ -19,7 +19,6 @@ const cardSchema = z.object({
 type Portion = { portion: "A" | "B"; amount: number; platform: number; professional: number };
 
 function portions(total: number): Portion[] {
-  if (total < 5000) return [{ portion: "A", amount: total, platform: Math.min(1000, total), professional: Math.max(total - 1000, 0) }];
   if (total < 6700) throw new Error("O valor mínimo para reserva no cartão é R$ 67,00.");
   return [
     { portion: "A", amount: 5000, platform: 1000, professional: 4000 },

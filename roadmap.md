@@ -65,7 +65,7 @@
 ## Pagamentos Asaas — 29/09/2026
 - [x] Criar estrutura privada para subcontas, clientes, autorizações A/B e webhooks
 - [x] Isolar sandbox e produção por chave e endereço da API
-- [ ] Conectar formulário de reserva no cartão e estados do paciente
-- [ ] Conectar criação de subconta e estado de recebimento do psicólogo
-- [ ] Conectar captura/cancelamento aos desfechos da consulta
+- [x] Conectar formulário de reserva no cartão e estados do paciente
+- [x] Conectar estado de recebimento do psicólogo; criação fica sob ação administrativa após conferência KYC
+- [x] Conectar captura/cancelamento aos desfechos da consulta
 - [ ] Validar no sandbox autorização A/B, cancelamento imediato, split e webhook
