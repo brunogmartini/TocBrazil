@@ -169,6 +169,13 @@
       "when": 1790696149537,
       "tag": "0023_asaas_webhook_safe_error_message",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1790697728239,
+      "tag": "0024_explicit_deny_server_only_tables",
+      "breakpoints": true
     }
   ]
 }
