@@ -37,12 +37,12 @@ export function EtapasCadastro({
   compacto?: boolean;
 }) {
   const passos = [
-    "Cadastro iniciado",
-    "Dados preenchidos",
-    "Documentos enviados",
-    "Em análise",
-    "Correção / decisão",
-    "Aprovado",
+    "Criar conta",
+    "Preencher cadastro",
+    "Enviar comprovantes",
+    "Conferência documental",
+    "Aceite do contrato",
+    "Configurar agenda",
     "Perfil publicado",
   ];
   const problema = etapaAtual.chave === "correcao" || etapaAtual.chave === "rejeitado" || etapaAtual.chave === "suspenso";

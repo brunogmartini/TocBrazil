@@ -557,6 +557,7 @@ export function calcularEtapa(
     apresentacao?: string | null;
     areas?: string[] | null;
     valor_centavos?: number | null;
+    cadastro_conferido_em?: string | null;
   } | null,
   documentos: { status: string }[],
   temAgenda: boolean,
@@ -574,6 +575,9 @@ export function calcularEtapa(
     return temAgenda
       ? { chave: "publicado", titulo: "Perfil publicado", descricao: "Seu perfil está visível e recebe agendamentos.", indice: 6 }
       : { chave: "aprovado", titulo: "Cadastro aprovado", descricao: "Defina sua disponibilidade para receber agendamentos.", indice: 5 };
+  }
+  if (prof.cadastro_conferido_em) {
+    return { chave: "aprovado", titulo: "Aceite do contrato", descricao: "Leia o contrato e os anexos para prosseguir.", indice: 4 };
   }
   if (prof.requer_correcao) {
     return { chave: "correcao", titulo: "Necessita correção", descricao: "Ajuste o que foi pedido e reenvie.", indice: 4 };
