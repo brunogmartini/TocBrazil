@@ -533,7 +533,7 @@ function CadastroProfissional() {
 
 
       <div className="mt-12 flex flex-wrap gap-3">
-        {vinculo.data?.ativo ? <Link to="/profissional/agenda" className="btn-base btn-primary">Configurar minha agenda</Link> : <p className="max-w-xl text-sm text-muted-foreground">Credenciamento aprovado. Estamos finalizando a integração de pagamentos e avisaremos assim que seu perfil for publicado.</p>}
+        {vinculo.data?.ativo && <Link to="/profissional/agenda" className="btn-base btn-primary">Configurar minha agenda</Link>}
         <Link to="/profissional" className="btn-base btn-ghost">
           Voltar para a área do profissional
         </Link>
