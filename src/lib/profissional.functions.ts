@@ -742,6 +742,10 @@ export const marcarConsultaRealizada = createServerFn({ method: "POST" })
       ator: context.userId,
       atorPapel: "profissional",
     });
+    const { settleAsaasAppointment } = await import("@/services/asaas-settlement.server");
+    const outcome = data.status === "realizada" ? "REALIZADA" : data.status === "nao_compareceu" ? "FALTA_PACIENTE" : "FALTA_PROFISSIONAL";
+    const settlement = await settleAsaasAppointment(data.id, outcome, context.userId, "profissional");
+    if (!settlement.ok) return { ok: false as const, erro: settlement.erro };
     return { ok: true as const };
   });
 

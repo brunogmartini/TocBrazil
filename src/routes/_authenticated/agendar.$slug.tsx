@@ -8,11 +8,12 @@ import {
   listarHorariosLivres,
   obterProfissional,
 } from "@/lib/plataforma.functions";
-import { iniciarPagamento } from "@/lib/pagamento.functions";
 import { track } from "@/lib/analytics";
 import { moeda } from "@/lib/video-sala";
 import { exigirAreaPaciente } from "@/lib/role-access";
 import { institucional } from "@/config/institucional";
+import { Modal } from "@/components/modal";
+import { AsaasCardForm } from "@/components/asaas-card-form";
 
 export const Route = createFileRoute("/_authenticated/agendar/$slug")({
   // Só pacientes agendam consultas.
@@ -61,11 +62,11 @@ function Agendar() {
   const buscarHorarios = useServerFn(listarHorariosLivres);
   const buscarConfig = useServerFn(configuracoesAutenticadas);
   const agendar = useServerFn(criarAgendamento);
-  const pagar = useServerFn(iniciarPagamento);
 
   const [selecionado, setSelecionado] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  const [consultaReservaId, setConsultaReservaId] = useState<string | null>(null);
 
   const prof = useQuery({
     queryKey: ["profissional", slug],
@@ -73,7 +74,7 @@ function Agendar() {
   });
   const horarios = useQuery({
     queryKey: ["horarios", slug],
-    queryFn: () => buscarHorarios({ data: { slug, dias: 21 } }),
+    queryFn: () => buscarHorarios({ data: { slug, dias: 3 } }),
   });
   const config = useQuery({ queryKey: ["config"], queryFn: () => buscarConfig() });
 
@@ -116,13 +117,7 @@ function Agendar() {
         await queryClient.invalidateQueries({ queryKey: ["horarios", slug] });
         return;
       }
-      // Reserva de 15 minutos: o horário só fica confirmado com o pagamento aprovado.
-      const pg = await pagar({ data: { consultaId: r.consultaId, origem: window.location.origin } });
-      if (pg.ok) {
-        window.location.href = pg.link;
-        return;
-      }
-      navigate({ to: "/painel" });
+      setConsultaReservaId(r.consultaId);
     } finally {
       setEnviando(false);
     }
@@ -221,7 +216,7 @@ function Agendar() {
                 : !institucional.pagamentosAtivos
                   ? "Pagamentos temporariamente indisponíveis"
                   : selecionado
-                    ? "Reservar e pagar"
+                    ? "Reservar horário"
                     : "Escolha um horário"}
             </button>
             {erro && <p className="mt-3 text-sm text-destructive">{erro}</p>}
@@ -231,8 +226,8 @@ function Agendar() {
               </p>
             )}
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-               Este é o valor total da consulta. Ao reservar, o horário fica guardado para
-              você por 15 minutos até a aprovação do pagamento. A consulta acontece na sala de
+               Este é o valor total da consulta. O valor é reservado no seu cartão agora e cobrado
+              depois da consulta. A consulta acontece na sala de
               videochamada do próprio profissional, e o endereço da sala aparece na sua área pouco
               antes do horário.
             </p>
@@ -242,6 +237,12 @@ function Agendar() {
           </div>
         </aside>
       </div>
+      <Modal aberto={Boolean(consultaReservaId)} titulo="Reservar horário" onFechar={() => setConsultaReservaId(null)} largura="max-w-lg">
+        {consultaReservaId && <AsaasCardForm consultaId={consultaReservaId} onSuccess={async () => {
+          setConsultaReservaId(null);
+          await navigate({ to: "/painel", search: { pagamento: "reservado" } });
+        }} />}
+      </Modal>
     </div>
   );
 }

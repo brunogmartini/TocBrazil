@@ -17,13 +17,13 @@ import { CalendarioConsultas, type ItemCalendario } from "@/components/calendari
 import { Modal } from "@/components/modal";
 import { ChatAdministrativo } from "@/components/chat-administrativo";
 
-import { iniciarPagamento } from "@/lib/pagamento.functions";
 import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 import { horaDe, rotuloDiaLongo, chaveDia } from "@/lib/agenda-tempo";
 import { exigirAreaPaciente } from "@/lib/role-access";
 import { baixarIcs } from "@/lib/calendario-ics";
 import { institucional } from "@/config/institucional";
 import { criarPreferenciaRecorrencia, remarcarConsulta, responderPesquisaPosConsulta } from "@/lib/continuidade.functions";
+import { AsaasCardForm } from "@/components/asaas-card-form";
 
 export const Route = createFileRoute("/_authenticated/painel")({
   // Área exclusiva do paciente: profissionais e gestores são levados à sua própria área.
@@ -56,7 +56,6 @@ function Painel() {
   const salvar = useServerFn(salvarPerfil);
   const cancelar = useServerFn(cancelarConsulta);
   const confirmarConsulta = useServerFn(confirmarRealizacao);
-  const pagar = useServerFn(iniciarPagamento);
   const pesquisar = useServerFn(responderPesquisaPosConsulta);
   const recorrencia = useServerFn(criarPreferenciaRecorrencia);
   const remarcar = useServerFn(remarcarConsulta);
@@ -72,10 +71,12 @@ function Painel() {
   const [aviso, setAviso] = useState<string | null>(null);
   const [remarcando, setRemarcando] = useState<{ id: string; slug: string } | null>(null);
   const [novosHorarios, setNovosHorarios] = useState<{ inicio: string; fim: string }[]>([]);
+  const [reservaPagamentoId, setReservaPagamentoId] = useState<string | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const pg = params.get("pagamento");
+    if (pg === "reservado") setAviso("Reserva confirmada. Nada foi debitado.");
     if (pg === "aprovado") setAviso("Pagamento aprovado. Sua consulta está confirmada.");
     if (pg === "pendente") setAviso("Pagamento em processamento. Avisaremos assim que for confirmado.");
     if (pg === "recusado") setAviso("O pagamento não foi aprovado. Você pode tentar novamente abaixo.");
@@ -237,20 +238,15 @@ function Painel() {
                   {c.status === "aguardando_pagamento" && institucional.pagamentosAtivos && (
                     <div className="mt-3 rounded-xl bg-muted p-4 text-sm text-muted-foreground">
                       <p>
-                        Seu horário fica reservado por 15 minutos. Para confirmar, pague a consulta
-                        de <strong className="text-foreground">{moeda(c.valor_consulta_centavos)}</strong>.
+                         Seu horário fica reservado por 15 minutos. Para confirmar, reserve no cartão o valor
+                         de <strong className="text-foreground">{moeda(c.valor_consulta_centavos)}</strong>.
                       </p>
                       <button
                         type="button"
                         className="btn-base btn-primary mt-4"
-                        onClick={async () => {
-                          setErroPagamento(null);
-                          const r = await pagar({ data: { consultaId: c.id, origem: window.location.origin } });
-                          if (r.ok) window.location.href = r.link;
-                          else setErroPagamento(r.erro);
-                        }}
+                         onClick={() => { setErroPagamento(null); setReservaPagamentoId(c.id); }}
                       >
-                        Pagar com Mercado Pago
+                         Reservar no cartão
                       </button>
                       {erroPagamento && <p className="mt-3 text-destructive">{erroPagamento}</p>}
                     </div>
@@ -292,7 +288,13 @@ function Painel() {
                         <div>
                           <dt className="text-xs text-muted-foreground">Pagamento</dt>
                           <dd className="font-semibold">
-                            {c.payment_status === "aprovado" ? "Aprovado" : "Pendente"}
+                             {c.settlement_status === "EXECUTADO" && c.amount_captured_centavos > 0
+                               ? `Cobrado ${moeda(c.amount_captured_centavos)}`
+                               : c.auth_status_a === "AUTHORIZED"
+                                 ? "Reservado"
+                                 : c.payment_status === "cancelado" || c.payment_status === "estornado"
+                                   ? "Reserva liberada"
+                                   : "Pendente"}
                           </dd>
                         </div>
                       </dl>
@@ -372,6 +374,13 @@ function Painel() {
       </Modal>
       <Modal aberto={Boolean(remarcando)} titulo="Escolha o novo horário" onFechar={() => setRemarcando(null)} largura="max-w-lg">
         <div className="max-h-80 space-y-2 overflow-y-auto">{novosHorarios.slice(0, 40).map((slot) => <button key={slot.inicio} type="button" className="btn-base btn-ghost w-full justify-between" onClick={async () => { if (!remarcando) return; const r = await remarcar({ data: { consultaId: remarcando.id, novoInicio: slot.inicio } }); setAviso(r.ok ? "Consulta remarcada." : r.erro); if (r.ok) { setRemarcando(null); await queryClient.invalidateQueries({ queryKey: ['consultas'] }); } }}>{formatarData(slot.inicio)}</button>)}</div>
+      </Modal>
+      <Modal aberto={Boolean(reservaPagamentoId)} titulo="Reservar horário" onFechar={() => setReservaPagamentoId(null)} largura="max-w-lg">
+        {reservaPagamentoId && <AsaasCardForm consultaId={reservaPagamentoId} onSuccess={async () => {
+          setReservaPagamentoId(null);
+          setAviso("Reserva confirmada. Nada foi debitado.");
+          await queryClient.invalidateQueries({ queryKey: ["consultas"] });
+        }} />}
       </Modal>
 
       <Modal
