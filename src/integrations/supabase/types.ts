@@ -500,6 +500,7 @@ export type Database = {
       asaas_webhook_events: {
         Row: {
           environment: string
+          error_message: string | null
           event_id: string
           event_type: string
           failure_code: string | null
@@ -511,6 +512,7 @@ export type Database = {
         }
         Insert: {
           environment: string
+          error_message?: string | null
           event_id: string
           event_type: string
           failure_code?: string | null
@@ -522,6 +524,7 @@ export type Database = {
         }
         Update: {
           environment?: string
+          error_message?: string | null
           event_id?: string
           event_type?: string
           failure_code?: string | null
