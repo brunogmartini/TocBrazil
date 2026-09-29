@@ -62,7 +62,7 @@ const perguntas = [
   },
   {
     q: "Como funciona o pagamento da consulta?",
-    a: "O psicólogo informa quanto deseja receber. O preço mostrado ao paciente inclui esse valor líquido e a taxa fixa da plataforma.",
+    a: "O psicólogo define livremente o valor da sua consulta, e é esse valor que você vê e paga. A taxa que o psicólogo paga à plataforma é obrigação dele e não é somada ao preço.",
   },
   {
     q: "Posso remarcar ou cancelar?",
