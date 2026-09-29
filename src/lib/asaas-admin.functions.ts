@@ -2,10 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
-async function requireAdmin(context: { supabase: { rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" }) => Promise<{ data: boolean | null }> }; userId: string; claims?: unknown }) {
-  if ((context.claims as { aal?: string } | undefined)?.aal !== "aal2") throw new Error("A autenticação em duas etapas é obrigatória.");
-  const { data } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+async function requireAdmin(supabase: SupabaseClient<Database>, userId: string, claims: unknown) {
+  if ((claims as { aal?: string } | undefined)?.aal !== "aal2") throw new Error("A autenticação em duas etapas é obrigatória.");
+  const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
   if (!data) throw new Error("Acesso restrito ao gestor.");
 }
 
@@ -25,18 +27,18 @@ const authorizationSchema = z.object({
 });
 
 export const listarTestesAsaasSandbox = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
-  await requireAdmin(context);
+  await requireAdmin(context.supabase, context.userId, context.claims);
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin.from("asaas_sandbox_test_runs").select("id, label, wallet_id, subaccount_id, customer_id, payment_id_a, payment_id_b, status_a, status_b, total_centavos, last_action, failure_code, created_at, updated_at").order("created_at", { ascending: false }).limit(30);
   return { runs: data ?? [], publicPaymentsEnabled: false as const };
 });
 
 export const criarSubcontaTesteAsaas = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => subaccountSchema.parse(input)).handler(async ({ data, context }) => {
-  await requireAdmin(context);
+  await requireAdmin(context.supabase, context.userId, context.claims);
   const { createSandboxSubaccount } = await import("@/services/asaas.server");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   try {
-    const account = await createSandboxSubaccount(data);
+    const account = await createSandboxSubaccount({ ...data, complement: data.complement ?? null });
     const { data: run, error } = await supabaseAdmin.from("asaas_sandbox_test_runs").insert({ created_by: context.userId, label: data.label, subaccount_id: account.id, wallet_id: account.walletId, last_action: "subconta_criada" }).select("id, wallet_id").single();
     if (error || !run) return { ok: false as const, erro: "A subconta foi criada, mas o teste não pôde ser registrado." };
     await supabaseAdmin.from("audit_log").insert({ actor_id: context.userId, actor_role: "admin", action: "asaas_sandbox_subaccount_created", entity: "asaas_sandbox_test", entity_id: run.id, metadata: { environment: "sandbox" } });
@@ -48,7 +50,7 @@ export const criarSubcontaTesteAsaas = createServerFn({ method: "POST" }).middle
 });
 
 export const autorizarTesteAsaas = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => authorizationSchema.parse(input)).handler(async ({ data, context }) => {
-  await requireAdmin(context);
+  await requireAdmin(context.supabase, context.userId, context.claims);
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: run } = await supabaseAdmin.from("asaas_sandbox_test_runs").select("id, wallet_id, customer_id, payment_id_a, payment_id_b").eq("id", data.runId).maybeSingle();
   if (!run?.wallet_id) return { ok: false as const, erro: "Crie a subconta de teste antes das autorizações." };
@@ -82,7 +84,7 @@ export const autorizarTesteAsaas = createServerFn({ method: "POST" }).middleware
 
 const actionSchema = z.object({ runId: z.string().uuid(), portion: z.enum(["A", "B"]), action: z.enum(["refresh", "capture", "cancel"]) });
 export const executarAcaoTesteAsaas = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => actionSchema.parse(input)).handler(async ({ data, context }) => {
-  await requireAdmin(context);
+  await requireAdmin(context.supabase, context.userId, context.claims);
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: run } = await supabaseAdmin.from("asaas_sandbox_test_runs").select("payment_id_a, payment_id_b").eq("id", data.runId).maybeSingle();
   const paymentId = data.portion === "A" ? run?.payment_id_a : run?.payment_id_b;
@@ -90,7 +92,8 @@ export const executarAcaoTesteAsaas = createServerFn({ method: "POST" }).middlew
   const { getSandboxPayment, captureSandboxPayment, cancelSandboxPayment } = await import("@/services/asaas.server");
   try {
     const payment = data.action === "capture" ? await captureSandboxPayment(paymentId) : data.action === "cancel" ? await cancelSandboxPayment(paymentId) : await getSandboxPayment(paymentId);
-    await supabaseAdmin.from("asaas_sandbox_test_runs").update({ [data.portion === "A" ? "status_a" : "status_b"]: payment.status, last_action: `${data.action}_${data.portion.toLowerCase()}`, failure_code: null }).eq("id", data.runId);
+    const statusPatch = data.portion === "A" ? { status_a: payment.status } : { status_b: payment.status };
+    await supabaseAdmin.from("asaas_sandbox_test_runs").update({ ...statusPatch, last_action: `${data.action}_${data.portion.toLowerCase()}`, failure_code: null }).eq("id", data.runId);
     await supabaseAdmin.from("audit_log").insert({ actor_id: context.userId, actor_role: "admin", action: `asaas_sandbox_${data.action}`, entity: "asaas_sandbox_test", entity_id: data.runId, metadata: { environment: "sandbox", portion: data.portion, status: payment.status } });
     return { ok: true as const, status: payment.status };
   } catch (error) {
