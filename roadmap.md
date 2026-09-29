@@ -97,6 +97,9 @@
 - [x] Tornar acessos e aceites imutáveis e gravados somente pelo servidor
 - [x] Travar agenda e publicação até contrato, recebimento e disponibilidade
 - [x] Recolocar taxa, explicação e pagamento garantido; remover pedido de seguro
+- [x] Registrar decisões de conferência com checklist e histórico imutável
+- [x] Ancorar a liberação do contrato na aprovação registrada no banco
+- [x] Exigir recebimento ativo antes de configurar agenda e publicar perfil
 
 ## Correção contratual do valor da consulta — 29/09/2026
 - [x] Inventariar cadastros existentes sem converter valores automaticamente
