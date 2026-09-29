@@ -786,6 +786,45 @@ export type Database = {
           },
         ]
       }
+      contract_documents: {
+        Row: {
+          active: boolean
+          contract_version: string
+          created_at: string
+          display_name: string
+          display_order: number
+          document_key: string
+          id: string
+          required_before_acceptance: boolean
+          sha256: string
+          storage_path: string
+        }
+        Insert: {
+          active?: boolean
+          contract_version: string
+          created_at?: string
+          display_name: string
+          display_order?: number
+          document_key: string
+          id?: string
+          required_before_acceptance?: boolean
+          sha256: string
+          storage_path: string
+        }
+        Update: {
+          active?: boolean
+          contract_version?: string
+          created_at?: string
+          display_name?: string
+          display_order?: number
+          document_key?: string
+          id?: string
+          required_before_acceptance?: boolean
+          sha256?: string
+          storage_path?: string
+        }
+        Relationships: []
+      }
       contrato_versoes: {
         Row: {
           arquivo_sha256: string
@@ -956,6 +995,115 @@ export type Database = {
           },
           {
             foreignKeyName: "deteccoes_anticontato_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_acceptances: {
+        Row: {
+          accepted_at: string
+          annex_hashes: Json
+          contract_sha256: string
+          contract_version: string
+          created_at: string
+          declarations: Json
+          evidence_sha256: string
+          geo_city: string | null
+          geo_country: string | null
+          geo_region: string | null
+          id: string
+          ip: unknown
+          professional_id: string
+          scroll_completed_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          annex_hashes: Json
+          contract_sha256: string
+          contract_version: string
+          created_at?: string
+          declarations: Json
+          evidence_sha256: string
+          geo_city?: string | null
+          geo_country?: string | null
+          geo_region?: string | null
+          id?: string
+          ip?: unknown
+          professional_id: string
+          scroll_completed_at: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          annex_hashes?: Json
+          contract_sha256?: string
+          contract_version?: string
+          created_at?: string
+          declarations?: Json
+          evidence_sha256?: string
+          geo_city?: string | null
+          geo_country?: string | null
+          geo_region?: string | null
+          id?: string
+          ip?: unknown
+          professional_id?: string
+          scroll_completed_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_acceptances_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_accesses: {
+        Row: {
+          accessed_at: string
+          contract_version: string
+          document_key: string
+          document_sha256: string
+          id: string
+          ip: unknown
+          professional_id: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accessed_at?: string
+          contract_version: string
+          document_key: string
+          document_sha256: string
+          id?: string
+          ip?: unknown
+          professional_id: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accessed_at?: string
+          contract_version?: string
+          document_key?: string
+          document_sha256?: string
+          id?: string
+          ip?: unknown
+          professional_id?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_accesses_professional_id_fkey"
             columns: ["professional_id"]
             isOneToOne: false
             referencedRelation: "professionals"
@@ -1901,6 +2049,10 @@ export type Database = {
         }[]
       }
       perfil_pronto_para_publicar: {
+        Args: { _professional_id: string }
+        Returns: boolean
+      }
+      professional_contract_ready: {
         Args: { _professional_id: string }
         Returns: boolean
       }

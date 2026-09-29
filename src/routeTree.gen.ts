@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CadastroProfissionalRouteImport } from './routes/cadastro-profissional'
 import { Route as ComoFuncionaRouteImport } from './routes/como-funciona'
+import { Route as ContratoProfissionalRouteImport } from './routes/contrato-profissional'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as EntendaOTocRouteImport } from './routes/entenda-o-toc'
 import { Route as MeuCuidadoRouteImport } from './routes/meu-cuidado'
@@ -68,6 +69,11 @@ const CadastroProfissionalRoute = CadastroProfissionalRouteImport.update({
 const ComoFuncionaRoute = ComoFuncionaRouteImport.update({
   id: '/como-funciona',
   path: '/como-funciona',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContratoProfissionalRoute = ContratoProfissionalRouteImport.update({
+  id: '/contrato-profissional',
+  path: '/contrato-profissional',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CookiesRoute = CookiesRouteImport.update({
@@ -242,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/cadastro-profissional': typeof CadastroProfissionalRoute
   '/como-funciona': typeof ComoFuncionaRoute
+  '/contrato-profissional': typeof ContratoProfissionalRoute
   '/cookies': typeof CookiesRoute
   '/entenda-o-toc': typeof EntendaOTocRoute
   '/meu-cuidado': typeof MeuCuidadoRoute
@@ -279,6 +286,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/cadastro-profissional': typeof CadastroProfissionalRoute
   '/como-funciona': typeof ComoFuncionaRoute
+  '/contrato-profissional': typeof ContratoProfissionalRoute
   '/cookies': typeof CookiesRoute
   '/entenda-o-toc': typeof EntendaOTocRoute
   '/meu-cuidado': typeof MeuCuidadoRoute
@@ -317,6 +325,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/cadastro-profissional': typeof CadastroProfissionalRoute
   '/como-funciona': typeof ComoFuncionaRoute
+  '/contrato-profissional': typeof ContratoProfissionalRoute
   '/cookies': typeof CookiesRoute
   '/entenda-o-toc': typeof EntendaOTocRoute
   '/meu-cuidado': typeof MeuCuidadoRoute
@@ -356,6 +365,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cadastro-profissional'
     | '/como-funciona'
+    | '/contrato-profissional'
     | '/cookies'
     | '/entenda-o-toc'
     | '/meu-cuidado'
@@ -393,6 +403,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cadastro-profissional'
     | '/como-funciona'
+    | '/contrato-profissional'
     | '/cookies'
     | '/entenda-o-toc'
     | '/meu-cuidado'
@@ -430,6 +441,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cadastro-profissional'
     | '/como-funciona'
+    | '/contrato-profissional'
     | '/cookies'
     | '/entenda-o-toc'
     | '/meu-cuidado'
@@ -469,6 +481,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CadastroProfissionalRoute: typeof CadastroProfissionalRoute
   ComoFuncionaRoute: typeof ComoFuncionaRoute
+  ContratoProfissionalRoute: typeof ContratoProfissionalRoute
   CookiesRoute: typeof CookiesRoute
   EntendaOTocRoute: typeof EntendaOTocRoute
   MeuCuidadoRoute: typeof MeuCuidadoRoute
@@ -529,6 +542,13 @@ declare module '@tanstack/react-router' {
       path: '/como-funciona'
       fullPath: '/como-funciona'
       preLoaderRoute: typeof ComoFuncionaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contrato-profissional': {
+      id: '/contrato-profissional'
+      path: '/contrato-profissional'
+      fullPath: '/contrato-profissional'
+      preLoaderRoute: typeof ContratoProfissionalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cookies': {
@@ -796,6 +816,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CadastroProfissionalRoute: CadastroProfissionalRoute,
   ComoFuncionaRoute: ComoFuncionaRoute,
+  ContratoProfissionalRoute: ContratoProfissionalRoute,
   CookiesRoute: CookiesRoute,
   EntendaOTocRoute: EntendaOTocRoute,
   MeuCuidadoRoute: MeuCuidadoRoute,
