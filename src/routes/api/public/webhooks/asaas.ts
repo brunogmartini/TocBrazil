@@ -45,10 +45,10 @@ async function processWebhook(request: Request) {
     const patch = {
       provider_status: payment.status,
       status: payment.status,
-      authorized_at: payment.status === "AUTHORIZED" ? agora : undefined,
-      captured_at: ["CONFIRMED", "RECEIVED"].includes(payment.status) ? agora : undefined,
-      canceled_at: ["DELETED", "CANCELLED"].includes(payment.status) ? agora : undefined,
-      refunded_at: ["REFUNDED", "REFUND_REQUESTED"].includes(payment.status) ? agora : undefined,
+      ...(payment.status === "AUTHORIZED" ? { authorized_at: agora } : {}),
+      ...(["CONFIRMED", "RECEIVED"].includes(payment.status) ? { captured_at: agora } : {}),
+      ...(["DELETED", "CANCELLED"].includes(payment.status) ? { canceled_at: agora } : {}),
+      ...(["REFUNDED", "REFUND_REQUESTED"].includes(payment.status) ? { refunded_at: agora } : {}),
     };
     await supabaseAdmin.from("asaas_payment_authorizations").update(patch).eq("id", authorization.id);
     await supabaseAdmin.from("appointments").update(authorization.portion === "A" ? { auth_status_a: payment.status } : { auth_status_b: payment.status }).eq("id", authorization.appointment_id);
