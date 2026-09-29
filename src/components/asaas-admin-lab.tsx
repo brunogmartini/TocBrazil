@@ -1,21 +1,18 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { autorizarTesteAsaas, criarSubcontaTesteAsaas, executarAcaoTesteAsaas, listarTestesAsaasSandbox } from "@/lib/asaas-admin.functions";
+import { criarSubcontaTesteAsaas, executarAcaoTesteAsaas, listarTestesAsaasSandbox } from "@/lib/asaas-admin.functions";
 import { moeda } from "@/lib/video-sala";
 
 const initialAccount = { label: "Teste de split", name: "", email: "", cpfCnpj: "", birthDate: "", mobilePhone: "", incomeValue: "5000", postalCode: "", address: "", addressNumber: "", province: "", complement: "" };
-const initialPayment = { total: "100,00", customerName: "", customerEmail: "", customerCpfCnpj: "", phone: "", postalCode: "", addressNumber: "", holderName: "", cardNumber: "", expiryMonth: "", expiryYear: "", ccv: "" };
 
 export function AsaasAdminLab() {
   const queryClient = useQueryClient();
   const list = useServerFn(listarTestesAsaasSandbox);
   const createAccount = useServerFn(criarSubcontaTesteAsaas);
-  const authorize = useServerFn(autorizarTesteAsaas);
   const runAction = useServerFn(executarAcaoTesteAsaas);
   const query = useQuery({ queryKey: ["asaas-sandbox-tests"], queryFn: () => list(), refetchInterval: 15_000 });
   const [account, setAccount] = useState(initialAccount);
-  const [payment, setPayment] = useState(initialPayment);
   const [selected, setSelected] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -59,35 +56,10 @@ export function AsaasAdminLab() {
         <button type="submit" className="btn-base btn-primary mt-5" disabled={busy}>{busy ? "Criando…" : "Criar subconta no Sandbox"}</button>
       </form>
 
-      <form className="card-soft p-6" onSubmit={async (event) => {
-        event.preventDefault(); if (!run) return; setBusy(true); setMessage(null);
-        try {
-          const totalCentavos = Math.round(Number(payment.total.replace(".", "").replace(",", ".")) * 100);
-          const result = await authorize({ data: { runId: run.id, totalCentavos, ...payment } });
-          setMessage(result.ok ? "Autorizações A e B criadas com split no Sandbox." : result.erro); await refresh();
-        } catch (error) { setMessage(error instanceof Error ? error.message : "Não foi possível executar o teste."); }
-        finally { setBusy(false); }
-      }}>
+      <div className="card-soft p-6">
         <h3 className="text-lg">2. Testar autorizações e split</h3>
-        <p className="mt-1 text-xs text-muted-foreground">A: R$ 50,00 e split R$ 10,00. B: restante e split R$ 17,00.</p>
-        <label className="mt-4 block text-sm">Execução<select className="field-base mt-1" value={run?.id ?? ""} onChange={(e) => setSelected(e.target.value)} required><option value="" disabled>Crie uma subconta primeiro</option>{query.data?.runs.filter((item) => item.wallet_id).map((item) => <option key={item.id} value={item.id}>{item.label} · {item.wallet_id}</option>)}</select></label>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <Input label="Total do teste (R$)" value={payment.total} onChange={(v) => setPayment({ ...payment, total: v })} />
-          <Input label="Nome fictício do cliente" value={payment.customerName} onChange={(v) => setPayment({ ...payment, customerName: v })} />
-          <Input label="E-mail fictício" type="email" value={payment.customerEmail} onChange={(v) => setPayment({ ...payment, customerEmail: v })} />
-          <Input label="CPF/CNPJ de teste" value={payment.customerCpfCnpj} onChange={(v) => setPayment({ ...payment, customerCpfCnpj: digits(v, 14) })} />
-          <Input label="Telefone de teste" value={payment.phone} onChange={(v) => setPayment({ ...payment, phone: digits(v, 13) })} />
-          <Input label="CEP de teste" value={payment.postalCode} onChange={(v) => setPayment({ ...payment, postalCode: digits(v, 8) })} />
-          <Input label="Número do endereço" value={payment.addressNumber} onChange={(v) => setPayment({ ...payment, addressNumber: v })} />
-          <Input label="Nome no cartão de teste" value={payment.holderName} onChange={(v) => setPayment({ ...payment, holderName: v })} />
-          <Input label="Cartão de teste" value={payment.cardNumber} onChange={(v) => setPayment({ ...payment, cardNumber: digits(v, 19) })} wide />
-          <Input label="Mês" value={payment.expiryMonth} onChange={(v) => setPayment({ ...payment, expiryMonth: digits(v, 2) })} />
-          <Input label="Ano" value={payment.expiryYear} onChange={(v) => setPayment({ ...payment, expiryYear: digits(v, 4) })} />
-          <Input label="Código de segurança" value={payment.ccv} onChange={(v) => setPayment({ ...payment, ccv: digits(v, 4) })} />
-        </div>
-        <p className="mt-3 text-xs text-muted-foreground">Os dados do cartão seguem para o Asaas durante o teste e não são salvos.</p>
-        <button type="submit" className="btn-base btn-primary mt-5" disabled={!run || busy}>{busy ? "Autorizando…" : "Criar autorizações A/B"}</button>
-      </form>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">A coleta de cartão neste laboratório foi desativada. O Asaas não oferece tokenização direta no navegador com chave pública; o próximo fluxo usará uma página hospedada pelo próprio Asaas, após a validação das autorizações e do split.</p>
+      </div>
     </div>
 
     <div>

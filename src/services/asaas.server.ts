@@ -13,33 +13,6 @@ export type AsaasPayment = {
   creditCard?: { creditCardToken?: string | null };
 };
 
-export type CardInput = {
-  holderName: string;
-  number: string;
-  expiryMonth: string;
-  expiryYear: string;
-  ccv: string;
-  holder: {
-    name: string;
-    email: string;
-    cpfCnpj: string;
-    postalCode: string;
-    addressNumber: string;
-    phone: string;
-  };
-  remoteIp: string;
-};
-
-export type AuthorizationInput = {
-  customerId: string;
-  appointmentId: string;
-  portion: "A" | "B";
-  amountCentavos: number;
-  professionalCentavos: number;
-  professionalWalletId: string;
-  card: CardInput;
-};
-
 function configuredEnvironment(): AsaasEnvironment {
   const value = process.env["ASAAS_ENV"] ?? "sandbox";
   if (value !== "sandbox" && value !== "production") throw new Error("Ambiente Asaas inválido.");
@@ -131,33 +104,6 @@ export async function createCustomer(input: {
   });
 }
 
-export async function createAuthorizedPayment(input: AuthorizationInput) {
-  const idempotencyKey = `appointment:${input.appointmentId}:${input.portion}`;
-  return request<AsaasPayment>("/payments", {
-    method: "POST",
-    headers: { "asaas-idempotency-key": idempotencyKey },
-    body: JSON.stringify({
-      customer: input.customerId,
-      billingType: "CREDIT_CARD",
-      value: input.amountCentavos / 100,
-      dueDate: new Date().toISOString().slice(0, 10),
-      description: `Reserva de consulta TOC Brazil · parcela ${input.portion}`,
-      externalReference: `${input.appointmentId}:${input.portion}`,
-      authorizeOnly: true,
-      creditCard: {
-        holderName: input.card.holderName,
-        number: input.card.number,
-        expiryMonth: input.card.expiryMonth,
-        expiryYear: input.card.expiryYear,
-        ccv: input.card.ccv,
-      },
-      creditCardHolderInfo: input.card.holder,
-      remoteIp: input.card.remoteIp,
-      split: [{ walletId: input.professionalWalletId, fixedValue: input.professionalCentavos / 100 }],
-    }),
-  });
-}
-
 export async function getPayment(paymentId: string) {
   return request<AsaasPayment>(`/payments/${encodeURIComponent(paymentId)}`);
 }
@@ -231,26 +177,6 @@ export async function createSandboxCustomer(input: {
   return sandboxRequest<{ id: string }>("/customers", {
     method: "POST",
     body: JSON.stringify({ name: input.name, cpfCnpj: input.cpfCnpj, email: input.email, mobilePhone: input.phone, externalReference: input.externalReference, notificationDisabled: true }),
-  });
-}
-
-export async function createSandboxAuthorizedPayment(input: AuthorizationInput) {
-  return sandboxRequest<AsaasPayment>("/payments", {
-    method: "POST",
-    headers: { "asaas-idempotency-key": `sandbox-test:${input.appointmentId}:${input.portion}` },
-    body: JSON.stringify({
-      customer: input.customerId,
-      billingType: "CREDIT_CARD",
-      value: input.amountCentavos / 100,
-      dueDate: new Date().toISOString().slice(0, 10),
-      description: `Teste administrativo TOC Brazil · autorização ${input.portion}`,
-      externalReference: `sandbox-test:${input.appointmentId}:${input.portion}`,
-      authorizeOnly: true,
-      creditCard: { holderName: input.card.holderName, number: input.card.number, expiryMonth: input.card.expiryMonth, expiryYear: input.card.expiryYear, ccv: input.card.ccv },
-      creditCardHolderInfo: input.card.holder,
-      remoteIp: input.card.remoteIp,
-      split: [{ walletId: input.professionalWalletId, fixedValue: input.professionalCentavos / 100 }],
-    }),
   });
 }
 
