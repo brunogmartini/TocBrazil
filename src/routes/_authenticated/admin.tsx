@@ -90,6 +90,7 @@ function Admin() {
   const [filtroPagamento, setFiltroPagamento] = useState<FiltroPagamento>("pendente");
   const [aberto, setAberto] = useState<string | null>(null);
   const [observacao, setObservacao] = useState<Record<string, string>>({});
+  const [checklists, setChecklists] = useState<Record<string, Record<string, boolean>>>({});
   const [aviso, setAviso] = useState<string | null>(null);
 
   const painel = useQuery({
@@ -154,6 +155,14 @@ function Admin() {
     setAviso(r.ok ? "Status atualizado." : r.erro);
     await atualizar();
   }
+
+  const itensConferencia = [
+    ["identity_matches", "Nome e CPF do documento conferem com o cadastro"],
+    ["crp_active", "Inscrição no CRP ativa e regular"],
+    ["certificate_valid", "Certidão de regularidade dentro da validade"],
+    ["diploma_matches", "Diploma de graduação confere"],
+    ["annex_v_compliant", "Perfil conforme o Anexo V: sem promessa de resultado, sem índice de sucesso, sem comparação com outros profissionais, “especialista” apenas com título registrado, e sem telefone, e-mail, rede social, site pessoal ou chave de pagamento em qualquer campo"],
+  ] as const;
 
   const ABAS: [Aba, string][] = [
     ["visao", "Visão geral"],
@@ -436,22 +445,28 @@ function Admin() {
                       />
                     </div>
 
+                    {!p.cadastro_conferido_em && <fieldset className="rounded-lg border border-border p-4">
+                      <legend className="px-1 text-base font-semibold">Checklist da conferência</legend>
+                      <div className="mt-3 space-y-3">{itensConferencia.map(([chave, rotulo]) => <label key={chave} className="flex items-start gap-3 text-sm leading-relaxed"><input type="checkbox" className="mt-1" checked={checklists[p.id]?.[chave] ?? false} onChange={(event) => setChecklists((atual) => ({ ...atual, [p.id]: { ...atual[p.id], [chave]: event.target.checked } }))} /><span>{rotulo}</span></label>)}</div>
+                    </fieldset>}
+
                     <div className="flex flex-wrap gap-3">
                       {!p.cadastro_conferido_em && <button type="button" className="btn-base btn-primary" onClick={async () => {
-                        const resultado = await conferirCadastro({ data: { id: p.id, observacao: observacao[p.id] ?? p.observacao_admin ?? "" } });
-                        setAviso(resultado.ok ? "Cadastro conferido. O contrato será liberado quando houver uma versão ativa." : resultado.erro);
+                        const checklist = checklists[p.id] ?? {};
+                        const resultado = await conferirCadastro({ data: { id: p.id, checklist: { identity_matches: checklist["identity_matches"] === true, crp_active: checklist["crp_active"] === true, certificate_valid: checklist["certificate_valid"] === true, diploma_matches: checklist["diploma_matches"] === true, annex_v_compliant: checklist["annex_v_compliant"] === true } } });
+                        setAviso(resultado.ok ? "Cadastro aprovado. O contrato foi liberado para aceite." : resultado.erro);
                         await atualizar();
-                      }}>Concluir conferência</button>}
+                      }} disabled={!itensConferencia.every(([chave]) => checklists[p.id]?.[chave])}>Aprovar e liberar contrato</button>}
                       <button type="button" className="btn-base btn-primary" onClick={() => aplicarStatus(p, "aprovado")}>
                         Publicar após assinatura
                       </button>
-                      <button type="button" className="btn-base btn-ghost" onClick={() => aplicarStatus(p, "pendente", true)}>
+                      <button type="button" className="btn-base btn-ghost" disabled={!String(observacao[p.id] ?? p.observacao_admin ?? "").trim()} onClick={() => aplicarStatus(p, "pendente", true)}>
                         Solicitar correção
                       </button>
                       <button type="button" className="btn-base btn-ghost" onClick={() => aplicarStatus(p, "pendente", false)}>
                         Voltar para análise
                       </button>
-                      <button type="button" className="btn-base btn-ghost" onClick={() => aplicarStatus(p, "rejeitado")}>
+                      <button type="button" className="btn-base btn-ghost" disabled={!String(observacao[p.id] ?? p.observacao_admin ?? "").trim()} onClick={() => aplicarStatus(p, "rejeitado")}>
                         Rejeitar
                       </button>
                       <button type="button" className="btn-base btn-ghost" onClick={() => aplicarStatus(p, "suspenso")}>
@@ -482,6 +497,7 @@ function Admin() {
                         </ul>
                       </div>
                     )}
+                    {p.decisoes.length > 0 && <div><h3 className="text-base font-semibold">Decisões de conferência</h3><ul className="mt-3 space-y-2 text-sm">{p.decisoes.map((decisao) => <li key={decisao.id} className="rounded-xl bg-surface px-4 py-3"><div className="flex flex-wrap justify-between gap-2"><strong>{decisao.decision === "approved" ? "Aprovado" : decisao.decision === "correction_requested" ? "Correção solicitada" : "Reprovado"}</strong><span className="text-muted-foreground">{dataHoraBR(decisao.decided_at)}</span></div>{decisao.reason && <p className="mt-1 text-muted-foreground">{decisao.reason}</p>}</li>)}</ul></div>}
 
                   </div>
                 )}

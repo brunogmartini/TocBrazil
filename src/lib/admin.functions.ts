@@ -114,6 +114,13 @@ export type ProfissionalAdmin = {
     observacao: string | null;
     created_at: string;
   }[];
+  decisoes: {
+    id: string;
+    decision: string;
+    checklist: Record<string, boolean>;
+    reason: string | null;
+    decided_at: string;
+  }[];
 };
 
 async function garantirAdmin(context: { supabase: unknown; userId: string; claims?: unknown }) {
@@ -245,7 +252,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
       }));
 
     const idsProfissionais = (profissionais ?? []).map((p) => p.id);
-    const [{ data: documentos }, { data: historico }, { data: contratos }] = idsProfissionais.length
+    const [{ data: documentos }, { data: historico }, { data: contratos }, { data: decisoes }] = idsProfissionais.length
       ? await Promise.all([
           supabaseAdmin
             .from("professional_documents")
@@ -263,8 +270,13 @@ export const painelAdmin = createServerFn({ method: "GET" })
             .in("professional_id", idsProfissionais)
             .eq("status_assinatura", "aceita")
             .order("aceito_em", { ascending: false }),
+          supabaseAdmin
+            .from("professional_review_decisions")
+            .select("id, professional_id, decision, checklist, reason, decided_at")
+            .in("professional_id", idsProfissionais)
+            .order("decided_at", { ascending: false }),
         ])
-      : [{ data: [] }, { data: [] }, { data: [] }];
+      : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }];
 
     const docsPorProfissional = new Map<string, ProfissionalAdmin["documentos"]>();
     for (const doc of documentos ?? []) {
@@ -290,6 +302,12 @@ export const painelAdmin = createServerFn({ method: "GET" })
       if (!contratoPorProfissional.has(contrato.professional_id)) {
         contratoPorProfissional.set(contrato.professional_id, contrato);
       }
+    }
+    const decisoesPorProfissional = new Map<string, ProfissionalAdmin["decisoes"]>();
+    for (const decisao of decisoes ?? []) {
+      const lista = decisoesPorProfissional.get(decisao.professional_id) ?? [];
+      lista.push({ id: decisao.id, decision: decisao.decision, checklist: (decisao.checklist ?? {}) as Record<string, boolean>, reason: decisao.reason, decided_at: decisao.decided_at });
+      decisoesPorProfissional.set(decisao.professional_id, lista);
     }
 
     const listaProfissionais: ProfissionalAdmin[] = [];
@@ -356,6 +374,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
         criadoEm: p.created_at,
         documentos: docs,
         historico: histPorProfissional.get(p.id) ?? [],
+        decisoes: decisoesPorProfissional.get(p.id) ?? [],
       });
     }
 
@@ -415,6 +434,7 @@ export const relatorioMetadados = createServerFn({ method: "GET" })
     await garantirAdmin(context);
     await registrarAcessoAdmin(context.userId, "relatorio_metadados");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
     await supabaseAdmin.rpc("concluir_consultas_vencidas");
     const agora = new Date();
     const de = data.de ? new Date(data.de) : new Date(agora.getFullYear(), agora.getMonth() - 2, 1);
@@ -454,6 +474,23 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await garantirAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    if ((data.status === "rejeitado" || data.requerCorrecao) && !data.observacao) {
+      return { ok: false as const, erro: "Informe o motivo antes de continuar." };
+    }
+    if (data.status === "rejeitado" || data.requerCorrecao) {
+      const { error: decisionError } = await supabaseAdmin.rpc("record_professional_review_decision", {
+        _professional_id: data.id,
+        _decided_by: context.userId,
+        _decision: data.status === "rejeitado" ? "rejected" : "correction_requested",
+        _checklist: {},
+        _reason: data.observacao ?? "",
+      });
+      if (decisionError) return { ok: false as const, erro: "Não foi possível registrar a decisão." };
+      const { writeAuditEvent } = await import("@/lib/audit.server");
+      await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "professional_registration_reviewed", entity: "professional", entityId: data.id, metadata: { status: data.status, correction_required: data.requerCorrecao } });
+      return { ok: true as const };
+    }
 
     if (data.status === "aprovado") {
       const [{ data: prof }, { data: perfilPronto }] = await Promise.all([
@@ -520,11 +557,19 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+const checklistConferenciaSchema = {
+  identity_matches: false,
+  crp_active: false,
+  certificate_valid: false,
+  diploma_matches: false,
+  annex_v_compliant: false,
+};
+
 export const conferirCadastroProfissional = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { id: string; observacao?: string }) => ({
+  .inputValidator((data: { id: string; checklist: Record<keyof typeof checklistConferenciaSchema, boolean> }) => ({
     id: String(data.id),
-    observacao: String(data.observacao ?? "").trim().slice(0, 1000) || null,
+    checklist: Object.fromEntries(Object.keys(checklistConferenciaSchema).map((key) => [key, data.checklist?.[key as keyof typeof checklistConferenciaSchema] === true])) as Record<keyof typeof checklistConferenciaSchema, boolean>,
   }))
   .handler(async ({ data, context }) => {
     await garantirAdmin(context);
@@ -536,6 +581,7 @@ export const conferirCadastroProfissional = createServerFn({ method: "POST" })
     ]);
     const hoje = new Date().toISOString().slice(0, 10);
     const tipos = new Set((documentos ?? []).map((doc) => doc.tipo));
+    if (!Object.values(data.checklist).every(Boolean)) return { ok: false as const, erro: "Marque todos os itens da conferência antes de aprovar." };
     if (!prof?.cnpj || prof.cnpj.length !== 14) return { ok: false as const, erro: "O CNPJ do profissional ainda não foi informado." };
     if (!prof.ferramenta_url_sala) return { ok: false as const, erro: "A ferramenta de videochamada ainda não foi cadastrada." };
     if (!perfilPronto) return { ok: false as const, erro: "O perfil público ainda está incompleto ou a foto não foi aprovada." };
@@ -543,15 +589,8 @@ export const conferirCadastroProfissional = createServerFn({ method: "POST" })
     if (!tipos.has("Carteirinha profissional do CRP") || !tipos.has("Diploma de graduação")) {
       return { ok: false as const, erro: "A carteirinha do CRP e o diploma precisam estar aprovados." };
     }
-    const { error } = await supabaseAdmin.from("professionals").update({
-      cadastro_conferido_em: new Date().toISOString(),
-      cadastro_conferido_por: context.userId,
-      observacao_admin: data.observacao,
-      status: "pendente",
-      validado_em: new Date().toISOString(),
-      validado_por: context.userId,
-    }).eq("id", data.id);
-    if (error) return { ok: false as const, erro: "Não foi possível concluir a conferência." };
+    const { error: decisionError } = await supabaseAdmin.rpc("record_professional_review_decision", { _professional_id: data.id, _decided_by: context.userId, _decision: "approved", _checklist: data.checklist, _reason: "" });
+    if (decisionError) return { ok: false as const, erro: "Não foi possível registrar a decisão de aprovação." };
     const { writeAuditEvent } = await import("@/lib/audit.server");
     await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "professional_registration_reviewed", entity: "professional", entityId: data.id, metadata: { status: "checked" } });
     return { ok: true as const };

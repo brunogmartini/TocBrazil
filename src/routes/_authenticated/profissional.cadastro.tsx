@@ -10,7 +10,7 @@ import {
   salvarCadastroProfissional,
 } from "@/lib/profissional.functions";
 import { statusRecebimentoAsaas } from "@/lib/asaas.functions";
-import { ProfessionalNav } from "@/components/professional-nav";
+import { EtapasCadastro, ProfessionalNav } from "@/components/professional-nav";
 import { ContractAcceptance } from "@/components/contract-acceptance";
 import { exigirAreaProfissional } from "@/lib/role-access";
 import { moeda } from "@/lib/video-sala";
@@ -287,6 +287,7 @@ function CadastroProfissional() {
         </p>
       </div>
       <ProfessionalNav ativo="/profissional/cadastro" />
+      {dados.data?.etapa && <div className="card-soft mt-6 p-5"><EtapasCadastro etapaAtual={dados.data.etapa} /><p className="mt-4 text-sm text-muted-foreground">{dados.data.etapa.descricao}</p></div>}
 
       {dados.data?.profissional && (
         <div className="card-soft mt-6 p-5">
@@ -532,9 +533,7 @@ function CadastroProfissional() {
 
 
       <div className="mt-12 flex flex-wrap gap-3">
-        <Link to="/profissional/agenda" className="btn-base btn-primary">
-          Configurar minha agenda
-        </Link>
+        {vinculo.data?.ativo && <Link to="/profissional/agenda" className="btn-base btn-primary">Configurar minha agenda</Link>}
         <Link to="/profissional" className="btn-base btn-ghost">
           Voltar para a área do profissional
         </Link>

@@ -39,14 +39,15 @@ export const professionalContractState = createServerFn({ method: "GET" })
       .select("id, nome, cpf, registro, uf, cadastro_conferido_em")
       .eq("user_id", context.userId).maybeSingle();
     if (!professional) return { available: false as const, reason: "no_registration" as const };
-    if (!professional.cadastro_conferido_em) return { available: false as const, reason: "under_review" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const [{ data: documents }, { data: accesses }, { data: acceptance }, { data: account }] = await Promise.all([
+    const [{ data: review }, { data: documents }, { data: accesses }, { data: acceptance }, { data: account }] = await Promise.all([
+      supabaseAdmin.from("professional_review_decisions").select("decision").eq("professional_id", professional.id).order("decided_at", { ascending: false }).limit(1).maybeSingle(),
       supabaseAdmin.from("contract_documents").select("document_key, display_name, sha256, storage_path, display_order, contract_version").eq("active", true).order("display_order"),
       supabaseAdmin.from("document_accesses").select("document_key, accessed_at").eq("user_id", context.userId).eq("contract_version", CONTRACT_VERSION),
       supabaseAdmin.from("document_acceptances").select("id, accepted_at, evidence_sha256").eq("user_id", context.userId).eq("contract_version", CONTRACT_VERSION).maybeSingle(),
       supabaseAdmin.from("asaas_professional_accounts").select("status, wallet_id").eq("professional_id", professional.id).eq("environment", "sandbox").maybeSingle(),
     ]);
+    if (review?.decision !== "approved") return { available: false as const, reason: "under_review" as const };
     const signed = await Promise.all((documents ?? []).map(async (document) => {
       const { data } = await supabaseAdmin.storage.from("contratos-profissionais").createSignedUrl(document.storage_path, 600);
       return { key: document.document_key, name: document.display_name, sha256: document.sha256, version: document.contract_version, url: data?.signedUrl ?? null };
@@ -70,9 +71,11 @@ export const recordContractDocumentAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ documentKey: documentKeySchema }).parse(input))
   .handler(async ({ data, context }) => {
-    const { data: professional } = await context.supabase.from("professionals").select("id, cadastro_conferido_em").eq("user_id", context.userId).maybeSingle();
-    if (!professional?.cadastro_conferido_em) return { ok: false as const, error: "Documentos em análise." };
+    const { data: professional } = await context.supabase.from("professionals").select("id").eq("user_id", context.userId).maybeSingle();
+    if (!professional) return { ok: false as const, error: "Documentos em análise." };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: review } = await supabaseAdmin.from("professional_review_decisions").select("decision").eq("professional_id", professional.id).order("decided_at", { ascending: false }).limit(1).maybeSingle();
+    if (review?.decision !== "approved") return { ok: false as const, error: "Documentos em análise." };
     const { data: document } = await supabaseAdmin.from("contract_documents").select("sha256").eq("active", true).eq("contract_version", CONTRACT_VERSION).eq("document_key", data.documentKey).maybeSingle();
     if (!document) return { ok: false as const, error: "Documento indisponível." };
     const metadata = requestMetadata();
@@ -86,14 +89,16 @@ export const acceptProfessionalContract = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ scrollCompleted: z.literal(true), declarations: z.array(z.boolean()).length(7) }).parse(input))
   .handler(async ({ data, context }) => {
     if (!data.declarations.every(Boolean)) return { ok: false as const, error: "Confirme cada declaração individualmente." };
-    const { data: professional } = await context.supabase.from("professionals").select("id, nome, cpf, registro, uf, cadastro_conferido_em").eq("user_id", context.userId).maybeSingle();
-    if (!professional?.cadastro_conferido_em) return { ok: false as const, error: "Seu cadastro ainda está em conferência." };
+    const { data: professional } = await context.supabase.from("professionals").select("id, nome, cpf, registro, uf").eq("user_id", context.userId).maybeSingle();
+    if (!professional) return { ok: false as const, error: "Seu cadastro ainda está em conferência." };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const [{ data: documents }, { data: accesses }, { data: existing }] = await Promise.all([
+    const [{ data: review }, { data: documents }, { data: accesses }, { data: existing }] = await Promise.all([
+      supabaseAdmin.from("professional_review_decisions").select("decision").eq("professional_id", professional.id).order("decided_at", { ascending: false }).limit(1).maybeSingle(),
       supabaseAdmin.from("contract_documents").select("document_key, sha256").eq("active", true).eq("contract_version", CONTRACT_VERSION),
       supabaseAdmin.from("document_accesses").select("document_key").eq("user_id", context.userId).eq("contract_version", CONTRACT_VERSION),
       supabaseAdmin.from("document_acceptances").select("id").eq("user_id", context.userId).eq("contract_version", CONTRACT_VERSION).maybeSingle(),
     ]);
+    if (review?.decision !== "approved") return { ok: false as const, error: "Seu cadastro ainda está em conferência." };
     if (existing) return { ok: false as const, error: "Esta versão já foi aceita." };
     const opened = new Set((accesses ?? []).map((row) => row.document_key));
     if (!REQUIRED_ANNEX_KEYS.every((key) => opened.has(key))) return { ok: false as const, error: "Abra os quatro anexos antes de aceitar." };

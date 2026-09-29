@@ -1626,6 +1626,44 @@ export type Database = {
           },
         ]
       }
+      professional_review_decisions: {
+        Row: {
+          checklist: Json
+          decided_at: string
+          decided_by: string
+          decision: string
+          id: string
+          professional_id: string
+          reason: string | null
+        }
+        Insert: {
+          checklist?: Json
+          decided_at?: string
+          decided_by: string
+          decision: string
+          id?: string
+          professional_id: string
+          reason?: string | null
+        }
+        Update: {
+          checklist?: Json
+          decided_at?: string
+          decided_by?: string
+          decision?: string
+          id?: string
+          professional_id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_review_decisions_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_status_history: {
         Row: {
           alterado_por: string | null
@@ -2078,6 +2116,16 @@ export type Database = {
           inicio: string
           slug: string
         }[]
+      }
+      record_professional_review_decision: {
+        Args: {
+          _checklist: Json
+          _decided_by: string
+          _decision: string
+          _professional_id: string
+          _reason: string
+        }
+        Returns: undefined
       }
       registrar_deteccao_anticontato: {
         Args: {
