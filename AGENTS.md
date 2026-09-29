@@ -17,5 +17,5 @@
 - Keep credentialing files private and issue 60-second signed URLs only after an MFA-authenticated admin action; why: each access must be authorized and auditable.
 - Keep clinical-content legacy tables and fields locked and deprecated, never use them in application code; why: consultations occur outside the platform.
 - Write required security events to immutable `audit_log` with metadata keys only, never values containing messages or health information; why: preserve accountability without creating sensitive replicas.
-- Keep Asaas environments fail-closed: sandbox uses only `ASAAS_API_KEY_SANDBOX`, production only `ASAAS_API_KEY_PRODUCTION`, and payment data stays server-side; why: prevent real charges during testing and credential exposure.
+- Keep Asaas fail-closed and server-only; its admin lab is sandbox-only and detached from real users/appointments; why: prevent real test charges.
 - Use two Asaas card pre-authorizations for booking outcomes and limit bookable slots to the provider's three-day authorization window; why: partial capture is not relied upon.

@@ -69,3 +69,5 @@
 - [x] Conectar estado de recebimento do psicólogo; criação fica sob ação administrativa após conferência KYC
 - [x] Conectar captura/cancelamento aos desfechos da consulta
 - [ ] Validar no sandbox autorização A/B, cancelamento imediato, split e webhook
+- [x] Criar laboratório administrativo isolado para subconta, split, captura e cancelamento no Sandbox
+- [ ] Executar ciclo financeiro completo no laboratório com dados e cartão oficiais de teste do Asaas

@@ -437,6 +437,66 @@ export type Database = {
           },
         ]
       }
+      asaas_sandbox_test_runs: {
+        Row: {
+          created_at: string
+          created_by: string
+          customer_id: string | null
+          failure_code: string | null
+          id: string
+          label: string
+          last_action: string
+          payment_id_a: string | null
+          payment_id_b: string | null
+          platform_a_centavos: number
+          platform_b_centavos: number
+          status_a: string | null
+          status_b: string | null
+          subaccount_id: string | null
+          total_centavos: number
+          updated_at: string
+          wallet_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          customer_id?: string | null
+          failure_code?: string | null
+          id?: string
+          label: string
+          last_action?: string
+          payment_id_a?: string | null
+          payment_id_b?: string | null
+          platform_a_centavos?: number
+          platform_b_centavos?: number
+          status_a?: string | null
+          status_b?: string | null
+          subaccount_id?: string | null
+          total_centavos?: number
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          customer_id?: string | null
+          failure_code?: string | null
+          id?: string
+          label?: string
+          last_action?: string
+          payment_id_a?: string | null
+          payment_id_b?: string | null
+          platform_a_centavos?: number
+          platform_b_centavos?: number
+          status_a?: string | null
+          status_b?: string | null
+          subaccount_id?: string | null
+          total_centavos?: number
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Relationships: []
+      }
       asaas_webhook_events: {
         Row: {
           environment: string
