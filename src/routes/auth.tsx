@@ -90,15 +90,26 @@ function Auth() {
       return false;
     }
 
+    // Uma tentativa interrompida deixa um fator não verificado sem que o QR
+    // possa ser recuperado. Remova-o antes de gerar uma inscrição nova.
+    const fatoresPendentes = fatores.totp.filter((fator) => fator.status === "unverified");
+    for (const fator of fatoresPendentes) {
+      const { error: erroRemocao } = await supabase.auth.mfa.unenroll({ factorId: fator.id });
+      if (erroRemocao) throw erroRemocao;
+    }
+
     const { data: inscricao, error: erroInscricao } = await supabase.auth.mfa.enroll({
       factorType: "totp",
       friendlyName: "Gestão TOC Brazil",
     });
     if (erroInscricao) throw erroInscricao;
+    const qrCode = inscricao.totp.qr_code?.trim();
+    const secret = inscricao.totp.secret?.trim();
+    if (!qrCode && !secret) throw new Error("Não foi possível gerar o código de configuração.");
     setMfa({
       factorId: inscricao.id,
-      qrCode: inscricao.totp.qr_code,
-      secret: inscricao.totp.secret,
+      qrCode,
+      secret,
     });
     return false;
   }
