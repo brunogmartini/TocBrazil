@@ -92,7 +92,9 @@ function Auth() {
 
     // Uma tentativa interrompida deixa um fator não verificado sem que o QR
     // possa ser recuperado. Remova-o antes de gerar uma inscrição nova.
-    const fatoresPendentes = fatores.totp.filter((fator) => fator.status === "unverified");
+    const fatoresPendentes = fatores.all.filter(
+      (fator) => fator.factor_type === "totp" && fator.status === "unverified",
+    );
     for (const fator of fatoresPendentes) {
       const { error: erroRemocao } = await supabase.auth.mfa.unenroll({ factorId: fator.id });
       if (erroRemocao) throw erroRemocao;
