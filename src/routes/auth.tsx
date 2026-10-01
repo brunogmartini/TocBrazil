@@ -6,7 +6,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { areaDoCaminho, destinoDaArea, INICIO_DA_AREA, ROTULO_DA_AREA, type Area } from "@/lib/areas";
 import { guardarPerfilPretendido, minhaArea } from "@/lib/role-access";
 import { useServerFn } from "@tanstack/react-start";
-import { autorizarTentativaLogin, limparMfaGestorIncompleto, registrarEventoAutenticacao } from "@/lib/auth.functions";
+import { autorizarTentativaLogin, registrarEventoAutenticacao } from "@/lib/auth.functions";
 
 type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
 type MfaPendente = { factorId: string; qrCode?: string; secret?: string };
@@ -64,7 +64,6 @@ function Auth() {
   const [mfa, setMfa] = useState<MfaPendente | null>(null);
   const [codigoMfa, setCodigoMfa] = useState("");
   const autorizarLogin = useServerFn(autorizarTentativaLogin);
-  const limparMfaIncompleto = useServerFn(limparMfaGestorIncompleto);
   const registrarAuth = useServerFn(registrarEventoAutenticacao);
 
   const profissional = search.perfil === "profissional";
@@ -84,13 +83,7 @@ function Auth() {
     if (erroNivel) throw erroNivel;
     if (niveis.currentLevel === "aal2") return true;
 
-    let { data: fatores, error: erroFatores } = await supabase.auth.mfa.listFactors();
-    if (erroFatores) {
-      // Uma inscrição TOTP interrompida pode deixar /factors indisponível. A
-      // limpeza autenticada remove somente fatores não verificados desta gestora.
-      await limparMfaIncompleto();
-      ({ data: fatores, error: erroFatores } = await supabase.auth.mfa.listFactors());
-    }
+    const { data: fatores, error: erroFatores } = await supabase.auth.mfa.listFactors();
     if (erroFatores) throw erroFatores;
     const fatorVerificado = fatores.totp.find((fator) => fator.status === "verified");
     if (fatorVerificado) {
@@ -100,7 +93,9 @@ function Auth() {
 
     const { data: inscricao, error: erroInscricao } = await supabase.auth.mfa.enroll({
       factorType: "totp",
-      friendlyName: "Gestão TOC Brazil",
+      // O provedor mantém nomes de inscrições interrompidas por algum tempo.
+      // Um sufixo único evita que esse histórico impeça a criação do novo QR.
+      friendlyName: `Gestão TOC Brazil ${Date.now()}`,
     });
     if (erroInscricao) throw erroInscricao;
     const qrCode = inscricao.totp.qr_code?.trim();
@@ -162,14 +157,26 @@ function Auth() {
         if (cancelado) return;
         if (area !== areaPretendida) {
           if (area === "gestor") {
-            if (!(await prepararMfaGestor())) return;
+            try {
+              if (!(await prepararMfaGestor())) return;
+            } catch {
+              setErro("Não foi possível preparar a autenticação em duas etapas. Saia, entre novamente e tente de novo.");
+              return;
+            }
             navigate({ to: destinoDaArea(area, search.redirect), replace: true });
             return;
           }
           setConflito({ area, email: session.user.email ?? null });
           return;
         }
-        if (area === "gestor" && !(await prepararMfaGestor())) return;
+        if (area === "gestor") {
+          try {
+            if (!(await prepararMfaGestor())) return;
+          } catch {
+            setErro("Não foi possível preparar a autenticação em duas etapas. Saia, entre novamente e tente de novo.");
+            return;
+          }
+        }
         navigate({ to: destinoDaArea(area, search.redirect), replace: true });
       } catch {
         if (!cancelado) setErro("Não foi possível identificar sua área de acesso. Tente novamente.");
