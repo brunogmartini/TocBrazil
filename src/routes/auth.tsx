@@ -6,7 +6,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { areaDoCaminho, destinoDaArea, INICIO_DA_AREA, ROTULO_DA_AREA, type Area } from "@/lib/areas";
 import { guardarPerfilPretendido, minhaArea } from "@/lib/role-access";
 import { useServerFn } from "@tanstack/react-start";
-import { autorizarTentativaLogin, limparMfaGestorIncompleto, registrarEventoAutenticacao } from "@/lib/auth.functions";
+import { autorizarTentativaLogin, registrarEventoAutenticacao } from "@/lib/auth.functions";
 
 type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
 type MfaPendente = { factorId: string; qrCode?: string; secret?: string };
@@ -64,7 +64,6 @@ function Auth() {
   const [mfa, setMfa] = useState<MfaPendente | null>(null);
   const [codigoMfa, setCodigoMfa] = useState("");
   const autorizarLogin = useServerFn(autorizarTentativaLogin);
-  const limparMfaIncompleto = useServerFn(limparMfaGestorIncompleto);
   const registrarAuth = useServerFn(registrarEventoAutenticacao);
 
   const profissional = search.perfil === "profissional";
@@ -80,9 +79,6 @@ function Auth() {
   const inicioPretendido = INICIO_DA_AREA[areaPretendida];
 
   async function prepararMfaGestor() {
-    // Faça a recuperação antes de consultar o nível: o próprio endpoint de
-    // fatores pode falhar quando existe uma inscrição TOTP incompleta.
-    await limparMfaIncompleto();
     const { data: niveis, error: erroNivel } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     if (erroNivel) throw erroNivel;
     if (niveis.currentLevel === "aal2") return true;
