@@ -124,8 +124,6 @@ export type ProfissionalAdmin = {
 };
 
 async function garantirAdmin(context: { supabase: unknown; userId: string; claims?: unknown }) {
-  const aal = (context.claims as { aal?: string } | undefined)?.aal;
-  if (aal !== "aal2") throw new Error("A autenticação em duas etapas é obrigatória para a gestão.");
   const supabase = context.supabase as {
     rpc: (
       fn: string,
@@ -137,6 +135,11 @@ async function garantirAdmin(context: { supabase: unknown; userId: string; claim
     _role: "admin",
   });
   if (!data) throw new Error("Acesso restrito ao administrador.");
+}
+
+function garantirMfa(context: { claims?: unknown }) {
+  const aal = (context.claims as { aal?: string } | undefined)?.aal;
+  if (aal !== "aal2") throw new Error("A autenticação em duas etapas é obrigatória para abrir documentos privados.");
 }
 
 async function registrarAcessoAdmin(userId: string, recurso: string) {
@@ -601,6 +604,7 @@ export const obterDocumentoCredenciamento = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string }) => ({ id: String(data.id) }))
   .handler(async ({ data, context }) => {
     await garantirAdmin(context);
+    garantirMfa(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: documento } = await supabaseAdmin
       .from("professional_documents")

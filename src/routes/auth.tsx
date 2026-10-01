@@ -9,8 +9,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { autorizarTentativaLogin, registrarEventoAutenticacao } from "@/lib/auth.functions";
 
 type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
-type MfaPendente = { factorId: string; qrCode?: string; secret?: string };
-
 type BuscaAuth = {
   redirect?: string | undefined;
   modo: Modo;
@@ -61,8 +59,6 @@ function Auth() {
   const [confirmacaoPendente, setConfirmacaoPendente] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [conflito, setConflito] = useState<{ area: Area; email: string | null } | null>(null);
-  const [mfa, setMfa] = useState<MfaPendente | null>(null);
-  const [codigoMfa, setCodigoMfa] = useState("");
   const autorizarLogin = useServerFn(autorizarTentativaLogin);
   const registrarAuth = useServerFn(registrarEventoAutenticacao);
 
@@ -77,69 +73,6 @@ function Auth() {
       : (areaDoCaminho(search.redirect) ?? "paciente");
   const acessoGestor = areaPretendida === "gestor";
   const inicioPretendido = INICIO_DA_AREA[areaPretendida];
-
-  async function prepararMfaGestor() {
-    const { data: niveis, error: erroNivel } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    if (erroNivel) throw erroNivel;
-    if (niveis.currentLevel === "aal2") return true;
-
-    const { data: fatores, error: erroFatores } = await supabase.auth.mfa.listFactors();
-    if (erroFatores) throw erroFatores;
-    const fatorVerificado = fatores.totp.find((fator) => fator.status === "verified");
-    if (fatorVerificado) {
-      setMfa({ factorId: fatorVerificado.id });
-      return false;
-    }
-
-    const { data: inscricao, error: erroInscricao } = await supabase.auth.mfa.enroll({
-      factorType: "totp",
-      // O provedor mantém nomes de inscrições interrompidas por algum tempo.
-      // Um sufixo único evita que esse histórico impeça a criação do novo QR.
-      friendlyName: `Gestão TOC Brazil ${Date.now()}`,
-    });
-    if (erroInscricao) throw erroInscricao;
-    const qrCode = inscricao.totp.qr_code?.trim();
-    const secret = inscricao.totp.secret?.trim();
-    if (!qrCode && !secret) throw new Error("Não foi possível gerar o código de configuração.");
-    setMfa({
-      factorId: inscricao.id,
-      qrCode,
-      secret,
-    });
-    return false;
-  }
-
-  async function verificarMfa(e: React.FormEvent) {
-    e.preventDefault();
-    if (!mfa || codigoMfa.trim().length !== 6) return;
-    setErro(null);
-    setCarregando(true);
-    try {
-      const { data: desafio, error: erroDesafio } = await supabase.auth.mfa.challenge({ factorId: mfa.factorId });
-      if (erroDesafio) throw erroDesafio;
-      const { data: sessaoMfa, error: erroVerificacao } = await supabase.auth.mfa.verify({
-        factorId: mfa.factorId,
-        challengeId: desafio.id,
-        code: codigoMfa.trim(),
-      });
-      if (erroVerificacao) throw erroVerificacao;
-      const { error: erroSessao } = await supabase.auth.setSession({
-        access_token: sessaoMfa.access_token,
-        refresh_token: sessaoMfa.refresh_token,
-      });
-      if (erroSessao) throw erroSessao;
-      const { data: niveis, error: erroNivel } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      if (erroNivel || niveis.currentLevel !== "aal2") {
-        throw new Error("A segunda etapa ainda não foi confirmada.");
-      }
-      const area = await minhaArea();
-      navigate({ to: destinoDaArea(area, search.redirect), replace: true });
-    } catch {
-      setErro("Código inválido ou expirado. Confira o aplicativo e tente novamente.");
-    } finally {
-      setCarregando(false);
-    }
-  }
 
   useEffect(() => {
     setModo(search.modo);
@@ -157,25 +90,11 @@ function Auth() {
         if (cancelado) return;
         if (area !== areaPretendida) {
           if (area === "gestor") {
-            try {
-              if (!(await prepararMfaGestor())) return;
-            } catch {
-              setErro("Não foi possível preparar a autenticação em duas etapas. Saia, entre novamente e tente de novo.");
-              return;
-            }
             navigate({ to: destinoDaArea(area, search.redirect), replace: true });
             return;
           }
           setConflito({ area, email: session.user.email ?? null });
           return;
-        }
-        if (area === "gestor") {
-          try {
-            if (!(await prepararMfaGestor())) return;
-          } catch {
-            setErro("Não foi possível preparar a autenticação em duas etapas. Saia, entre novamente e tente de novo.");
-            return;
-          }
         }
         navigate({ to: destinoDaArea(area, search.redirect), replace: true });
       } catch {
@@ -355,33 +274,6 @@ function Auth() {
     );
   }
 
-  if (acessoGestor && mfa) {
-    return (
-      <div className="container-page py-14 lg:py-20">
-        <div className="card-soft mx-auto max-w-lg p-7 sm:p-8">
-          <span className="section-label">Proteção da gestão</span>
-          <h1 className="heading-page mt-3">Autenticação em duas etapas</h1>
-          {mfa.qrCode ? (
-            <>
-              <p className="mt-4 text-sm text-muted-foreground">Leia o código com seu aplicativo autenticador e informe o código de seis dígitos.</p>
-              <img src={mfa.qrCode} alt="Código QR para configurar o aplicativo autenticador" className="mx-auto mt-6 size-56" />
-              {mfa.secret && <p className="mt-3 break-all text-center text-xs text-muted-foreground">Chave manual: {mfa.secret}</p>}
-            </>
-          ) : (
-            <p className="mt-4 text-sm text-muted-foreground">Informe o código de seis dígitos do seu aplicativo autenticador.</p>
-          )}
-          <form onSubmit={verificarMfa} className="mt-6 space-y-4">
-            <label className="block text-sm">Código de verificação
-              <input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" value={codigoMfa} onChange={(e) => setCodigoMfa(e.target.value.replace(/\D/g, ""))} className="field-base mt-1" required />
-            </label>
-            {erro && <p className="text-sm text-destructive">{erro}</p>}
-            <button type="submit" disabled={carregando || codigoMfa.length !== 6} className="btn-base btn-primary w-full disabled:opacity-60">{carregando ? "Verificando…" : "Verificar e entrar"}</button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
   const titulo =
     modo === "cadastro"
       ? profissional ? "Crie sua conta profissional" : "Crie sua conta"
@@ -406,7 +298,7 @@ function Auth() {
                : profissional
                 ? "Entre para acessar seu consultório digital: agenda, consultas, financeiro e cadastro."
                   : acessoGestor
-                    ? "Entre com uma conta autorizada e autenticação em duas etapas para acessar a gestão da plataforma."
+                    ? "Entre com uma conta autorizada para acessar a gestão da plataforma."
                 : modo === "cadastro"
                   ? "Cadastre-se para ver os horários disponíveis, os valores e agendar com o profissional que escolher."
                   : "Entre para acessar suas consultas, lembretes e dados de cadastro."}
