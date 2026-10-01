@@ -22,3 +22,4 @@
 - Keep explicit deny policies on server-only tables; why: access stays fail-closed.
 - Keep managed auth emails and signup resend support; why: confirmation is recoverable.
 - Resolve existing account areas from the authenticated user's own RLS-scoped role row before provisioning a missing role server-side; why: login must not race bearer propagation.
+- Recover manager MFA through an authenticated server function that deletes only the current admin's unverified factors; why: interrupted enrollment must not block login or weaken verified MFA.

@@ -6,7 +6,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { areaDoCaminho, destinoDaArea, INICIO_DA_AREA, ROTULO_DA_AREA, type Area } from "@/lib/areas";
 import { guardarPerfilPretendido, minhaArea } from "@/lib/role-access";
 import { useServerFn } from "@tanstack/react-start";
-import { autorizarTentativaLogin, registrarEventoAutenticacao } from "@/lib/auth.functions";
+import { autorizarTentativaLogin, limparMfaGestorIncompleto, registrarEventoAutenticacao } from "@/lib/auth.functions";
 
 type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
 type MfaPendente = { factorId: string; qrCode?: string; secret?: string };
@@ -64,6 +64,7 @@ function Auth() {
   const [mfa, setMfa] = useState<MfaPendente | null>(null);
   const [codigoMfa, setCodigoMfa] = useState("");
   const autorizarLogin = useServerFn(autorizarTentativaLogin);
+  const limparMfaIncompleto = useServerFn(limparMfaGestorIncompleto);
   const registrarAuth = useServerFn(registrarEventoAutenticacao);
 
   const profissional = search.perfil === "profissional";
@@ -83,7 +84,13 @@ function Auth() {
     if (erroNivel) throw erroNivel;
     if (niveis.currentLevel === "aal2") return true;
 
-    const { data: fatores, error: erroFatores } = await supabase.auth.mfa.listFactors();
+    let { data: fatores, error: erroFatores } = await supabase.auth.mfa.listFactors();
+    if (erroFatores) {
+      // Uma inscrição TOTP interrompida pode deixar /factors indisponível. A
+      // limpeza autenticada remove somente fatores não verificados desta gestora.
+      await limparMfaIncompleto();
+      ({ data: fatores, error: erroFatores } = await supabase.auth.mfa.listFactors());
+    }
     if (erroFatores) throw erroFatores;
     const fatorVerificado = fatores.totp.find((fator) => fator.status === "verified");
     if (fatorVerificado) {
