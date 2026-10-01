@@ -43,3 +43,33 @@ export const registrarEventoAutenticacao = createServerFn({ method: "POST" })
     await writeAuditEvent({ actorId: context.userId, actorRole: papel, action: data.evento, entity: "auth_session", entityId: context.userId });
     return { ok: true as const };
   });
+
+/**
+ * Remove apenas configurações TOTP incompletas da própria conta gestora.
+ * Um fator verificado nunca é alterado por esta recuperação.
+ */
+export const limparMfaGestorIncompleto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: papel, error: erroPapel } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (erroPapel || !papel) throw new Error("Acesso não autorizado.");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.auth.admin.mfa.listFactors({ userId: context.userId });
+    if (error) throw error;
+
+    for (const fator of data.factors) {
+      if (fator.status !== "unverified") continue;
+      const { error: erroExclusao } = await supabaseAdmin.auth.admin.mfa.deleteFactor({
+        userId: context.userId,
+        id: fator.id,
+      });
+      if (erroExclusao) throw erroExclusao;
+    }
+    return { ok: true as const };
+  });
