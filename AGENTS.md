@@ -22,3 +22,4 @@
 - Keep explicit deny policies on server-only tables; why: access stays fail-closed.
 - Keep managed auth emails and signup resend support; why: confirmation is recoverable.
 - Resolve existing account areas from the authenticated user's own RLS-scoped role row before provisioning a missing role server-side; why: login must not race bearer propagation.
+- Send the fixed-recipient management email only after the first successful professional profile creation, using the profile ID for idempotency; why: edits must not generate duplicate signup alerts.
