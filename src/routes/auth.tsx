@@ -155,6 +155,11 @@ function Auth() {
         const area = await minhaArea(areaPretendida === "profissional" ? "profissional" : undefined);
         if (cancelado) return;
         if (area !== areaPretendida) {
+          if (area === "gestor") {
+            if (!(await prepararMfaGestor())) return;
+            navigate({ to: destinoDaArea(area, search.redirect), replace: true });
+            return;
+          }
           setConflito({ area, email: session.user.email ?? null });
           return;
         }
