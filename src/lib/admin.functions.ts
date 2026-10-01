@@ -478,6 +478,10 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
     await garantirAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    const { data: estadoAtual } = await supabaseAdmin.from("professionals").select("status").eq("id", data.id).maybeSingle();
+    if (!estadoAtual || estadoAtual.status === "descredenciado") {
+      return { ok: false as const, erro: "Este profissional não está mais na lista ativa." };
+    }
     if ((data.status === "rejeitado" || data.requerCorrecao) && !data.observacao) {
       return { ok: false as const, erro: "Informe o motivo antes de continuar." };
     }
@@ -580,7 +584,7 @@ export const excluirProfissional = createServerFn({ method: "POST" })
       .select("id", { count: "exact", head: true })
       .eq("professional_id", data.id)
       .in("status", ["aguardando_pagamento", "confirmada"])
-      .gte("inicio", new Date().toISOString());
+      .gte("fim", new Date().toISOString());
     if (consultasErro) return { ok: false as const, erro: "Não foi possível conferir as consultas deste profissional." };
     if (count) return { ok: false as const, erro: "Há consultas futuras em aberto. Resolva esses agendamentos antes de excluir o profissional." };
 
@@ -617,11 +621,12 @@ export const conferirCadastroProfissional = createServerFn({ method: "POST" })
     await garantirAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: prof }, { data: perfilPronto }, { data: documentos }] = await Promise.all([
-      supabaseAdmin.from("professionals").select("cnpj, ferramenta_url_sala, certidao_validade").eq("id", data.id).maybeSingle(),
+      supabaseAdmin.from("professionals").select("cnpj, ferramenta_url_sala, certidao_validade, status").eq("id", data.id).maybeSingle(),
       supabaseAdmin.rpc("perfil_pronto_para_publicar", { _professional_id: data.id }),
       supabaseAdmin.from("professional_documents").select("tipo, status").eq("professional_id", data.id).eq("status", "aprovado"),
     ]);
     const hoje = new Date().toISOString().slice(0, 10);
+    if (!prof || prof.status === "descredenciado") return { ok: false as const, erro: "Este profissional não está mais na lista ativa." };
     const tipos = new Set((documentos ?? []).map((doc) => doc.tipo));
     if (!Object.values(data.checklist).every(Boolean)) return { ok: false as const, erro: "Marque todos os itens da conferência antes de aprovar." };
     if (!prof?.cnpj || prof.cnpj.length !== 14) return { ok: false as const, erro: "O CNPJ do profissional ainda não foi informado." };

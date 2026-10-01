@@ -108,5 +108,5 @@
 - [x] Validar cadastro, financeiro, desktop e 375 px
 
 ## Exclusão de profissionais no painel gestor — 01/10/2026
-- [ ] Adicionar ação confirmada e exclusiva da gestão para retirar o profissional do site
-- [ ] Preservar consultas, contratos, pagamentos e auditoria; verificar acesso e lista após a ação
+- [x] Adicionar ação confirmada e exclusiva da gestão para retirar o profissional do site
+- [x] Preservar consultas, contratos, pagamentos e auditoria; verificar acesso e lista após a ação
