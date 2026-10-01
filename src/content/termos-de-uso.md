@@ -4,7 +4,7 @@
 
 # TOC BRAZIL
 
-*Versão 1.3 — vigente a partir de 28/09/2026*
+*Versão 1.4 — vigente a partir de 01/10/2026*
 
 
 > **EM RESUMO. A TOC Brazil é uma plataforma de tecnologia: você encontra psicólogos com experiência em TOC, escolhe um, agenda e paga por aqui — o valor é reservado no seu cartão na véspera e cobrado só depois da consulta. A consulta acontece na sala de videochamada do próprio psicólogo, e quem presta o atendimento é ele — não a TOC Brazil. A plataforma não avalia, não diagnostica, não trata e não garante resultado. Não somos um serviço de urgência: em caso de crise, ligue 188 (CVV) ou 192 (SAMU).**
@@ -72,7 +72,7 @@
 
 7.1. O valor é reservado no seu cartão 36 horas antes da consulta e cobrado somente depois dela. Você pode cancelar ou remarcar pela plataforma até 24 (vinte e quatro) horas antes do horário agendado: a reserva é integralmente liberada e nada é cobrado de você.
 
-7.1.1. Cancelando com menos de 24 horas de antecedência, não comparecendo, ou atrasando mais de 15 (quinze) minutos, é cobrada apenas a quantia de R$ 50,00 (cinquenta reais) e o restante da reserva é liberado. Desse valor, R$ 40,00 remuneram o psicólogo pelo horário que ele reservou e manteve à sua disposição, e R$ 10,00 remuneram a plataforma pelo uso da estrutura. Se a consulta custar menos de R$ 50,00, a cobrança fica limitada ao valor reservado.
+7.1.1. Cancelando com menos de 24 horas de antecedência, não comparecendo, ou atrasando mais de 15 (quinze) minutos, é cobrada apenas a quantia de R$ 50,00 (cinquenta reais) e o restante da reserva é liberado. Desse valor, R$ 40,00 remuneram o psicólogo pelo horário que ele reservou e manteve à sua disposição, e R$ 10,00 remuneram a plataforma pelo uso da estrutura. Se a consulta custar menos de R$ 50,00, a cobrança fica limitada ao valor reservado. Você recebe documento fiscal do psicólogo pelos R$ 40,00 e da TOC Brazil pelos R$ 10,00.
 
 7.1.2. Se o psicólogo não comparecer, ou atrasar mais de 15 (quinze) minutos, a reserva é integralmente liberada e nada é cobrado de você. Você pode remarcar, se preferir.
 

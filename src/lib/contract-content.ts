@@ -1,4 +1,4 @@
-export const CONTRACT_VERSION = "6.2";
+export const CONTRACT_VERSION = "6.3";
 
 export const CONTRACT_SUMMARY = "A TOC Brazil é uma plataforma de tecnologia. Você atende como profissional autônomo, fixa livremente seus honorários e recebe do paciente. A TOC Brazil não presta serviços de saúde, não avalia sua competência técnica, não garante resultado e não fornece sala de videochamada. Você paga uma taxa fixa em reais por consulta realizada, pelo uso da estrutura — não é comissão nem percentual sobre o que você cobra (Cláusula 6). As Cláusulas 6, 8, 12, 13 e 14 limitam direitos ou restringem condutas e estão destacadas, nos termos do art. 54, § 4º, do Código de Defesa do Consumidor, aplicado por analogia, e dos arts. 423 e 424 do Código Civil.";
 

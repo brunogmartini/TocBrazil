@@ -4,7 +4,7 @@
 
 # TOC BRAZIL
 
-*Versão 1.3 — vigente a partir de 28/09/2026*
+*Versão 1.4 — vigente a partir de 01/10/2026*
 
 
 > **O QUE VOCÊ PRECISA SABER PRIMEIRO. A TOC Brazil trata os dados necessários para você encontrar um psicólogo, agendar e pagar. NÃO temos acesso ao conteúdo das suas consultas, não guardamos prontuário, não registramos sintomas, diagnóstico ou histórico de saúde, e não gravamos as sessões. Os dados do seu atendimento ficam com o psicólogo, que é quem responde por eles.**
