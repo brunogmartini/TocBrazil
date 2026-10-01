@@ -80,17 +80,14 @@ function Auth() {
   const inicioPretendido = INICIO_DA_AREA[areaPretendida];
 
   async function prepararMfaGestor() {
+    // Faça a recuperação antes de consultar o nível: o próprio endpoint de
+    // fatores pode falhar quando existe uma inscrição TOTP incompleta.
+    await limparMfaIncompleto();
     const { data: niveis, error: erroNivel } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     if (erroNivel) throw erroNivel;
     if (niveis.currentLevel === "aal2") return true;
 
-    let { data: fatores, error: erroFatores } = await supabase.auth.mfa.listFactors();
-    if (erroFatores) {
-      // Uma inscrição TOTP interrompida pode deixar /factors indisponível. A
-      // limpeza autenticada remove somente fatores não verificados desta gestora.
-      await limparMfaIncompleto();
-      ({ data: fatores, error: erroFatores } = await supabase.auth.mfa.listFactors());
-    }
+    const { data: fatores, error: erroFatores } = await supabase.auth.mfa.listFactors();
     if (erroFatores) throw erroFatores;
     const fatorVerificado = fatores.totp.find((fator) => fator.status === "verified");
     if (fatorVerificado) {
