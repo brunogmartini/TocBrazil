@@ -75,6 +75,7 @@ function Auth() {
     : gestor
       ? "gestor"
       : (areaDoCaminho(search.redirect) ?? "paciente");
+  const acessoGestor = areaPretendida === "gestor";
   const inicioPretendido = INICIO_DA_AREA[areaPretendida];
 
   async function prepararMfaGestor() {
@@ -154,10 +155,15 @@ function Auth() {
         const area = await minhaArea(areaPretendida === "profissional" ? "profissional" : undefined);
         if (cancelado) return;
         if (area !== areaPretendida) {
+          if (area === "gestor") {
+            if (!(await prepararMfaGestor())) return;
+            navigate({ to: destinoDaArea(area, search.redirect), replace: true });
+            return;
+          }
           setConflito({ area, email: session.user.email ?? null });
           return;
         }
-        if (gestor && !(await prepararMfaGestor())) return;
+        if (area === "gestor" && !(await prepararMfaGestor())) return;
         navigate({ to: destinoDaArea(area, search.redirect), replace: true });
       } catch {
         if (!cancelado) setErro("Não foi possível identificar sua área de acesso. Tente novamente.");
@@ -184,7 +190,7 @@ function Auth() {
       sub.subscription.unsubscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [areaPretendida, search.redirect, navigate, gestor]);
+  }, [areaPretendida, search.redirect, navigate]);
 
   async function sairDaContaAtual() {
     setCarregando(true);
@@ -209,7 +215,7 @@ function Auth() {
     try {
       if (modo === "recuperar") {
         const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-            redirectTo: `${window.location.origin}/auth?modo=nova-senha${profissional ? "&perfil=profissional" : gestor ? "&perfil=gestor" : ""}`,
+            redirectTo: `${window.location.origin}/auth?modo=nova-senha${profissional ? "&perfil=profissional" : acessoGestor ? "&perfil=gestor" : ""}`,
         });
         if (error) throw error;
         setAviso("Se este e-mail tiver conta, você receberá um link para criar uma nova senha.");
@@ -336,7 +342,7 @@ function Auth() {
     );
   }
 
-  if (gestor && mfa) {
+  if (acessoGestor && mfa) {
     return (
       <div className="container-page py-14 lg:py-20">
         <div className="card-soft mx-auto max-w-lg p-7 sm:p-8">
@@ -370,13 +376,13 @@ function Auth() {
         ? "Recuperar acesso"
         : modo === "nova-senha"
           ? "Defina uma nova senha"
-           : profissional ? "Acesso do profissional" : gestor ? "Acesso do gestor" : "Entrar na plataforma";
+           : profissional ? "Acesso do profissional" : acessoGestor ? "Acesso do gestor" : "Entrar na plataforma";
 
   return (
     <div className="container-page grid gap-10 py-14 lg:grid-cols-[1fr_0.9fr] lg:py-20">
       <div className="max-w-lg">
         <span className="section-label">
-           {profissional ? "Área do profissional" : gestor ? "Área da gestão" : modo === "cadastro" ? "Criar conta de paciente" : "Acesso do paciente"}
+           {profissional ? "Área do profissional" : acessoGestor ? "Área da gestão" : modo === "cadastro" ? "Criar conta de paciente" : "Acesso do paciente"}
         </span>
         <h1 className="heading-page mt-3">{titulo}</h1>
         <p className="mt-4 text-muted-foreground">
@@ -386,13 +392,13 @@ function Auth() {
               ? "Escolha uma senha nova com pelo menos 10 caracteres."
                : profissional
                 ? "Entre para acessar seu consultório digital: agenda, consultas, financeiro e cadastro."
-                  : gestor
+                  : acessoGestor
                     ? "Entre com uma conta autorizada e autenticação em duas etapas para acessar a gestão da plataforma."
                 : modo === "cadastro"
                   ? "Cadastre-se para ver os horários disponíveis, os valores e agendar com o profissional que escolher."
                   : "Entre para acessar suas consultas, lembretes e dados de cadastro."}
         </p>
-         {!profissional && !gestor && (
+         {!profissional && !acessoGestor && (
           <ul className="mt-8 space-y-3 text-sm text-muted-foreground">
             <li className="card-soft p-4">Agenda real dos profissionais, com confirmação imediata.</li>
             <li className="card-soft p-4">Histórico de consultas, lembretes e recibos em um só lugar.</li>
