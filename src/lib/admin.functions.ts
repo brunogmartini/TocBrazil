@@ -575,12 +575,20 @@ export const excluirProfissional = createServerFn({ method: "POST" })
     if (!profissional || profissional.status === "descredenciado") {
       return { ok: false as const, erro: "Este profissional não está mais na lista ativa." };
     }
+    const { count, error: consultasErro } = await supabaseAdmin
+      .from("appointments")
+      .select("id", { count: "exact", head: true })
+      .eq("professional_id", data.id)
+      .in("status", ["aguardando_pagamento", "confirmada"])
+      .gte("inicio", new Date().toISOString());
+    if (consultasErro) return { ok: false as const, erro: "Não foi possível conferir as consultas deste profissional." };
+    if (count) return { ok: false as const, erro: "Há consultas futuras em aberto. Resolva esses agendamentos antes de excluir o profissional." };
 
     // A remoção física apagaria documentos e vínculos em cascata; o estado
     // descredenciado remove o perfil público sem destruir evidências legais.
     const { data: alterado, error } = await supabaseAdmin
       .from("professionals")
-      .update({ status: "descredenciado", requer_correcao: false, validado_em: new Date().toISOString(), validado_por: context.userId })
+      .update({ status: "descredenciado", requer_correcao: false })
       .eq("id", data.id)
       .neq("status", "descredenciado")
       .select("id")
