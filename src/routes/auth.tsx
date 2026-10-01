@@ -157,14 +157,26 @@ function Auth() {
         if (cancelado) return;
         if (area !== areaPretendida) {
           if (area === "gestor") {
-            if (!(await prepararMfaGestor())) return;
+            try {
+              if (!(await prepararMfaGestor())) return;
+            } catch {
+              setErro("Não foi possível preparar a autenticação em duas etapas. Saia, entre novamente e tente de novo.");
+              return;
+            }
             navigate({ to: destinoDaArea(area, search.redirect), replace: true });
             return;
           }
           setConflito({ area, email: session.user.email ?? null });
           return;
         }
-        if (area === "gestor" && !(await prepararMfaGestor())) return;
+        if (area === "gestor") {
+          try {
+            if (!(await prepararMfaGestor())) return;
+          } catch {
+            setErro("Não foi possível preparar a autenticação em duas etapas. Saia, entre novamente e tente de novo.");
+            return;
+          }
+        }
         navigate({ to: destinoDaArea(area, search.redirect), replace: true });
       } catch {
         if (!cancelado) setErro("Não foi possível identificar sua área de acesso. Tente novamente.");
