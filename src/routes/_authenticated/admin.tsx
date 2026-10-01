@@ -1,9 +1,8 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { exigirAreaGestor } from "@/lib/role-access";
-import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   definirStatusConsultaAdmin,
   definirStatusDocumento,
@@ -71,7 +70,6 @@ type FiltroProf = "todos" | "pendente" | "aprovado" | "rejeitado" | "suspenso";
 type FiltroPagamento = "pendente" | "aprovado" | "todos";
 
 function Admin() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const carregar = useServerFn(painelAdmin);
   const carregarRelatorio = useServerFn(relatorioMetadados);
@@ -94,31 +92,9 @@ function Admin() {
   const [observacao, setObservacao] = useState<Record<string, string>>({});
   const [checklists, setChecklists] = useState<Record<string, Record<string, boolean>>>({});
   const [aviso, setAviso] = useState<string | null>(null);
-  const [mfaConfirmada, setMfaConfirmada] = useState(false);
-
-  useEffect(() => {
-    let ativo = true;
-    void supabase.auth.mfa.getAuthenticatorAssuranceLevel().then(({ data, error }) => {
-      if (!ativo) return;
-      if (error || data.currentLevel !== "aal2") {
-        void navigate({
-          to: "/auth",
-          search: { modo: "entrar", perfil: "gestor", redirect: "/admin" },
-          replace: true,
-        });
-        return;
-      }
-      setMfaConfirmada(true);
-    });
-    return () => {
-      ativo = false;
-    };
-  }, [navigate]);
-
   const painel = useQuery({
     queryKey: ["painel-admin"],
     queryFn: () => carregar(),
-    enabled: mfaConfirmada,
     refetchInterval: aba === "financeiro" ? 15_000 : false,
     refetchIntervalInBackground: true,
     refetchOnWindowFocus: true,
@@ -131,7 +107,7 @@ function Admin() {
   const indicadores = useQuery({ queryKey: ["admin-indicadores"], queryFn: () => carregarIndicadores(), enabled: aba === "relatorio" });
   const atualizar = () => queryClient.invalidateQueries({ queryKey: ["painel-admin"] });
 
-  if (!mfaConfirmada || painel.isPending) {
+  if (painel.isPending) {
     return (
       <div className="container-page py-20">
         <p className="text-muted-foreground">Confirmando acesso à gestão…</p>
