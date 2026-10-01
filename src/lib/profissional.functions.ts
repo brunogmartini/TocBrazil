@@ -591,6 +591,9 @@ export function calcularEtapa(
   if (!prof) {
     return { chave: "iniciado", titulo: "Cadastro iniciado", descricao: "Preencha seus dados profissionais.", indice: 0 };
   }
+  if (prof.status === "descredenciado") {
+    return { chave: "suspenso", titulo: "Cadastro encerrado", descricao: "Entre em contato com o suporte.", indice: 5 };
+  }
   if (prof.status === "rejeitado") {
     return { chave: "rejeitado", titulo: "Cadastro não aprovado", descricao: "Veja a observação da análise.", indice: 4 };
   }

@@ -9,6 +9,7 @@ import {
   definirStatusFoto,
   definirStatusPagamento,
   definirStatusProfissional,
+  excluirProfissional,
   conferirCadastroProfissional,
   editarProfissionalAdmin,
   obterDocumentoCredenciamento,
@@ -22,6 +23,7 @@ import { EtapasCadastro } from "@/components/professional-nav";
 import { indicadoresGestao } from "@/lib/continuidade.functions";
 import { dataBR, dataHoraBR, moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 import { AsaasAdminLab } from "@/components/asaas-admin-lab";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   // Área exclusiva do gestor: qualquer outra conta é levada de volta à sua própria área.
@@ -57,6 +59,7 @@ const rotuloStatusProf: Record<string, string> = {
   aprovado: "Aprovado",
   rejeitado: "Rejeitado",
   suspenso: "Suspenso",
+  descredenciado: "Excluído",
 };
 
 const rotuloDoc: Record<string, string> = {
@@ -66,7 +69,7 @@ const rotuloDoc: Record<string, string> = {
 };
 
 type Aba = "visao" | "pacientes" | "profissionais" | "consultas" | "financeiro" | "asaas" | "relatorio" | "configuracoes";
-type FiltroProf = "todos" | "pendente" | "aprovado" | "rejeitado" | "suspenso";
+type FiltroProf = "todos" | "pendente" | "aprovado" | "rejeitado" | "suspenso" | "descredenciado";
 type FiltroPagamento = "pendente" | "aprovado" | "todos";
 
 function Admin() {
@@ -74,6 +77,7 @@ function Admin() {
   const carregar = useServerFn(painelAdmin);
   const carregarRelatorio = useServerFn(relatorioMetadados);
   const mudarStatusProf = useServerFn(definirStatusProfissional);
+  const excluirProf = useServerFn(excluirProfissional);
   const conferirCadastro = useServerFn(conferirCadastroProfissional);
   const mudarStatusDoc = useServerFn(definirStatusDocumento);
   const mudarStatusFoto = useServerFn(definirStatusFoto);
@@ -92,6 +96,7 @@ function Admin() {
   const [observacao, setObservacao] = useState<Record<string, string>>({});
   const [checklists, setChecklists] = useState<Record<string, Record<string, boolean>>>({});
   const [aviso, setAviso] = useState<string | null>(null);
+  const [excluindo, setExcluindo] = useState<string | null>(null);
   const painel = useQuery({
     queryKey: ["painel-admin"],
     queryFn: () => carregar(),
@@ -142,7 +147,7 @@ function Admin() {
   const profissionais = (dados?.profissionais ?? []).filter(
     (p) =>
       (!filtro || p.nome.toLowerCase().includes(filtro) || p.registro.toLowerCase().includes(filtro)) &&
-      (filtroProf === "todos" || p.status === filtroProf),
+       (filtroProf === "todos" ? p.status !== "descredenciado" : p.status === filtroProf),
   );
   const pagamentos = (dados?.pagamentos ?? []).filter((r) => !filtro || r.profissional.toLowerCase().includes(filtro));
   const pagamentosVisiveis = pagamentos.filter((r) => {
@@ -161,6 +166,22 @@ function Admin() {
     });
     setAviso(r.ok ? "Status atualizado." : r.erro);
     await atualizar();
+  }
+
+  async function confirmarExclusao(p: ProfissionalAdmin) {
+    if (!window.confirm(`Excluir ${p.nome} da plataforma? O perfil deixará de aparecer para pacientes. Consultas, pagamentos, contratos e histórico serão preservados.`)) return;
+    setExcluindo(p.id);
+    setAviso(null);
+    try {
+      const resultado = await excluirProf({ data: { id: p.id } });
+      setAviso(resultado.ok ? `${p.nome} foi retirado da lista de profissionais. O histórico foi preservado.` : resultado.erro);
+      if (resultado.ok) setAberto(null);
+      await atualizar();
+    } catch {
+      setAviso("Não foi possível excluir o profissional da lista. Tente novamente.");
+    } finally {
+      setExcluindo(null);
+    }
   }
 
   const itensConferencia = [
@@ -314,6 +335,7 @@ function Admin() {
                 ["rejeitado", "Rejeitados"],
                 ["suspenso", "Suspensos"],
                 ["todos", "Todos"],
+                ["descredenciado", "Excluídos"],
               ] as const
             ).map(([id, rotulo]) => (
               <button
@@ -457,7 +479,7 @@ function Admin() {
                       <div className="mt-3 space-y-3">{itensConferencia.map(([chave, rotulo]) => <label key={chave} className="flex items-start gap-3 text-sm leading-relaxed"><input type="checkbox" className="mt-1" checked={checklists[p.id]?.[chave] ?? false} onChange={(event) => setChecklists((atual) => ({ ...atual, [p.id]: { ...atual[p.id], [chave]: event.target.checked } }))} /><span>{rotulo}</span></label>)}</div>
                     </fieldset>}
 
-                    <div className="flex flex-wrap gap-3">
+                    {p.status !== "descredenciado" && <div className="flex flex-wrap gap-3">
                       {!p.cadastro_conferido_em && <button type="button" className="btn-base btn-primary" onClick={async () => {
                         const checklist = checklists[p.id] ?? {};
                         const resultado = await conferirCadastro({ data: { id: p.id, checklist: { identity_matches: checklist["identity_matches"] === true, crp_active: checklist["crp_active"] === true, certificate_valid: checklist["certificate_valid"] === true, diploma_matches: checklist["diploma_matches"] === true, annex_v_compliant: checklist["annex_v_compliant"] === true } } });
@@ -479,7 +501,10 @@ function Admin() {
                       <button type="button" className="btn-base btn-ghost" onClick={() => aplicarStatus(p, "suspenso")}>
                         Suspender
                       </button>
-                    </div>
+                      <Button type="button" variant="destructive" disabled={excluindo === p.id} onClick={() => void confirmarExclusao(p)}>
+                        {excluindo === p.id ? "Excluindo…" : "Excluir profissional"}
+                      </Button>
+                    </div>}
                     {p.documentos.some((d) => d.status !== "aprovado") && (
                       <p className="text-xs text-muted-foreground">
                         Atenção: ainda há documentos não aprovados. O perfil só deve ser publicado após a aprovação de todos os requisitos.
