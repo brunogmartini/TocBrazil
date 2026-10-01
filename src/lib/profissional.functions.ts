@@ -282,6 +282,26 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       entityId: criado.id,
       metadata: { fields: Object.keys(data), created: true },
     });
+
+    try {
+      const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+      await sendTemplateEmail("novo-cadastro-profissional", "", {
+        templateData: {
+          nomeProfissional: data.nome,
+          registro: data.registro,
+          uf: data.uf,
+          cadastradoEm: new Date().toLocaleString("pt-BR", {
+            timeZone: "America/Sao_Paulo",
+            dateStyle: "short",
+            timeStyle: "short",
+          }),
+        },
+        idempotencyKey: `novo-cadastro-profissional-${criado.id}`,
+      });
+    } catch (erro) {
+      console.error("falha ao avisar novo cadastro profissional", criado.id, erro);
+    }
+
     return { ok: true as const, id: criado.id, slug: criado.slug };
   });
 
