@@ -383,12 +383,13 @@ export const painelAdmin = createServerFn({ method: "GET" })
 
     const agora = Date.now();
     const realizadas = listaConsultas.filter((c) => c.status === "realizada");
+    const profissionaisNaPlataforma = listaProfissionais.filter((p) => p.status !== "descredenciado");
     const totais = {
       pacientes: pacientes.filter((p) => !(p.papeis.includes("profissional") || p.papeis.includes("admin"))).length,
-      profissionais: listaProfissionais.length,
-      profissionaisAtivos: listaProfissionais.filter((p) => p.status === "aprovado").length,
-      pendentes: listaProfissionais.filter((p) => p.status === "pendente").length,
-      perfisSinalizados: listaProfissionais.filter((p) => p.perfil_bloqueios_contato > 2).length,
+      profissionais: profissionaisNaPlataforma.length,
+      profissionaisAtivos: profissionaisNaPlataforma.filter((p) => p.status === "aprovado").length,
+      pendentes: profissionaisNaPlataforma.filter((p) => p.status === "pendente").length,
+      perfisSinalizados: profissionaisNaPlataforma.filter((p) => p.perfil_bloqueios_contato > 2).length,
       consultasFuturas: listaConsultas.filter(
         (c) => new Date(c.inicio).getTime() > agora && (c.status === "confirmada" || c.status === "aguardando_pagamento"),
       ).length,

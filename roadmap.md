@@ -110,3 +110,4 @@
 ## Exclusão de profissionais no painel gestor — 01/10/2026
 - [x] Adicionar ação confirmada e exclusiva da gestão para retirar o profissional do site
 - [x] Preservar consultas, contratos, pagamentos e auditoria; verificar acesso e lista após a ação
+- [x] Atualizar os totais atuais da Visão geral após a exclusão, mantendo os indicadores históricos de consultas e pagamentos
