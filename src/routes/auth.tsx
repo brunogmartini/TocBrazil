@@ -97,7 +97,9 @@ function Auth() {
 
     const { data: inscricao, error: erroInscricao } = await supabase.auth.mfa.enroll({
       factorType: "totp",
-      friendlyName: "Gestão TOC Brazil",
+      // O provedor mantém nomes de inscrições interrompidas por algum tempo.
+      // Um sufixo único evita que esse histórico impeça a criação do novo QR.
+      friendlyName: `Gestão TOC Brazil ${Date.now()}`,
     });
     if (erroInscricao) throw erroInscricao;
     const qrCode = inscricao.totp.qr_code?.trim();
