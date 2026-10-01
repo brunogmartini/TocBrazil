@@ -21,3 +21,4 @@
 - Use two Asaas card pre-authorizations for booking outcomes and limit bookable slots to the provider's three-day authorization window; why: partial capture is not relied upon.
 - Keep explicit deny policies on server-only tables; why: access stays fail-closed.
 - Keep managed auth emails and signup resend support; why: confirmation is recoverable.
+- Resolve existing account areas from the authenticated user's own RLS-scoped role row before provisioning a missing role server-side; why: login must not race bearer propagation.

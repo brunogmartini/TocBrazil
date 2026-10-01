@@ -1,6 +1,7 @@
 import { redirect } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 import { meusPapeis } from "@/lib/plataforma.functions";
-import { INICIO_DA_AREA, type Area } from "@/lib/areas";
+import { areaDosPapeis, INICIO_DA_AREA, type Area } from "@/lib/areas";
 
 export const CHAVE_PERFIL_PRETENDIDO = "toc-perfil-pretendido";
 
@@ -22,6 +23,27 @@ export function guardarPerfilPretendido(perfil: "paciente" | "profissional" | "g
  */
 export async function minhaArea(perfilPretendido?: "profissional"): Promise<Area> {
   const perfil = perfilPretendido ?? perfilPretendidoGuardado();
+
+  // Contas existentes já têm um papel. Consultá-lo pela sessão atual evita a
+  // corrida entre o evento SIGNED_IN e a propagação do token para server functions.
+  if (typeof window !== "undefined") {
+    const { data: usuario, error: erroUsuario } = await supabase.auth.getUser();
+    if (erroUsuario) throw erroUsuario;
+    if (!usuario.user) throw new Error("Sessão não encontrada.");
+
+    const { data: linhas, error: erroPapeis } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", usuario.user.id);
+    if (erroPapeis) throw erroPapeis;
+    if (linhas && linhas.length > 0) {
+      window.sessionStorage.removeItem(CHAVE_PERFIL_PRETENDIDO);
+      return areaDosPapeis(linhas.map((linha) => linha.role));
+    }
+  }
+
+  // Apenas contas novas, ainda sem papel, precisam do fluxo servidor que fixa
+  // paciente ou profissional na primeira entrada.
   const resposta = await meusPapeis({ data: perfil ? { perfil } : {} });
   if (typeof window !== "undefined") window.sessionStorage.removeItem(CHAVE_PERFIL_PRETENDIDO);
   return resposta.area;
