@@ -11,7 +11,7 @@ export function ContractAcceptance() {
   const loadState = useServerFn(professionalContractState);
   const recordAccess = useServerFn(recordContractDocumentAccess);
   const accept = useServerFn(acceptProfessionalContract);
-  const state = useQuery({ queryKey: ["professional-contract-v62"], queryFn: () => loadState() });
+  const state = useQuery({ queryKey: ["professional-contract-v63"], queryFn: () => loadState() });
   const [scrollCompleted, setScrollCompleted] = useState(false);
   const [checks, setChecks] = useState<boolean[]>(Array(7).fill(false));
   const [message, setMessage] = useState<string | null>(null);
@@ -44,7 +44,7 @@ export function ContractAcceptance() {
         if (!document.url) { event.preventDefault(); return; }
         const result = await recordAccess({ data: { documentKey: document.key as "annex_i" | "annex_iii" | "annex_iv" | "annex_v" } });
         if (!result.ok) { event.preventDefault(); setMessage(result.error); return; }
-        await queryClient.invalidateQueries({ queryKey: ["professional-contract-v62"] });
+         await queryClient.invalidateQueries({ queryKey: ["professional-contract-v63"] });
       }}><span>{document.name}</span><span aria-hidden="true">{opened.has(document.key) ? "✓" : "↗"}</span></a>)}</div>
     </div>
 
@@ -56,7 +56,7 @@ export function ContractAcceptance() {
       setMessage(null);
       const result = await accept({ data: { scrollCompleted: true, declarations: checks } });
       if (!result.ok) return setMessage(result.error);
-      await queryClient.invalidateQueries({ queryKey: ["professional-contract-v62"] });
+       await queryClient.invalidateQueries({ queryKey: ["professional-contract-v63"] });
       setMessage("Aceite eletrônico registrado com sucesso.");
     }}>Aceitar e assinar eletronicamente</button>
   </div>;

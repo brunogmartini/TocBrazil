@@ -111,3 +111,10 @@
 - [x] Adicionar ação confirmada e exclusiva da gestão para retirar o profissional do site
 - [x] Preservar consultas, contratos, pagamentos e auditoria; verificar acesso e lista após a ação
 - [x] Atualizar os totais atuais da Visão geral após a exclusão, mantendo os indicadores históricos de consultas e pagamentos
+
+## Documentos jurídicos v6.3 e v1.4 — 01/10/2026
+- [x] Conferir e subir os cinco PDFs v6.3 sem transformação
+- [x] Preservar integralmente a v6.2 e marcar somente a v6.3 como vigente
+- [x] Atualizar contrato público e aceite eletrônico para a v6.3
+- [x] Publicar integralmente Termos de Uso e Política de Privacidade v1.4
+- [x] Validar páginas públicas e os cinco hashes servidos

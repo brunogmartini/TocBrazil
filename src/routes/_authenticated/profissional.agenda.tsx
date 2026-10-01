@@ -66,7 +66,7 @@ function PaginaAgenda() {
     refetchIntervalInBackground: true,
     refetchOnWindowFocus: true,
   });
-  const contrato = useQuery({ queryKey: ["professional-contract-v62"], queryFn: () => carregarContrato() });
+  const contrato = useQuery({ queryKey: ["professional-contract-v63"], queryFn: () => carregarContrato() });
 
   const [consulta, setConsulta] = useState<ConsultaAgenda | null>(null);
   const [bloqueioSel, setBloqueioSel] = useState<Bloqueio | null>(null);
