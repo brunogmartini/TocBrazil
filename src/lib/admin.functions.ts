@@ -560,6 +560,45 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+export const excluirProfissional = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { id: string }) => ({ id: String(data.id) }))
+  .handler(async ({ data, context }) => {
+    await garantirAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profissional, error: buscaErro } = await supabaseAdmin
+      .from("professionals")
+      .select("id, status")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (buscaErro) return { ok: false as const, erro: "Não foi possível conferir o cadastro." };
+    if (!profissional || profissional.status === "descredenciado") {
+      return { ok: false as const, erro: "Este profissional não está mais na lista ativa." };
+    }
+    const { count, error: consultasErro } = await supabaseAdmin
+      .from("appointments")
+      .select("id", { count: "exact", head: true })
+      .eq("professional_id", data.id)
+      .in("status", ["aguardando_pagamento", "confirmada"])
+      .gte("inicio", new Date().toISOString());
+    if (consultasErro) return { ok: false as const, erro: "Não foi possível conferir as consultas deste profissional." };
+    if (count) return { ok: false as const, erro: "Há consultas futuras em aberto. Resolva esses agendamentos antes de excluir o profissional." };
+
+    // A remoção física apagaria documentos e vínculos em cascata; o estado
+    // descredenciado remove o perfil público sem destruir evidências legais.
+    const { data: alterado, error } = await supabaseAdmin
+      .from("professionals")
+      .update({ status: "descredenciado", requer_correcao: false })
+      .eq("id", data.id)
+      .neq("status", "descredenciado")
+      .select("id")
+      .maybeSingle();
+    if (error || !alterado) return { ok: false as const, erro: "Não foi possível excluir o profissional da lista." };
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "professional_registration_reviewed", entity: "professional", entityId: data.id, metadata: { status: "descredenciado" } });
+    return { ok: true as const };
+  });
+
 const checklistConferenciaSchema = {
   identity_matches: false,
   crp_active: false,
