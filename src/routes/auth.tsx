@@ -115,12 +115,21 @@ function Auth() {
     try {
       const { data: desafio, error: erroDesafio } = await supabase.auth.mfa.challenge({ factorId: mfa.factorId });
       if (erroDesafio) throw erroDesafio;
-      const { error: erroVerificacao } = await supabase.auth.mfa.verify({
+      const { data: sessaoMfa, error: erroVerificacao } = await supabase.auth.mfa.verify({
         factorId: mfa.factorId,
         challengeId: desafio.id,
         code: codigoMfa.trim(),
       });
       if (erroVerificacao) throw erroVerificacao;
+      const { error: erroSessao } = await supabase.auth.setSession({
+        access_token: sessaoMfa.access_token,
+        refresh_token: sessaoMfa.refresh_token,
+      });
+      if (erroSessao) throw erroSessao;
+      const { data: niveis, error: erroNivel } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (erroNivel || niveis.currentLevel !== "aal2") {
+        throw new Error("A segunda etapa ainda não foi confirmada.");
+      }
       const area = await minhaArea();
       navigate({ to: destinoDaArea(area, search.redirect), replace: true });
     } catch {
