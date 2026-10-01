@@ -117,4 +117,4 @@
 - [x] Preservar integralmente a v6.2 e marcar somente a v6.3 como vigente
 - [x] Atualizar contrato público e aceite eletrônico para a v6.3
 - [x] Publicar integralmente Termos de Uso e Política de Privacidade v1.4
-- [ ] Validar páginas públicas e os cinco hashes servidos
+- [x] Validar páginas públicas e os cinco hashes servidos
