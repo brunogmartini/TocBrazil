@@ -248,8 +248,6 @@ function CadastroProfissional() {
     if (file.size > 5 * 1024 * 1024) return setErro("A foto deve ter no máximo 5 MB.");
     const dimensoes = await new Promise<{ largura: number; altura: number }>((resolve, reject) => {
       const imagem = new Image();
-      imagem.onload = () => resolve({ largura: imagem.naturalWidth, altura: imagem.naturalHeight });
-      imagem.onerror = reject;
       const url = URL.createObjectURL(file);
       imagem.onload = () => { URL.revokeObjectURL(url); resolve({ largura: imagem.naturalWidth, altura: imagem.naturalHeight }); };
       imagem.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Imagem inválida.")); };
