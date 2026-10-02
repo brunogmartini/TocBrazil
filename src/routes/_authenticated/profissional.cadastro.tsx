@@ -15,6 +15,7 @@ import { ContractAcceptance } from "@/components/contract-acceptance";
 import { exigirAreaProfissional } from "@/lib/role-access";
 import { moeda } from "@/lib/video-sala";
 import { TAXA_FIXA_CENTAVOS, valorProfissionalCentavos } from "@/lib/precos";
+import { cpfValido, cnpjValido, formatarCpf, formatarCnpj } from "@/lib/documento-pessoa";
 import {
   ABORDAGENS_PERFIL,
   IDIOMAS_PERFIL,
@@ -68,6 +69,7 @@ function CadastroProfissional() {
 
   const [form, setForm] = useState({
     nome: "",
+    tipo_pessoa: "PF" as "PF" | "PJ",
     cpf: "",
     cnpj: "",
     registro: "",
@@ -90,6 +92,7 @@ function CadastroProfissional() {
   });
   const [aviso, setAviso] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [campoErro, setCampoErro] = useState<string | null>(null);
   const [enviandoDoc, setEnviandoDoc] = useState(false);
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [cadastroFinalizado, setCadastroFinalizado] = useState(false);
@@ -125,6 +128,7 @@ function CadastroProfissional() {
     if (p) {
       setForm({
         nome: p.nome ?? "",
+        tipo_pessoa: p.tipo_pessoa === "PJ" ? "PJ" : "PF",
         cpf: p.cpf ?? "",
         cnpj: p.cnpj ?? "",
         registro: p.registro ?? "",
@@ -153,13 +157,21 @@ function CadastroProfissional() {
   async function enviarCadastro(e: React.FormEvent) {
     e.preventDefault();
     setErro(null);
+    setCampoErro(null);
     setAviso(null);
     try {
+      const apontar = (campo: string, mensagem: string) => {
+        setCampoErro(campo);
+        setErro(mensagem);
+        document.getElementById(campo)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        document.getElementById(campo)?.focus();
+      };
+      if (!cpfValido(form.cpf)) return apontar("cpf", "Informe um CPF válido.");
+      if (form.tipo_pessoa === "PJ" && !cnpjValido(form.cnpj)) return apontar("cnpj", "Informe um CNPJ válido.");
       const { valor_consulta, ...restoForm } = form;
       const valorConsultaCentavos = Math.round((Number(valor_consulta) || 0) * 100);
       if (valorConsultaCentavos <= TAXA_FIXA_CENTAVOS) {
-        setErro("O valor da consulta precisa ser maior que R$ 27,00.");
-        return;
+        return apontar("valor-da-consulta", "O valor da consulta precisa ser maior que R$ 27,00.");
       }
       const r = await salvar({
         data: {
@@ -172,6 +184,7 @@ function CadastroProfissional() {
       });
       if (!r.ok) {
         setErro(r.erro);
+        document.getElementById("erro-cadastro")?.scrollIntoView({ behavior: "smooth", block: "center" });
         return;
       }
       setAviso("Recebemos seu cadastro. Ele está aguardando a validação da equipe e o perfil ainda não aparece publicamente.");
@@ -179,11 +192,15 @@ function CadastroProfissional() {
       await queryClient.invalidateQueries();
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Não foi possível salvar agora.");
+      console.error("Falha no cadastro profissional", err);
+      document.getElementById("erro-cadastro")?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }
 
   async function enviarArquivo(file: File, tipo: string) {
     setErro(null);
+    if (!["application/pdf", "image/jpeg", "image/png"].includes(file.type)) return setErro("Envie um PDF, JPG ou PNG.");
+    if (file.size > 5 * 1024 * 1024) return setErro("O documento deve ter no máximo 5 MB.");
     setEnviandoDoc(true);
     try {
       const { data: sessao } = await supabase.auth.getUser();
@@ -203,6 +220,7 @@ function CadastroProfissional() {
       await queryClient.invalidateQueries({ queryKey: ["cadastro-profissional"] });
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Não foi possível enviar o documento.");
+      console.error("Falha no envio de documento profissional", err);
     } finally {
       setEnviandoDoc(false);
     }
@@ -251,7 +269,7 @@ function CadastroProfissional() {
           {titulo}
           <input
             type="file"
-            accept="application/pdf,image/*"
+             accept="application/pdf,image/jpeg,image/png"
             className="field-base mt-2"
             disabled={enviandoDoc}
             onChange={(e) => {
@@ -311,7 +329,7 @@ function CadastroProfissional() {
       )}
 
       {aviso && <p className="mt-6 text-sm font-semibold">{aviso}</p>}
-      {erro && <p className="mt-6 text-sm font-semibold text-destructive">{erro}</p>}
+        {erro && <p id="erro-cadastro" role="alert" className="mt-6 text-sm font-semibold text-destructive">{erro}</p>}
 
 
       {cadastroFinalizado && !temCadastro ? null : <form onSubmit={enviarCadastro} className="card-soft mt-8 grid gap-5 p-7 sm:grid-cols-2">
@@ -329,19 +347,32 @@ function CadastroProfissional() {
           className="sm:col-span-2"
           required
         />
+        <fieldset className="sm:col-span-2">
+          <legend className="section-label">Tipo de cadastro</legend>
+          <div className="mt-2 flex gap-6 text-sm">
+            <label className="flex items-center gap-2"><input type="radio" name="tipo-pessoa" checked={form.tipo_pessoa === "PF"} onChange={() => setForm({ ...form, tipo_pessoa: "PF", cnpj: "" })} /> Pessoa física</label>
+            <label className="flex items-center gap-2"><input type="radio" name="tipo-pessoa" checked={form.tipo_pessoa === "PJ"} onChange={() => setForm({ ...form, tipo_pessoa: "PJ" })} /> Pessoa jurídica</label>
+          </div>
+        </fieldset>
         <Campo
           label="CPF"
-          value={form.cpf}
+          id="cpf"
+          inputMode="numeric"
+          invalid={campoErro === "cpf"}
+          value={formatarCpf(form.cpf)}
           onChange={(v) => setForm({ ...form, cpf: v.replace(/\D/g, "").slice(0, 11) })}
           required
         />
         {temCadastro && <div className="sm:col-span-2"><DocumentoCampo tipo="Documento de identidade" titulo="Documento de identidade com foto" /></div>}
-        <Campo
+        {form.tipo_pessoa === "PJ" && <Campo
           label="CNPJ"
-          value={form.cnpj}
+          id="cnpj"
+          inputMode="numeric"
+          invalid={campoErro === "cnpj"}
+          value={formatarCnpj(form.cnpj)}
           onChange={(v) => setForm({ ...form, cnpj: v.replace(/\D/g, "").slice(0, 14) })}
           required
-        />
+        />}
         <Campo
           label="Registro profissional (CRP)"
           value={form.registro}
@@ -545,6 +576,9 @@ function CadastroProfissional() {
 
 function Campo({
   label,
+  id,
+  inputMode,
+  invalid,
   value,
   onChange,
   type = "text",
@@ -552,23 +586,28 @@ function Campo({
   required = false,
 }: {
   label: string;
+  id?: string;
+  inputMode?: "numeric";
+  invalid?: boolean;
   value: string;
   onChange: (v: string) => void;
   type?: string;
   className?: string;
   required?: boolean;
 }) {
-  const id = label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const campoId = id ?? label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   return (
     <div className={className}>
-      <label htmlFor={id} className="section-label">
+      <label htmlFor={campoId} className="section-label">
         {label}
       </label>
       <input
-        id={id}
+        id={campoId}
+        inputMode={inputMode}
+        aria-invalid={invalid}
         type={type}
         required={required}
-        className="field-base mt-2"
+        className={`field-base mt-2 ${invalid ? "border-destructive ring-1 ring-destructive" : ""}`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
