@@ -265,6 +265,11 @@ function CadastroProfissional() {
       const caminho = `${uid}/perfil-${Date.now()}.${extensao}`;
       const { error: uploadErro } = await supabase.storage.from("fotos-profissionais").upload(caminho, file);
       if (uploadErro) throw new Error("Não foi possível enviar a foto.");
+      // Se havia uma foto nova ainda não salva, substituí-la não deve deixar um arquivo órfão.
+      const fotoAnterior = form.foto_caminho;
+      if (fotoAnterior && fotoAnterior !== dados.data?.profissional?.foto_caminho && fotoAnterior.startsWith(`${uid}/`)) {
+        await supabase.storage.from("fotos-profissionais").remove([fotoAnterior]);
+      }
       setForm((atual) => ({ ...atual, foto_caminho: caminho }));
       setAviso("Foto enviada. Salve o cadastro para encaminhá-la à conferência manual.");
     } catch (err) {
