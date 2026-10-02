@@ -225,6 +225,13 @@
       "when": 1790715640983,
       "tag": "0031_enforce_acceptance_latest_approval",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1790944531348,
+      "tag": "0032_professional_pf_pj_registration",
+      "breakpoints": true
     }
   ]
 }

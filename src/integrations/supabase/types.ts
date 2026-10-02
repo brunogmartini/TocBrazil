@@ -1763,6 +1763,7 @@ export type Database = {
           telefone: string | null
           temas_toc_publicos: string[]
           timezone: string
+          tipo_pessoa: string | null
           uf: string
           updated_at: string
           user_id: string | null
@@ -1829,6 +1830,7 @@ export type Database = {
           telefone?: string | null
           temas_toc_publicos?: string[]
           timezone?: string
+          tipo_pessoa?: string | null
           uf: string
           updated_at?: string
           user_id?: string | null
@@ -1895,6 +1897,7 @@ export type Database = {
           telefone?: string | null
           temas_toc_publicos?: string[]
           timezone?: string
+          tipo_pessoa?: string | null
           uf?: string
           updated_at?: string
           user_id?: string | null
