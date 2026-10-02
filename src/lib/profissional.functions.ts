@@ -10,6 +10,7 @@ import {
   type FormacaoPublica,
 } from "@/lib/perfil-profissional";
 import { TAXA_FIXA_CENTAVOS, valorProfissionalCentavos } from "@/lib/precos";
+import { apenasDigitos, cpfValido, cnpjValido, type TipoPessoa } from "@/lib/documento-pessoa";
 
 export const TEXTO_ACEITE_ELETRONICO =
   "Assinatura eletrônica: ao aceitar, ficam registrados nome completo, CPF, número de inscrição no CRP,\n\ndata, hora, endereço IP, geolocalização aproximada e identificador do dispositivo. É dispensada a\n\nassinatura de testemunhas quando a integridade do documento for conferida por provedor de assinatura\n\n(art. 784, § 4º, do Código de Processo Civil).";
@@ -38,6 +39,7 @@ export type CadastroProfissionalEntrada = {
   profissao: "psicologo";
   cpf?: string;
   cnpj?: string;
+  tipo_pessoa: TipoPessoa;
   registro: string;
   uf: string;
   genero?: string;
@@ -147,8 +149,12 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     const uf = String(data.uf ?? "").trim().toUpperCase().slice(0, 2);
     if (uf.length !== 2) throw new Error("Informe a UF do registro.");
     const profissao: "psicologo" = "psicologo";
-    const cnpj = String(data.cnpj ?? "").replace(/\D/g, "").slice(0, 14);
-    if (cnpj.length !== 14) throw new Error("Informe um CNPJ válido com 14 dígitos.");
+    const tipoPessoa = data.tipo_pessoa;
+    if (tipoPessoa !== "PF" && tipoPessoa !== "PJ") throw new Error("Escolha pessoa física ou jurídica.");
+    const cpf = apenasDigitos(String(data.cpf ?? ""));
+    const cnpj = apenasDigitos(String(data.cnpj ?? ""));
+    if (!cpfValido(cpf)) throw new Error("Informe um CPF válido.");
+    if (tipoPessoa === "PJ" && !cnpjValido(cnpj)) throw new Error("Informe um CNPJ válido.");
     const valorConsultaCentavos = Math.min(
       Math.max(Math.round(Number(data.valor_centavos ?? 0) || 0), 0),
       500000,
@@ -178,8 +184,9 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       registro,
       uf,
       profissao,
-      cpf: String(data.cpf ?? "").replace(/\D/g, "").slice(0, 11) || null,
-      cnpj,
+      cpf,
+      cnpj: tipoPessoa === "PJ" ? cnpj : null,
+      tipo_pessoa: tipoPessoa,
       genero: String(data.genero ?? "").trim().slice(0, 30) || null,
       abordagens_publicas: abordagens,
       formacoes_publicas: formacoes,
@@ -252,7 +259,10 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
 
     if (existente) {
       const { error } = await supabase.from("professionals").update(data).eq("id", existente.id);
-      if (error) return { ok: false as const, erro: "Não foi possível salvar seus dados agora." };
+      if (error) {
+        console.error("Falha ao atualizar cadastro profissional", { code: error.code });
+        return { ok: false as const, erro: error.code === "23505" ? "CPF ou CNPJ já cadastrado." : "Não foi possível salvar seus dados agora." };
+      }
       const { writeAuditEvent } = await import("@/lib/audit.server");
       await writeAuditEvent({ actorId: userId, actorRole: "profissional", action: "profile_data_changed", entity: "professional", entityId: existente.id, metadata: { fields: Object.keys(data) } });
       return { ok: true as const, id: existente.id, slug: existente.slug };
@@ -271,7 +281,10 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       .insert({ ...data, slug, user_id: userId, status: "pendente" })
       .select("id, slug")
       .single();
-    if (error) return { ok: false as const, erro: "Não foi possível criar seu cadastro agora." };
+    if (error) {
+      console.error("Falha ao criar cadastro profissional", { code: error.code });
+      return { ok: false as const, erro: error.code === "23505" ? "CPF ou CNPJ já cadastrado." : "Não foi possível criar seu cadastro agora." };
+    }
 
     const { writeAuditEvent } = await import("@/lib/audit.server");
     await writeAuditEvent({
@@ -302,6 +315,14 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       console.error("falha ao avisar novo cadastro profissional", criado.id, erro);
     }
 
+    try {
+      const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+      const destinatario = (context.claims as { email?: string }).email;
+      if (destinatario) await sendTemplateEmail("cadastro-profissional-status", destinatario, { templateData: { nome: data.nome, situacao: "recebido" }, idempotencyKey: `cadastro-recebido-${criado.id}` });
+    } catch (erro) {
+      console.error("Falha ao avisar profissional sobre cadastro", criado.id, erro);
+    }
+
     return { ok: true as const, id: criado.id, slug: criado.slug };
   });
 
@@ -319,6 +340,7 @@ export const salvarDisponibilidade = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    if (!data.nome_arquivo || !["Carteirinha profissional do CRP", "Documento de identidade", "Diploma de graduação", "Certidão de regularidade do CRP"].includes(data.tipo) && !/^Comprovante de formação \d{1,2}$/.test(data.tipo)) return { ok: false as const, erro: "Tipo de documento inválido." };
     const { data: prof } = await supabase
       .from("professionals")
       .select("id")
