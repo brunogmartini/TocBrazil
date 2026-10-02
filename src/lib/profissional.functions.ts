@@ -263,8 +263,15 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
         console.error("Falha ao atualizar cadastro profissional", { code: error.code });
         return { ok: false as const, erro: error.code === "23505" ? "CPF ou CNPJ já cadastrado." : "Não foi possível salvar seus dados agora." };
       }
+      if (existente.status === "rejeitado") {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { error: reenvioErro } = await supabaseAdmin.from("professionals")
+          .update({ status: "pendente", requer_correcao: false })
+          .eq("id", existente.id).eq("user_id", userId).eq("status", "rejeitado");
+        if (reenvioErro) return { ok: false as const, erro: "Dados salvos, mas não foi possível reenviar para análise. Tente novamente." };
+      }
       const { writeAuditEvent } = await import("@/lib/audit.server");
-      await writeAuditEvent({ actorId: userId, actorRole: "profissional", action: "profile_data_changed", entity: "professional", entityId: existente.id, metadata: { fields: Object.keys(data) } });
+      await writeAuditEvent({ actorId: userId, actorRole: "profissional", action: "profile_data_changed", entity: "professional", entityId: existente.id, metadata: { fields: Object.keys(data), resubmitted: existente.status === "rejeitado" } });
       return { ok: true as const, id: existente.id, slug: existente.slug };
     }
 
