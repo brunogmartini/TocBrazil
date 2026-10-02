@@ -40,6 +40,7 @@ export type CadastroProfissionalEntrada = {
   cpf?: string;
   cnpj?: string;
   tipo_pessoa: TipoPessoa;
+  ciencia_documento_fiscal: boolean;
   telefone?: string;
   registro: string;
   uf: string;
@@ -156,6 +157,7 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     if (telefone.length < 10 || telefone.length > 11) throw new Error("Informe um telefone válido com DDD.");
     const tipoPessoa = data.tipo_pessoa;
     if (tipoPessoa !== "PF" && tipoPessoa !== "PJ") throw new Error("Escolha pessoa física ou jurídica.");
+    if (data.ciencia_documento_fiscal !== true) throw new Error("Confirme sua obrigação de fornecer o documento fiscal ao paciente pelo valor total da consulta.");
     const cpf = apenasDigitos(String(data.cpf ?? ""));
     const cnpj = apenasDigitos(String(data.cnpj ?? ""));
     if (!cpfValido(cpf)) throw new Error("Informe um CPF válido.");
@@ -430,8 +432,14 @@ export const registrarDocumento = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     if (!data.nome_arquivo || !["Carteirinha profissional do CRP", "Documento de identidade", "Diploma de graduação", "Certidão de regularidade do CRP"].includes(data.tipo) && !/^Comprovante de formação \d{1,2}$/.test(data.tipo)) return { ok: false as const, erro: "Tipo de documento inválido." };
-    if (!data.caminho.startsWith(`${userId}/`)) {
+    if (!data.caminho.startsWith(`${userId}/`) || data.caminho.slice(userId.length + 1).includes("/")) {
       return { ok: false as const, erro: "Arquivo inválido." };
+    }
+    const arquivoNome = data.caminho.slice(userId.length + 1);
+    const { data: arquivos, error: erroArquivo } = await supabase.storage.from("documentos-profissionais").list(userId, { search: arquivoNome, limit: 10 });
+    const arquivo = arquivos?.find((item) => item.name === arquivoNome);
+    if (erroArquivo || !arquivo?.id || !["application/pdf", "image/jpeg", "image/png"].includes(String(arquivo.metadata?.mimetype ?? "")) || Number(arquivo.metadata?.size ?? 0) > 5 * 1024 * 1024) {
+      return { ok: false as const, erro: "Arquivo não encontrado ou formato inválido. Envie novamente." };
     }
     const { data: prof } = await supabase
       .from("professionals")
@@ -439,8 +447,6 @@ export const registrarDocumento = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .maybeSingle();
     if (!prof) return { ok: false as const, erro: "Complete seu cadastro primeiro." };
-
-    // Contrato: etapa final do cadastro, será adicionado à plataforma mais adiante.
 
     const { error } = await supabase
       .from("professional_documents")
@@ -583,13 +589,14 @@ export const removerDocumento = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data: doc } = await supabase
       .from("professional_documents")
-      .select("id, caminho")
+      .select("id, caminho, status")
       .eq("id", data.id)
       .maybeSingle();
     if (!doc) return { ok: false as const, erro: "Documento não encontrado." };
-    await supabase.storage.from("documentos-profissionais").remove([doc.caminho]);
+    if (doc.status === "aprovado") return { ok: false as const, erro: "Um documento aprovado não pode ser removido. Peça uma nova análise à equipe." };
     const { error } = await supabase.from("professional_documents").delete().eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível remover o documento." };
+    await supabase.storage.from("documentos-profissionais").remove([doc.caminho]);
     return { ok: true as const };
   });
 
@@ -649,6 +656,8 @@ export function calcularEtapa(
     return { chave: "suspenso", titulo: "Perfil suspenso", descricao: "Entre em contato com o suporte.", indice: 5 };
   }
   if (prof.status === "aprovado") {
+    if (!temContrato) return { chave: "aprovado", titulo: "Aceite do contrato", descricao: "Leia o contrato e os anexos para prosseguir.", indice: 4 };
+    if (!recebimentoAtivo) return { chave: "aprovado", titulo: "Integração de pagamentos", descricao: "Aguarde a ativação da conta de recebimento antes de configurar a agenda.", indice: 5 };
     return temAgenda
       ? { chave: "publicado", titulo: "Perfil publicado", descricao: "Seu perfil está visível e recebe agendamentos.", indice: 6 }
       : { chave: "aprovado", titulo: "Cadastro aprovado", descricao: "Defina sua disponibilidade para receber agendamentos.", indice: 5 };

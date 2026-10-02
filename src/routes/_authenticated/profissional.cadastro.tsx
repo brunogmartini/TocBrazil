@@ -70,6 +70,7 @@ function CadastroProfissional() {
   const [form, setForm] = useState({
     nome: "",
     tipo_pessoa: "PF" as "PF" | "PJ",
+    ciencia_documento_fiscal: false,
     cpf: "",
     telefone: "",
     cnpj: "",
@@ -130,6 +131,7 @@ function CadastroProfissional() {
       setForm({
         nome: p.nome ?? "",
         tipo_pessoa: p.tipo_pessoa === "PJ" ? "PJ" : "PF",
+        ciencia_documento_fiscal: false,
         cpf: p.cpf ?? "",
         telefone: p.telefone ?? "",
         cnpj: p.cnpj ?? "",
@@ -196,7 +198,7 @@ function CadastroProfissional() {
         console.error("Falha no cadastro profissional", { mensagem: r.erro });
         return;
       }
-      setAviso("Dados salvos. Agora envie o comprovante do CRP e os demais documentos para a análise. Você receberá uma atualização por e-mail.");
+      setAviso("Dados salvos. Envie o comprovante do CRP e os demais documentos para análise. Acompanhe a situação nesta página.");
       setCadastroFinalizado(true);
       await queryClient.invalidateQueries();
     } catch (err) {
@@ -293,7 +295,7 @@ function CadastroProfissional() {
         {enviados.map((documento) => (
           <div key={documento.id} className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs">
             <span>{documento.nome_arquivo} · {rotuloDoc[documento.status] ?? documento.status}</span>
-            <button type="button" className="underline underline-offset-4" onClick={async () => { await remover({ data: { id: documento.id } }); await queryClient.invalidateQueries({ queryKey: ["cadastro-profissional"] }); }}>Remover</button>
+            {documento.status !== "aprovado" && <button type="button" className="underline underline-offset-4" onClick={async () => { const resposta = await remover({ data: { id: documento.id } }); if (!resposta.ok) setErro(resposta.erro); await queryClient.invalidateQueries({ queryKey: ["cadastro-profissional"] }); }}>Remover</button>}
           </div>
         ))}
       </div>
@@ -310,7 +312,7 @@ function CadastroProfissional() {
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           {temCadastro
-            ? "Seus dados essenciais foram recebidos. Complete abaixo as informações e os comprovantes necessários para a conferência."
+            ? "Complete abaixo as informações e os comprovantes necessários para a conferência."
             : "Comece com seus dados essenciais. Depois de salvar, você poderá completar o perfil e enviar os comprovantes em uma área privada."}
         </p>
       </div>
@@ -321,17 +323,17 @@ function CadastroProfissional() {
         <div className="card-soft mt-6 min-w-0 p-5">
           <p className="section-label">Situação do seu cadastro</p>
           <p className="mt-2 text-sm font-semibold">
-             {dados.data.profissional.status === "aprovado"
-               ? "Cadastro aprovado. Seu perfil está publicado na página pública de profissionais."
+              {dados.data.profissional.status === "aprovado"
+                ? dados.data.etapa?.chave === "publicado" ? "Cadastro aprovado. Seu perfil está publicado na página pública de profissionais." : "Cadastro aprovado. Conclua as etapas restantes antes da publicação do perfil."
               : dados.data.profissional.status === "rejeitado"
                 ? "Cadastro rejeitado. Veja a observação da equipe, ajuste os dados e salve novamente."
                 : dados.data.profissional.status === "suspenso"
                   ? "Perfil suspenso temporariamente. Fale com a equipe da plataforma."
                    : documentos.some((documento) => documento.tipo === "Carteirinha profissional do CRP")
-                     ? "Recebemos seu cadastro e o comprovante do CRP. Ele está em análise; avisaremos por e-mail. Seu perfil ainda não aparece na busca."
+                      ? "Recebemos seu cadastro e o comprovante do CRP. Ele está em análise; acompanhe a situação aqui. Seu perfil ainda não aparece na busca."
                      : "Dados iniciais recebidos. Envie o comprovante do CRP abaixo para continuar a conferência. Seu perfil ainda não aparece na busca."}
           </p>
-           {dados.data.profissional.status === "aprovado" && <p className="mt-2 text-sm text-muted-foreground">Cadastro aprovado e contrato vigente aceito.</p>}
+           {dados.data.profissional.status === "aprovado" && dados.data.contrato && <p className="mt-2 text-sm text-muted-foreground">Contrato registrado no cadastro.</p>}
           {dados.data.profissional.observacao_admin && (
             <p className="mt-2 text-sm text-muted-foreground">
               Observação da equipe: {dados.data.profissional.observacao_admin}
@@ -366,6 +368,10 @@ function CadastroProfissional() {
             <label className="flex items-center gap-2"><input type="radio" name="tipo-pessoa" checked={form.tipo_pessoa === "PJ"} onChange={() => setForm({ ...form, tipo_pessoa: "PJ" })} /> Pessoa jurídica</label>
           </div>
         </fieldset>
+        <label className="sm:col-span-2 flex items-start gap-3 border border-border bg-muted p-4 text-sm leading-relaxed">
+          <input type="checkbox" className="mt-1" checked={form.ciencia_documento_fiscal} onChange={(e) => setForm({ ...form, ciencia_documento_fiscal: e.target.checked })} required />
+          <span>{form.tipo_pessoa === "PJ" ? "Tenho CNPJ e fornecerei ao paciente a nota fiscal pelo valor total da consulta." : "Atuo com CPF e fornecerei ao paciente o recibo Receita Saúde pelo valor total da consulta."} A taxa fixa da plataforma é uma obrigação minha e não reduz o valor do documento fornecido ao paciente.</span>
+        </label>
         <Campo
           label="CPF"
           id="cpf"

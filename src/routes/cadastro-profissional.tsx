@@ -31,8 +31,8 @@ const etapas = [
   { t: "Preencha seu cadastro inicial", d: "Conte quem você é e apresente sua experiência profissional." },
   { t: "Complete a verificação", d: "Depois do cadastro inicial, envie os comprovantes necessários em sua área." },
   { t: "Conferência documental", d: "Conferimos inscrição ativa no CRP e documentos apresentados. Se algo precisar de correção, avisamos na sua área." },
-  { t: "Configure sua agenda", d: "Defina sua disponibilidade recorrente e bloqueie exceções direto no calendário." },
-  { t: "Perfil publicado", d: "Depois da aprovação, seu perfil fica visível e pronto para receber agendamentos." },
+  { t: "Contrato e recebimento", d: "Depois da conferência, leia e aceite o contrato. A publicação depende também do recebimento ativo e da agenda configurada." },
+  { t: "Configure sua agenda", d: "Após o aceite e a ativação do recebimento, defina sua disponibilidade no calendário." },
 ];
 
 const statusFluxo = [
@@ -41,8 +41,8 @@ const statusFluxo = [
   { t: "3. Documentação/títulos enviados", d: "Arquivos recebidos e aguardando a análise." },
   { t: "4. Documentação em análise", d: "Nossa equipe está verificando registro e documentos." },
   { t: "5. Necessita correção/complementação", d: "Algum item precisa ser reenviado ou ajustado." },
-  { t: "6. Cadastro aprovado", d: "Tudo validado. Falta apenas definir a agenda." },
-  { t: "7. Perfil publicado/ativo", d: "Perfil visível na vitrine e recebendo agendamentos." },
+  { t: "6. Contrato e recebimento", d: "Após a conferência documental, aceite o contrato e aguarde a ativação do recebimento." },
+  { t: "7. Perfil publicado/ativo", d: "Com contrato aceito, recebimento ativo e agenda, o perfil pode aparecer na busca." },
 ];
 
 const beneficios = [
