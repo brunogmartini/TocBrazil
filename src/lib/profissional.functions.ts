@@ -340,7 +340,6 @@ export const salvarDisponibilidade = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    if (!data.nome_arquivo || !["Carteirinha profissional do CRP", "Documento de identidade", "Diploma de graduação", "Certidão de regularidade do CRP"].includes(data.tipo) && !/^Comprovante de formação \d{1,2}$/.test(data.tipo)) return { ok: false as const, erro: "Tipo de documento inválido." };
     const { data: prof } = await supabase
       .from("professionals")
       .select("id")
@@ -407,6 +406,7 @@ export const registrarDocumento = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    if (!data.nome_arquivo || !["Carteirinha profissional do CRP", "Documento de identidade", "Diploma de graduação", "Certidão de regularidade do CRP"].includes(data.tipo) && !/^Comprovante de formação \d{1,2}$/.test(data.tipo)) return { ok: false as const, erro: "Tipo de documento inválido." };
     if (!data.caminho.startsWith(`${userId}/`)) {
       return { ok: false as const, erro: "Arquivo inválido." };
     }
