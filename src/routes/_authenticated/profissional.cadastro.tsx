@@ -539,10 +539,10 @@ function CadastroProfissional() {
 
       <section className="mt-12" aria-labelledby="seguranca-conta">
         <h2 id="seguranca-conta" className="text-2xl">Segurança da conta</h2>
-        <div className="card-soft mt-5 p-7">
+        <div className="card-soft mt-5 min-w-0 p-5 sm:p-7">
           <p className="max-w-2xl text-sm text-muted-foreground">Você pode proteger seu acesso com um aplicativo autenticador.</p>
           {!mfaProfissional ? (
-            <button type="button" className="btn-base btn-ghost mt-4" onClick={prepararMfaProfissional}>Configurar autenticação em duas etapas</button>
+            <button type="button" className="btn-base btn-ghost mt-4 max-w-full whitespace-normal text-center" onClick={prepararMfaProfissional}>Configurar autenticação em duas etapas</button>
           ) : (
             <div className="mt-5 max-w-md space-y-4">
               <img src={mfaProfissional.qr} alt="Código QR para configurar o aplicativo autenticador" className="size-52" />
