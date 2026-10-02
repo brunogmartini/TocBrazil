@@ -133,3 +133,7 @@
 - [x] Validar cadastro em desktop e 375px; testes unitários de identidade e anticontato passaram (25 testes)
 - [ ] Testar decisão administrativa, aceite contratual, ativação do recebimento e publicação ponta a ponta com contas elegíveis; não liberar pagamentos públicos antes da validação externa do Asaas
 - [ ] Confirmar entrega real de e-mails após validar o domínio de envio
+
+## Verificação adicional do cadastro — 02/10/2026
+- [ ] Corrigir falhas verificadas nas etapas e no envio de documentos
+- [ ] Testar acesso autenticado, formulário, documentos e limites do fluxo de aprovação sem liberar pagamentos
