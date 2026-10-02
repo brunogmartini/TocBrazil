@@ -89,7 +89,7 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       { data: documentos },
       { data: regras },
       { data: bloqueios },
-      { data: contrato },
+       { data: contrato },
       { data: contaRecebimento },
       { data: contatoAdministrativo },
     ] = await Promise.all([
@@ -116,13 +116,16 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
           .order("aceito_em", { ascending: false })
           .limit(1)
           .maybeSingle(),
-        (await import("@/integrations/supabase/client.server")).supabaseAdmin
+         (await import("@/integrations/supabase/client.server")).supabaseAdmin
           .from("asaas_professional_accounts")
           .select("status, wallet_id")
           .eq("professional_id", profissional.id)
           .maybeSingle(),
         supabase.from("professional_admin_contacts").select("telefone").eq("professional_id", profissional.id).maybeSingle(),
       ]);
+
+    // O aceite vigente é registrado em document_acceptances, não no fluxo legado.
+    const { data: contratoVigente } = await supabase.rpc("professional_contract_ready", { _professional_id: profissional.id });
 
     let fotoUrlTemporaria: string | null = null;
     if (profissional.foto_caminho) {
@@ -136,9 +139,9 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       documentos: documentos ?? [],
       regras: regras ?? [],
       bloqueios: bloqueios ?? [],
-      contrato: contrato ?? null,
+       contrato: contratoVigente ? { aceito: true } : null,
       recebimentoAtivo: Boolean(contaRecebimento?.wallet_id && contaRecebimento.status === "ativa"),
-      etapa: calcularEtapa(profissional, documentos ?? [], (regras ?? []).length > 0, Boolean(contrato), Boolean(contaRecebimento?.wallet_id && contaRecebimento.status === "ativa")),
+       etapa: calcularEtapa(profissional, documentos ?? [], (regras ?? []).length > 0, Boolean(contratoVigente), Boolean(contaRecebimento?.wallet_id && contaRecebimento.status === "ativa")),
       email: (claims as { email?: string }).email ?? null,
     };
   });
