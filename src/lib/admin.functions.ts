@@ -3,6 +3,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { calcularEtapa, type EtapaCadastro } from "@/lib/profissional.functions";
 import { mapearConfiguracoes, type ConfiguracoesPlataforma } from "@/lib/plataforma.functions";
 import { cpfValido, cnpjValido } from "@/lib/documento-pessoa";
+import { primeiraDeteccaoPerfil, ROTULO_ANTICONTATO } from "@/lib/anticontato";
+import { ABORDAGENS_PERFIL, IDIOMAS_PERFIL, TEMAS_TOC_PERFIL } from "@/lib/perfil-profissional";
+import { TAXA_FIXA_CENTAVOS, valorProfissionalCentavos } from "@/lib/precos";
 
 export type PacienteAdmin = {
   id: string;
@@ -686,7 +689,9 @@ export const obterDocumentoCredenciamento = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string }) => ({ id: String(data.id) }))
   .handler(async ({ data, context }) => {
     await garantirAdmin(context);
-    garantirMfa(context);
+    if ((context.claims as { aal?: string } | undefined)?.aal !== "aal2") {
+      return { ok: false as const, erro: "Proteja esta sessão com o código do aplicativo autenticador para abrir documentos privados." };
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: documento } = await supabaseAdmin
       .from("professional_documents")
@@ -760,60 +765,119 @@ export const editarProfissionalAdmin = createServerFn({ method: "POST" })
   .inputValidator(
     (data: {
       id: string;
-      nome?: string;
-      graduacao?: string;
-      instituicao?: string;
-      abordagem?: string;
-      apresentacao?: string;
-      experiencia_toc?: string;
-      experiencia_anos?: number;
-      formacao?: string;
-      especializacoes?: string;
-      cursos?: string;
-      areas?: string;
-      idiomas?: string;
-      foto_url?: string;
-      voltarParaAnalise?: boolean;
+      nome: string;
+      tipo_pessoa: "PF" | "PJ";
+      cpf: string;
+      cnpj?: string;
+      telefone: string;
+      registro: string;
+      uf: string;
+      valor_centavos: number;
+      experiencia_anos: number;
+      abordagens_publicas: string;
+      formacoes_publicas: string;
+      temas_toc_publicos: string;
+      biografia_publica: string;
+      areas: string;
+      idiomas: string;
+      ferramenta_provedor: string;
+      ferramenta_url_sala: string;
+      ferramenta_instrucoes: string;
     }) => {
-      const texto = (v: unknown, max: number) => String(v ?? "").trim().slice(0, max) || null;
-      const lista = (v: unknown) =>
+      const texto = (v: unknown, max: number) => String(v ?? "").trim().slice(0, max);
+      const lista = (v: unknown, limite = 30) =>
         String(v ?? "")
           .split(",")
           .map((item) => item.trim())
           .filter(Boolean)
-          .slice(0, 30);
+          .slice(0, limite);
+      const nome = texto(data.nome, 120);
+      const registro = texto(data.registro, 40);
+      const uf = texto(data.uf, 2).toUpperCase();
+      const cpf = String(data.cpf ?? "").replace(/\D/g, "");
+      const cnpj = String(data.cnpj ?? "").replace(/\D/g, "");
+      const telefone = String(data.telefone ?? "").replace(/\D/g, "");
+      const tipoPessoa = data.tipo_pessoa === "PJ" ? "PJ" : "PF";
+      const valorCentavos = Math.min(Math.max(Math.round(Number(data.valor_centavos) || 0), 0), 500000);
+      if (nome.length < 3) throw new Error("Informe o nome completo da profissional.");
+      if (!cpfValido(cpf)) throw new Error("Informe um CPF válido.");
+      if (tipoPessoa === "PJ" && !cnpjValido(cnpj)) throw new Error("Informe um CNPJ válido.");
+      if (telefone.length < 10 || telefone.length > 11) throw new Error("Informe um telefone válido com DDD.");
+      if (registro.length < 3) throw new Error("Informe o registro profissional (CRP).");
+      if (uf.length !== 2) throw new Error("Informe a UF do registro.");
+      if (valorCentavos <= TAXA_FIXA_CENTAVOS) throw new Error("O valor da consulta precisa ser maior que R$ 27,00.");
+      const abordagens = lista(data.abordagens_publicas, 3).filter((item) => (ABORDAGENS_PERFIL as readonly string[]).includes(item));
+      const temas = lista(data.temas_toc_publicos).filter((item) => (TEMAS_TOC_PERFIL as readonly string[]).includes(item));
+      const idiomas = lista(data.idiomas).filter((item) => (IDIOMAS_PERFIL as readonly string[]).includes(item));
+      const formacoes = texto(data.formacoes_publicas, 3000).split("\n").map((linha) => {
+        const [curso = "", instituicao = "", anoTexto = ""] = linha.split("|").map((item) => item.trim());
+        return { curso: curso.slice(0, 160), instituicao: instituicao.slice(0, 160), ano: Math.round(Number(anoTexto)) };
+      }).filter((item) => item.curso && item.instituicao && item.ano >= 1900 && item.ano <= new Date().getFullYear()).slice(0, 12);
+      const biografia = texto(data.biografia_publica, 600);
+      const areas = lista(data.areas);
+      const instrucoes = texto(data.ferramenta_instrucoes, 1000);
+      const deteccao = primeiraDeteccaoPerfil([biografia, ...abordagens, ...temas, ...formacoes.flatMap((item) => [item.curso, item.instituicao]), ...areas, ...idiomas, instrucoes]);
+      if (deteccao) throw new Error(`Remova ${ROTULO_ANTICONTATO[deteccao.tipo]} das informações públicas: “${deteccao.trecho}”.`);
+      const sala = texto(data.ferramenta_url_sala, 500);
+      if (sala) {
+        try {
+          const url = new URL(sala);
+          if (url.protocol !== "https:") throw new Error();
+        } catch {
+          throw new Error("Informe um endereço HTTPS válido para a sala virtual.");
+        }
+      }
       return {
         id: String(data.id),
-        nome: texto(data.nome, 120),
-        graduacao: texto(data.graduacao, 160),
-        instituicao: texto(data.instituicao, 160),
-        abordagem: texto(data.abordagem, 160),
-        apresentacao: texto(data.apresentacao, 2000),
-        experiencia_toc: texto(data.experiencia_toc, 2000),
+        nome,
+        tipo_pessoa: tipoPessoa,
+        cpf,
+        cnpj: tipoPessoa === "PJ" ? cnpj : null,
+        telefone,
+        registro,
+        uf,
+        valor_centavos: valorCentavos,
+        valor_liquido_centavos: valorProfissionalCentavos(valorCentavos),
         experiencia_anos: Math.min(Math.max(Number(data.experiencia_anos ?? 0) || 0, 0), 70),
-        formacao: lista(data.formacao),
-        especializacoes: lista(data.especializacoes),
-        cursos: lista(data.cursos),
-        areas: lista(data.areas),
-        idiomas: lista(data.idiomas),
-        foto_url: texto(data.foto_url, 500),
-        voltarParaAnalise: Boolean(data.voltarParaAnalise),
+        abordagens_publicas: abordagens,
+        formacoes_publicas: formacoes,
+        temas_toc_publicos: temas,
+        biografia_publica: biografia || null,
+        areas,
+        idiomas,
+        ferramenta_provedor: texto(data.ferramenta_provedor, 80) || null,
+        ferramenta_url_sala: sala || null,
+        ferramenta_instrucoes: instrucoes || null,
       };
     },
   )
   .handler(async ({ data, context }) => {
     await garantirAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { id, voltarParaAnalise, nome, ...resto } = data;
+    const { id, telefone, ...dadosCadastro } = data;
+    const { data: atual } = await supabaseAdmin.from("professionals").select("status").eq("id", id).maybeSingle();
+    if (!atual || atual.status === "descredenciado") return { ok: false as const, erro: "Este profissional não está mais na lista ativa." };
     const { error } = await supabaseAdmin
       .from("professionals")
       .update({
-        ...resto,
-        ...(nome ? { nome } : {}),
-        ...(voltarParaAnalise ? { status: "pendente" as const } : {}),
+        ...dadosCadastro,
+        status: "pendente" as const,
+        requer_correcao: false,
       })
       .eq("id", id);
     if (error) return { ok: false as const, erro: "Não foi possível salvar as alterações." };
+    const { error: contatoErro } = await supabaseAdmin.from("professional_admin_contacts").upsert({ professional_id: id, telefone });
+    if (contatoErro) return { ok: false as const, erro: "Os dados foram salvos, mas o telefone não pôde ser atualizado." };
+    if (atual.status !== "pendente") {
+      const { error: decisaoErro } = await supabaseAdmin.rpc("record_professional_review_decision", {
+        _professional_id: id,
+        _decided_by: context.userId,
+        _decision: "correction_requested",
+        _checklist: {},
+        _reason: "Dados ajustados manualmente pela gestão; nova conferência necessária.",
+      });
+      if (decisaoErro) return { ok: false as const, erro: "Dados salvos, mas não foi possível devolver o cadastro para conferência." };
+    }
     const { writeAuditEvent } = await import("@/lib/audit.server");
     await writeAuditEvent({
       actorId: context.userId,
@@ -821,7 +885,7 @@ export const editarProfissionalAdmin = createServerFn({ method: "POST" })
       action: "profile_data_changed",
       entity: "professional",
       entityId: id,
-      metadata: { fields: [...Object.keys(resto), ...(nome ? ["nome"] : []), ...(voltarParaAnalise ? ["status"] : [])] },
+      metadata: { fields: [...Object.keys(dadosCadastro), "telefone", "status"] },
     });
     return { ok: true as const };
   });

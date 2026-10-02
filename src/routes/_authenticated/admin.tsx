@@ -24,6 +24,8 @@ import { indicadoresGestao } from "@/lib/continuidade.functions";
 import { dataBR, dataHoraBR, moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 import { AsaasAdminLab } from "@/components/asaas-admin-lab";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { ABORDAGENS_PERFIL, IDIOMAS_PERFIL, TEMAS_TOC_PERFIL } from "@/lib/perfil-profissional";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   // Área exclusiva do gestor: qualquer outra conta é levada de volta à sua própria área.
@@ -97,6 +99,9 @@ function Admin() {
   const [checklists, setChecklists] = useState<Record<string, Record<string, boolean>>>({});
   const [aviso, setAviso] = useState<string | null>(null);
   const [excluindo, setExcluindo] = useState<string | null>(null);
+  const [protecaoDocumentos, setProtecaoDocumentos] = useState<{ factorId: string; qr?: string; secret?: string } | null>(null);
+  const [codigoDocumentos, setCodigoDocumentos] = useState("");
+  const [documentosDesbloqueados, setDocumentosDesbloqueados] = useState(false);
   const painel = useQuery({
     queryKey: ["painel-admin"],
     queryFn: () => carregar(),
@@ -181,6 +186,51 @@ function Admin() {
       setAviso("Não foi possível excluir o profissional da lista. Tente novamente.");
     } finally {
       setExcluindo(null);
+    }
+  }
+
+  async function iniciarProtecaoDocumentos() {
+    setAviso(null);
+    const { data: fatores, error } = await supabase.auth.mfa.listFactors();
+    if (error) return setAviso("Não foi possível preparar a proteção dos documentos agora.");
+    const fatorAtivo = fatores.totp.find((fator) => fator.status === "verified");
+    if (fatorAtivo) {
+      setProtecaoDocumentos({ factorId: fatorAtivo.id });
+      return;
+    }
+    const { data: inscricao, error: erroInscricao } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyName: "Documentos privados TOC Brazil" });
+    if (erroInscricao) return setAviso("Não foi possível iniciar a proteção dos documentos agora.");
+    setProtecaoDocumentos({ factorId: inscricao.id, qr: inscricao.totp.qr_code, secret: inscricao.totp.secret });
+  }
+
+  async function confirmarProtecaoDocumentos() {
+    if (!protecaoDocumentos || codigoDocumentos.length !== 6) return;
+    setAviso(null);
+    const { data: desafio, error: erroDesafio } = await supabase.auth.mfa.challenge({ factorId: protecaoDocumentos.factorId });
+    if (erroDesafio) return setAviso("Não foi possível validar o código agora.");
+    const { error } = await supabase.auth.mfa.verify({ factorId: protecaoDocumentos.factorId, challengeId: desafio.id, code: codigoDocumentos });
+    if (error) return setAviso("Código inválido ou expirado.");
+    setCodigoDocumentos("");
+    setProtecaoDocumentos(null);
+    setDocumentosDesbloqueados(true);
+    setAviso("Documentos privados desbloqueados nesta sessão.");
+  }
+
+  async function abrirDocumentoPrivado(id: string) {
+    const novaAba = window.open("about:blank", "_blank");
+    try {
+      const resultado = await abrirDocumento({ data: { id } });
+      if (resultado.ok) {
+        if (novaAba) novaAba.location.href = resultado.url;
+        else setAviso("O navegador bloqueou a nova aba. Permita novas abas para este site e tente novamente.");
+        return;
+      }
+      novaAba?.close();
+      setAviso(resultado.erro);
+      if (resultado.erro.includes("aplicativo autenticador")) await iniciarProtecaoDocumentos();
+    } catch {
+      novaAba?.close();
+      setAviso("Não foi possível abrir o documento. Tente novamente.");
     }
   }
 
@@ -425,6 +475,8 @@ function Admin() {
 
                     <div>
                       <h3 className="text-base font-semibold">Documentos e títulos</h3>
+                      {!documentosDesbloqueados && !protecaoDocumentos && <div className="mt-3 rounded-lg border border-border bg-muted p-4"><p className="text-sm text-muted-foreground">Por segurança, os documentos privados exigem um código do aplicativo autenticador somente no momento da abertura.</p><Button type="button" variant="outline" className="mt-3" onClick={() => void iniciarProtecaoDocumentos()}>Desbloquear documentos</Button></div>}
+                      {protecaoDocumentos && <div className="mt-3 rounded-lg border border-border bg-muted p-4"><p className="text-sm font-semibold">Proteção dos documentos privados</p>{protecaoDocumentos.qr && <><img src={protecaoDocumentos.qr} alt="Código QR para proteger o acesso aos documentos" className="mt-4 size-48" /><p className="mt-2 break-all text-xs text-muted-foreground">Chave manual: {protecaoDocumentos.secret}</p></>}<label className="mt-4 block text-sm">Código de seis dígitos<input className="field-base mt-2 max-w-xs" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={codigoDocumentos} onChange={(event) => setCodigoDocumentos(event.target.value.replace(/\D/g, ""))} /></label><Button type="button" className="mt-3" disabled={codigoDocumentos.length !== 6} onClick={() => void confirmarProtecaoDocumentos()}>Confirmar e desbloquear</Button></div>}
                       {p.documentos.length === 0 && (
                         <p className="mt-2 text-sm text-muted-foreground">Nenhum documento enviado até agora.</p>
                       )}
@@ -439,11 +491,7 @@ function Admin() {
                               </p>
                             </div>
                             <div className="flex flex-wrap gap-2">
-                              <button type="button" className="btn-base btn-ghost px-4 py-2" onClick={async () => {
-                                const resultado = await abrirDocumento({ data: { id: d.id } });
-                                if (resultado.ok) window.open(resultado.url, "_blank", "noopener,noreferrer");
-                                else setAviso(resultado.erro);
-                              }}>Abrir documento</button>
+                              <button type="button" className="btn-base btn-ghost px-4 py-2" onClick={() => void abrirDocumentoPrivado(d.id)}>Abrir documento</button>
                               <select
                                 className="field-base"
                                 aria-label={`Situação do documento ${d.nome_arquivo}`}
@@ -462,6 +510,13 @@ function Admin() {
                         ))}
                       </ul>
                     </div>
+
+                    <EdicaoProfissional profissional={p} salvar={async (conteudo) => {
+                      const resultado = await editarProf({ data: { id: p.id, ...conteudo } });
+                      setAviso(resultado.ok ? "Informações atualizadas. O cadastro voltou para análise." : resultado.erro);
+                      if (resultado.ok) await atualizar();
+                      return resultado.ok;
+                    }} />
 
                     <div>
                       <label htmlFor={`obs-${p.id}`} className="section-label">
@@ -833,24 +888,33 @@ function EdicaoProfissional({
   salvar,
 }: {
   profissional: ProfissionalAdmin;
-  salvar: (dados: Record<string, string | number | boolean>) => Promise<void>;
+  salvar: (dados: {
+    nome: string; tipo_pessoa: "PF" | "PJ"; cpf: string; cnpj: string; telefone: string; registro: string; uf: string;
+    valor_centavos: number; experiencia_anos: number; abordagens_publicas: string; formacoes_publicas: string;
+    temas_toc_publicos: string; biografia_publica: string; areas: string; idiomas: string;
+    ferramenta_provedor: string; ferramenta_url_sala: string; ferramenta_instrucoes: string;
+  }) => Promise<boolean>;
 }) {
   const [form, setForm] = useState({
     nome: profissional.nome,
-    graduacao: profissional.graduacao ?? "",
-    instituicao: profissional.instituicao ?? "",
-    abordagem: profissional.abordagem ?? "",
-    apresentacao: profissional.apresentacao ?? "",
-    experiencia_toc: profissional.experiencia_toc ?? "",
+    tipo_pessoa: (profissional.tipo_pessoa === "PJ" ? "PJ" : "PF") as "PF" | "PJ",
+    cpf: profissional.cpf ?? "",
+    cnpj: profissional.cnpj ?? "",
+    telefone: profissional.telefone ?? "",
+    registro: profissional.registro,
+    uf: profissional.uf,
+    valor: String(profissional.valor_centavos / 100),
     experiencia_anos: String(profissional.experiencia_anos ?? 0),
-    formacao: profissional.formacao.join(", "),
-    especializacoes: profissional.especializacoes.join(", "),
-    cursos: profissional.cursos.join(", "),
+    abordagens_publicas: profissional.abordagens_publicas.join(", "),
+    formacoes_publicas: profissional.formacoes_publicas.map((item) => `${item.curso} | ${item.instituicao} | ${item.ano}`).join("\n"),
+    temas_toc_publicos: profissional.temas_toc_publicos.join(", "),
+    biografia_publica: profissional.biografia_publica ?? "",
     areas: profissional.areas.join(", "),
     idiomas: profissional.idiomas.join(", "),
-    foto_url: profissional.foto_url ?? "",
+    ferramenta_provedor: profissional.ferramenta_provedor ?? "",
+    ferramenta_url_sala: profissional.ferramenta_url_sala ?? "",
+    ferramenta_instrucoes: "",
   });
-  const [voltarParaAnalise, setVoltar] = useState(false);
   const [salvo, setSalvo] = useState(false);
 
   return (
@@ -859,29 +923,33 @@ function EdicaoProfissional({
       onSubmit={async (e) => {
         e.preventDefault();
         setSalvo(false);
-        await salvar({
+        const ok = await salvar({
           ...form,
+          valor_centavos: Math.round((Number(form.valor) || 0) * 100),
           experiencia_anos: Number(form.experiencia_anos) || 0,
-          voltarParaAnalise,
         });
-        setSalvo(true);
+        setSalvo(ok);
       }}
     >
-      <h3 className="text-base font-semibold">Editar informações do perfil</h3>
+      <h3 className="text-base font-semibold">Acrescentar ou corrigir informações</h3>
+      <p className="mt-2 text-sm text-muted-foreground">As alterações ficam registradas e devolvem o cadastro para conferência. Documentos não são aprovados automaticamente.</p>
+      <fieldset className="mt-4"><legend className="section-label">Tipo de cadastro</legend><div className="mt-2 flex gap-5 text-sm"><label className="flex items-center gap-2"><input type="radio" checked={form.tipo_pessoa === "PF"} onChange={() => setForm({ ...form, tipo_pessoa: "PF", cnpj: "" })} />Pessoa física</label><label className="flex items-center gap-2"><input type="radio" checked={form.tipo_pessoa === "PJ"} onChange={() => setForm({ ...form, tipo_pessoa: "PJ" })} />Pessoa jurídica</label></div></fieldset>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {(
           [
             ["nome", "Nome"],
-            ["graduacao", "Graduação"],
-            ["instituicao", "Instituição"],
-            ["abordagem", "Abordagem"],
+            ["cpf", "CPF"],
+            ["telefone", "Telefone administrativo"],
+            ["registro", "Registro profissional (CRP)"],
+            ["uf", "UF do registro"],
+            ["valor", "Valor da consulta (R$)"],
             ["experiencia_anos", "Anos de experiência"],
-            ["formacao", "Formação (vírgulas)"],
-            ["especializacoes", "Especializações (vírgulas)"],
-            ["cursos", "Cursos relevantes (vírgulas)"],
+            ["abordagens_publicas", `Abordagens (${ABORDAGENS_PERFIL.join(", ")})`],
+            ["temas_toc_publicos", `Experiência com TOC (${TEMAS_TOC_PERFIL.join(", ")})`],
             ["areas", "Áreas de experiência (vírgulas)"],
-            ["idiomas", "Idiomas (vírgulas)"],
-            ["foto_url", "Endereço da foto"],
+            ["idiomas", `Idiomas (${IDIOMAS_PERFIL.join(", ")})`],
+            ["ferramenta_provedor", "Provedor da sala virtual"],
+            ["ferramenta_url_sala", "Endereço HTTPS da sala virtual"],
           ] as const
         ).map(([campo, rotulo]) => (
           <div key={campo}>
@@ -896,31 +964,30 @@ function EdicaoProfissional({
             />
           </div>
         ))}
+        {form.tipo_pessoa === "PJ" && <div><label htmlFor={`cnpj-${profissional.id}`} className="section-label">CNPJ</label><input id={`cnpj-${profissional.id}`} className="field-base mt-2" value={form.cnpj} onChange={(event) => setForm({ ...form, cnpj: event.target.value })} /></div>}
         <div className="sm:col-span-2">
-          <label htmlFor={`apresentacao-${profissional.id}`} className="section-label">Apresentação</label>
+          <label htmlFor={`formacoes-${profissional.id}`} className="section-label">Formações — uma por linha: Curso | Instituição | Ano</label>
           <textarea
-            id={`apresentacao-${profissional.id}`}
+            id={`formacoes-${profissional.id}`}
             rows={3}
             className="field-base mt-2"
-            value={form.apresentacao}
-            onChange={(e) => setForm({ ...form, apresentacao: e.target.value })}
+            value={form.formacoes_publicas}
+            onChange={(e) => setForm({ ...form, formacoes_publicas: e.target.value })}
           />
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor={`toc-${profissional.id}`} className="section-label">Experiência com TOC</label>
+          <label htmlFor={`biografia-${profissional.id}`} className="section-label">Biografia pública</label>
           <textarea
-            id={`toc-${profissional.id}`}
+            id={`biografia-${profissional.id}`}
             rows={3}
             className="field-base mt-2"
-            value={form.experiencia_toc}
-            onChange={(e) => setForm({ ...form, experiencia_toc: e.target.value })}
+            maxLength={600}
+            value={form.biografia_publica}
+            onChange={(e) => setForm({ ...form, biografia_publica: e.target.value })}
           />
         </div>
+        <div className="sm:col-span-2"><label htmlFor={`instrucoes-${profissional.id}`} className="section-label">Instruções da sala virtual</label><textarea id={`instrucoes-${profissional.id}`} rows={3} className="field-base mt-2" value={form.ferramenta_instrucoes} onChange={(event) => setForm({ ...form, ferramenta_instrucoes: event.target.value })} /></div>
       </div>
-      <label className="mt-4 flex items-center gap-2 text-sm">
-        <input type="checkbox" checked={voltarParaAnalise} onChange={(e) => setVoltar(e.target.checked)} />
-        Devolver o perfil para nova análise antes de publicar esta versão
-      </label>
       <div className="mt-4 flex items-center gap-3">
         <button type="submit" className="btn-base btn-primary">Salvar alterações</button>
         {salvo && <span className="text-sm font-semibold">Alterações salvas.</span>}
