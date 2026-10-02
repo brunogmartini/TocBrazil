@@ -26,3 +26,4 @@
 - Treat manager-requested professional removal as decredentialing rather than a physical delete, and exclude removed profiles from current dashboard profile counts; why: appointments, contracts, payment records, and audit history must survive without inflating current totals.
 - Store professional PF/PJ identity on the existing professional record with validated CPF and conditional CNPJ; why: independent psychologists can register without weakening manual review or publication gates.
 - Store professional administrative phone numbers in an owner/admin-only contact table, not the public-readable professional record; why: RLS exposes the entire eligible professional row.
+- Evaluate public professional eligibility through a narrow security-definer helper for private receiving and schedule tables; why: public listing must not grant financial-table access or block owner registration.
