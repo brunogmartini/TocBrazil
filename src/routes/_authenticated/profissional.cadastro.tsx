@@ -184,10 +184,12 @@ function CadastroProfissional() {
       });
       if (!r.ok) {
         setErro(r.erro);
+        if (r.erro.includes("CPF")) setCampoErro("cpf");
+        if (r.erro.includes("CNPJ") && !r.erro.includes("CPF")) setCampoErro("cnpj");
         document.getElementById("erro-cadastro")?.scrollIntoView({ behavior: "smooth", block: "center" });
         return;
       }
-      setAviso("Recebemos seu cadastro. Ele está aguardando a validação da equipe e o perfil ainda não aparece publicamente.");
+      setAviso("Recebemos seu cadastro. Envie o comprovante do CRP e os demais documentos abaixo para a análise. Você receberá uma atualização por e-mail.");
       setCadastroFinalizado(true);
       await queryClient.invalidateQueries();
     } catch (err) {
@@ -385,7 +387,7 @@ function CadastroProfissional() {
           onChange={(v) => setForm({ ...form, uf: v.toUpperCase().slice(0, 2) })}
           required
         />
-        {temCadastro && <div className="sm:col-span-2"><DocumentoCampo tipo="Carteirinha profissional do CRP" titulo="Carteirinha profissional do CRP" descricao="Envie uma imagem ou PDF legível para conferência do registro." /></div>}
+        {temCadastro && <div className="sm:col-span-2"><DocumentoCampo tipo="Carteirinha profissional do CRP" titulo="Comprovante do CRP (obrigatório)" descricao="Envie a carteirinha ou a certidão de situação ativa em PDF, JPG ou PNG (até 5 MB). Você pode substituir o arquivo antes da conferência." /></div>}
 
         {!temCadastro && (
           <>
