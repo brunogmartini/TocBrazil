@@ -1,0 +1,1 @@
+GRANT UPDATE (cpf, cnpj, tipo_pessoa, abordagens_publicas, formacoes_publicas, temas_toc_publicos, biografia_publica, foto_caminho, valor_liquido_centavos, certidao_validade, ferramenta_provedor, ferramenta_url_sala, ferramenta_instrucoes) ON public.professionals TO authenticated;
