@@ -25,3 +25,4 @@
 - Send the fixed-recipient management email only after the first successful professional profile creation, using the profile ID for idempotency; why: edits must not generate duplicate signup alerts.
 - Treat manager-requested professional removal as decredentialing rather than a physical delete, and exclude removed profiles from current dashboard profile counts; why: appointments, contracts, payment records, and audit history must survive without inflating current totals.
 - Store professional PF/PJ identity on the existing professional record with validated CPF and conditional CNPJ; why: independent psychologists can register without weakening manual review or publication gates.
+- Store professional administrative phone numbers in an owner/admin-only contact table, not the public-readable professional record; why: RLS exposes the entire eligible professional row.
