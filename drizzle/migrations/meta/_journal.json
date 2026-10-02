@@ -232,6 +232,13 @@
       "when": 1790944531348,
       "tag": "0032_professional_pf_pj_registration",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1790944705652,
+      "tag": "0033_guard_professional_registration_and_private_documents",
+      "breakpoints": true
     }
   ]
 }
