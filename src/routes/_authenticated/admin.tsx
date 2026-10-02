@@ -386,7 +386,9 @@ function Admin() {
                     <dl className="grid gap-4 text-sm sm:grid-cols-2">
                       <Info rotulo="Preço da consulta" valor={moeda(p.valor_centavos)} />
                       <Info rotulo="Valor do profissional" valor={moeda(Math.max(p.valor_centavos - 2700, 0))} />
-                      <Info rotulo="CNPJ" valor={p.cnpj ?? "—"} />
+                      <Info rotulo="Tipo de cadastro" valor={p.tipo_pessoa === "PJ" ? "Pessoa jurídica" : "Pessoa física"} />
+                      <Info rotulo="CPF" valor={p.cpf ?? "—"} />
+                      {p.tipo_pessoa === "PJ" && <Info rotulo="CNPJ" valor={p.cnpj ?? "—"} />}
                       <Info
                         rotulo="Ferramenta de videochamada"
                         valor={

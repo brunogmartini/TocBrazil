@@ -118,3 +118,10 @@
 - [x] Atualizar contrato público e aceite eletrônico para a v6.3
 - [x] Publicar integralmente Termos de Uso e Política de Privacidade v1.4
 - [x] Validar páginas públicas e os cinco hashes servidos
+
+## Cadastro profissional PF/PJ — 02/10/2026
+- [x] Diagnosticar a trava do CNPJ e migrar a identificação sem apagar cadastros
+- [x] Aceitar CPF obrigatório, CNPJ condicional, bloquear duplicados e melhorar erros
+- [x] Validar o comprovante de CRP e preservar upload privado e revisão manual
+- [x] Mostrar PF/PJ na gestão e enviar avisos de situação
+- [ ] Validar PF/PJ autenticados, comprovante privado e ciclo completo de aprovação em desktop e celular

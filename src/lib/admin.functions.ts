@@ -666,6 +666,16 @@ export const conferirCadastroProfissional = createServerFn({ method: "POST" })
     if (decisionError) return { ok: false as const, erro: "Não foi possível registrar a decisão de aprovação." };
     const { writeAuditEvent } = await import("@/lib/audit.server");
     await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "professional_registration_reviewed", entity: "professional", entityId: data.id, metadata: { status: "checked" } });
+    try {
+      const { data: perfil } = await supabaseAdmin.from("professionals").select("nome, user_id").eq("id", data.id).single();
+      if (perfil?.user_id) {
+        const { data: conta } = await supabaseAdmin.auth.admin.getUserById(perfil.user_id);
+        if (conta.user?.email) {
+          const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+          await sendTemplateEmail("cadastro-profissional-status", conta.user.email, { templateData: { nome: perfil.nome, situacao: "aprovado" }, idempotencyKey: `cadastro-conferido-${data.id}` });
+        }
+      }
+    } catch (error) { console.error("Falha ao avisar aprovação profissional", { id: data.id, error }); }
     return { ok: true as const };
   });
 

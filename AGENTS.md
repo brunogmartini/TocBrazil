@@ -24,3 +24,4 @@
 - Resolve existing account areas from the authenticated user's own RLS-scoped role row before provisioning a missing role server-side; why: login must not race bearer propagation.
 - Send the fixed-recipient management email only after the first successful professional profile creation, using the profile ID for idempotency; why: edits must not generate duplicate signup alerts.
 - Treat manager-requested professional removal as decredentialing rather than a physical delete, and exclude removed profiles from current dashboard profile counts; why: appointments, contracts, payment records, and audit history must survive without inflating current totals.
+- Store professional PF/PJ identity on the existing professional record with validated CPF and conditional CNPJ; why: independent psychologists can register without weakening manual review or publication gates.
