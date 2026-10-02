@@ -90,6 +90,7 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       { data: bloqueios },
       { data: contrato },
       { data: contaRecebimento },
+      { data: contatoAdministrativo },
     ] = await Promise.all([
         supabase
           .from("professional_documents")
@@ -119,6 +120,7 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
           .select("status, wallet_id")
           .eq("professional_id", profissional.id)
           .maybeSingle(),
+        supabase.from("professional_admin_contacts").select("telefone").eq("professional_id", profissional.id).maybeSingle(),
       ]);
 
     let fotoUrlTemporaria: string | null = null;
@@ -129,7 +131,7 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       fotoUrlTemporaria = foto?.signedUrl ?? null;
     }
     return {
-      profissional: { ...profissional, foto_url_temporaria: fotoUrlTemporaria },
+      profissional: { ...profissional, telefone: contatoAdministrativo?.telefone ?? null, foto_url_temporaria: fotoUrlTemporaria },
       documentos: documentos ?? [],
       regras: regras ?? [],
       bloqueios: bloqueios ?? [],
@@ -262,10 +264,16 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     }
 
     if (existente) {
-      const { error } = await supabase.from("professionals").update(data).eq("id", existente.id);
+      const { telefone, ...dadosCadastro } = data;
+      const { error } = await supabase.from("professionals").update(dadosCadastro).eq("id", existente.id);
       if (error) {
         console.error("Falha ao atualizar cadastro profissional", { code: error.code });
         return { ok: false as const, erro: error.code === "23505" ? "CPF ou CNPJ já cadastrado." : "Não foi possível salvar seus dados agora." };
+      }
+      const { error: contatoErro } = await supabase.from("professional_admin_contacts").upsert({ professional_id: existente.id, telefone });
+      if (contatoErro) {
+        console.error("Falha ao salvar contato administrativo", { code: contatoErro.code });
+        return { ok: false as const, erro: "Dados salvos, mas não foi possível salvar o telefone. Tente novamente." };
       }
       if (existente.status === "rejeitado") {
         const { data: reenviado, error: reenvioErro } = await supabase.rpc("reenviar_cadastro_profissional", { _professional_id: existente.id });
@@ -284,14 +292,21 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       .maybeSingle();
     if (conflito) slug = `${slug}-${userId.slice(0, 4)}`;
 
+    const { telefone, ...dadosCadastro } = data;
     const { data: criado, error } = await supabase
       .from("professionals")
-      .insert({ ...data, slug, user_id: userId, status: "pendente" })
+      .insert({ ...dadosCadastro, slug, user_id: userId, status: "pendente" })
       .select("id, slug")
       .single();
     if (error) {
       console.error("Falha ao criar cadastro profissional", { code: error.code });
       return { ok: false as const, erro: error.code === "23505" ? "CPF ou CNPJ já cadastrado." : "Não foi possível criar seu cadastro agora." };
+    }
+
+    const { error: contatoErro } = await supabase.from("professional_admin_contacts").upsert({ professional_id: criado.id, telefone });
+    if (contatoErro) {
+      console.error("Falha ao salvar contato administrativo", { code: contatoErro.code });
+      return { ok: false as const, erro: "Cadastro criado, mas não foi possível salvar o telefone. Tente novamente." };
     }
 
     const { writeAuditEvent } = await import("@/lib/audit.server");

@@ -168,6 +168,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
       { data: papeis },
       { data: consultas },
       { data: profissionais },
+      { data: contatosProfissionais },
       { data: cfgRows },
       { data: regras },
     ] = await Promise.all([
@@ -184,12 +185,14 @@ export const painelAdmin = createServerFn({ method: "GET" })
         .order("inicio", { ascending: false })
         .limit(500),
        supabaseAdmin.from("professionals").select("*").order("created_at", { ascending: true }),
+       supabaseAdmin.from("professional_admin_contacts").select("professional_id, telefone"),
       supabaseAdmin.from("platform_settings").select("chave, valor"),
       supabaseAdmin.from("availability_rules").select("professional_id"),
     ]);
 
     const nomePorId = new Map((perfis ?? []).map((p) => [p.id, p.nome ?? p.email ?? "—"]));
     const emailPorId = new Map((perfis ?? []).map((p) => [p.id, p.email]));
+    const telefoneProfissionalPorId = new Map((contatosProfissionais ?? []).map((c) => [c.professional_id, c.telefone]));
     const papeisPorId = new Map<string, string[]>();
     for (const p of papeis ?? []) {
       papeisPorId.set(p.user_id, [...(papeisPorId.get(p.user_id) ?? []), p.role as string]);
@@ -345,7 +348,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
         valor_liquido_centavos: p.valor_liquido_centavos,
         consultas: stats?.total ?? 0,
         consultasRealizadas: stats?.realizadas ?? 0,
-        telefone: p.telefone,
+        telefone: telefoneProfissionalPorId.get(p.id) ?? null,
         email_contato: p.email_contato,
         email_login: p.user_id ? (emailPorId.get(p.user_id) ?? null) : null,
         graduacao: p.graduacao,

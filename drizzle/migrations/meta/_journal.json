@@ -260,6 +260,27 @@
       "when": 1790945049526,
       "tag": "0036_keep_professional_phone_private_in_profile_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1790945312529,
+      "tag": "0037_isolate_professional_administrative_phones",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1790945767062,
+      "tag": "0038_isolate_public_professional_eligibility_checks",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1790945886745,
+      "tag": "0039_allow_owner_professional_profile_fields_update",
+      "breakpoints": true
     }
   ]
 }

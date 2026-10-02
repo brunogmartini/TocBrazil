@@ -1541,6 +1541,32 @@ export type Database = {
           },
         ]
       }
+      professional_admin_contacts: {
+        Row: {
+          professional_id: string
+          telefone: string
+          updated_at: string
+        }
+        Insert: {
+          professional_id: string
+          telefone: string
+          updated_at?: string
+        }
+        Update: {
+          professional_id?: string
+          telefone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_admin_contacts_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: true
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_documents: {
         Row: {
           caminho: string
