@@ -315,10 +315,10 @@ function CadastroProfissional() {
         </p>
       </div>
       <ProfessionalNav ativo="/profissional/cadastro" />
-      {dados.data?.etapa && <div className="card-soft mt-6 p-5"><EtapasCadastro etapaAtual={dados.data.etapa} /><p className="mt-4 text-sm text-muted-foreground">{dados.data.etapa.descricao}</p></div>}
+      {dados.data?.etapa && <div className="card-soft mt-6 min-w-0 p-5"><EtapasCadastro etapaAtual={dados.data.etapa} /><p className="mt-4 text-sm text-muted-foreground">{dados.data.etapa.descricao}</p></div>}
 
       {dados.data?.profissional && (
-        <div className="card-soft mt-6 p-5">
+        <div className="card-soft mt-6 min-w-0 p-5">
           <p className="section-label">Situação do seu cadastro</p>
           <p className="mt-2 text-sm font-semibold">
              {dados.data.profissional.status === "aprovado"
@@ -344,7 +344,7 @@ function CadastroProfissional() {
         {erro && <p id="erro-cadastro" role="alert" className="mt-6 text-sm font-semibold text-destructive">{erro}</p>}
 
 
-      {cadastroFinalizado && !temCadastro ? null : <form onSubmit={enviarCadastro} className="card-soft mt-8 grid gap-5 p-7 sm:grid-cols-2">
+      {cadastroFinalizado && !temCadastro ? null : <form onSubmit={enviarCadastro} className="card-soft mt-8 grid min-w-0 gap-5 p-5 sm:grid-cols-2 sm:p-7">
         <div className="sm:col-span-2">
           <span className="professional-label">Etapa {temCadastro ? "2" : "1"}</span>
           <h2 className="heading-section mt-2">{temCadastro ? "Complete seu perfil e a verificação" : "Dados essenciais"}</h2>
