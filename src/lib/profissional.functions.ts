@@ -448,8 +448,6 @@ export const registrarDocumento = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!prof) return { ok: false as const, erro: "Complete seu cadastro primeiro." };
 
-    // Contrato: etapa final do cadastro, será adicionado à plataforma mais adiante.
-
     const { error } = await supabase
       .from("professional_documents")
       .insert({ professional_id: prof.id, ...data });

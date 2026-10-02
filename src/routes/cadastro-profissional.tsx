@@ -31,7 +31,7 @@ const etapas = [
   { t: "Preencha seu cadastro inicial", d: "Conte quem você é e apresente sua experiência profissional." },
   { t: "Complete a verificação", d: "Depois do cadastro inicial, envie os comprovantes necessários em sua área." },
   { t: "Conferência documental", d: "Conferimos inscrição ativa no CRP e documentos apresentados. Se algo precisar de correção, avisamos na sua área." },
-  { t: "Contrato e publicação", d: "Depois da conferência, leia e aceite o contrato. A publicação depende também do recebimento ativo e da agenda configurada." },
+  { t: "Contrato e recebimento", d: "Depois da conferência, leia e aceite o contrato. A publicação depende também do recebimento ativo e da agenda configurada." },
   { t: "Configure sua agenda", d: "Após o aceite e a ativação do recebimento, defina sua disponibilidade no calendário." },
 ];
 
