@@ -604,7 +604,7 @@ function Campo({
 }: {
   label: string;
   id?: string;
-  inputMode?: "numeric";
+  inputMode?: "numeric" | "tel";
   invalid?: boolean;
   value: string;
   onChange: (v: string) => void;
