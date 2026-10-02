@@ -89,7 +89,6 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       { data: documentos },
       { data: regras },
       { data: bloqueios },
-       { data: contrato },
       { data: contaRecebimento },
       { data: contatoAdministrativo },
     ] = await Promise.all([
@@ -109,14 +108,7 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
           .eq("professional_id", profissional.id)
           .gte("fim", new Date().toISOString())
           .order("inicio"),
-        supabase
-          .from("contratos_profissionais")
-          .select("id, versao, nome_assinatura, aceito_em, modo_assinatura, status_assinatura")
-          .eq("professional_id", profissional.id)
-          .order("aceito_em", { ascending: false })
-          .limit(1)
-          .maybeSingle(),
-         (await import("@/integrations/supabase/client.server")).supabaseAdmin
+        (await import("@/integrations/supabase/client.server")).supabaseAdmin
           .from("asaas_professional_accounts")
           .select("status, wallet_id")
           .eq("professional_id", profissional.id)
@@ -635,9 +627,14 @@ export function calcularEtapa(
   prof: {
     status: string;
     requer_correcao?: boolean | null;
-    graduacao?: string | null;
-    apresentacao?: string | null;
-    areas?: string[] | null;
+    nome?: string | null;
+    registro?: string | null;
+    uf?: string | null;
+    biografia_publica?: string | null;
+    formacoes_publicas?: unknown;
+    abordagens_publicas?: string[] | null;
+    temas_toc_publicos?: string[] | null;
+    idiomas?: string[] | null;
     valor_centavos?: number | null;
     cadastro_conferido_em?: string | null;
   } | null,
@@ -673,9 +670,16 @@ export function calcularEtapa(
   if (prof.requer_correcao) {
     return { chave: "correcao", titulo: "Necessita correção", descricao: "Ajuste o que foi pedido e reenvie.", indice: 4 };
   }
-  const dadosOk = Boolean(prof.graduacao && prof.apresentacao && (prof.areas ?? []).length > 0);
+  const dadosOk = Boolean(
+    prof.nome && prof.registro && prof.uf &&
+    (prof.biografia_publica?.trim().length ?? 0) >= 20 &&
+    Array.isArray(prof.formacoes_publicas) && prof.formacoes_publicas.length > 0 &&
+    (prof.abordagens_publicas?.length ?? 0) > 0 &&
+    (prof.temas_toc_publicos?.length ?? 0) > 0 &&
+    (prof.idiomas?.length ?? 0) > 0,
+  );
   if (!dadosOk) {
-    return { chave: "dados", titulo: "Dados pessoais em preenchimento", descricao: "Complete formação, apresentação e áreas.", indice: 1 };
+    return { chave: "dados", titulo: "Perfil em preenchimento", descricao: "Complete formação, biografia, abordagens, experiência com TOC e idiomas.", indice: 1 };
   }
   if (documentos.length === 0) {
     return { chave: "documentos", titulo: "Aguardando documentos", descricao: "Envie identidade, registro e diplomas.", indice: 2 };

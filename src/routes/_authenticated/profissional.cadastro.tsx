@@ -213,6 +213,7 @@ function CadastroProfissional() {
     if (!["application/pdf", "image/jpeg", "image/png"].includes(file.type)) return setErro("Envie um PDF, JPG ou PNG.");
     if (file.size > 5 * 1024 * 1024) return setErro("O documento deve ter no máximo 5 MB.");
     setEnviandoDoc(true);
+    let caminhoEnviado: string | null = null;
     try {
       const { data: sessao } = await supabase.auth.getUser();
       const uid = sessao.user?.id;
@@ -223,13 +224,16 @@ function CadastroProfissional() {
         .from("documentos-profissionais")
         .upload(caminho, file, { upsert: false });
       if (erroUpload) throw new Error("Não foi possível enviar o arquivo.");
+      caminhoEnviado = caminho;
       const r = await registrar({
         data: { tipo, nome_arquivo: file.name, caminho },
       });
       if (!r.ok) throw new Error(r.erro);
+      caminhoEnviado = null;
       setAviso(tipo === "Carteirinha profissional do CRP" ? "Comprovante do CRP recebido para análise." : "Documento enviado para análise.");
       await queryClient.invalidateQueries({ queryKey: ["cadastro-profissional"] });
     } catch (err) {
+      if (caminhoEnviado) await supabase.storage.from("documentos-profissionais").remove([caminhoEnviado]);
       setErro(err instanceof Error ? err.message : "Não foi possível enviar o documento.");
       console.error("Falha no envio de documento profissional", err);
       document.getElementById("erro-cadastro")?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -240,13 +244,16 @@ function CadastroProfissional() {
 
   async function enviarFoto(file: File) {
     setErro(null);
-    if (!file.type.startsWith("image/")) return setErro("Envie uma imagem JPG, PNG ou WebP.");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return setErro("Envie uma imagem JPG, PNG ou WebP.");
     if (file.size > 5 * 1024 * 1024) return setErro("A foto deve ter no máximo 5 MB.");
     const dimensoes = await new Promise<{ largura: number; altura: number }>((resolve, reject) => {
       const imagem = new Image();
       imagem.onload = () => resolve({ largura: imagem.naturalWidth, altura: imagem.naturalHeight });
       imagem.onerror = reject;
-      imagem.src = URL.createObjectURL(file);
+      const url = URL.createObjectURL(file);
+      imagem.onload = () => { URL.revokeObjectURL(url); resolve({ largura: imagem.naturalWidth, altura: imagem.naturalHeight }); };
+      imagem.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Imagem inválida.")); };
+      imagem.src = url;
     }).catch(() => null);
     if (!dimensoes || dimensoes.largura < 600 || dimensoes.altura < 600 || dimensoes.largura !== dimensoes.altura) {
       return setErro("A foto precisa ser quadrada e ter pelo menos 600 × 600 pixels.");
