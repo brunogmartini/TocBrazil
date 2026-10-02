@@ -266,7 +266,7 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     }
 
     if (existente) {
-      const { telefone, ciencia_documento_fiscal, ...dadosCadastro } = data;
+      const { telefone, ...dadosCadastro } = data;
       const { error } = await supabase.from("professionals").update(dadosCadastro).eq("id", existente.id);
       if (error) {
         console.error("Falha ao atualizar cadastro profissional", { code: error.code });
@@ -294,7 +294,7 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       .maybeSingle();
     if (conflito) slug = `${slug}-${userId.slice(0, 4)}`;
 
-    const { telefone, ciencia_documento_fiscal, ...dadosCadastro } = data;
+    const { telefone, ...dadosCadastro } = data;
     const { data: criado, error } = await supabase
       .from("professionals")
       .insert({ ...dadosCadastro, slug, user_id: userId, status: "pendente" })

@@ -146,7 +146,7 @@ function Painel() {
           <div>
             <h2 className="text-lg">Complete seu cadastro</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Precisamos apenas do seu nome para emitir recibos e identificar você para o profissional.
+              Precisamos do seu nome para identificar você para o profissional.
             </p>
           </div>
           <button type="button" className="btn-base btn-primary" onClick={() => setEditandoPerfil(true)}>
@@ -301,7 +301,8 @@ function Painel() {
                       {c.status === "realizada" && <div className="mt-4 border-t border-border/60 pt-4">
                         <p className="text-sm font-semibold">Você gostaria de continuar com este profissional?</p>
                         <div className="mt-3 flex flex-wrap gap-2">{([['sim','Sim'],['ainda_nao_sei','Ainda não sei'],['nao','Não']] as const).map(([resposta, rotulo]) => <button key={resposta} type="button" className="pill" onClick={async () => { const r = await pesquisar({ data: { consultaId: c.id, resposta } }); setAviso(r.ok ? "Resposta registrada. Obrigado." : r.erro); }}>{rotulo}</button>)}</div>
-                        <div className="mt-3 flex flex-wrap gap-2"><button type="button" className="btn-base btn-ghost" onClick={async () => { const r = await recorrencia({ data: { consultaId: c.id, frequencia: 'semanal' } }); setAviso(r.ok ? "Preferência semanal registrada. Cada horário exigirá confirmação e pagamento." : r.erro); }}>Preferência semanal</button><button type="button" className="btn-base btn-ghost" onClick={() => window.print()}>Imprimir recibo</button></div>
+                         <div className="mt-3 flex flex-wrap gap-2"><button type="button" className="btn-base btn-ghost" onClick={async () => { const r = await recorrencia({ data: { consultaId: c.id, frequencia: 'semanal' } }); setAviso(r.ok ? "Preferência semanal registrada. Cada horário exigirá confirmação e pagamento." : r.erro); }}>Preferência semanal</button></div>
+                         <p className="mt-3 text-xs text-muted-foreground">O profissional fornece a nota fiscal (CNPJ) ou o recibo Receita Saúde (CPF) pelo valor total da consulta. Solicite o documento diretamente a ele durante o atendimento.</p>
                       </div>}
                       {c.status === "confirmada" && new Date(c.fim).getTime() <= agora && (
                         <div className="mt-4 border-t border-border/60 pt-4">
