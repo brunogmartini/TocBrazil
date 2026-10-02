@@ -137,3 +137,9 @@
 ## Verificação adicional do cadastro — 02/10/2026
 - [ ] Corrigir falhas verificadas nas etapas e no envio de documentos
 - [ ] Testar acesso autenticado, formulário, documentos e limites do fluxo de aprovação sem liberar pagamentos
+
+## Diploma e edição manual pela gestão — 02/10/2026
+- [x] Corrigir a abertura do documento privado sem bloqueio de nova aba
+- [x] Manter código adicional somente para abrir documentos, com endereço temporário e auditoria
+- [x] Conectar a edição manual à ficha da profissional e validar dados privados e públicos
+- [ ] Validar abertura real do diploma e salvamento administrativo na prévia autenticada
