@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { calcularEtapa, type EtapaCadastro } from "@/lib/profissional.functions";
 import { mapearConfiguracoes, type ConfiguracoesPlataforma } from "@/lib/plataforma.functions";
+import { cpfValido, cnpjValido } from "@/lib/documento-pessoa";
 
 export type PacienteAdmin = {
   id: string;
@@ -55,6 +56,8 @@ export type ProfissionalAdmin = {
   registro: string;
   uf: string;
   cnpj: string | null;
+  cpf: string | null;
+  tipo_pessoa: string;
   cidade: string | null;
   status: string;
   requer_correcao: boolean;
@@ -180,7 +183,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
         )
         .order("inicio", { ascending: false })
         .limit(500),
-      supabaseAdmin.from("professionals").select("*").order("created_at", { ascending: false }),
+       supabaseAdmin.from("professionals").select("*").order("created_at", { ascending: true }),
       supabaseAdmin.from("platform_settings").select("chave, valor"),
       supabaseAdmin.from("availability_rules").select("professional_id"),
     ]);
@@ -332,6 +335,8 @@ export const painelAdmin = createServerFn({ method: "GET" })
         registro: p.registro,
         uf: p.uf,
         cnpj: p.cnpj,
+        cpf: p.cpf,
+        tipo_pessoa: p.tipo_pessoa ?? (p.cnpj ? "PJ" : "PF"),
         cidade: p.cidade,
         status: p.status as string,
         requer_correcao: Boolean(p.requer_correcao),
@@ -494,7 +499,17 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
         _checklist: {},
         _reason: data.observacao ?? "",
       });
-      if (decisionError) return { ok: false as const, erro: "Não foi possível registrar a decisão." };
+       if (decisionError) return { ok: false as const, erro: "Não foi possível registrar a decisão." };
+       try {
+         const { data: perfil } = await supabaseAdmin.from("professionals").select("nome, user_id").eq("id", data.id).single();
+         if (perfil?.user_id) {
+           const { data: conta } = await supabaseAdmin.auth.admin.getUserById(perfil.user_id);
+           if (conta.user?.email) {
+             const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+             await sendTemplateEmail("cadastro-profissional-status", conta.user.email, { templateData: { nome: perfil.nome, situacao: data.status === "rejeitado" ? "rejeitado" : "recebido", motivo: data.observacao }, idempotencyKey: `cadastro-${data.status}-${data.id}-${Date.now()}` });
+           }
+         }
+       } catch (error) { console.error("Falha ao notificar revisão profissional", { id: data.id, error }); }
       const { writeAuditEvent } = await import("@/lib/audit.server");
       await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "professional_registration_reviewed", entity: "professional", entityId: data.id, metadata: { status: data.status, correction_required: data.requerCorrecao } });
       return { ok: true as const };
@@ -502,12 +517,12 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
 
     if (data.status === "aprovado") {
       const [{ data: prof }, { data: perfilPronto }] = await Promise.all([
-        supabaseAdmin.from("professionals").select("cnpj, ferramenta_url_sala, certidao_validade").eq("id", data.id).maybeSingle(),
+         supabaseAdmin.from("professionals").select("cpf, cnpj, tipo_pessoa, ferramenta_url_sala, certidao_validade").eq("id", data.id).maybeSingle(),
         supabaseAdmin.rpc("perfil_pronto_para_publicar", { _professional_id: data.id }),
       ]);
       const hoje = new Date().toISOString().slice(0, 10);
-      if (!prof?.cnpj || prof.cnpj.length !== 14) {
-        return { ok: false as const, erro: "O CNPJ do profissional ainda não foi informado." };
+       if (!prof || !cpfValido(prof.cpf ?? "") || (prof.tipo_pessoa === "PJ" && !cnpjValido(prof.cnpj ?? ""))) {
+         return { ok: false as const, erro: "Confira o CPF e, para pessoa jurídica, o CNPJ do profissional." };
       }
       if (!prof?.ferramenta_url_sala) {
         return {
@@ -553,6 +568,16 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
       })
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível atualizar." };
+    try {
+      const { data: perfil } = await supabaseAdmin.from("professionals").select("nome, user_id").eq("id", data.id).single();
+      if (perfil?.user_id) {
+        const { data: conta } = await supabaseAdmin.auth.admin.getUserById(perfil.user_id);
+        if (conta.user?.email) {
+          const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+          await sendTemplateEmail("cadastro-profissional-status", conta.user.email, { templateData: { nome: perfil.nome, situacao: data.status === "suspenso" ? "suspenso" : "aprovado" }, idempotencyKey: `cadastro-${data.status}-${data.id}-${Date.now()}` });
+        }
+      }
+    } catch (error) { console.error("Falha ao notificar status profissional", { id: data.id, error }); }
     const { writeAuditEvent } = await import("@/lib/audit.server");
     await writeAuditEvent({
       actorId: context.userId,
@@ -622,7 +647,7 @@ export const conferirCadastroProfissional = createServerFn({ method: "POST" })
     await garantirAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: prof }, { data: perfilPronto }, { data: documentos }] = await Promise.all([
-      supabaseAdmin.from("professionals").select("cnpj, ferramenta_url_sala, certidao_validade, status").eq("id", data.id).maybeSingle(),
+       supabaseAdmin.from("professionals").select("cpf, cnpj, tipo_pessoa, ferramenta_url_sala, certidao_validade, status").eq("id", data.id).maybeSingle(),
       supabaseAdmin.rpc("perfil_pronto_para_publicar", { _professional_id: data.id }),
       supabaseAdmin.from("professional_documents").select("tipo, status").eq("professional_id", data.id).eq("status", "aprovado"),
     ]);
@@ -630,7 +655,7 @@ export const conferirCadastroProfissional = createServerFn({ method: "POST" })
     if (!prof || prof.status === "descredenciado") return { ok: false as const, erro: "Este profissional não está mais na lista ativa." };
     const tipos = new Set((documentos ?? []).map((doc) => doc.tipo));
     if (!Object.values(data.checklist).every(Boolean)) return { ok: false as const, erro: "Marque todos os itens da conferência antes de aprovar." };
-    if (!prof?.cnpj || prof.cnpj.length !== 14) return { ok: false as const, erro: "O CNPJ do profissional ainda não foi informado." };
+    if (!cpfValido(prof.cpf ?? "") || (prof.tipo_pessoa === "PJ" && !cnpjValido(prof.cnpj ?? ""))) return { ok: false as const, erro: "Confira o CPF e, para pessoa jurídica, o CNPJ do profissional." };
     if (!prof.ferramenta_url_sala) return { ok: false as const, erro: "A ferramenta de videochamada ainda não foi cadastrada." };
     if (!perfilPronto) return { ok: false as const, erro: "O perfil público ainda está incompleto ou a foto não foi aprovada." };
     if (prof.certidao_validade && prof.certidao_validade < hoje) return { ok: false as const, erro: "A certidão do conselho está vencida." };
