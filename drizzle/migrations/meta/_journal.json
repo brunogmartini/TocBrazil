@@ -239,6 +239,27 @@
       "when": 1790944705652,
       "tag": "0033_guard_professional_registration_and_private_documents",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1790944946200,
+      "tag": "0034_safe_professional_resubmission",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1790945019554,
+      "tag": "0035_enforce_professional_status_guard_for_client_inserts",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1790945049526,
+      "tag": "0036_keep_professional_phone_private_in_profile_guard",
+      "breakpoints": true
     }
   ]
 }

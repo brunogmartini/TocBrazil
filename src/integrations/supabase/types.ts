@@ -2130,6 +2130,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      reenviar_cadastro_profissional: {
+        Args: { _professional_id: string }
+        Returns: boolean
+      }
       registrar_deteccao_anticontato: {
         Args: {
           _acao: string

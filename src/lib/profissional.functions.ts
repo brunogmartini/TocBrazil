@@ -40,6 +40,7 @@ export type CadastroProfissionalEntrada = {
   cpf?: string;
   cnpj?: string;
   tipo_pessoa: TipoPessoa;
+  telefone?: string;
   registro: string;
   uf: string;
   genero?: string;
@@ -149,6 +150,8 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     const uf = String(data.uf ?? "").trim().toUpperCase().slice(0, 2);
     if (uf.length !== 2) throw new Error("Informe a UF do registro.");
     const profissao: "psicologo" = "psicologo";
+    const telefone = apenasDigitos(String(data.telefone ?? ""));
+    if (telefone.length < 10 || telefone.length > 11) throw new Error("Informe um telefone válido com DDD.");
     const tipoPessoa = data.tipo_pessoa;
     if (tipoPessoa !== "PF" && tipoPessoa !== "PJ") throw new Error("Escolha pessoa física ou jurídica.");
     const cpf = apenasDigitos(String(data.cpf ?? ""));
@@ -187,6 +190,7 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
       cpf,
       cnpj: tipoPessoa === "PJ" ? cnpj : null,
       tipo_pessoa: tipoPessoa,
+      telefone,
       genero: String(data.genero ?? "").trim().slice(0, 30) || null,
       abordagens_publicas: abordagens,
       formacoes_publicas: formacoes,
@@ -264,11 +268,8 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
         return { ok: false as const, erro: error.code === "23505" ? "CPF ou CNPJ já cadastrado." : "Não foi possível salvar seus dados agora." };
       }
       if (existente.status === "rejeitado") {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { error: reenvioErro } = await supabaseAdmin.from("professionals")
-          .update({ status: "pendente", requer_correcao: false })
-          .eq("id", existente.id).eq("user_id", userId).eq("status", "rejeitado");
-        if (reenvioErro) return { ok: false as const, erro: "Dados salvos, mas não foi possível reenviar para análise. Tente novamente." };
+        const { data: reenviado, error: reenvioErro } = await supabase.rpc("reenviar_cadastro_profissional", { _professional_id: existente.id });
+        if (reenvioErro || !reenviado) return { ok: false as const, erro: "Dados salvos, mas não foi possível reenviar para análise. Tente novamente." };
       }
       const { writeAuditEvent } = await import("@/lib/audit.server");
       await writeAuditEvent({ actorId: userId, actorRole: "profissional", action: "profile_data_changed", entity: "professional", entityId: existente.id, metadata: { fields: Object.keys(data), resubmitted: existente.status === "rejeitado" } });
@@ -429,7 +430,10 @@ export const registrarDocumento = createServerFn({ method: "POST" })
     const { error } = await supabase
       .from("professional_documents")
       .insert({ professional_id: prof.id, ...data });
-    if (error) return { ok: false as const, erro: "Não foi possível registrar o documento." };
+    if (error) {
+      console.error("Falha ao registrar documento profissional", { code: error.code });
+      return { ok: false as const, erro: "Não foi possível registrar o documento. Tente enviar novamente." };
+    }
     return { ok: true as const };
   });
 

@@ -71,6 +71,7 @@ function CadastroProfissional() {
     nome: "",
     tipo_pessoa: "PF" as "PF" | "PJ",
     cpf: "",
+    telefone: "",
     cnpj: "",
     registro: "",
     uf: "",
@@ -130,6 +131,7 @@ function CadastroProfissional() {
         nome: p.nome ?? "",
         tipo_pessoa: p.tipo_pessoa === "PJ" ? "PJ" : "PF",
         cpf: p.cpf ?? "",
+        telefone: p.telefone ?? "",
         cnpj: p.cnpj ?? "",
         registro: p.registro ?? "",
         uf: p.uf ?? "",
@@ -168,6 +170,7 @@ function CadastroProfissional() {
       };
       if (!cpfValido(form.cpf)) return apontar("cpf", "Informe um CPF válido.");
       if (form.tipo_pessoa === "PJ" && !cnpjValido(form.cnpj)) return apontar("cnpj", "Informe um CNPJ válido.");
+      if (!/^\d{10,11}$/.test(form.telefone.replace(/\D/g, ""))) return apontar("telefone", "Informe um telefone válido com DDD.");
       const { valor_consulta, ...restoForm } = form;
       const valorConsultaCentavos = Math.round((Number(valor_consulta) || 0) * 100);
       if (valorConsultaCentavos <= TAXA_FIXA_CENTAVOS) {
@@ -184,9 +187,13 @@ function CadastroProfissional() {
       });
       if (!r.ok) {
         setErro(r.erro);
-        if (r.erro.includes("CPF")) setCampoErro("cpf");
-        if (r.erro.includes("CNPJ") && !r.erro.includes("CPF")) setCampoErro("cnpj");
-        document.getElementById("erro-cadastro")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        const campo = r.erro.includes("CNPJ") ? "cnpj" : r.erro.includes("CPF") ? "cpf" : r.erro.includes("telefone") ? "telefone" : r.erro.includes("CRP") ? "registro" : r.erro.includes("UF") ? "uf" : null;
+        if (campo) {
+          setCampoErro(campo);
+          document.getElementById(campo)?.scrollIntoView({ behavior: "smooth", block: "center" });
+          document.getElementById(campo)?.focus();
+        } else document.getElementById("erro-cadastro")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        console.error("Falha no cadastro profissional", { mensagem: r.erro });
         return;
       }
       setAviso("Dados salvos. Agora envie o comprovante do CRP e os demais documentos para a análise. Você receberá uma atualização por e-mail.");
@@ -223,6 +230,7 @@ function CadastroProfissional() {
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Não foi possível enviar o documento.");
       console.error("Falha no envio de documento profissional", err);
+      document.getElementById("erro-cadastro")?.scrollIntoView({ behavior: "smooth", block: "center" });
     } finally {
       setEnviandoDoc(false);
     }
@@ -367,6 +375,7 @@ function CadastroProfissional() {
           onChange={(v) => setForm({ ...form, cpf: v.replace(/\D/g, "").slice(0, 11) })}
           required
         />
+        <Campo label="Telefone com DDD (uso administrativo, não publicado)" id="telefone" inputMode="tel" invalid={campoErro === "telefone"} value={form.telefone} onChange={(v) => setForm({ ...form, telefone: v.replace(/\D/g, "").slice(0, 11) })} required />
         {temCadastro && <div className="sm:col-span-2"><DocumentoCampo tipo="Documento de identidade" titulo="Documento de identidade com foto" /></div>}
         {form.tipo_pessoa === "PJ" && <Campo
           label="CNPJ"
@@ -379,12 +388,16 @@ function CadastroProfissional() {
         />}
         <Campo
           label="Registro profissional (CRP)"
+          id="registro"
+          invalid={campoErro === "registro"}
           value={form.registro}
           onChange={(v) => setForm({ ...form, registro: v })}
           required
         />
         <Campo
           label="UF do registro"
+          id="uf"
+          invalid={campoErro === "uf"}
           value={form.uf}
           onChange={(v) => setForm({ ...form, uf: v.toUpperCase().slice(0, 2) })}
           required
@@ -591,7 +604,7 @@ function Campo({
 }: {
   label: string;
   id?: string;
-  inputMode?: "numeric";
+  inputMode?: "numeric" | "tel";
   invalid?: boolean;
   value: string;
   onChange: (v: string) => void;
