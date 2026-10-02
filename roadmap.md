@@ -124,4 +124,4 @@
 - [x] Aceitar CPF obrigatório, CNPJ condicional, bloquear duplicados e melhorar erros
 - [x] Validar o comprovante de CRP e preservar upload privado e revisão manual
 - [x] Mostrar PF/PJ na gestão e enviar avisos de situação
-- [ ] Validar PF/PJ autenticados, comprovante privado e ciclo completo de aprovação em desktop e celular
+- [ ] Validar PF/PJ autenticados, comprovante privado e ciclo completo de aprovação em desktop e celular — depende de contas de teste profissionais PF e PJ, confirmação de e-mail e acesso administrativo com MFA para documentos

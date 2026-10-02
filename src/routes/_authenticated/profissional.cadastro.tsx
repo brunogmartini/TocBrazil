@@ -189,7 +189,7 @@ function CadastroProfissional() {
         document.getElementById("erro-cadastro")?.scrollIntoView({ behavior: "smooth", block: "center" });
         return;
       }
-      setAviso("Recebemos seu cadastro. Envie o comprovante do CRP e os demais documentos abaixo para a análise. Você receberá uma atualização por e-mail.");
+      setAviso("Dados salvos. Agora envie o comprovante do CRP e os demais documentos para a análise. Você receberá uma atualização por e-mail.");
       setCadastroFinalizado(true);
       await queryClient.invalidateQueries();
     } catch (err) {
@@ -218,7 +218,7 @@ function CadastroProfissional() {
         data: { tipo, nome_arquivo: file.name, caminho },
       });
       if (!r.ok) throw new Error(r.erro);
-      setAviso("Documento enviado para análise.");
+      setAviso(tipo === "Carteirinha profissional do CRP" ? "Comprovante do CRP recebido para análise." : "Documento enviado para análise.");
       await queryClient.invalidateQueries({ queryKey: ["cadastro-profissional"] });
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Não foi possível enviar o documento.");
@@ -319,7 +319,9 @@ function CadastroProfissional() {
                 ? "Cadastro rejeitado. Veja a observação da equipe, ajuste os dados e salve novamente."
                 : dados.data.profissional.status === "suspenso"
                   ? "Perfil suspenso temporariamente. Fale com a equipe da plataforma."
-                  : "Recebemos seu cadastro. Ele está aguardando a validação da equipe e o perfil ainda não aparece publicamente."}
+                   : documentos.some((documento) => documento.tipo === "Carteirinha profissional do CRP")
+                     ? "Recebemos seu cadastro e o comprovante do CRP. Ele está em análise; avisaremos por e-mail. Seu perfil ainda não aparece na busca."
+                     : "Dados iniciais recebidos. Envie o comprovante do CRP abaixo para continuar a conferência. Seu perfil ainda não aparece na busca."}
           </p>
            {dados.data.profissional.status === "aprovado" && <p className="mt-2 text-sm text-muted-foreground">Cadastro aprovado e contrato vigente aceito.</p>}
           {dados.data.profissional.observacao_admin && (
@@ -511,7 +513,7 @@ function CadastroProfissional() {
         </fieldset>
         </>}
         <button type="submit" className="btn-base btn-primary sm:col-span-2">
-          {temCadastro ? "Salvar atualizações" : "Finalizar cadastro inicial"}
+          {temCadastro ? "Salvar atualizações" : "Salvar dados e continuar"}
         </button>
       </form>}
 
