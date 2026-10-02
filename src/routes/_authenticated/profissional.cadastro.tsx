@@ -323,8 +323,8 @@ function CadastroProfissional() {
         <div className="card-soft mt-6 min-w-0 p-5">
           <p className="section-label">Situação do seu cadastro</p>
           <p className="mt-2 text-sm font-semibold">
-             {dados.data.profissional.status === "aprovado"
-               ? "Cadastro aprovado. Seu perfil está publicado na página pública de profissionais."
+              {dados.data.profissional.status === "aprovado"
+                ? dados.data.etapa?.chave === "publicado" ? "Cadastro aprovado. Seu perfil está publicado na página pública de profissionais." : "Cadastro aprovado. Conclua as etapas restantes antes da publicação do perfil."
               : dados.data.profissional.status === "rejeitado"
                 ? "Cadastro rejeitado. Veja a observação da equipe, ajuste os dados e salve novamente."
                 : dados.data.profissional.status === "suspenso"
@@ -333,7 +333,7 @@ function CadastroProfissional() {
                       ? "Recebemos seu cadastro e o comprovante do CRP. Ele está em análise; acompanhe a situação aqui. Seu perfil ainda não aparece na busca."
                      : "Dados iniciais recebidos. Envie o comprovante do CRP abaixo para continuar a conferência. Seu perfil ainda não aparece na busca."}
           </p>
-           {dados.data.profissional.status === "aprovado" && <p className="mt-2 text-sm text-muted-foreground">Cadastro aprovado e contrato vigente aceito.</p>}
+           {dados.data.profissional.status === "aprovado" && dados.data.contrato && <p className="mt-2 text-sm text-muted-foreground">Contrato registrado no cadastro.</p>}
           {dados.data.profissional.observacao_admin && (
             <p className="mt-2 text-sm text-muted-foreground">
               Observação da equipe: {dados.data.profissional.observacao_admin}

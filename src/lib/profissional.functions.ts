@@ -658,6 +658,8 @@ export function calcularEtapa(
     return { chave: "suspenso", titulo: "Perfil suspenso", descricao: "Entre em contato com o suporte.", indice: 5 };
   }
   if (prof.status === "aprovado") {
+    if (!temContrato) return { chave: "aprovado", titulo: "Aceite do contrato", descricao: "Leia o contrato e os anexos para prosseguir.", indice: 4 };
+    if (!recebimentoAtivo) return { chave: "aprovado", titulo: "Integração de pagamentos", descricao: "Aguarde a ativação da conta de recebimento antes de configurar a agenda.", indice: 5 };
     return temAgenda
       ? { chave: "publicado", titulo: "Perfil publicado", descricao: "Seu perfil está visível e recebe agendamentos.", indice: 6 }
       : { chave: "aprovado", titulo: "Cadastro aprovado", descricao: "Defina sua disponibilidade para receber agendamentos.", indice: 5 };
