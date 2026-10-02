@@ -239,6 +239,13 @@
       "when": 1790944705652,
       "tag": "0033_guard_professional_registration_and_private_documents",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1790944946200,
+      "tag": "0034_safe_professional_resubmission",
+      "breakpoints": true
     }
   ]
 }
