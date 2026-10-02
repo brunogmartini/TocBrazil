@@ -260,6 +260,13 @@
       "when": 1790945049526,
       "tag": "0036_keep_professional_phone_private_in_profile_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1790945312529,
+      "tag": "0037_isolate_professional_administrative_phones",
+      "breakpoints": true
     }
   ]
 }
