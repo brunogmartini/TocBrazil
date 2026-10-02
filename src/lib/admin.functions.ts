@@ -273,12 +273,11 @@ export const painelAdmin = createServerFn({ method: "GET" })
             .select("id, professional_id, status_anterior, status_novo, requer_correcao, observacao, created_at")
             .in("professional_id", idsProfissionais)
             .order("created_at", { ascending: false }),
-          supabaseAdmin
-            .from("contratos_profissionais")
-            .select("professional_id, versao, aceito_em, status_assinatura")
-            .in("professional_id", idsProfissionais)
-            .eq("status_assinatura", "aceita")
-            .order("aceito_em", { ascending: false }),
+           supabaseAdmin
+             .from("document_acceptances")
+             .select("professional_id, contract_version, accepted_at")
+             .in("professional_id", idsProfissionais)
+             .order("accepted_at", { ascending: false }),
           supabaseAdmin
             .from("professional_review_decisions")
             .select("id, professional_id, decision, checklist, reason, decided_at")
@@ -306,7 +305,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
       lista.push(h);
       histPorProfissional.set(h.professional_id, lista);
     }
-    const contratoPorProfissional = new Map<string, { versao: string; aceito_em: string }>();
+     const contratoPorProfissional = new Map<string, { contract_version: string; accepted_at: string }>();
     for (const contrato of contratos ?? []) {
       if (!contratoPorProfissional.has(contrato.professional_id)) {
         contratoPorProfissional.set(contrato.professional_id, contrato);
@@ -343,7 +342,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
         cidade: p.cidade,
         status: p.status as string,
         requer_correcao: Boolean(p.requer_correcao),
-        etapa: calcularEtapa(p, docs, comAgenda.has(p.id)),
+         etapa: calcularEtapa(p, docs, comAgenda.has(p.id), Boolean(contrato), false),
         valor_centavos: p.valor_centavos,
         valor_liquido_centavos: p.valor_liquido_centavos,
         consultas: stats?.total ?? 0,
@@ -373,8 +372,8 @@ export const painelAdmin = createServerFn({ method: "GET" })
         observacao_admin: p.observacao_admin,
         validado_em: p.validado_em,
         cadastro_conferido_em: p.cadastro_conferido_em,
-        contrato_aceito_em: contrato?.aceito_em ?? null,
-        contrato_versao: contrato?.versao ?? null,
+         contrato_aceito_em: contrato?.accepted_at ?? null,
+         contrato_versao: contrato?.contract_version ?? null,
         ferramenta_provedor: p.ferramenta_provedor,
         ferramenta_url_sala: p.ferramenta_url_sala,
         certidao_validade: p.certidao_validade,
