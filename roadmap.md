@@ -128,6 +128,8 @@
 - [ ] Validar salvamento PJ autenticado, comprovante privado e ciclo completo de aprovação — depende de conta PJ de teste, confirmação de e-mail e acesso administrativo com MFA para documentos
 
 ## Revisão integral do cadastro e obrigação fiscal — 02/10/2026
-- [ ] Corrigir etapas, salvamento, documentos e avisos inconsistentes; testar o fluxo autenticado
-- [ ] Exigir ciência da emissão de nota fiscal (PJ) ou recibo Receita Saúde (PF) pelo valor integral e informar paciente/profissional sem simular emissão
-- [ ] Validar em desktop e celular; registrar limites dos testes de aprovação e pagamentos
+- [x] Corrigir etapas, salvamento, documentos e avisos inconsistentes; testar salvamento autenticado com CPF e CNPJ e upload/remoção de PDF sintético
+- [x] Exigir ciência da emissão de nota fiscal (PJ) ou recibo Receita Saúde (PF) pelo valor integral e informar paciente/profissional sem simular emissão
+- [x] Validar cadastro em desktop e 375px; testes unitários de identidade e anticontato passaram (25 testes)
+- [ ] Testar decisão administrativa, aceite contratual, ativação do recebimento e publicação ponta a ponta com contas elegíveis; não liberar pagamentos públicos antes da validação externa do Asaas
+- [ ] Confirmar entrega real de e-mails após validar o domínio de envio
