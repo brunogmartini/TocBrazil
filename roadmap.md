@@ -154,4 +154,4 @@
 - [x] Impedir que atualizações de documentos ou foto substituam campos ainda digitados
 - [x] Registrar a foto imediatamente no cadastro e remover o arquivo novo quando a gravação falhar
 - [x] Exibir a foto privada enviada e manter sua conferência manual
-- [ ] Validar persistência, formatos inválidos, computador e celular
+- [x] Validar persistência, formatos inválidos, computador e celular

@@ -386,7 +386,7 @@ export const salvarFotoPerfilProfissional = createServerFn({ method: "POST" })
     await writeAuditEvent({
       actorId: userId,
       actorRole: "profissional",
-      action: "profile_photo_changed",
+      action: "profile_data_changed",
       entity: "professional",
       entityId: profissional.id,
       metadata: { pending_moderation: true },
