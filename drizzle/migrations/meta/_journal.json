@@ -281,6 +281,13 @@
       "when": 1790945886745,
       "tag": "0039_allow_owner_professional_profile_fields_update",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1791240158167,
+      "tag": "0040_grant_public_professional_directory_columns",
+      "breakpoints": true
     }
   ]
 }
