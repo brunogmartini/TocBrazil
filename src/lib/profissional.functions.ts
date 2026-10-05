@@ -346,6 +346,54 @@ export const salvarCadastroProfissional = createServerFn({ method: "POST" })
     return { ok: true as const, id: criado.id, slug: criado.slug };
   });
 
+export const salvarFotoPerfilProfissional = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { caminho: string }) => ({
+    caminho: String(data.caminho ?? "").trim().slice(0, 500),
+  }))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    if (!data.caminho.startsWith(`${userId}/`)) {
+      return { ok: false as const, erro: "Arquivo de foto inválido." };
+    }
+
+    const { data: profissional } = await supabase
+      .from("professionals")
+      .select("id, foto_caminho")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!profissional) {
+      return { ok: false as const, erro: "Salve seus dados essenciais antes de enviar a foto." };
+    }
+
+    const { error } = await supabase
+      .from("professionals")
+      .update({ foto_caminho: data.caminho })
+      .eq("id", profissional.id);
+    if (error) {
+      console.error("Falha ao registrar foto profissional", { code: error.code });
+      return { ok: false as const, erro: "Não foi possível registrar a foto agora." };
+    }
+
+    if (profissional.foto_caminho && profissional.foto_caminho !== data.caminho) {
+      const { error: remocaoErro } = await supabase.storage
+        .from("fotos-profissionais")
+        .remove([profissional.foto_caminho]);
+      if (remocaoErro) console.error("Falha ao remover foto profissional substituída", { code: remocaoErro.message });
+    }
+
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({
+      actorId: userId,
+      actorRole: "profissional",
+      action: "profile_photo_changed",
+      entity: "professional",
+      entityId: profissional.id,
+      metadata: { pending_moderation: true },
+    });
+    return { ok: true as const };
+  });
+
 export const salvarDisponibilidade = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { regras: { weekday: number; hora_inicio: string; hora_fim: string }[] }) => ({

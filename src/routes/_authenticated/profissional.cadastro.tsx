@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   meuCadastroProfissional,
   registrarDocumento,
   removerDocumento,
   salvarCadastroProfissional,
+  salvarFotoPerfilProfissional,
 } from "@/lib/profissional.functions";
 import { statusRecebimentoAsaas } from "@/lib/asaas.functions";
 import { EtapasCadastro, ProfessionalNav } from "@/components/professional-nav";
@@ -58,6 +59,7 @@ function CadastroProfissional() {
   const salvar = useServerFn(salvarCadastroProfissional);
   const registrar = useServerFn(registrarDocumento);
   const remover = useServerFn(removerDocumento);
+  const salvarFoto = useServerFn(salvarFotoPerfilProfissional);
   const statusVinculo = useServerFn(statusRecebimentoAsaas);
 
   const dados = useQuery({ queryKey: ["cadastro-profissional"], queryFn: () => carregar() });
@@ -100,6 +102,7 @@ function CadastroProfissional() {
   const [cadastroFinalizado, setCadastroFinalizado] = useState(false);
   const [mfaProfissional, setMfaProfissional] = useState<{ id: string; qr: string; secret: string } | null>(null);
   const [codigoMfa, setCodigoMfa] = useState("");
+  const cadastroHidratado = useRef<string | null>(null);
 
   async function prepararMfaProfissional() {
     setErro(null);
@@ -127,7 +130,8 @@ function CadastroProfissional() {
 
   useEffect(() => {
     const p = dados.data?.profissional;
-    if (p) {
+    if (p && cadastroHidratado.current !== p.id) {
+      cadastroHidratado.current = p.id;
       setForm({
         nome: p.nome ?? "",
         tipo_pessoa: p.tipo_pessoa === "PJ" ? "PJ" : "PF",
@@ -263,15 +267,18 @@ function CadastroProfissional() {
       if (!uid) throw new Error("Sessão expirada.");
       const extensao = file.name.split(".").pop()?.toLowerCase() || "jpg";
       const caminho = `${uid}/perfil-${Date.now()}.${extensao}`;
-      const { error: uploadErro } = await supabase.storage.from("fotos-profissionais").upload(caminho, file);
+      const { error: uploadErro } = await supabase.storage
+        .from("fotos-profissionais")
+        .upload(caminho, file, { cacheControl: "3600", contentType: file.type, upsert: false });
       if (uploadErro) throw new Error("Não foi possível enviar a foto.");
-      // Se havia uma foto nova ainda não salva, substituí-la não deve deixar um arquivo órfão.
-      const fotoAnterior = form.foto_caminho;
-      if (fotoAnterior && fotoAnterior !== dados.data?.profissional?.foto_caminho && fotoAnterior.startsWith(`${uid}/`)) {
-        await supabase.storage.from("fotos-profissionais").remove([fotoAnterior]);
+      const registro = await salvarFoto({ data: { caminho } });
+      if (!registro.ok) {
+        await supabase.storage.from("fotos-profissionais").remove([caminho]);
+        throw new Error(registro.erro);
       }
       setForm((atual) => ({ ...atual, foto_caminho: caminho }));
-      setAviso("Foto enviada. Salve o cadastro para encaminhá-la à conferência manual.");
+      setAviso("Foto enviada e encaminhada à conferência manual.");
+      await queryClient.invalidateQueries({ queryKey: ["cadastro-profissional"] });
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Não foi possível enviar a foto.");
     } finally {
@@ -436,6 +443,13 @@ function CadastroProfissional() {
           <label htmlFor="foto-perfil" className="section-label">Foto do perfil</label>
           <input id="foto-perfil" type="file" accept="image/jpeg,image/png,image/webp" className="field-base mt-2" disabled={enviandoFoto} onChange={(e) => { const arquivo = e.target.files?.[0]; if (arquivo) void enviarFoto(arquivo); e.target.value = ""; }} />
           <p className="mt-1 text-xs text-muted-foreground">Rosto visível, recente, quadrada e com no mínimo 600 × 600 pixels. A publicação depende de conferência manual.</p>
+          {dados.data?.profissional?.foto_url_temporaria && (
+            <img
+              src={dados.data.profissional.foto_url_temporaria}
+              alt="Foto do perfil enviada"
+              className="mt-3 size-28 rounded-md border border-border object-cover"
+            />
+          )}
           {dados.data?.profissional?.foto_status && <p className="mt-2 text-xs font-semibold">Situação: {dados.data.profissional.foto_status === "aprovada" ? "aprovada" : dados.data.profissional.foto_status === "recusada" ? "requer nova foto" : dados.data.profissional.foto_status === "pendente" ? "em análise" : "não enviada"}</p>}
         </div>
         <div>
