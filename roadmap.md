@@ -148,4 +148,4 @@
 - [x] Restaurar a leitura pública somente das colunas usadas no diretório de profissionais, mantendo a política de elegibilidade
 - [x] Calcular a etapa administrativa com o estado real da conta de recebimento
 - [x] Preservar as instruções existentes da sala virtual ao editar outros dados do profissional
-- [ ] Validar o diretório anônimo e o painel gestor após a compilação
+- [x] Validar o diretório anônimo e o painel gestor após a compilação
