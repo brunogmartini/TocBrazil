@@ -98,6 +98,7 @@ export type ProfissionalAdmin = {
   contrato_versao: string | null;
   ferramenta_provedor: string | null;
   ferramenta_url_sala: string | null;
+  ferramenta_instrucoes: string | null;
   certidao_validade: string | null;
   apolice_validade: string | null;
   seguradora_nome: string | null;
@@ -174,6 +175,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
       { data: contatosProfissionais },
       { data: cfgRows },
       { data: regras },
+      { data: contasRecebimento },
     ] = await Promise.all([
       supabaseAdmin
         .from("profiles")
@@ -191,6 +193,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
        supabaseAdmin.from("professional_admin_contacts").select("professional_id, telefone"),
       supabaseAdmin.from("platform_settings").select("chave, valor"),
       supabaseAdmin.from("availability_rules").select("professional_id"),
+      supabaseAdmin.from("asaas_professional_accounts").select("professional_id, wallet_id, status"),
     ]);
 
     const nomePorId = new Map((perfis ?? []).map((p) => [p.id, p.nome ?? p.email ?? "—"]));
@@ -201,6 +204,11 @@ export const painelAdmin = createServerFn({ method: "GET" })
       papeisPorId.set(p.user_id, [...(papeisPorId.get(p.user_id) ?? []), p.role as string]);
     }
     const comAgenda = new Set((regras ?? []).map((r) => r.professional_id));
+    const comRecebimentoAtivo = new Set(
+      (contasRecebimento ?? [])
+        .filter((conta) => conta.status === "ativa" && Boolean(conta.wallet_id))
+        .map((conta) => conta.professional_id),
+    );
     const consultasPorPaciente = new Map<string, { total: number; realizadas: number; pago: number }>();
     const consultasPorProfissional = new Map<string, { total: number; realizadas: number }>();
     for (const c of consultas ?? []) {
@@ -345,7 +353,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
         cidade: p.cidade,
         status: p.status as string,
         requer_correcao: Boolean(p.requer_correcao),
-         etapa: calcularEtapa(p, docs, comAgenda.has(p.id), Boolean(contrato), false),
+         etapa: calcularEtapa(p, docs, comAgenda.has(p.id), Boolean(contrato), comRecebimentoAtivo.has(p.id)),
         valor_centavos: p.valor_centavos,
         valor_liquido_centavos: p.valor_liquido_centavos,
         consultas: stats?.total ?? 0,
@@ -379,6 +387,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
          contrato_versao: contrato?.contract_version ?? null,
         ferramenta_provedor: p.ferramenta_provedor,
         ferramenta_url_sala: p.ferramenta_url_sala,
+         ferramenta_instrucoes: p.ferramenta_instrucoes,
         certidao_validade: p.certidao_validade,
         apolice_validade: p.apolice_validade,
         seguradora_nome: p.seguradora_nome,

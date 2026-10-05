@@ -143,3 +143,9 @@
 - [x] Manter código adicional somente para abrir documentos, com endereço temporário e auditoria
 - [x] Conectar a edição manual à ficha da profissional e validar dados privados e públicos
 - [x] Validar a ficha autenticada, os controles do diploma e o formulário administrativo na prévia; nenhuma informação real foi alterada no teste
+
+## Correções do monitoramento — 05/10/2026
+- [x] Restaurar a leitura pública somente das colunas usadas no diretório de profissionais, mantendo a política de elegibilidade
+- [x] Calcular a etapa administrativa com o estado real da conta de recebimento
+- [x] Preservar as instruções existentes da sala virtual ao editar outros dados do profissional
+- [ ] Validar o diretório anônimo e o painel gestor após a compilação
