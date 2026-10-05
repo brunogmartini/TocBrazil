@@ -913,7 +913,7 @@ function EdicaoProfissional({
     idiomas: profissional.idiomas.join(", "),
     ferramenta_provedor: profissional.ferramenta_provedor ?? "",
     ferramenta_url_sala: profissional.ferramenta_url_sala ?? "",
-    ferramenta_instrucoes: "",
+    ferramenta_instrucoes: profissional.ferramenta_instrucoes ?? "",
   });
   const [salvo, setSalvo] = useState(false);
 
