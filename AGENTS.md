@@ -27,3 +27,4 @@
 - Store professional PF/PJ identity on the existing professional record with validated CPF and conditional CNPJ; why: independent psychologists can register without weakening manual review or publication gates.
 - Store professional administrative phone numbers in an owner/admin-only contact table, not the public-readable professional record; why: RLS exposes the entire eligible professional row.
 - Evaluate public professional eligibility through a narrow security-definer helper for private receiving and schedule tables; why: public listing must not grant financial-table access or block owner registration.
+- Validate and audit manager-entered professional data on the server and return edited profiles to pending review; why: assistance must not bypass credentialing or publication gates.
