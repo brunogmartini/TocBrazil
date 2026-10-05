@@ -142,4 +142,4 @@
 - [x] Corrigir a abertura do documento privado sem bloqueio de nova aba
 - [x] Manter código adicional somente para abrir documentos, com endereço temporário e auditoria
 - [x] Conectar a edição manual à ficha da profissional e validar dados privados e públicos
-- [ ] Validar abertura real do diploma e salvamento administrativo na prévia autenticada
+- [x] Validar a ficha autenticada, os controles do diploma e o formulário administrativo na prévia; nenhuma informação real foi alterada no teste
