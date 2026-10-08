@@ -23,6 +23,8 @@ import { exigirAreaPaciente } from "@/lib/role-access";
 import { baixarIcs } from "@/lib/calendario-ics";
 import { institucional } from "@/config/institucional";
 import { criarPreferenciaRecorrencia, remarcarConsulta, responderPesquisaPosConsulta } from "@/lib/continuidade.functions";
+import { AttendanceConfirmation } from "@/components/attendance-confirmation";
+import { AppointmentRoom } from "@/components/appointment-room";
 import { AsaasCardForm } from "@/components/asaas-card-form";
 
 export const Route = createFileRoute("/_authenticated/painel")({
@@ -62,7 +64,7 @@ function Painel() {
   const buscarHorarios = useServerFn(listarHorariosLivres);
 
   const contexto = useQuery({ queryKey: ["contexto"], queryFn: () => carregarContexto() });
-  const consultas = useQuery({ queryKey: ["consultas"], queryFn: () => carregarConsultas() });
+  const consultas = useQuery({ queryKey: ["consultas"], queryFn: () => carregarConsultas(), refetchInterval: 15_000 });
   const notificacoes = useQuery({ queryKey: ["notificacoes"], queryFn: () => carregarNotificacoes() });
 
   const [editandoPerfil, setEditandoPerfil] = useState(false);
@@ -108,7 +110,6 @@ function Painel() {
       fim: c.fim,
       titulo: c.professionals?.nome ?? "Consulta",
       status: c.status,
-      videoUrl: c.link_acesso,
     }));
   const consultaSelecionada = lista.find((c) => c.id === selecionada) ?? null;
 
@@ -198,21 +199,7 @@ function Painel() {
 
                   {c.status === "confirmada" && (
                     <div className="mt-4 flex flex-wrap gap-3">
-                      {c.linkLiberado && c.link_acesso ? (
-                        <a
-                          href={c.link_acesso}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn-base btn-primary"
-                        >
-                          Entrar na sala do profissional
-                        </a>
-                      ) : (
-                        <p className="text-xs text-muted-foreground">
-                          O endereço da sala aparece aqui {c.antecedenciaLinkMinutos} minutos antes
-                          do horário.
-                        </p>
-                      )}
+                      <AppointmentRoom id={c.id} inicio={c.inicio} fim={c.fim} paymentStatus={c.payment_status} releaseMinutes={c.antecedenciaLinkMinutos} />
                       <button
                         type="button"
                         className="btn-base btn-ghost"
@@ -235,6 +222,7 @@ function Painel() {
                     </div>
                   )}
 
+                  <AttendanceConfirmation id={c.id} inicio={c.inicio} status={c.status} attendanceStatus={c.attendance_status} patientConfirmedAt={c.patient_confirmed_at} professionalConfirmedAt={c.professional_confirmed_at} side="paciente" onUpdated={() => queryClient.invalidateQueries({ queryKey: ["consultas"] })} />
                   {c.status === "aguardando_pagamento" && institucional.pagamentosAtivos && (
                     <div className="mt-3 rounded-xl bg-muted p-4 text-sm text-muted-foreground">
                       <p>
@@ -304,24 +292,9 @@ function Painel() {
                          <div className="mt-3 flex flex-wrap gap-2"><button type="button" className="btn-base btn-ghost" onClick={async () => { const r = await recorrencia({ data: { consultaId: c.id, frequencia: 'semanal' } }); setAviso(r.ok ? "Preferência semanal registrada. Cada horário exigirá confirmação e pagamento." : r.erro); }}>Preferência semanal</button></div>
                          <p className="mt-3 text-xs text-muted-foreground">O profissional fornece a nota fiscal (CNPJ) ou o recibo Receita Saúde (CPF) pelo valor total da consulta. Solicite o documento diretamente a ele durante o atendimento.</p>
                       </div>}
-                      {c.status === "confirmada" && new Date(c.fim).getTime() <= agora && (
-                        <div className="mt-4 border-t border-border/60 pt-4">
-                          <p className="text-xs text-muted-foreground">
-                            A consulta acontece na sala do profissional. Confirme que ela aconteceu.
-                          </p>
-                          <button
-                            type="button"
-                            className="btn-base btn-primary mt-3"
-                            onClick={async () => {
-                              const r = await confirmarConsulta({ data: { id: c.id } });
-                              setAviso(r.ok ? "Obrigado por confirmar." : r.erro);
-                              if (r.ok) await queryClient.invalidateQueries({ queryKey: ["consultas"] });
-                            }}
-                          >
-                            Confirmar que aconteceu
-                          </button>
-                        </div>
-                      )}
+                      {(c.status === "confirmada" || c.status === "realizada") && <AppointmentRoom id={c.id} inicio={c.inicio} fim={c.fim} paymentStatus={c.payment_status} releaseMinutes={c.antecedenciaLinkMinutos} />}
+                      <AttendanceConfirmation id={c.id} inicio={c.inicio} status={c.status} attendanceStatus={c.attendance_status} patientConfirmedAt={c.patient_confirmed_at} professionalConfirmedAt={c.professional_confirmed_at} side="paciente" onUpdated={() => queryClient.invalidateQueries({ queryKey: ["consultas"] })} />
+
                     </li>
                   );
                 })}

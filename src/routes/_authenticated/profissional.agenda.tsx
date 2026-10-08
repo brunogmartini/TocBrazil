@@ -10,8 +10,10 @@ import {
   type ConsultaAgenda,
 } from "@/lib/profissional.functions";
 import { AgendaProfissional as AgendaVisual, type Bloqueio, type Visao } from "@/components/agenda-profissional";
+import { missingRoomAlert } from "@/lib/attendance";
 import { ConsultaDetalhe } from "@/components/consulta-detalhe";
 import { ProfessionalNav } from "@/components/professional-nav";
+import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/modal";
 import {
   DIAS_SEMANA,
@@ -158,6 +160,7 @@ function PaginaAgenda() {
         </div>
 
         <ProfessionalNav ativo="/profissional/agenda" />
+        {(dados.data?.consultas ?? []).filter((c) => (c.status === "confirmada" || c.status === "aguardando_pagamento") && missingRoomAlert(c.inicio, Boolean(c.meeting_url_updated_at))).map((c) => <div key={c.id} role="alert" className="mt-4 flex flex-wrap items-center justify-between gap-3 border border-destructive/40 bg-destructive/5 p-4 text-sm"><p>A consulta de {dataHoraBR(c.inicio)} ainda não tem link da sala virtual.</p><Button variant="outline" onClick={() => setConsulta(c)}>Informar link</Button></div>)}
 
         {aviso && <p className="card-soft mt-6 border-primary/40 p-4 text-sm" role="status">{aviso}</p>}
         {erro && <p className="mt-6 text-sm text-destructive" role="alert">{erro}</p>}

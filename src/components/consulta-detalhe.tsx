@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { AttendanceConfirmation } from "@/components/attendance-confirmation";
+import { AppointmentRoom } from "@/components/appointment-room";
 import { Modal } from "@/components/modal";
 import { ChatAdministrativo } from "@/components/chat-administrativo";
 
@@ -23,7 +25,6 @@ export function ConsultaDetalhe({
 
   if (!consulta) return null;
   const c = consulta;
-  const futura = new Date(c.inicio).getTime() > Date.now();
 
   async function mudarStatus(status: "realizada" | "nao_compareceu" | "cancelada") {
     if (status === "cancelada" && !window.confirm("Cancelar esta consulta?")) return;
@@ -61,16 +62,8 @@ export function ConsultaDetalhe({
           </div>
         </dl>
 
-        {c.link_acesso && (c.status === "confirmada" || c.status === "realizada") && (
-          <a
-            href={c.link_acesso}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-base btn-primary"
-          >
-            Abrir sua sala de atendimento
-          </a>
-        )}
+        {(c.status === "confirmada" || c.status === "realizada" || c.status === "aguardando_pagamento") && <AppointmentRoom key={c.id} id={c.id} professional inicio={c.inicio} fim={c.fim} paymentStatus={c.payment_status} onSaved={onAtualizado} />}
+        <AttendanceConfirmation id={c.id} inicio={c.inicio} status={c.status} attendanceStatus={c.attendance_status} patientConfirmedAt={c.patient_confirmed_at} professionalConfirmedAt={c.professional_confirmed_at} side="profissional" onUpdated={onAtualizado} />
 
         {c.status === "aguardando_pagamento" && (
           <p className="rounded-xl border border-border/60 p-3 text-xs text-muted-foreground">
@@ -80,16 +73,6 @@ export function ConsultaDetalhe({
 
         {(c.status === "confirmada" || c.status === "aguardando_pagamento") && (
           <div className="flex flex-wrap gap-2 border-t border-border/60 pt-4">
-            {!futura && c.status === "confirmada" && (
-              <>
-                <button type="button" className="btn-base btn-ghost" onClick={() => mudarStatus("realizada")}>
-                  Confirmar que a consulta ocorreu
-                </button>
-                <button type="button" className="btn-base btn-ghost" onClick={() => mudarStatus("nao_compareceu")}>
-                  Paciente não compareceu
-                </button>
-              </>
-            )}
             <button type="button" className="btn-base btn-ghost" onClick={() => mudarStatus("cancelada")}>
               Cancelar consulta
             </button>

@@ -22,6 +22,7 @@ import type { ConfiguracoesPlataforma } from "@/lib/plataforma.functions";
 import { EtapasCadastro } from "@/components/professional-nav";
 import { indicadoresGestao } from "@/lib/continuidade.functions";
 import { dataBR, dataHoraBR, moeda, rotuloStatusConsulta } from "@/lib/video-sala";
+import { AttendanceAdmin } from "@/components/attendance-admin";
 import { AsaasAdminLab } from "@/components/asaas-admin-lab";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -598,6 +599,8 @@ function Admin() {
           </div>
         </>
       )}
+
+      {aba === "consultas" && <AttendanceAdmin />}
 
       {aba === "consultas" && (
         <div className="card-soft mt-6 overflow-x-auto p-2">
