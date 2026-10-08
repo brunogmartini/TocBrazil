@@ -330,6 +330,13 @@
       "when": 1791477276099,
       "tag": "0046_legal_public_reads_and_rate_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1791477323693,
+      "tag": "0047_legal_anon_policy_role_separation",
+      "breakpoints": true
     }
   ]
 }

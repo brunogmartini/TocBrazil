@@ -17,6 +17,7 @@ type AuditAction =
   | "asaas_sandbox_refresh"
   | "asaas_sandbox_capture"
   | "asaas_sandbox_cancel";
+  
 
 type AuditRole = "paciente" | "profissional" | "admin" | "sistema" | "anonimo";
 
