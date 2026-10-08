@@ -31,3 +31,5 @@
 
 - Keep appointment meeting URLs behind owner-scoped database RPCs and exclude URL columns from authenticated general SELECT grants; why: patient access must obey the payment and time window even through direct database calls.
 - Keep dual attendance confirmations and administrative adjudication in attendance_status, independent of appointment financial status and settlement; why: presence decisions must not capture, refund or distribute payments in this phase.
+- Keep legal document versions immutable and record consent through authenticated server evidence or one-use signup receipts; why: browser checkboxes alone cannot establish versioned consent.
+- Keep legal withdrawal separate from data deletion and enforce reacceptance in database booking guards; why: history and legally retained evidence must remain available during closure review.

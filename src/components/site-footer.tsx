@@ -23,8 +23,10 @@ const colunas = [
     titulo: "Institucional",
     links: [
       { to: "/entenda-o-toc", label: "Sobre o transtorno" },
-      { to: "/termos", label: "Termos de Uso" },
+      { to: "/termos-de-uso", label: "Termos de Uso" },
+      { to: "/termos-profissionais", label: "Termos profissionais" },
       { to: "/privacidade", label: "Privacidade e LGPD" },
+      { to: "/privacidade/solicitacoes", label: "Solicitações de privacidade" },
       { to: "/cookies", label: "Cookies" },
     ],
   },

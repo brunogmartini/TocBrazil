@@ -164,8 +164,8 @@
 - [ ] Testar regras, acessos diretos, computador e celular sem publicar
 
 ## Documentos legais e consentimento — 08/10/2026
-- [ ] Versionar textos oficiais preservados e criar páginas públicas com índice
-- [ ] Registrar aceites seguros no cadastro e exigir reaceite aplicável
-- [ ] Disponibilizar revogação, solicitações e gestão administrativa
+- [x] Versionar textos oficiais preservados e criar páginas públicas com índice
+- [x] Implementar aceites seguros por e-mail e modal de reaceite com bloqueios no banco
+- [x] Disponibilizar revogação, solicitações e gestão administrativa
 - [ ] Testar isolamento, imutabilidade, bloqueios e desktop/celular; não publicar
 - [ ] Receber texto oficial do termo profissional (dependência da responsável)

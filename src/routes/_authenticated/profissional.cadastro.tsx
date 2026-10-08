@@ -425,7 +425,7 @@ function CadastroProfissional() {
           onChange={(v) => setForm({ ...form, uf: v.toUpperCase().slice(0, 2) })}
           required
         />
-        {temCadastro && <div className="sm:col-span-2"><DocumentoCampo tipo="Carteirinha profissional do CRP" titulo="Comprovante do CRP (obrigatório)" descricao="Envie a carteirinha ou a certidão de situação ativa em PDF, JPG ou PNG (até 5 MB). Você pode substituir o arquivo antes da conferência." /></div>}
+        {temCadastro && <div className="sm:col-span-2"><DocumentoCampo tipo="Carteirinha profissional do CRP" titulo="Comprovante do CRP (obrigatório)" descricao="Envie a carteirinha ou a certidão de situação ativa em PDF, JPG ou PNG (até 5 MB). Você pode substituir o arquivo antes da conferência." /><p className="mt-2 text-xs text-muted-foreground">Usamos este documento somente para verificar seu registro profissional. Ele fica em ambiente privado e não é exibido a pacientes.</p></div>}
 
         {!temCadastro && (
           <>

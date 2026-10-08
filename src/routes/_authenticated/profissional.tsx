@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { registrarEventoAutenticacao } from "@/lib/auth.functions";
 import { exigirAreaProfissional } from "@/lib/role-access";
+import { LegalUserPanel } from "@/components/legal-user-panel";
 
 /**
  * Casca da área do profissional (consultório digital).
@@ -86,6 +87,7 @@ function CascaProfissional() {
 
         <div className="min-w-0 [&_.container-page]:max-w-none [&_.container-page]:px-0 [&_.professional-workspace]:py-0">
           <Outlet />
+          <LegalUserPanel />
         </div>
       </div>
     </div>

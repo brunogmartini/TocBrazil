@@ -60,7 +60,7 @@ export const recordLegalConsent=createServerFn({method:"POST"}).middleware([requ
  if(error) throw new Error("Não foi possível verificar sua área.");
  if(roles?.some(r=>r.role==="paciente")&&!data.sensitive) throw new Error("Confirme o consentimento específico.");
  const {supabaseAdmin}=await import("@/integrations/supabase/client.server"); const evidence=requestEvidence();
- const {error:saveError}=await supabaseAdmin.rpc("legal_record_acceptances_for_user",{_user_id:context.userId,_documents:data.documents,_sensitive:data.sensitive,_ip:evidence.ip??undefined,_agent:evidence.agent??undefined});
+ const {error:saveError}=await supabaseAdmin.rpc("legal_record_acceptances_for_user",{_user_id:context.userId,_documents:data.documents,_sensitive:data.sensitive,_ip:evidence.ip,_agent:evidence.agent??""});
  if(saveError) throw new Error("Não foi possível registrar o aceite; verifique se a versão mudou.");
  return {ok:true};
 });

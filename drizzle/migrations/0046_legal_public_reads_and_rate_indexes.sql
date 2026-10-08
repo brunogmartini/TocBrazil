@@ -1,0 +1,11 @@
+DROP POLICY legal_documents_public ON public.legal_documents;
+CREATE POLICY legal_documents_public ON public.legal_documents FOR SELECT TO anon,authenticated USING (CASE WHEN is_active AND published_at<=now() THEN true WHEN auth.uid() IS NOT NULL THEN public.has_role(auth.uid(),'admin') ELSE false END);
+REVOKE INSERT,UPDATE,DELETE ON public.legal_acceptances,public.legal_account_closures,public.legal_documents,public.privacy_requests FROM anon,authenticated;
+REVOKE ALL ON public.legal_signup_receipts FROM anon,authenticated;
+REVOKE SELECT ON public.legal_acceptances,public.legal_account_closures,public.privacy_requests FROM anon;
+GRANT SELECT ON public.legal_documents TO anon,authenticated;
+GRANT SELECT ON public.legal_acceptances,public.legal_account_closures,public.privacy_requests TO authenticated;
+GRANT ALL ON public.legal_documents,public.legal_acceptances,public.legal_account_closures,public.privacy_requests,public.legal_signup_receipts TO service_role;
+CREATE INDEX IF NOT EXISTS legal_signup_receipts_rate_idx ON public.legal_signup_receipts(ip_hash,created_at);
+CREATE INDEX IF NOT EXISTS privacy_requests_rate_idx ON public.privacy_requests(ip_hash,created_at);
+CREATE INDEX IF NOT EXISTS legal_acceptances_owner_idx ON public.legal_acceptances(user_id,document_slug,kind);

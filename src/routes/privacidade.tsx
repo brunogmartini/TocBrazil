@@ -21,7 +21,6 @@ export const Route = createFileRoute("/privacidade")({
 function Privacidade() {
   return (
     <div className="container-page py-12 lg:py-16">
-      <span className="section-label">Institucional</span>
       <LegalPage slug="privacidade" />
       <nav aria-label="Documentos relacionados" className="mt-12 flex flex-col gap-3 sm:flex-row">
         <Link to="/seguranca" className="btn-base btn-ghost">Como protegemos seus dados</Link>

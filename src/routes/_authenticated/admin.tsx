@@ -24,6 +24,7 @@ import { indicadoresGestao } from "@/lib/continuidade.functions";
 import { dataBR, dataHoraBR, moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 import { AttendanceAdmin } from "@/components/attendance-admin";
 import { AsaasAdminLab } from "@/components/asaas-admin-lab";
+import { LegalAdmin } from "@/components/legal-admin";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ABORDAGENS_PERFIL, IDIOMAS_PERFIL, TEMAS_TOC_PERFIL } from "@/lib/perfil-profissional";
@@ -71,7 +72,7 @@ const rotuloDoc: Record<string, string> = {
   recusado: "Recusado",
 };
 
-type Aba = "visao" | "pacientes" | "profissionais" | "consultas" | "financeiro" | "asaas" | "relatorio" | "configuracoes";
+type Aba = "visao" | "pacientes" | "profissionais" | "consultas" | "financeiro" | "asaas" | "relatorio" | "configuracoes" | "legal";
 type FiltroProf = "todos" | "pendente" | "aprovado" | "rejeitado" | "suspenso" | "descredenciado";
 type FiltroPagamento = "pendente" | "aprovado" | "todos";
 
@@ -252,6 +253,7 @@ function Admin() {
     ["asaas", "Testes Asaas"],
     ["relatorio", "Relatório"],
     ["configuracoes", "Configurações"],
+    ["legal", "Documentos e privacidade"],
   ];
 
   return (
@@ -276,7 +278,7 @@ function Admin() {
             </button>
           ))}
         </div>
-        {aba !== "visao" && aba !== "configuracoes" && (
+        {aba !== "visao" && aba !== "configuracoes" && aba !== "legal" && (
           <input
             className="field-base max-w-xs"
             placeholder="Buscar por nome, e-mail ou registro"
@@ -293,6 +295,7 @@ function Admin() {
         </p>
       )}
       {painel.isLoading && <p className="mt-8 text-sm text-muted-foreground">Carregando…</p>}
+      {aba === "legal" && <LegalAdmin />}
 
       {aba === "visao" && t && (
         <>
