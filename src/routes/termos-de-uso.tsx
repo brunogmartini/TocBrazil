@@ -1,0 +1,3 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { LegalPage,legalDocumentsQuery } from "@/components/legal-page";
+export const Route=createFileRoute("/termos-de-uso")({loader:({context})=>context.queryClient.ensureQueryData(legalDocumentsQuery),head:()=>({meta:[{title:"Termos de Uso para Pacientes | TOC Brazil"},{name:"description",content:"Texto integral vigente dos Termos de Uso da TOC Brazil para pacientes, com versão e data."},{property:"og:title",content:"Termos de Uso para Pacientes | TOC Brazil"},{property:"og:description",content:"Condições de uso da plataforma para pacientes."},{property:"og:type",content:"article"},{name:"twitter:card",content:"summary"}]}),component:()=> <LegalPage slug="termos-de-uso"/>});

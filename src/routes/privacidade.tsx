@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { LegalDocument } from "@/components/legal-document";
-import texto from "@/content/politica-de-privacidade.md?raw";
+import { LegalPage, legalDocumentsQuery } from "@/components/legal-page";
 
 export const Route = createFileRoute("/privacidade")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(legalDocumentsQuery),
   head: () => ({
     meta: [
       { title: "Política de Privacidade e Proteção de Dados | TOC Brazil" },
@@ -22,7 +22,7 @@ function Privacidade() {
   return (
     <div className="container-page py-12 lg:py-16">
       <span className="section-label">Institucional</span>
-      <LegalDocument text={texto} />
+      <LegalPage slug="privacidade" />
       <nav aria-label="Documentos relacionados" className="mt-12 flex flex-col gap-3 sm:flex-row">
         <Link to="/seguranca" className="btn-base btn-ghost">Como protegemos seus dados</Link>
         <Link to="/suporte" className="btn-base btn-ghost">Falar com o suporte</Link>
