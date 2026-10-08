@@ -56,7 +56,7 @@ function PainelProfissional() {
     .filter((c) => new Date(c.inicio).getTime() > agora && c.status !== "cancelada" && chaveDia(c.inicio) !== diaHoje)
     .slice(0, 6);
   const pendentesDeConclusao = consultas.filter(
-    (c) => c.status === "confirmada" && new Date(c.fim).getTime() <= agora,
+    (c) => c.status === "confirmada" && c.attendance_status === "agendada" && !c.professional_confirmed_at && new Date(c.inicio).getTime() <= agora && agora <= new Date(c.inicio).getTime() + 24 * 3600_000,
   );
 
   async function recarregar() {
