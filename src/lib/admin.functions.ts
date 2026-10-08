@@ -33,7 +33,6 @@ export type ConsultaAdmin = {
   valor_profissional_centavos: number;
   paciente: string;
   profissional: string;
-  video_url: string | null;
 };
 
 export type PagamentoAdmin = {
@@ -185,7 +184,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
       supabaseAdmin
         .from("appointments")
         .select(
-          "id, inicio, fim, status, payment_status, taxa_agendamento_centavos, valor_consulta_centavos, valor_plataforma_centavos, valor_profissional_centavos, patient_id, professional_id, video_url, professionals(nome)",
+          "id, inicio, fim, status, payment_status, taxa_agendamento_centavos, valor_consulta_centavos, valor_plataforma_centavos, valor_profissional_centavos, patient_id, professional_id, professionals(nome)",
         )
         .order("inicio", { ascending: false })
         .limit(500),
@@ -252,7 +251,6 @@ export const painelAdmin = createServerFn({ method: "GET" })
       valor_profissional_centavos: c.valor_profissional_centavos ?? 0,
       paciente: nomePorId.get(c.patient_id) ?? "—",
       profissional: (c.professionals as { nome?: string } | null)?.nome ?? "—",
-      video_url: c.video_url,
     }));
 
     const pagamentos: PagamentoAdmin[] = listaConsultas
