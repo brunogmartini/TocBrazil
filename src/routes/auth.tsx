@@ -254,6 +254,10 @@ function Auth() {
 
   async function entrarComGoogle() {
     setErro(null);
+    if (modo === "cadastro" && !consentReady) {
+      setErro("Confira os documentos disponíveis e marque os aceites obrigatórios.");
+      return;
+    }
     guardarPerfilPretendido(areaPretendida);
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
@@ -357,7 +361,7 @@ function Auth() {
               </button>
             </div>
 
-            <button type="button" onClick={entrarComGoogle} className="btn-base btn-ghost mt-5 w-full">
+            <button type="button" onClick={entrarComGoogle} disabled={modo === "cadastro" && !consentReady} className="btn-base btn-ghost mt-5 w-full disabled:opacity-60">
               Continuar com o Google
             </button>
 
