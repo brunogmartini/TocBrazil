@@ -275,7 +275,7 @@ export const salvarPerfil = createServerFn({ method: "POST" })
   });
 
 /**
- * Consultas confirmadas cujo horário final já passou viram "realizada".
+ * Confirmações incompletas após 24 horas do início são encaminhadas à gestão.
  * Executado pelo servidor (papel de serviço) sempre que uma agenda é carregada.
  */
 export async function concluirConsultasVencidas() {
@@ -319,7 +319,7 @@ export const minhasConsultas = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("appointments")
       .select(
-        "id, inicio, fim, status, payment_status, valor_centavos, taxa_agendamento_centavos, valor_consulta_centavos, duracao_minutos, link_acesso, cancelada_em, professional_id, auth_status_a, auth_status_b, settlement_status, amount_captured_centavos",
+        "id, inicio, fim, status, payment_status, valor_centavos, taxa_agendamento_centavos, valor_consulta_centavos, duracao_minutos, professional_confirmed_at, patient_confirmed_at, attendance_status, cancelada_em, professional_id, auth_status_a, auth_status_b, settlement_status, amount_captured_centavos",
       )
       .eq("patient_id", userId)
       .order("inicio", { ascending: false });
@@ -329,32 +329,11 @@ export const minhasConsultas = createServerFn({ method: "GET" })
       carregarConfiguracoesPrivadas(),
       profissionaisDasConsultas(supabase),
     ]);
-    const agora = Date.now();
-    const revelados: string[] = [];
-    const consultas = (data ?? []).map((c) => {
-      const inicio = new Date(c.inicio).getTime();
-      const fim = new Date(c.fim).getTime();
-      const dentroDaJanela =
-        agora >= inicio - cfg.antecedenciaLinkMinutos * 60000 && agora <= fim + 2 * 3600_000;
-      const liberado = c.status === "confirmada" && dentroDaJanela && Boolean(c.link_acesso);
-      if (liberado) revelados.push(c.id);
-      return {
-        ...c,
-        professionals: profissionais.get(c.professional_id) ?? null,
-        link_acesso: liberado ? c.link_acesso : null,
-        linkLiberado: liberado,
-        linkLiberadoEm: new Date(inicio - cfg.antecedenciaLinkMinutos * 60000).toISOString(),
-        antecedenciaLinkMinutos: cfg.antecedenciaLinkMinutos,
-      };
-    });
-    for (const id of revelados) {
-      await registrarEvento({
-        tipo: "acesso_link",
-        appointmentId: id,
-        ator: userId,
-        atorPapel: "paciente",
-      });
-    }
+    const consultas = (data ?? []).map((c) => ({
+      ...c,
+      professionals: profissionais.get(c.professional_id) ?? null,
+      antecedenciaLinkMinutos: cfg.antecedenciaLinkMinutos,
+    }));
     return { consultas };
   });
 
@@ -363,45 +342,9 @@ export const confirmarRealizacao = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { id: string }) => ({ id: String(data.id) }))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: consulta } = await supabase
-      .from("appointments")
-      .select("id, fim, status, patient_id, professional_id")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (!consulta || consulta.patient_id !== userId) {
-      return { ok: false as const, erro: "Consulta não encontrada." };
-    }
-    if (consulta.status !== "confirmada") {
-      return { ok: false as const, erro: "Esta consulta não pode ser confirmada." };
-    }
-    if (new Date(consulta.fim).getTime() > Date.now()) {
-      return { ok: false as const, erro: "Você pode confirmar depois do horário de término." };
-    }
-    const agora = new Date().toISOString();
-    const { error } = await supabase
-      .from("appointments")
-      .update({
-        status: "realizada",
-        realizada_em: agora,
-        confirmado_realizado_por: "paciente",
-        confirmado_em: agora,
-      })
-      .eq("id", data.id);
-    if (error) return { ok: false as const, erro: "Não foi possível confirmar agora." };
-    const { writeAuditEvent } = await import("@/lib/audit.server");
-    await writeAuditEvent({ actorId: userId, actorRole: "paciente", action: "appointment_status_changed", entity: "appointment", entityId: consulta.id, metadata: { status: "realizada" } });
-    await registrarEvento({
-      tipo: "realizacao_confirmada",
-      appointmentId: consulta.id,
-      professionalId: consulta.professional_id,
-      ator: userId,
-      atorPapel: "paciente",
-    });
-    const { settleAsaasAppointment } = await import("@/services/asaas-settlement.server");
-    const settlement = await settleAsaasAppointment(consulta.id, "REALIZADA", userId, "paciente");
-    if (!settlement.ok) return { ok: false as const, erro: settlement.erro };
-    return { ok: true as const };
+    const { error } = await context.supabase.rpc("appointment_attendance_confirm", { _appointment_id: data.id, _side: "paciente" });
+    return error ? { ok: false as const, erro: "A confirmação está disponível do início até 24 horas depois." } : { ok: true as const };
+
   });
 
 export const criarAgendamento = createServerFn({ method: "POST" })
@@ -418,7 +361,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
 
     const { data: prof, error: erroProf } = await supabase
       .from("professionals")
-      .select("id, slug, nome, slot_minutos, status, valor_centavos, ferramenta_url_sala")
+      .select("id, slug, nome, slot_minutos, status, valor_centavos")
       .eq("slug", data.slug)
       .maybeSingle();
     if (erroProf || !prof || prof.status !== "aprovado") {
@@ -447,7 +390,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
 
     const consultaId = crypto.randomUUID();
     // A sala de videochamada é do próprio profissional; guardamos apenas o link.
-    const linkAcesso = prof.ferramenta_url_sala ?? null;
+    // O profissional informa um link específico depois da reserva.
 
     const { data: criada, error } = await supabase
       .from("appointments")
@@ -467,8 +410,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
         valor_plataforma_centavos: 0,
         valor_profissional_centavos: Math.max(valorConsulta - taxaFixa, 0),
         taxa_plataforma_centavos: taxaFixa,
-        link_acesso: linkAcesso,
-        video_url: linkAcesso,
+
         video_provider: "externo",
         reserva_expira_em: new Date(Date.now() + 15 * 60000).toISOString(),
       })
