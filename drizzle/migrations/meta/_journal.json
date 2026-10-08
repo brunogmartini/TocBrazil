@@ -323,6 +323,13 @@
       "when": 1791476906754,
       "tag": "0045_legal_evidence_server_identity",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1791477276099,
+      "tag": "0046_legal_public_reads_and_rate_indexes",
+      "breakpoints": true
     }
   ]
 }
