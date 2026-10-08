@@ -7,6 +7,11 @@ import { areaDoCaminho, destinoDaArea, INICIO_DA_AREA, ROTULO_DA_AREA, type Area
 import { guardarPerfilPretendido, minhaArea } from "@/lib/role-access";
 import { useServerFn } from "@tanstack/react-start";
 import { autorizarTentativaLogin, registrarEventoAutenticacao } from "@/lib/auth.functions";
+import { useQuery } from "@tanstack/react-query";
+import { legalDocumentsQuery } from "@/components/legal-page";
+import { LegalConsentFields } from "@/components/legal-consent-fields";
+import { prepareSignupConsent } from "@/lib/legal.functions";
+import { legalDocumentReady, registrationConsentAllowed, type LegalSlug } from "@/lib/legal";
 
 type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
 type BuscaAuth = {
@@ -61,6 +66,10 @@ function Auth() {
   const [conflito, setConflito] = useState<{ area: Area; email: string | null } | null>(null);
   const autorizarLogin = useServerFn(autorizarTentativaLogin);
   const registrarAuth = useServerFn(registrarEventoAutenticacao);
+  const prepareConsent = useServerFn(prepareSignupConsent);
+  const legalDocuments = useQuery(legalDocumentsQuery);
+  const [terms, setTerms] = useState(false);
+  const [sensitive, setSensitive] = useState(false);
 
   const profissional = search.perfil === "profissional";
   const gestor = search.perfil === "gestor";
@@ -73,11 +82,16 @@ function Auth() {
       : (areaDoCaminho(search.redirect) ?? "paciente");
   const acessoGestor = areaPretendida === "gestor";
   const inicioPretendido = INICIO_DA_AREA[areaPretendida];
+  const applicableDocuments = (legalDocuments.data ?? []).filter(d => d.slug === "privacidade" || d.slug === (profissional ? "termos-profissionais" : "termos-de-uso"));
+  const documentsReady = applicableDocuments.length === 2 && applicableDocuments.every(d => legalDocumentReady(d.content_md));
+  const consentReady = documentsReady && registrationConsentAllowed(terms, sensitive, profissional ? "profissional" : "paciente");
 
   useEffect(() => {
     setModo(search.modo);
     setErro(null);
     setAviso(null);
+    setTerms(false);
+    setSensitive(false);
   }, [search.modo]);
 
   useEffect(() => {
@@ -171,13 +185,15 @@ function Auth() {
         }
         // A intenção declarada aqui fixa a área da conta (paciente ou profissional) no primeiro acesso.
         const perfilConta = areaPretendida === "profissional" ? "profissional" : "paciente";
+        if (!consentReady) throw new Error("Confira os documentos disponíveis e marque os aceites obrigatórios.");
+        const receipt = await prepareConsent({ data: { email: email.trim(), area: perfilConta, terms, sensitive, documents: applicableDocuments.map(d => ({ slug: d.slug as LegalSlug, version: d.version })) } });
         guardarPerfilPretendido(perfilConta);
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password: senha,
           options: {
             emailRedirectTo: window.location.origin + inicioPretendido,
-            data: { nome: nome.trim(), perfil: perfilConta },
+            data: { nome: nome.trim(), perfil: perfilConta, legal_receipt: receipt.token },
           },
         });
         if (error) throw error;
@@ -395,6 +411,7 @@ function Auth() {
             </label>
           )}
 
+          {modo === "cadastro" && <><LegalConsentFields area={profissional ? "profissional" : "paciente"} terms={terms} sensitive={sensitive} onTerms={setTerms} onSensitive={setSensitive} disabled={carregando || !documentsReady} /><p className="text-xs text-muted-foreground">{!documentsReady ? "Os documentos legais desta área ainda não estão disponíveis para aceite. A criação de novas contas aguarda o texto oficial." : !consentReady ? "Marque os aceites obrigatórios para criar sua conta." : "Os aceites serão registrados com a versão dos documentos."}</p></>}
           {erro && <p className="text-sm text-destructive">{erro}</p>}
           {aviso && <p className="text-sm text-foreground">{aviso}</p>}
           {confirmacaoPendente && (
@@ -408,7 +425,7 @@ function Auth() {
             </button>
           )}
 
-          <button type="submit" disabled={carregando} className="btn-base btn-primary w-full disabled:opacity-60">
+          <button type="submit" disabled={carregando || (modo === "cadastro" && !consentReady)} className="btn-base btn-primary w-full disabled:opacity-60">
             {carregando
               ? "Aguarde…"
               : modo === "cadastro"
@@ -441,7 +458,7 @@ function Auth() {
         )}
 
         <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
-          Ao continuar, você concorda com os{" "}
+          Consulte os{" "}
           <Link to="/termos" className="underline underline-offset-4">
             Termos de uso
           </Link>{" "}
@@ -449,7 +466,7 @@ function Auth() {
           <Link to="/privacidade" className="underline underline-offset-4">
             Política de privacidade
           </Link>
-          , incluindo o uso de dados necessários para cadastro, agendamento e pagamento conforme a LGPD.
+          . O aceite é registrado separadamente, quando solicitado.
         </p>
       </div>
     </div>

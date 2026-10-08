@@ -26,6 +26,7 @@ import { criarPreferenciaRecorrencia, remarcarConsulta, responderPesquisaPosCons
 import { AttendanceConfirmation } from "@/components/attendance-confirmation";
 import { AppointmentRoom } from "@/components/appointment-room";
 import { AsaasCardForm } from "@/components/asaas-card-form";
+import { LegalUserPanel } from "@/components/legal-user-panel";
 
 export const Route = createFileRoute("/_authenticated/painel")({
   // Área exclusiva do paciente: profissionais e gestores são levados à sua própria área.
@@ -136,6 +137,7 @@ function Painel() {
         </div>
       </div>
 
+      <LegalUserPanel />
       {aviso && (
         <p className="card-soft mt-6 border-primary/40 p-4 text-sm" role="status">
           {aviso}
