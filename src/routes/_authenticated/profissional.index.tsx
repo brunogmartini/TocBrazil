@@ -9,6 +9,7 @@ import { chaveDia, hoje, horaDe, rotuloDiaLongo } from "@/lib/agenda-tempo";
 import { moeda, rotuloStatusConsulta } from "@/lib/video-sala";
 import { exigirAreaProfissional } from "@/lib/role-access";
 import { TAXA_FIXA_CENTAVOS } from "@/lib/precos";
+import { missingRoomAlert } from "@/lib/attendance";
 
 export const Route = createFileRoute("/_authenticated/profissional/")({
   beforeLoad: () => exigirAreaProfissional(),
@@ -55,7 +56,7 @@ function PainelProfissional() {
     .filter((c) => new Date(c.inicio).getTime() > agora && c.status !== "cancelada" && chaveDia(c.inicio) !== diaHoje)
     .slice(0, 6);
   const pendentesDeConclusao = consultas.filter(
-    (c) => c.status === "confirmada" && new Date(c.fim).getTime() <= agora,
+    (c) => c.status === "confirmada" && c.attendance_status === "agendada" && !c.professional_confirmed_at && new Date(c.inicio).getTime() <= agora && agora <= new Date(c.inicio).getTime() + 24 * 3600_000,
   );
 
   async function recarregar() {
@@ -165,13 +166,15 @@ function PainelProfissional() {
           </div>
         </div>
 
+        {consultas.some((c) => c.status === "confirmada" && missingRoomAlert(c.inicio, !!c.meeting_url_updated_at)) && <div role="alert" className="card-soft mt-8 border-primary/40 p-5 text-sm"><p className="font-semibold">Informe o link das consultas que começam em menos de 24 horas.</p><div className="mt-3 flex flex-wrap gap-2">{consultas.filter((c) => c.status === "confirmada" && missingRoomAlert(c.inicio, !!c.meeting_url_updated_at)).map((c) => <button key={c.id} type="button" className="pill" onClick={() => setSelecionada(c)}>{horaDe(c.inicio)} · Informar link</button>)}</div></div>}
+
         {pendentesDeConclusao.length > 0 && (
           <div className="card-soft mt-8 border-primary/40 p-5 text-sm">
             <p className="font-semibold">
               {pendentesDeConclusao.length} consulta{pendentesDeConclusao.length > 1 ? "s" : ""} com horário encerrado
             </p>
             <p className="mt-1 text-muted-foreground">
-              Confirme se elas aconteceram para atualizar seu extrato.
+              Registre sua confirmação de presença; isso não executa repasses nem altera seu extrato.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {pendentesDeConclusao.map((c) => (

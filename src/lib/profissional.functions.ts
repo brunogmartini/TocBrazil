@@ -749,8 +749,10 @@ export type ConsultaAgenda = {
   valor_profissional_centavos: number;
   valor_plataforma_centavos: number;
   taxa_plataforma_centavos: number;
-  link_acesso: string | null;
-  video_url: string | null;
+  professional_confirmed_at: string | null;
+  patient_confirmed_at: string | null;
+  attendance_status: string;
+  meeting_url_updated_at: string | null;
   patient_id: string;
   paciente: string;
   codigo: string | null;
@@ -803,7 +805,7 @@ export const minhaAgendaProfissional = createServerFn({ method: "GET" })
         supabase
           .from("appointments")
           .select(
-            "id, inicio, fim, status, payment_status, duracao_minutos, valor_consulta_centavos, taxa_agendamento_centavos, valor_profissional_centavos, valor_plataforma_centavos, taxa_plataforma_centavos, link_acesso, video_url, patient_id",
+            "id, inicio, fim, status, payment_status, duracao_minutos, valor_consulta_centavos, taxa_agendamento_centavos, valor_profissional_centavos, valor_plataforma_centavos, taxa_plataforma_centavos, professional_confirmed_at, patient_confirmed_at, attendance_status, meeting_url_updated_at, patient_id",
           )
           .eq("professional_id", prof.id)
           .gte("inicio", de.toISOString())
@@ -856,16 +858,13 @@ export const marcarConsultaRealizada = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, prof } = await profissionalDoUsuario(context);
     if (!prof) return { ok: false as const, erro: "Acesso exclusivo para profissionais." };
+    if (data.status !== "cancelada") {
+      if (data.status === "nao_compareceu") return { ok: false as const, erro: "A presença será analisada pela gestão após a janela de confirmação." };
+      const { error } = await supabase.rpc("appointment_attendance_confirm", { _appointment_id: data.id, _side: "profissional" });
+      return error ? { ok: false as const, erro: "A confirmação está disponível do início até 24 horas depois." } : { ok: true as const };
+    }
     const agora = new Date().toISOString();
-    const extra =
-      data.status === "cancelada"
-        ? { cancelada_em: agora, cancelada_por: "profissional" }
-        : {
-            // A consulta ocorre fora da plataforma: quem confirma fica registrado.
-            confirmado_realizado_por: "profissional",
-            confirmado_em: agora,
-            ...(data.status === "realizada" ? { realizada_em: agora } : {}),
-          };
+    const extra = { cancelada_em: agora, cancelada_por: "profissional" };
     const { data: consulta } = await supabase
       .from("appointments")
       .select("id")
@@ -890,8 +889,7 @@ export const marcarConsultaRealizada = createServerFn({ method: "POST" })
       atorPapel: "profissional",
     });
     const { settleAsaasAppointment } = await import("@/services/asaas-settlement.server");
-    const outcome = data.status === "realizada" ? "REALIZADA" : data.status === "nao_compareceu" ? "FALTA_PACIENTE" : "FALTA_PROFISSIONAL";
-    const settlement = await settleAsaasAppointment(data.id, outcome, context.userId, "profissional");
+    const settlement = await settleAsaasAppointment(data.id, "FALTA_PROFISSIONAL", context.userId, "profissional");
     if (!settlement.ok) return { ok: false as const, erro: settlement.erro };
     return { ok: true as const };
   });
