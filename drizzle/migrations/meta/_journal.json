@@ -337,6 +337,13 @@
       "when": 1791477323693,
       "tag": "0047_legal_anon_policy_role_separation",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1791477412124,
+      "tag": "0048_legal_room_access_reacceptance",
+      "breakpoints": true
     }
   ]
 }
