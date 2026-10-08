@@ -288,6 +288,13 @@
       "when": 1791240158167,
       "tag": "0040_grant_public_professional_directory_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1791474607961,
+      "tag": "0041_appointment_private_room_and_attendance",
+      "breakpoints": true
     }
   ]
 }

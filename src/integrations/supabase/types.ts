@@ -140,6 +140,11 @@ export type Database = {
           amount_captured_centavos: number
           asaas_payment_id_a: string | null
           asaas_payment_id_b: string | null
+          attendance_decided_at: string | null
+          attendance_decided_by: string | null
+          attendance_justification: string | null
+          attendance_observation: string | null
+          attendance_status: string
           auth_expires_at: string | null
           auth_status_a: string | null
           auth_status_b: string | null
@@ -155,13 +160,17 @@ export type Database = {
           id: string
           inicio: string
           link_acesso: string | null
+          meeting_url: string | null
+          meeting_url_updated_at: string | null
           observacoes: string | null
           outcome: string | null
+          patient_confirmed_at: string | null
           patient_id: string
           payment_status: Database["public"]["Enums"]["payment_status"]
           platform_amount_centavos: number
           primeira_consulta: boolean
           professional_amount_centavos: number
+          professional_confirmed_at: string | null
           professional_id: string
           realizada_em: string | null
           remarcada_de: string | null
@@ -184,6 +193,11 @@ export type Database = {
           amount_captured_centavos?: number
           asaas_payment_id_a?: string | null
           asaas_payment_id_b?: string | null
+          attendance_decided_at?: string | null
+          attendance_decided_by?: string | null
+          attendance_justification?: string | null
+          attendance_observation?: string | null
+          attendance_status?: string
           auth_expires_at?: string | null
           auth_status_a?: string | null
           auth_status_b?: string | null
@@ -199,13 +213,17 @@ export type Database = {
           id?: string
           inicio: string
           link_acesso?: string | null
+          meeting_url?: string | null
+          meeting_url_updated_at?: string | null
           observacoes?: string | null
           outcome?: string | null
+          patient_confirmed_at?: string | null
           patient_id: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
           platform_amount_centavos?: number
           primeira_consulta?: boolean
           professional_amount_centavos?: number
+          professional_confirmed_at?: string | null
           professional_id: string
           realizada_em?: string | null
           remarcada_de?: string | null
@@ -228,6 +246,11 @@ export type Database = {
           amount_captured_centavos?: number
           asaas_payment_id_a?: string | null
           asaas_payment_id_b?: string | null
+          attendance_decided_at?: string | null
+          attendance_decided_by?: string | null
+          attendance_justification?: string | null
+          attendance_observation?: string | null
+          attendance_status?: string
           auth_expires_at?: string | null
           auth_status_a?: string | null
           auth_status_b?: string | null
@@ -243,13 +266,17 @@ export type Database = {
           id?: string
           inicio?: string
           link_acesso?: string | null
+          meeting_url?: string | null
+          meeting_url_updated_at?: string | null
           observacoes?: string | null
           outcome?: string | null
+          patient_confirmed_at?: string | null
           patient_id?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
           platform_amount_centavos?: number
           primeira_consulta?: boolean
           professional_amount_centavos?: number
+          professional_confirmed_at?: string | null
           professional_id?: string
           realizada_em?: string | null
           remarcada_de?: string | null
@@ -2064,6 +2091,49 @@ export type Database = {
       }
     }
     Functions: {
+      appointment_attendance_confirm: {
+        Args: { _appointment_id: string; _side: string }
+        Returns: undefined
+      }
+      appointment_attendance_decide: {
+        Args: {
+          _appointment_id: string
+          _justification: string
+          _observation?: string
+          _status: string
+        }
+        Returns: undefined
+      }
+      appointment_attendance_reviews: {
+        Args: never
+        Returns: {
+          attendance_decided_at: string
+          attendance_decided_by: string
+          attendance_justification: string
+          attendance_observation: string
+          attendance_status: string
+          fim: string
+          id: string
+          inicio: string
+          patient_confirmed_at: string
+          patient_id: string
+          professional_confirmed_at: string
+          professional_id: string
+          professional_name: string
+        }[]
+      }
+      appointment_room_access: {
+        Args: { _appointment_id: string }
+        Returns: {
+          meeting_url: string
+          meeting_url_updated_at: string
+          suggestion_url: string
+        }[]
+      }
+      appointment_room_update: {
+        Args: { _appointment_id: string; _url: string }
+        Returns: undefined
+      }
       avaliacoes_resumo: {
         Args: { _professional_id: string }
         Returns: {
