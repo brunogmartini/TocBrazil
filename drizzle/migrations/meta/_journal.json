@@ -295,6 +295,13 @@
       "when": 1791474607961,
       "tag": "0041_appointment_private_room_and_attendance",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1791474783509,
+      "tag": "0042_appointment_room_url_validation",
+      "breakpoints": true
     }
   ]
 }
