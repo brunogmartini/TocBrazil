@@ -388,33 +388,8 @@ function Painel() {
                 </dd>
               </div>
             </dl>
-            {consultaSelecionada.status === "confirmada" &&
-              (consultaSelecionada.linkLiberado && consultaSelecionada.link_acesso ? (
-                <div className="space-y-3">
-                  <a
-                    href={consultaSelecionada.link_acesso}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-base btn-primary w-full"
-                  >
-                    Entrar na sala do profissional
-                  </a>
-                  {consultaSelecionada.professionals?.ferramenta_instrucoes && (
-                    <p className="rounded-xl bg-muted p-4 text-xs leading-relaxed text-muted-foreground">
-                      {consultaSelecionada.professionals.ferramenta_provedor
-                        ? `${consultaSelecionada.professionals.ferramenta_provedor}: `
-                        : ""}
-                      {consultaSelecionada.professionals.ferramenta_instrucoes}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  O endereço da sala do profissional aparece aqui{" "}
-                  {consultaSelecionada.antecedenciaLinkMinutos} minutos antes do horário e continua
-                  disponível até 2 horas depois do fim da consulta.
-                </p>
-              ))}
+            <AppointmentRoom id={consultaSelecionada.id} inicio={consultaSelecionada.inicio} fim={consultaSelecionada.fim} paymentStatus={consultaSelecionada.payment_status} releaseMinutes={consultaSelecionada.antecedenciaLinkMinutos} />
+            <AttendanceConfirmation id={consultaSelecionada.id} inicio={consultaSelecionada.inicio} status={consultaSelecionada.status} attendanceStatus={consultaSelecionada.attendance_status} patientConfirmedAt={consultaSelecionada.patient_confirmed_at} professionalConfirmedAt={consultaSelecionada.professional_confirmed_at} side="paciente" onUpdated={() => queryClient.invalidateQueries({ queryKey: ["consultas"] })} />
             {consultaSelecionada.status === "confirmada" && (
               <button
                 type="button"

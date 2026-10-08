@@ -864,15 +864,7 @@ export const marcarConsultaRealizada = createServerFn({ method: "POST" })
       return error ? { ok: false as const, erro: "A confirmação está disponível do início até 24 horas depois." } : { ok: true as const };
     }
     const agora = new Date().toISOString();
-    const extra =
-      data.status === "cancelada"
-        ? { cancelada_em: agora, cancelada_por: "profissional" }
-        : {
-            // A consulta ocorre fora da plataforma: quem confirma fica registrado.
-            confirmado_realizado_por: "profissional",
-            confirmado_em: agora,
-            ...(data.status === "realizada" ? { realizada_em: agora } : {}),
-          };
+    const extra = { cancelada_em: agora, cancelada_por: "profissional" };
     const { data: consulta } = await supabase
       .from("appointments")
       .select("id")
@@ -897,8 +889,7 @@ export const marcarConsultaRealizada = createServerFn({ method: "POST" })
       atorPapel: "profissional",
     });
     const { settleAsaasAppointment } = await import("@/services/asaas-settlement.server");
-    const outcome = data.status === "realizada" ? "REALIZADA" : data.status === "nao_compareceu" ? "FALTA_PACIENTE" : "FALTA_PROFISSIONAL";
-    const settlement = await settleAsaasAppointment(data.id, outcome, context.userId, "profissional");
+    const settlement = await settleAsaasAppointment(data.id, "FALTA_PROFISSIONAL", context.userId, "profissional");
     if (!settlement.ok) return { ok: false as const, erro: settlement.erro };
     return { ok: true as const };
   });
