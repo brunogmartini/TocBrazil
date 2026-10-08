@@ -2368,8 +2368,22 @@ export type Database = {
         }
         Returns: undefined
       }
+      legal_record_acceptances_for_user: {
+        Args: {
+          _agent: string
+          _documents: Json
+          _ip: unknown
+          _sensitive: boolean
+          _user_id: string
+        }
+        Returns: undefined
+      }
       legal_revoke_consent: {
         Args: { _agent: string; _ip: unknown }
+        Returns: undefined
+      }
+      legal_revoke_consent_for_user: {
+        Args: { _user_id: string }
         Returns: undefined
       }
       meus_pacientes_agendados: {

@@ -316,6 +316,13 @@
       "when": 1791476862002,
       "tag": "0044_legal_versions_consent_and_privacy_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1791476906754,
+      "tag": "0045_legal_evidence_server_identity",
+      "breakpoints": true
     }
   ]
 }
