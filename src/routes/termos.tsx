@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { LegalDocument } from "@/components/legal-document";
-import texto from "@/content/termos-de-uso.md?raw";
+import { LegalPage, legalDocumentsQuery } from "@/components/legal-page";
 
 export const Route = createFileRoute("/termos")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(legalDocumentsQuery),
   head: () => ({
     meta: [
       { title: "Termos de Uso | TOC Brazil" },
@@ -22,7 +22,7 @@ function Termos() {
   return (
     <div className="container-page py-12 lg:py-16">
       <span className="section-label">Institucional</span>
-      <LegalDocument text={texto} />
+      <LegalPage slug="termos-de-uso" />
       <nav aria-label="Documentos relacionados" className="mt-12 flex flex-col gap-3 sm:flex-row">
         <Link to="/privacidade" className="btn-base btn-ghost">Política de Privacidade</Link>
         <Link to="/cookies" className="btn-base btn-ghost">Política de Cookies</Link>

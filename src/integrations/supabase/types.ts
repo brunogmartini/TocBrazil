@@ -1186,6 +1186,137 @@ export type Database = {
           },
         ]
       }
+      legal_acceptances: {
+        Row: {
+          accepted_at: string
+          document_slug: string
+          document_version: string
+          id: string
+          ip_address: unknown
+          kind: string
+          revoked_at: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          document_slug: string
+          document_version: string
+          id?: string
+          ip_address?: unknown
+          kind: string
+          revoked_at?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          document_slug?: string
+          document_version?: string
+          id?: string
+          ip_address?: unknown
+          kind?: string
+          revoked_at?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_acceptances_document_slug_document_version_fkey"
+            columns: ["document_slug", "document_version"]
+            isOneToOne: false
+            referencedRelation: "legal_documents"
+            referencedColumns: ["slug", "version"]
+          },
+        ]
+      }
+      legal_account_closures: {
+        Row: {
+          requested_at: string
+          user_id: string
+        }
+        Insert: {
+          requested_at?: string
+          user_id: string
+        }
+        Update: {
+          requested_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      legal_documents: {
+        Row: {
+          change_summary: string
+          content_md: string
+          id: string
+          is_active: boolean
+          published_at: string
+          requires_reacceptance: boolean
+          slug: string
+          title: string
+          version: string
+        }
+        Insert: {
+          change_summary?: string
+          content_md: string
+          id?: string
+          is_active?: boolean
+          published_at?: string
+          requires_reacceptance?: boolean
+          slug: string
+          title: string
+          version: string
+        }
+        Update: {
+          change_summary?: string
+          content_md?: string
+          id?: string
+          is_active?: boolean
+          published_at?: string
+          requires_reacceptance?: boolean
+          slug?: string
+          title?: string
+          version?: string
+        }
+        Relationships: []
+      }
+      legal_signup_receipts: {
+        Row: {
+          area: string
+          consumed_at: string | null
+          created_at: string
+          documents: Json
+          email_hash: string
+          ip_address: unknown
+          ip_hash: string
+          token_hash: string
+          user_agent: string | null
+        }
+        Insert: {
+          area: string
+          consumed_at?: string | null
+          created_at?: string
+          documents: Json
+          email_hash: string
+          ip_address?: unknown
+          ip_hash: string
+          token_hash: string
+          user_agent?: string | null
+        }
+        Update: {
+          area?: string
+          consumed_at?: string | null
+          created_at?: string
+          documents?: Json
+          email_hash?: string
+          ip_address?: unknown
+          ip_hash?: string
+          token_hash?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       livro_compras: {
         Row: {
           clicado_em: string | null
@@ -1567,6 +1698,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      privacy_requests: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          ip_hash: string | null
+          mensagem: string
+          nome: string
+          responded_at: string | null
+          status: string
+          tipo: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          ip_hash?: string | null
+          mensagem: string
+          nome: string
+          responded_at?: string | null
+          status?: string
+          tipo: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          ip_hash?: string | null
+          mensagem?: string
+          nome?: string
+          responded_at?: string | null
+          status?: string
+          tipo?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       professional_admin_contacts: {
         Row: {
@@ -2176,6 +2346,45 @@ export type Database = {
           professional_id: string
           taxa_retorno: number
         }[]
+      }
+      legal_access_allowed: { Args: { _user_id: string }; Returns: boolean }
+      legal_publish_document: {
+        Args: {
+          _content: string
+          _requires: boolean
+          _slug: string
+          _summary: string
+          _title: string
+          _version: string
+        }
+        Returns: string
+      }
+      legal_record_acceptances: {
+        Args: {
+          _agent: string
+          _documents: Json
+          _ip: unknown
+          _sensitive: boolean
+        }
+        Returns: undefined
+      }
+      legal_record_acceptances_for_user: {
+        Args: {
+          _agent: string
+          _documents: Json
+          _ip: unknown
+          _sensitive: boolean
+          _user_id: string
+        }
+        Returns: undefined
+      }
+      legal_revoke_consent: {
+        Args: { _agent: string; _ip: unknown }
+        Returns: undefined
+      }
+      legal_revoke_consent_for_user: {
+        Args: { _user_id: string }
+        Returns: undefined
       }
       meus_pacientes_agendados: {
         Args: never

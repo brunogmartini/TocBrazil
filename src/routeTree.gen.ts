@@ -25,12 +25,15 @@ import { Route as SegurancaRouteImport } from './routes/seguranca'
 import { Route as SejaParceiroRouteImport } from './routes/seja-parceiro'
 import { Route as SuporteRouteImport } from './routes/suporte'
 import { Route as TermosRouteImport } from './routes/termos'
+import { Route as TermosDeUsoRouteImport } from './routes/termos-de-uso'
+import { Route as TermosProfissionaisRouteImport } from './routes/termos-profissionais'
 import { Route as TocRouteImport } from './routes/toc'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as AuthenticatedProfissionalRouteImport } from './routes/_authenticated/profissional'
 import { Route as ConteudosIndexRouteImport } from './routes/conteudos.index'
 import { Route as ConteudosSlugRouteImport } from './routes/conteudos.$slug'
+import { Route as PrivacidadeSolicitacoesRouteImport } from './routes/privacidade_.solicitacoes'
 import { Route as ProfissionaisIndexRouteImport } from './routes/profissionais.index'
 import { Route as ProfissionaisSlugRouteImport } from './routes/profissionais.$slug'
 import { Route as AuthenticatedAgendarSlugRouteImport } from './routes/_authenticated/agendar.$slug'
@@ -126,6 +129,16 @@ const TermosRoute = TermosRouteImport.update({
   path: '/termos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermosDeUsoRoute = TermosDeUsoRouteImport.update({
+  id: '/termos-de-uso',
+  path: '/termos-de-uso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermosProfissionaisRoute = TermosProfissionaisRouteImport.update({
+  id: '/termos-profissionais',
+  path: '/termos-profissionais',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TocRoute = TocRouteImport.update({
   id: '/toc',
   path: '/toc',
@@ -155,6 +168,11 @@ const ConteudosIndexRoute = ConteudosIndexRouteImport.update({
 const ConteudosSlugRoute = ConteudosSlugRouteImport.update({
   id: '/conteudos/$slug',
   path: '/conteudos/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeSolicitacoesRoute = PrivacidadeSolicitacoesRouteImport.update({
+  id: '/privacidade_/solicitacoes',
+  path: '/privacidade/solicitacoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfissionaisIndexRoute = ProfissionaisIndexRouteImport.update({
@@ -259,11 +277,14 @@ export interface FileRoutesByFullPath {
   '/seja-parceiro': typeof SejaParceiroRoute
   '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
+  '/termos-profissionais': typeof TermosProfissionaisRoute
   '/toc': typeof TocRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/profissional': typeof AuthenticatedProfissionalRouteWithChildren
   '/conteudos/$slug': typeof ConteudosSlugRoute
+  '/privacidade/solicitacoes': typeof PrivacidadeSolicitacoesRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
   '/conteudos/': typeof ConteudosIndexRoute
   '/profissionais/': typeof ProfissionaisIndexRoute
@@ -297,10 +318,13 @@ export interface FileRoutesByTo {
   '/seja-parceiro': typeof SejaParceiroRoute
   '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
+  '/termos-profissionais': typeof TermosProfissionaisRoute
   '/toc': typeof TocRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/painel': typeof AuthenticatedPainelRoute
   '/conteudos/$slug': typeof ConteudosSlugRoute
+  '/privacidade/solicitacoes': typeof PrivacidadeSolicitacoesRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
   '/conteudos': typeof ConteudosIndexRoute
   '/profissionais': typeof ProfissionaisIndexRoute
@@ -336,11 +360,14 @@ export interface FileRoutesById {
   '/seja-parceiro': typeof SejaParceiroRoute
   '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
+  '/termos-profissionais': typeof TermosProfissionaisRoute
   '/toc': typeof TocRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/painel': typeof AuthenticatedPainelRoute
   '/_authenticated/profissional': typeof AuthenticatedProfissionalRouteWithChildren
   '/conteudos/$slug': typeof ConteudosSlugRoute
+  '/privacidade_/solicitacoes': typeof PrivacidadeSolicitacoesRoute
   '/profissionais/$slug': typeof ProfissionaisSlugRoute
   '/conteudos/': typeof ConteudosIndexRoute
   '/profissionais/': typeof ProfissionaisIndexRoute
@@ -376,11 +403,14 @@ export interface FileRouteTypes {
     | '/seja-parceiro'
     | '/suporte'
     | '/termos'
+    | '/termos-de-uso'
+    | '/termos-profissionais'
     | '/toc'
     | '/admin'
     | '/painel'
     | '/profissional'
     | '/conteudos/$slug'
+    | '/privacidade/solicitacoes'
     | '/profissionais/$slug'
     | '/conteudos/'
     | '/profissionais/'
@@ -414,10 +444,13 @@ export interface FileRouteTypes {
     | '/seja-parceiro'
     | '/suporte'
     | '/termos'
+    | '/termos-de-uso'
+    | '/termos-profissionais'
     | '/toc'
     | '/admin'
     | '/painel'
     | '/conteudos/$slug'
+    | '/privacidade/solicitacoes'
     | '/profissionais/$slug'
     | '/conteudos'
     | '/profissionais'
@@ -452,11 +485,14 @@ export interface FileRouteTypes {
     | '/seja-parceiro'
     | '/suporte'
     | '/termos'
+    | '/termos-de-uso'
+    | '/termos-profissionais'
     | '/toc'
     | '/_authenticated/admin'
     | '/_authenticated/painel'
     | '/_authenticated/profissional'
     | '/conteudos/$slug'
+    | '/privacidade_/solicitacoes'
     | '/profissionais/$slug'
     | '/conteudos/'
     | '/profissionais/'
@@ -492,8 +528,11 @@ export interface RootRouteChildren {
   SejaParceiroRoute: typeof SejaParceiroRoute
   SuporteRoute: typeof SuporteRoute
   TermosRoute: typeof TermosRoute
+  TermosDeUsoRoute: typeof TermosDeUsoRoute
+  TermosProfissionaisRoute: typeof TermosProfissionaisRoute
   TocRoute: typeof TocRoute
   ConteudosSlugRoute: typeof ConteudosSlugRoute
+  PrivacidadeSolicitacoesRoute: typeof PrivacidadeSolicitacoesRoute
   ProfissionaisSlugRoute: typeof ProfissionaisSlugRoute
   ConteudosIndexRoute: typeof ConteudosIndexRoute
   ProfissionaisIndexRoute: typeof ProfissionaisIndexRoute
@@ -621,6 +660,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/termos-de-uso': {
+      id: '/termos-de-uso'
+      path: '/termos-de-uso'
+      fullPath: '/termos-de-uso'
+      preLoaderRoute: typeof TermosDeUsoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termos-profissionais': {
+      id: '/termos-profissionais'
+      path: '/termos-profissionais'
+      fullPath: '/termos-profissionais'
+      preLoaderRoute: typeof TermosProfissionaisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/toc': {
       id: '/toc'
       path: '/toc'
@@ -661,6 +714,13 @@ declare module '@tanstack/react-router' {
       path: '/conteudos/$slug'
       fullPath: '/conteudos/$slug'
       preLoaderRoute: typeof ConteudosSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade_/solicitacoes': {
+      id: '/privacidade_/solicitacoes'
+      path: '/privacidade/solicitacoes'
+      fullPath: '/privacidade/solicitacoes'
+      preLoaderRoute: typeof PrivacidadeSolicitacoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profissionais/': {
@@ -827,8 +887,11 @@ const rootRouteChildren: RootRouteChildren = {
   SejaParceiroRoute: SejaParceiroRoute,
   SuporteRoute: SuporteRoute,
   TermosRoute: TermosRoute,
+  TermosDeUsoRoute: TermosDeUsoRoute,
+  TermosProfissionaisRoute: TermosProfissionaisRoute,
   TocRoute: TocRoute,
   ConteudosSlugRoute: ConteudosSlugRoute,
+  PrivacidadeSolicitacoesRoute: PrivacidadeSolicitacoesRoute,
   ProfissionaisSlugRoute: ProfissionaisSlugRoute,
   ConteudosIndexRoute: ConteudosIndexRoute,
   ProfissionaisIndexRoute: ProfissionaisIndexRoute,
