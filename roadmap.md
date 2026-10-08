@@ -155,3 +155,10 @@
 - [x] Registrar a foto imediatamente no cadastro e remover o arquivo novo quando a gravação falhar
 - [x] Exibir a foto privada enviada e manter sua conferência manual
 - [x] Validar persistência, formatos inválidos, computador e celular
+
+## Link por consulta e confirmação de atendimento — 08/10/2026
+- [ ] Restringir links por agendamento e aplicar a janela de liberação no banco
+- [ ] Acrescentar edição de link, aviso e alerta ao profissional
+- [ ] Registrar confirmações imutáveis e encaminhar divergências à gestão sem liquidação financeira
+- [ ] Acrescentar decisão administrativa com justificativa e auditoria
+- [ ] Testar regras, acessos diretos, computador e celular sem publicar
