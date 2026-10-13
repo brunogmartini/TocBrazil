@@ -173,3 +173,7 @@
 ## Desbloquear criação de conta profissional — 13/10/2026
 - [x] Permitir conta profissional com aceite da Política de Privacidade sem aceitar o termo pendente
 - [x] Testar caixa, envio real do formulário e evidência da versão, preservando contrato e aprovação
+
+## Cobrança após confirmação de consulta — 13/10/2026
+- [ ] Validar a ausência de liquidação após presença final e definir execução financeira separada
+- [ ] Implementar e testar liquidação idempotente no Sandbox após aprovação do plano, sem liberar pagamentos públicos
