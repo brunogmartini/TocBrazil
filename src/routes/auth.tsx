@@ -11,7 +11,8 @@ import { useQuery } from "@tanstack/react-query";
 import { legalDocumentsQuery } from "@/components/legal-page";
 import { LegalConsentFields } from "@/components/legal-consent-fields";
 import { prepareSignupConsent } from "@/lib/legal.functions";
-import { legalDocumentReady, registrationConsentAllowed, type LegalSlug } from "@/lib/legal";
+import { signupLegalDocuments, signupDocumentsReady, registrationConsentAllowed, type LegalSlug } from "@/lib/legal";
+import { Button } from "@/components/ui/button";
 
 type Modo = "entrar" | "cadastro" | "recuperar" | "nova-senha";
 type BuscaAuth = {
@@ -82,8 +83,9 @@ function Auth() {
       : (areaDoCaminho(search.redirect) ?? "paciente");
   const acessoGestor = areaPretendida === "gestor";
   const inicioPretendido = INICIO_DA_AREA[areaPretendida];
-  const applicableDocuments = (legalDocuments.data ?? []).filter(d => d.slug === "privacidade" || d.slug === (profissional ? "termos-profissionais" : "termos-de-uso"));
-  const documentsReady = applicableDocuments.length === 2 && applicableDocuments.every(d => legalDocumentReady(d.content_md));
+  const signupArea = areaPretendida === "profissional" ? "profissional" : "paciente";
+  const applicableDocuments = signupLegalDocuments(legalDocuments.data ?? [], signupArea);
+  const documentsReady = signupDocumentsReady(legalDocuments.data ?? [], signupArea);
   const consentReady = documentsReady && registrationConsentAllowed(terms, sensitive, profissional ? "profissional" : "paciente");
 
   useEffect(() => {
@@ -415,7 +417,7 @@ function Auth() {
             </label>
           )}
 
-          {modo === "cadastro" && <><LegalConsentFields area={profissional ? "profissional" : "paciente"} terms={terms} sensitive={sensitive} onTerms={setTerms} onSensitive={setSensitive} disabled={carregando || !documentsReady} /><p className="text-xs text-muted-foreground">{!documentsReady ? "Os documentos legais desta área ainda não estão disponíveis para aceite. A criação de novas contas aguarda o texto oficial." : !consentReady ? "Marque os aceites obrigatórios para criar sua conta." : "Os aceites serão registrados com a versão dos documentos."}</p></>}
+          {modo === "cadastro" && <><LegalConsentFields area={signupArea} privacyOnly={signupArea === "profissional"} terms={terms} sensitive={sensitive} onTerms={setTerms} onSensitive={setSensitive} disabled={carregando || !documentsReady} /><p className="text-xs text-muted-foreground">{legalDocuments.isPending ? "Carregando Política de Privacidade…" : !documentsReady ? "Não foi possível carregar os documentos para aceite. Tente novamente." : !consentReady ? "Marque os aceites obrigatórios para criar sua conta." : "Os aceites serão registrados com a versão dos documentos."}</p>{legalDocuments.isError && <Button type="button" variant="outline" onClick={() => void legalDocuments.refetch()}>Tentar carregar novamente</Button>}{signupArea === "profissional" && <p className="text-xs text-muted-foreground">O termo profissional permanece pendente. O contrato será disponibilizado para aceite após a conferência do seu cadastro.</p>}</>}
           {erro && <p className="text-sm text-destructive">{erro}</p>}
           {aviso && <p className="text-sm text-foreground">{aviso}</p>}
           {confirmacaoPendente && (
@@ -429,7 +431,7 @@ function Auth() {
             </button>
           )}
 
-          <button type="submit" disabled={carregando || (modo === "cadastro" && !consentReady)} className="btn-base btn-primary w-full disabled:opacity-60">
+          <Button type="submit" disabled={carregando || (modo === "cadastro" && !consentReady)} className="btn-base btn-primary w-full disabled:opacity-60">
             {carregando
               ? "Aguarde…"
               : modo === "cadastro"
@@ -439,7 +441,7 @@ function Auth() {
                   : modo === "nova-senha"
                     ? "Salvar nova senha"
                     : "Entrar"}
-          </button>
+          </Button>
         </form>
 
         {modo === "entrar" && (

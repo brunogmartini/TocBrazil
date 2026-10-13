@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
-import { legalDocumentReady, registrationConsentAllowed } from "./legal";
+import { signupLegalDocuments, signupDocumentsReady, legalDocumentReady, registrationConsentAllowed } from "./legal";
 
 const slug = z.enum(["termos-de-uso", "termos-profissionais", "privacidade"]);
 const docsSchema = z.array(z.object({ slug, version: z.string().min(1).max(40) })).min(1).max(3);
@@ -29,8 +29,8 @@ export const prepareSignupConsent = createServerFn({method:"POST"}).inputValidat
   const {supabaseAdmin}=await import("@/integrations/supabase/client.server");
   const {data: documents,error}=await supabaseAdmin.from("legal_documents").select("slug,version,content_md").eq("is_active",true).lte("published_at",new Date().toISOString());
   if(error || !documents) throw new Error("Documentos indisponíveis.");
-  const expected=documents.filter(d=>d.slug==="privacidade" || d.slug===(data.area==="paciente"?"termos-de-uso":"termos-profissionais"));
-  if(expected.length!==2 || expected.some(d=>!legalDocumentReady(d.content_md)||!data.documents.some(v=>v.slug===d.slug&&v.version===d.version))) throw new Error("O texto legal ainda não está disponível ou mudou. Recarregue a página.");
+   const expected=signupLegalDocuments(documents,data.area);
+   if(!signupDocumentsReady(documents,data.area) || data.documents.length!==expected.length || expected.some(d=>!data.documents.some(v=>v.slug===d.slug&&v.version===d.version))) throw new Error("O texto legal ainda não está disponível ou mudou. Recarregue a página.");
   const evidence=requestEvidence(); const ipHash=await digest(evidence.ip??"local-preview");
   const {count,error:limitError}=await supabaseAdmin.from("legal_signup_receipts").select("token_hash",{count:"exact",head:true}).eq("ip_hash",ipHash).gte("created_at",new Date(Date.now()-15*60000).toISOString());
   if(limitError || (count??0)>=10) throw new Error("Aguarde alguns minutos antes de tentar novamente.");
