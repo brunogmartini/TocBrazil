@@ -135,6 +135,53 @@ export type Database = {
           },
         ]
       }
+      appointment_settlement_jobs: {
+        Row: {
+          appointment_id: string
+          attempts: number
+          available_at: string
+          claim_token: string | null
+          created_at: string
+          failure_code: string | null
+          locked_until: string | null
+          outcome: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_id: string
+          attempts?: number
+          available_at?: string
+          claim_token?: string | null
+          created_at?: string
+          failure_code?: string | null
+          locked_until?: string | null
+          outcome: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string
+          attempts?: number
+          available_at?: string
+          claim_token?: string | null
+          created_at?: string
+          failure_code?: string | null
+          locked_until?: string | null
+          outcome?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_settlement_jobs_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           amount_captured_centavos: number
@@ -466,6 +513,7 @@ export type Database = {
       }
       asaas_sandbox_test_runs: {
         Row: {
+          captured_centavos: number
           created_at: string
           created_by: string
           customer_id: string | null
@@ -477,6 +525,10 @@ export type Database = {
           payment_id_b: string | null
           platform_a_centavos: number
           platform_b_centavos: number
+          settlement_claim: string | null
+          settlement_locked_until: string | null
+          settlement_outcome: string | null
+          settlement_status: string
           status_a: string | null
           status_b: string | null
           subaccount_id: string | null
@@ -485,6 +537,7 @@ export type Database = {
           wallet_id: string | null
         }
         Insert: {
+          captured_centavos?: number
           created_at?: string
           created_by: string
           customer_id?: string | null
@@ -496,6 +549,10 @@ export type Database = {
           payment_id_b?: string | null
           platform_a_centavos?: number
           platform_b_centavos?: number
+          settlement_claim?: string | null
+          settlement_locked_until?: string | null
+          settlement_outcome?: string | null
+          settlement_status?: string
           status_a?: string | null
           status_b?: string | null
           subaccount_id?: string | null
@@ -504,6 +561,7 @@ export type Database = {
           wallet_id?: string | null
         }
         Update: {
+          captured_centavos?: number
           created_at?: string
           created_by?: string
           customer_id?: string | null
@@ -515,6 +573,10 @@ export type Database = {
           payment_id_b?: string | null
           platform_a_centavos?: number
           platform_b_centavos?: number
+          settlement_claim?: string | null
+          settlement_locked_until?: string | null
+          settlement_outcome?: string | null
+          settlement_status?: string
           status_a?: string | null
           status_b?: string | null
           subaccount_id?: string | null
@@ -2311,6 +2373,60 @@ export type Database = {
           total: number
         }[]
       }
+      claim_appointment_settlement: {
+        Args: { _id: string }
+        Returns: {
+          appointment_id: string
+          attempts: number
+          available_at: string
+          claim_token: string | null
+          created_at: string
+          failure_code: string | null
+          locked_until: string | null
+          outcome: string
+          status: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "appointment_settlement_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      claim_sandbox_settlement: {
+        Args: { _id: string; _outcome: string }
+        Returns: {
+          captured_centavos: number
+          created_at: string
+          created_by: string
+          customer_id: string | null
+          failure_code: string | null
+          id: string
+          label: string
+          last_action: string
+          payment_id_a: string | null
+          payment_id_b: string | null
+          platform_a_centavos: number
+          platform_b_centavos: number
+          settlement_claim: string | null
+          settlement_locked_until: string | null
+          settlement_outcome: string | null
+          settlement_status: string
+          status_a: string | null
+          status_b: string | null
+          subaccount_id: string | null
+          total_centavos: number
+          updated_at: string
+          wallet_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "asaas_sandbox_test_runs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       concluir_consultas_vencidas: { Args: never; Returns: number }
       contato_emergencia_paciente: {
         Args: { _patient_id: string }
@@ -2324,6 +2440,16 @@ export type Database = {
         Returns: boolean
       }
       expirar_reservas_vencidas: { Args: never; Returns: number }
+      finish_appointment_settlement: {
+        Args: {
+          _captured: number
+          _claim: string
+          _id: string
+          _platform: number
+          _professional: number
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2469,6 +2595,7 @@ export type Database = {
           inicio: string
         }[]
       }
+      wake_settlement_queue: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "paciente" | "profissional" | "admin"
