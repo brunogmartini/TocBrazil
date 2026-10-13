@@ -169,3 +169,7 @@
 - [x] Disponibilizar revogação, solicitações e gestão administrativa
 - [ ] Testar isolamento, imutabilidade, bloqueios e desktop/celular; não publicar
 - [ ] Receber texto oficial do termo profissional (dependência da responsável)
+
+## Desbloquear criação de conta profissional — 13/10/2026
+- [ ] Permitir conta profissional com aceite da Política de Privacidade sem aceitar o termo pendente
+- [ ] Testar caixa, envio real do formulário e evidência da versão, preservando contrato e aprovação
