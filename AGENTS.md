@@ -34,3 +34,4 @@
 - Keep legal document versions immutable and record consent through authenticated server evidence or one-use signup receipts; why: browser checkboxes alone cannot establish versioned consent.
 - Keep legal withdrawal separate from data deletion and enforce reacceptance in database booking guards; why: history and legally retained evidence must remain available during closure review.
 - Share signup document selection between the form and receipt validator, independently of post-approval contract gates; why: account creation must not require or record acceptance of an unavailable credentialing document.
+- Select only official applicable documents in the account consent panel and allow professional privacy acceptance while public professional terms are pending; why: pending text must not disable account completion or become accepted evidence.
