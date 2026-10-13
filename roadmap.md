@@ -171,5 +171,5 @@
 - [ ] Receber texto oficial do termo profissional (dependência da responsável)
 
 ## Desbloquear criação de conta profissional — 13/10/2026
-- [ ] Permitir conta profissional com aceite da Política de Privacidade sem aceitar o termo pendente
-- [ ] Testar caixa, envio real do formulário e evidência da versão, preservando contrato e aprovação
+- [x] Permitir conta profissional com aceite da Política de Privacidade sem aceitar o termo pendente
+- [x] Testar caixa, envio real do formulário e evidência da versão, preservando contrato e aprovação
