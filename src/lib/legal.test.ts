@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { signupLegalDocuments, signupDocumentsReady, legalDocumentReady, registrationConsentAllowed } from "./legal";
+import { accountConsentDocuments, accountConsentDocumentsReady, signupLegalDocuments, signupDocumentsReady, legalDocumentReady, registrationConsentAllowed } from "./legal";
 describe("explicit legal consent", () => {
   const documents = [
     { slug: "privacidade", content_md: "Política oficial integral para leitura e concordância explícita." },
@@ -16,6 +16,17 @@ describe("explicit legal consent", () => {
     expect(signupLegalDocuments(documents, "paciente").map(d => d.slug)).toEqual(["privacidade", "termos-de-uso"]);
     expect(signupDocumentsReady(documents, "paciente")).toBe(true);
     expect(signupDocumentsReady(documents.filter(d => d.slug !== "termos-de-uso"), "paciente")).toBe(false);
+  });
+  it("allows existing professionals to accept privacy while public terms remain pending", () => {
+    expect(accountConsentDocuments(documents, "profissional").map(d => d.slug)).toEqual(["privacidade"]);
+    expect(accountConsentDocumentsReady(documents, "profissional")).toBe(true);
+    expect(accountConsentDocumentsReady(documents.filter(d => d.slug !== "privacidade"), "profissional")).toBe(false);
+  });
+  it("requires official professional terms once supplied without weakening patient acceptance", () => {
+    const official = documents.map(d => d.slug === "termos-profissionais" ? { ...d, content_md: "Termo profissional oficial integral para leitura e concordância." } : d);
+    expect(accountConsentDocuments(official, "profissional").map(d => d.slug)).toEqual(["privacidade", "termos-profissionais"]);
+    expect(accountConsentDocumentsReady(official, "profissional")).toBe(true);
+    expect(accountConsentDocumentsReady(documents.filter(d => d.slug !== "termos-de-uso"), "paciente")).toBe(false);
   });
   it("requires both patient choices", () => {
     expect(registrationConsentAllowed(false, false, "paciente")).toBe(false);

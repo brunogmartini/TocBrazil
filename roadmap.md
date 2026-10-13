@@ -173,6 +173,7 @@
 ## Desbloquear criação de conta profissional — 13/10/2026
 - [x] Permitir conta profissional com aceite da Política de Privacidade sem aceitar o termo pendente
 - [x] Testar caixa, envio real do formulário e evidência da versão, preservando contrato e aprovação
+- [ ] Corrigir também o aceite dentro da conta profissional e verificar a caixa sem registrar termo pendente
 
 ## Cobrança após confirmação de consulta — 13/10/2026
 - [ ] Validar a ausência de liquidação após presença final e definir execução financeira separada
