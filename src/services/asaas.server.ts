@@ -10,6 +10,7 @@ export type AsaasPayment = {
   status: string;
   value: number;
   externalReference?: string | null;
+  billingType?: string;
   creditCard?: { creditCardToken?: string | null };
 };
 
@@ -122,10 +123,66 @@ export async function cancelAuthorizedPayment(paymentId: string) {
   return true;
 }
 
-export async function refundPayment(paymentId: string) {
+export async function refundPayment(paymentId: string, valueCentavos?: number) {
+  // Reembolso total quando valueCentavos é omitido; parcial quando informado
+  // (usado para devolver o crédito de R$150 ao paciente, retendo a taxa).
   return request<AsaasPayment>(`/payments/${encodeURIComponent(paymentId)}/refund`, {
     method: "POST",
-    body: JSON.stringify({}),
+    body: JSON.stringify(valueCentavos ? { value: valueCentavos / 100 } : {}),
+  });
+}
+
+/* ---------- Opção 1: cobrança única via página segura ---------- */
+
+export type AsaasHostedPayment = AsaasPayment & {
+  invoiceUrl?: string;
+  billingType?: string;
+};
+
+/**
+ * Cria uma cobrança única (R$200) na página segura hospedada do Asaas, sem split:
+ * o valor é capturado e fica na conta da plataforma até a liquidação pós-consulta.
+ * billingType "UNDEFINED" deixa o paciente escolher Pix ou cartão na própria
+ * página do Asaas — nenhum dado de cartão passa pelo nosso servidor.
+ */
+export async function createHostedPayment(input: {
+  customerId: string;
+  valueCentavos: number;
+  dueDate: string; // YYYY-MM-DD
+  description: string;
+  externalReference: string;
+  billingType?: "UNDEFINED" | "PIX" | "CREDIT_CARD";
+}) {
+  return request<AsaasHostedPayment>("/payments", {
+    method: "POST",
+    body: JSON.stringify({
+      customer: input.customerId,
+      billingType: input.billingType ?? "UNDEFINED",
+      value: input.valueCentavos / 100,
+      dueDate: input.dueDate,
+      description: input.description,
+      externalReference: input.externalReference,
+    }),
+  });
+}
+
+/**
+ * Transfere a parte do profissional (R$173 realizada / R$40 no-show) da conta da
+ * plataforma para a subconta Asaas dele, após a consulta. O restante permanece
+ * como receita da plataforma e/ou crédito do paciente.
+ */
+export async function transferToWallet(input: {
+  walletId: string;
+  valueCentavos: number;
+  externalReference: string;
+}) {
+  return request<{ id: string; status: string }>("/transfers", {
+    method: "POST",
+    body: JSON.stringify({
+      value: input.valueCentavos / 100,
+      walletId: input.walletId,
+      externalReference: input.externalReference,
+    }),
   });
 }
 
