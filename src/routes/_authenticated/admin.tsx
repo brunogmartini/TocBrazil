@@ -462,7 +462,6 @@ function Admin() {
                       <Info rotulo="Áreas de experiência" valor={p.areas.join(", ")} />
                       <Info rotulo="Idiomas" valor={p.idiomas.join(", ")} />
                       <Info rotulo="Biografia" valor={p.biografia_publica} />
-                      <Info rotulo="Experiência com TOC" valor={p.temas_toc_publicos.join(", ")} />
                       <Info rotulo="Bloqueios antidesvio" valor={String(p.perfil_bloqueios_contato)} />
                       <Info rotulo="Última validação" valor={p.validado_em ? dataHoraBR(p.validado_em) : "—"} />
                       <Info rotulo="Conferência cadastral" valor={p.cadastro_conferido_em ? dataHoraBR(p.cadastro_conferido_em) : "Pendente"} />
@@ -951,7 +950,6 @@ function EdicaoProfissional({
             ["valor", "Valor da consulta (R$)"],
             ["experiencia_anos", "Anos de experiência"],
             ["abordagens_publicas", `Abordagens (${ABORDAGENS_PERFIL.join(", ")})`],
-            ["temas_toc_publicos", `Experiência com TOC (${TEMAS_TOC_PERFIL.join(", ")})`],
             ["areas", "Áreas de experiência (vírgulas)"],
             ["idiomas", `Idiomas (${IDIOMAS_PERFIL.join(", ")})`],
             ["ferramenta_provedor", "Provedor da sala virtual"],
