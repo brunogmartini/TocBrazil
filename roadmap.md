@@ -185,6 +185,7 @@
 - [ ] Confirmar envio válido pela gestão — bloqueado: a sessão disponível abriu uma conta profissional, sem acesso administrativo; nenhum cadastro real foi alterado
 
 ## Alertas de acesso público e agenda — 19/10/2026
-- [ ] Confirmar e corrigir permissões dos critérios da busca pública sem ampliar acesso a dados privados.
-- [ ] Isolar a verificação de recebimento na agenda e testar acesso autenticado e isolamento.
-- [ ] Verificar os dois resultados e encerrar os alertas confirmados.
+- [x] Confirmar e corrigir permissões dos critérios da busca pública sem ampliar acesso a dados privados.
+- [x] Isolar a verificação de recebimento na agenda; leituras autenticadas passaram e tabela financeira continua inacessível.
+- [x] Reproduzir ambos os erros antes da correção e aprovar cinco testes reais de acesso após a correção; encerrar os alertas.
+- [ ] Validar salvamento de horários por profissional elegível — conta disponível ainda está em análise; não alterar aprovação para testar.
