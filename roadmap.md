@@ -178,3 +178,7 @@
 ## Cobrança após confirmação de consulta — 13/10/2026
 - [ ] Validar a ausência de liquidação após presença final e definir execução financeira separada
 - [ ] Implementar e testar liquidação idempotente no Sandbox após aprovação do plano, sem liberar pagamentos públicos
+
+## Foto adicionada pela gestão — 19/10/2026
+- [ ] Adicionar envio e substituição de foto na análise do psicólogo, com autorização administrativa, validação e conferência manual
+- [ ] Testar validação, permissões e envio pela tela; manter somente na prévia
