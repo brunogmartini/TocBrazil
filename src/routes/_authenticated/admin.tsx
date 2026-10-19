@@ -7,6 +7,7 @@ import {
   definirStatusConsultaAdmin,
   definirStatusDocumento,
   definirStatusFoto,
+  enviarFotoProfissionalAdmin,
   definirStatusPagamento,
   definirStatusProfissional,
   excluirProfissional,
@@ -85,6 +86,7 @@ function Admin() {
   const conferirCadastro = useServerFn(conferirCadastroProfissional);
   const mudarStatusDoc = useServerFn(definirStatusDocumento);
   const mudarStatusFoto = useServerFn(definirStatusFoto);
+  const enviarFotoAdmin = useServerFn(enviarFotoProfissionalAdmin);
   const editarProf = useServerFn(editarProfissionalAdmin);
   const abrirDocumento = useServerFn(obterDocumentoCredenciamento);
   const mudarPagamento = useServerFn(definirStatusPagamento);
@@ -101,6 +103,7 @@ function Admin() {
   const [checklists, setChecklists] = useState<Record<string, Record<string, boolean>>>({});
   const [aviso, setAviso] = useState<string | null>(null);
   const [excluindo, setExcluindo] = useState<string | null>(null);
+  const [enviandoFoto, setEnviandoFoto] = useState<string | null>(null);
   const [protecaoDocumentos, setProtecaoDocumentos] = useState<{ factorId: string; qr?: string; secret?: string } | null>(null);
   const [codigoDocumentos, setCodigoDocumentos] = useState("");
   const [documentosDesbloqueados, setDocumentosDesbloqueados] = useState(false);
@@ -189,6 +192,23 @@ function Admin() {
     } finally {
       setExcluindo(null);
     }
+  }
+
+  async function adicionarFoto(p: ProfissionalAdmin, arquivo: File) {
+    if (enviandoFoto) return;
+    setAviso(null);
+    if (!["image/jpeg", "image/png", "image/webp"].includes(arquivo.type)) return setAviso("Envie uma imagem JPG, PNG ou WebP.");
+    if (arquivo.size > 5 * 1024 * 1024) return setAviso("A foto deve ter no máximo 5 MB.");
+    setEnviandoFoto(p.id);
+    try {
+      const formulario = new FormData();
+      formulario.set("id", p.id);
+      formulario.set("foto", arquivo);
+      const resultado = await enviarFotoAdmin({ data: formulario });
+      setAviso(resultado.ok ? "Foto adicionada. Confira e aprove a foto; o cadastro voltou para análise." : resultado.erro);
+      if (resultado.ok) await atualizar();
+    } catch { setAviso("Não foi possível adicionar a foto. Tente novamente."); }
+    finally { setEnviandoFoto(null); }
   }
 
   async function iniciarProtecaoDocumentos() {
@@ -470,6 +490,15 @@ function Admin() {
 
                     <div className="rounded-lg border border-border p-4">
                       <h3 className="text-base font-semibold">Foto do perfil</h3>
+                      {p.status !== "descredenciado" && <div className="mt-3">
+                        <input id={`foto-admin-${p.id}`} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" disabled={enviandoFoto !== null}
+                          onChange={(event) => { const arquivo = event.target.files?.[0]; event.target.value = ""; if (arquivo) void adicionarFoto(p, arquivo); }} />
+                        <Button type="button" variant="outline" disabled={enviandoFoto !== null}
+                          onClick={() => document.getElementById(`foto-admin-${p.id}`)?.click()}>
+                          {enviandoFoto === p.id ? "Enviando foto…" : p.foto_url ? "Substituir foto" : "Adicionar foto"}
+                        </Button>
+                        <p className="mt-2 text-xs text-muted-foreground">JPG, PNG ou WebP; até 5 MB; quadrada, com pelo menos 600 × 600 pixels.</p>
+                      </div>}
                       {p.foto_url ? <img src={p.foto_url} alt={`Foto enviada por ${p.nome}`} className="mt-3 aspect-square w-48 rounded-lg object-cover" /> : <p className="mt-2 text-sm text-muted-foreground">Nenhuma foto enviada.</p>}
                       <p className="mt-2 text-sm">Situação: <strong>{p.foto_status}</strong></p>
                       <p className="mt-1 text-xs text-muted-foreground">Confira rosto visível, imagem recente e ausência de texto, telefone, arroba ou logotipo.</p>
