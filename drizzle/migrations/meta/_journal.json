@@ -351,6 +351,13 @@
       "when": 1791910889803,
       "tag": "0049_durable_attendance_settlement_queue",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1792443945575,
+      "tag": "0050_remove_toc_themes_publication_requirement",
+      "breakpoints": true
     }
   ]
 }
