@@ -180,5 +180,6 @@
 - [ ] Implementar e testar liquidação idempotente no Sandbox após aprovação do plano, sem liberar pagamentos públicos
 
 ## Foto adicionada pela gestão — 19/10/2026
-- [ ] Adicionar envio e substituição de foto na análise do psicólogo, com autorização administrativa, validação e conferência manual
-- [ ] Testar validação, permissões e envio pela tela; manter somente na prévia
+- [x] Adicionar envio e substituição de foto na análise do psicólogo, com autorização administrativa, validação e conferência manual
+- [x] Sete testes de validação e autorização aprovados; alteração somente na prévia
+- [ ] Confirmar envio válido pela gestão — bloqueado: a sessão disponível abriu uma conta profissional, sem acesso administrativo; nenhum cadastro real foi alterado
