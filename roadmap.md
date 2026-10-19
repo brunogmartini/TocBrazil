@@ -183,3 +183,9 @@
 - [x] Adicionar envio e substituição de foto na análise do psicólogo, com autorização administrativa, validação e conferência manual
 - [x] Sete testes de validação e autorização aprovados; alteração somente na prévia
 - [ ] Confirmar envio válido pela gestão — bloqueado: a sessão disponível abriu uma conta profissional, sem acesso administrativo; nenhum cadastro real foi alterado
+
+## Alertas de acesso público e agenda — 19/10/2026
+- [x] Confirmar e corrigir permissões dos critérios da busca pública sem ampliar acesso a dados privados.
+- [x] Isolar a verificação de recebimento na agenda; leituras autenticadas passaram e tabela financeira continua inacessível.
+- [x] Reproduzir ambos os erros antes da correção e aprovar cinco testes reais de acesso após a correção; encerrar os alertas.
+- [ ] Validar salvamento de horários por profissional elegível — conta disponível ainda está em análise; não alterar aprovação para testar.
