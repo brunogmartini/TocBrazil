@@ -19,26 +19,53 @@ export async function processSettlementJob(appointmentId: string) {
     if (error || data.claim_token !== token || data.status !== "processing" || !data.locked_until || new Date(data.locked_until).getTime() < Date.now() + 60000) throw new Error("LEASE_LOST");
   }
   try {
-    const { data: a, error } = await db.from("appointments").select("id,fim,status,attendance_status,patient_confirmed_at,professional_confirmed_at,attendance_decided_at,valor_centavos,taxa_plataforma_centavos,patient_id,asaas_payment_id,asaas_payment_method,settlement_status").eq("id", appointmentId).single();
+    const { data: a, error } = await db.from("appointments").select("id,fim,status,attendance_status,patient_confirmed_at,professional_confirmed_at,attendance_decided_at,valor_centavos,taxa_plataforma_centavos,patient_id,professional_id,asaas_payment_id,asaas_payment_method,professional_transfer_id,settlement_status").eq("id", appointmentId).single();
     if (error || !a) throw new Error("APPOINTMENT_READ_FAILED");
     if (["REALIZADA", "FALTA_PACIENTE", "FALTA_PROFISSIONAL"].includes(job.outcome) && attendanceOutcome(a) !== job.outcome) throw new SettlementReview("OUTCOME_NOT_FINAL");
     if (a.settlement_status === "EXECUTADO") throw new SettlementReview("ALREADY_SETTLED");
 
     // OPÇÃO 1 — cobrança única: a plataforma já capturou os R$200 no agendamento.
-    // Aqui apenas calculamos e registramos quem recebe o quê (repasse manual ao
-    // profissional), geramos o crédito do paciente no no-show e devolvemos
-    // integralmente quando o profissional falta. Nenhuma transferência automática.
+    // Após a consulta, calculamos quem recebe o quê, geramos o crédito do paciente
+    // no no-show, devolvemos integralmente quando o profissional falta e repassamos
+    // a parte do profissional por transferência (sempre PÓS-consulta, portanto nunca
+    // antes de a consulta ocorrer). Sem subconta ativa, o repasse fica manual.
     if (a.asaas_payment_id) {
-      const { asaasConfig, refundPayment } = await import("@/services/asaas.server");
+      const { asaasConfig, refundPayment, transferToWallet } = await import("@/services/asaas.server");
       const { environment } = asaasConfig();
       const valor = a.valor_centavos;
       const taxa = a.taxa_plataforma_centavos ?? TAXA_FIXA_CENTAVOS;
       let captured = 0, platform = 0, professional = 0;
 
+      // Repasse automático ao profissional, se houver subconta Asaas ativa.
+      async function repassarProfissional(valorRepasseCentavos: number) {
+        if (valorRepasseCentavos <= 0 || a.professional_transfer_id) return;
+        const { data: conta } = await db
+          .from("asaas_professional_accounts")
+          .select("wallet_id,status,environment")
+          .eq("professional_id", a.professional_id)
+          .maybeSingle();
+        if (!conta || conta.status !== "ativa" || !conta.wallet_id || conta.environment !== environment) {
+          // Sem subconta ativa: repasse manual pela gestão.
+          await db.from("appointments").update({ professional_transfer_status: "manual_pendente" }).eq("id", a.id);
+          return;
+        }
+        await lease();
+        const transfer = await transferToWallet({
+          walletId: conta.wallet_id,
+          valueCentavos: valorRepasseCentavos,
+          externalReference: a.id,
+        });
+        await db
+          .from("appointments")
+          .update({ professional_transfer_id: transfer.id, professional_transfer_status: transfer.status ?? "solicitada" })
+          .eq("id", a.id);
+      }
+
       if (job.outcome === "REALIZADA") {
         captured = valor;
         platform = taxa;
         professional = valor - taxa;
+        await repassarProfissional(professional);
       } else if (job.outcome === "FALTA_PACIENTE") {
         await lease();
         captured = NO_SHOW_FEE_CENTAVOS;
@@ -59,6 +86,7 @@ export async function processSettlementJob(appointmentId: string) {
           // 23505 = crédito já gerado numa tentativa anterior (idempotente).
           if (credErr && credErr.code !== "23505") throw new Error("CREDIT_SAVE_FAILED");
         }
+        await repassarProfissional(professional);
       } else if (job.outcome === "FALTA_PROFISSIONAL") {
         await lease();
         await refundPayment(a.asaas_payment_id); // devolução integral ao paciente

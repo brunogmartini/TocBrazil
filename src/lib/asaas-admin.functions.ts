@@ -42,6 +42,58 @@ export const criarSubcontaTesteAsaas = createServerFn({ method: "POST" }).middle
   }
 });
 
+const provisionSchema = z.object({
+  professionalId: z.string().uuid(),
+  name: z.string().trim().min(3).max(120),
+  email: z.string().email(),
+  cpfCnpj: z.string().transform((v) => v.replace(/\D/g, "")).pipe(z.string().min(11).max(14)),
+  birthDate: z.string().date(),
+  mobilePhone: z.string().transform((v) => v.replace(/\D/g, "")).pipe(z.string().min(10).max(13)),
+  incomeValue: z.coerce.number().positive().max(1_000_000),
+  postalCode: z.string().transform((v) => v.replace(/\D/g, "")).pipe(z.string().length(8)),
+  address: z.string().trim().min(3).max(120),
+  addressNumber: z.string().trim().min(1).max(20),
+  province: z.string().trim().min(2).max(80),
+  complement: z.string().trim().max(80).optional(),
+});
+
+/**
+ * Provisiona a subconta Asaas de produção do profissional e guarda o wallet_id,
+ * que é o destino do repasse automático na liquidação. Exige gestor + 2FA.
+ * Os dados de KYC (endereço, nascimento, renda, CEP) precisam ser coletados do
+ * profissional — não ficam todos no registro público dele.
+ */
+export const provisionarContaProfissionalAsaas = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => provisionSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context.supabase, context.userId, context.claims);
+    const { asaasConfig, createSubaccount } = await import("@/services/asaas.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { environment } = asaasConfig();
+    if (environment !== "production") {
+      return { ok: false as const, erro: "Provisionamento de subconta disponível apenas em produção." };
+    }
+    try {
+      const { professionalId, ...kyc } = data;
+      const conta = await createSubaccount({ ...kyc, complement: data.complement ?? null });
+      const { error } = await supabaseAdmin.from("asaas_professional_accounts").upsert({
+        professional_id: professionalId,
+        environment,
+        asaas_account_id: conta.id,
+        wallet_id: conta.walletId,
+        status: "ativa",
+        failure_code: null,
+      });
+      if (error) return { ok: false as const, erro: "A subconta foi criada, mas não pôde ser registrada." };
+      await supabaseAdmin.from("audit_log").insert({ actor_id: context.userId, actor_role: "admin", action: "asaas_subaccount_provisioned", entity: "professional", entity_id: professionalId, metadata: { environment } });
+      return { ok: true as const, walletId: conta.walletId };
+    } catch (error) {
+      console.error("Asaas subaccount provisioning failed", { code: error instanceof Error ? error.message : "UNKNOWN" });
+      return { ok: false as const, erro: "O Asaas recusou os dados da subconta do profissional." };
+    }
+  });
+
 const actionSchema = z.object({ runId: z.string().uuid(), portion: z.enum(["A", "B"]), action: z.enum(["refresh", "capture", "cancel"]) });
 export const executarAcaoTesteAsaas = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input) => actionSchema.parse(input)).handler(async ({ data, context }) => {
   await requireAdmin(context.supabase, context.userId, context.claims);
