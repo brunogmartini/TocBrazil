@@ -28,6 +28,7 @@
 - Store professional administrative phone numbers in an owner/admin-only contact table, not the public-readable professional record; why: RLS exposes the entire eligible professional row.
 - Evaluate public professional eligibility through a narrow security-definer helper for private receiving and schedule tables; why: public listing must not grant financial-table access or block owner registration.
 - Validate and audit manager-entered professional data on the server and return edited profiles to pending review; why: assistance must not bypass credentialing or publication gates.
+- Admin profile photos are uploaded through an authenticated server function with role and actual-image validation, stored privately, and reset to pending review; why: delegated uploads must not widen Storage permissions or bypass publication gates.
 
 - Keep appointment meeting URLs behind owner-scoped database RPCs and exclude URL columns from authenticated general SELECT grants; why: patient access must obey the payment and time window even through direct database calls.
 - Keep dual attendance confirmations and administrative adjudication in attendance_status, independent of appointment financial status and settlement; why: presence decisions must not capture, refund or distribute payments in this phase.
