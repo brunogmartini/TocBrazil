@@ -723,11 +723,10 @@ export function calcularEtapa(
     (prof.biografia_publica?.trim().length ?? 0) >= 20 &&
     Array.isArray(prof.formacoes_publicas) && prof.formacoes_publicas.length > 0 &&
     (prof.abordagens_publicas?.length ?? 0) > 0 &&
-    (prof.temas_toc_publicos?.length ?? 0) > 0 &&
     (prof.idiomas?.length ?? 0) > 0,
   );
   if (!dadosOk) {
-    return { chave: "dados", titulo: "Perfil em preenchimento", descricao: "Complete formação, biografia, abordagens, experiência com TOC e idiomas.", indice: 1 };
+    return { chave: "dados", titulo: "Perfil em preenchimento", descricao: "Complete formação, biografia, abordagens e idiomas.", indice: 1 };
   }
   if (documentos.length === 0) {
     return { chave: "documentos", titulo: "Aguardando documentos", descricao: "Envie identidade, registro e diplomas.", indice: 2 };

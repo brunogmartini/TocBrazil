@@ -133,12 +133,6 @@ function Perfil() {
               </p>
             </section>
             <section className="card-soft p-6">
-              <h2 className="text-lg">Experiência com TOC</h2>
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {p.temas_toc_publicos.map((tema) => <li key={tema} className="pill">{tema}</li>)}
-              </ul>
-            </section>
-            <section className="card-soft p-6">
               <h2 className="text-lg">Áreas de experiência e idiomas</h2>
               <ul className="mt-3 flex flex-wrap gap-2">
                 {p.areas.map((a) => (
