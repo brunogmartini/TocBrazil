@@ -6,6 +6,7 @@ import { cpfValido, cnpjValido } from "@/lib/documento-pessoa";
 import { primeiraDeteccaoPerfil, ROTULO_ANTICONTATO } from "@/lib/anticontato";
 import { ABORDAGENS_PERFIL, IDIOMAS_PERFIL, TEMAS_TOC_PERFIL } from "@/lib/perfil-profissional";
 import { TAXA_FIXA_CENTAVOS, valorProfissionalCentavos } from "@/lib/precos";
+import { z } from "zod";
 
 export type PacienteAdmin = {
   id: string;
@@ -730,6 +731,47 @@ export const definirStatusDocumento = createServerFn({ method: "POST" })
       .update({ status: data.status, observacao_admin: data.observacao })
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível atualizar o documento." };
+    return { ok: true as const };
+  });
+
+export const enviarFotoProfissionalAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: FormData) => {
+    if (!(input instanceof FormData)) throw new Error("Envio inválido.");
+    const id = z.string().uuid().parse(input.get("id"));
+    const arquivo = input.get("foto");
+    if (!(arquivo instanceof File) || arquivo.size > 5 * 1024 * 1024) throw new Error("Envie uma foto de até 5 MB.");
+    return { id, arquivo };
+  })
+  .handler(async ({ data, context }) => {
+    const { exigirAdminFoto, validarFotoAdmin } = await import("@/lib/foto-admin");
+    const { data: admin, error: roleError } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    exigirAdminFoto(roleError ? false : admin);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profissional, error: leituraErro } = await supabaseAdmin.from("professionals")
+      .select("id, user_id, foto_caminho, status").eq("id", data.id).maybeSingle();
+    if (leituraErro || !profissional || profissional.status === "descredenciado") return { ok: false as const, erro: "Cadastro indisponível para envio de foto." };
+    const bytes = new Uint8Array(await data.arquivo.arrayBuffer());
+    let extensao;
+    try { extensao = validarFotoAdmin(bytes, data.arquivo.type); }
+    catch (error) { return { ok: false as const, erro: error instanceof Error ? error.message : "Imagem inválida." }; }
+    const caminho = `${profissional.user_id ?? profissional.id}/perfil-admin-${crypto.randomUUID()}.${extensao}`;
+    const bucket = supabaseAdmin.storage.from("fotos-profissionais");
+    const { error: uploadErro } = await bucket.upload(caminho, bytes, { contentType: data.arquivo.type, upsert: false });
+    if (uploadErro) return { ok: false as const, erro: "Não foi possível enviar a foto. Tente novamente." };
+    const { data: atualizado, error: registroErro } = await supabaseAdmin.from("professionals").update({
+      foto_caminho: caminho, foto_status: "pendente", foto_moderada_em: null,
+      foto_moderada_por: null, foto_observacao: null, status: "pendente",
+    }).eq("id", data.id).eq("status", profissional.status)
+      .filter("foto_caminho", profissional.foto_caminho ? "eq" : "is", profissional.foto_caminho ?? "null")
+      .select("id").maybeSingle();
+    if (registroErro || !atualizado) {
+      await bucket.remove([caminho]);
+      return { ok: false as const, erro: "Não foi possível registrar a foto. Atualize a análise e tente novamente." };
+    }
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "profile_data_changed", entity: "professional", entityId: data.id,
+      metadata: { fields: ["foto_caminho", "foto_status", "status"] } });
     return { ok: true as const };
   });
 
