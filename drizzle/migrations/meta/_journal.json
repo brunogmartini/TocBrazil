@@ -365,6 +365,27 @@
       "when": 1792447910826,
       "tag": "0051_repair_directory_and_availability_policy_permissions",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1792447911826,
+      "tag": "0052_patient_credit_ledger",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1792447912826,
+      "tag": "0053_asaas_single_payment_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1792447913826,
+      "tag": "0054_settlement_enqueue_single_payment",
+      "breakpoints": true
     }
   ]
 }
