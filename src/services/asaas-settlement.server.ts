@@ -1,5 +1,11 @@
 import { attendanceOutcome, reconcileSettlement, SettlementReview, type SettlementOutcome } from "@/lib/settlement";
 import { settlementProvider } from "@/services/settlement-provider.server";
+import {
+  NO_SHOW_FEE_CENTAVOS,
+  NO_SHOW_PLATAFORMA_CENTAVOS,
+  NO_SHOW_PROFISSIONAL_CENTAVOS,
+  TAXA_FIXA_CENTAVOS,
+} from "@/lib/precos";
 
 export async function processSettlementJob(appointmentId: string) {
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
@@ -13,10 +19,68 @@ export async function processSettlementJob(appointmentId: string) {
     if (error || data.claim_token !== token || data.status !== "processing" || !data.locked_until || new Date(data.locked_until).getTime() < Date.now() + 60000) throw new Error("LEASE_LOST");
   }
   try {
-    const { data: a, error } = await db.from("appointments").select("id,fim,status,attendance_status,patient_confirmed_at,professional_confirmed_at,attendance_decided_at,valor_centavos,settlement_status").eq("id", appointmentId).single();
+    const { data: a, error } = await db.from("appointments").select("id,fim,status,attendance_status,patient_confirmed_at,professional_confirmed_at,attendance_decided_at,valor_centavos,taxa_plataforma_centavos,patient_id,asaas_payment_id,asaas_payment_method,settlement_status").eq("id", appointmentId).single();
     if (error || !a) throw new Error("APPOINTMENT_READ_FAILED");
     if (["REALIZADA", "FALTA_PACIENTE", "FALTA_PROFISSIONAL"].includes(job.outcome) && attendanceOutcome(a) !== job.outcome) throw new SettlementReview("OUTCOME_NOT_FINAL");
     if (a.settlement_status === "EXECUTADO") throw new SettlementReview("ALREADY_SETTLED");
+
+    // OPÇÃO 1 — cobrança única: a plataforma já capturou os R$200 no agendamento.
+    // Aqui apenas calculamos e registramos quem recebe o quê (repasse manual ao
+    // profissional), geramos o crédito do paciente no no-show e devolvemos
+    // integralmente quando o profissional falta. Nenhuma transferência automática.
+    if (a.asaas_payment_id) {
+      const { asaasConfig, refundPayment } = await import("@/services/asaas.server");
+      const { environment } = asaasConfig();
+      const valor = a.valor_centavos;
+      const taxa = a.taxa_plataforma_centavos ?? TAXA_FIXA_CENTAVOS;
+      let captured = 0, platform = 0, professional = 0;
+
+      if (job.outcome === "REALIZADA") {
+        captured = valor;
+        platform = taxa;
+        professional = valor - taxa;
+      } else if (job.outcome === "FALTA_PACIENTE") {
+        await lease();
+        captured = NO_SHOW_FEE_CENTAVOS;
+        platform = NO_SHOW_PLATAFORMA_CENTAVOS;
+        professional = NO_SHOW_PROFISSIONAL_CENTAVOS;
+        const credito = valor - NO_SHOW_FEE_CENTAVOS;
+        if (credito > 0) {
+          const origin = a.asaas_payment_method === "PIX" ? "no_show_pix" : "no_show_cartao";
+          const { error: credErr } = await db.from("patient_credits").insert({
+            patient_id: a.patient_id,
+            appointment_id: a.id,
+            environment,
+            amount_centavos: credito,
+            origin,
+            provider_payment_id: a.asaas_payment_id,
+            status: "disponivel",
+          });
+          // 23505 = crédito já gerado numa tentativa anterior (idempotente).
+          if (credErr && credErr.code !== "23505") throw new Error("CREDIT_SAVE_FAILED");
+        }
+      } else if (job.outcome === "FALTA_PROFISSIONAL") {
+        await lease();
+        await refundPayment(a.asaas_payment_id); // devolução integral ao paciente
+        captured = 0;
+        platform = 0;
+        professional = 0;
+      } else {
+        throw new SettlementReview("OUTCOME_UNSUPPORTED");
+      }
+
+      const { data: finishedOne, error: finishOneError } = await db.rpc("finish_appointment_settlement", {
+        _id: appointmentId,
+        _claim: token,
+        _captured: captured,
+        _platform: platform,
+        _professional: professional,
+      });
+      if (finishOneError || !finishedOne) throw new Error("FINISH_FAILED");
+      return { ok: true as const, capturedCentavos: captured };
+    }
+
+    // LEGADO — modelo A/B de pré-autorização (mantido por compatibilidade).
     const { data: auths, error: authError } = await db.from("asaas_payment_authorizations").select("*").eq("appointment_id", appointmentId).order("portion");
     if (authError || !auths) throw new Error("AUTHORIZATION_READ_FAILED");
     // Appointment processing is production-only and explicitly disabled until launch approval.

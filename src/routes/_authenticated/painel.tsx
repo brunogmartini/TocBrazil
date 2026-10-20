@@ -26,6 +26,7 @@ import { criarPreferenciaRecorrencia, remarcarConsulta, responderPesquisaPosCons
 import { AttendanceConfirmation } from "@/components/attendance-confirmation";
 import { AppointmentRoom } from "@/components/appointment-room";
 import { AsaasCardForm } from "@/components/asaas-card-form";
+import { CreditoPaciente } from "@/components/credito-paciente";
 import { LegalUserPanel } from "@/components/legal-user-panel";
 
 export const Route = createFileRoute("/_authenticated/painel")({
@@ -333,6 +334,7 @@ function Painel() {
               Atualizar meus dados
             </button>
           </div>
+          <CreditoPaciente />
         </aside>
       </div>
 
