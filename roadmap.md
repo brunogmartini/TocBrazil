@@ -189,3 +189,10 @@
 - [x] Isolar a verificação de recebimento na agenda; leituras autenticadas passaram e tabela financeira continua inacessível.
 - [x] Reproduzir ambos os erros antes da correção e aprovar cinco testes reais de acesso após a correção; encerrar os alertas.
 - [ ] Validar salvamento de horários por profissional elegível — conta disponível ainda está em análise; não alterar aprovação para testar.
+
+## Banco de dados e mudanças pendentes — 25/10/2026
+- [x] Confirmar que o banco do projeto já está ativo e respondendo; não havia nada a ativar
+- [x] Identificar três mudanças que chegaram pelo GitHub sem nunca terem chegado ao banco: crédito do paciente, campos de pagamento da consulta e função da fila de liquidação
+- [x] Aplicar as três na ordem registrada e confirmar no banco as duas tabelas de crédito, os cinco campos da consulta e a função atualizada da fila
+- [x] Conferir que o site volta a compilar com os tipos atualizados (compilação aprovada)
+- [ ] Validar crédito e liquidação no Sandbox antes de liberar pagamentos públicos
