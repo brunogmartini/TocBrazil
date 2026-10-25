@@ -386,6 +386,13 @@
       "when": 1792447913826,
       "tag": "0054_settlement_enqueue_single_payment",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1792953034517,
+      "tag": "0055_document_patient_credit_tables",
+      "breakpoints": true
     }
   ]
 }

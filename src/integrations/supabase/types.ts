@@ -185,8 +185,11 @@ export type Database = {
       appointments: {
         Row: {
           amount_captured_centavos: number
+          asaas_invoice_url: string | null
+          asaas_payment_id: string | null
           asaas_payment_id_a: string | null
           asaas_payment_id_b: string | null
+          asaas_payment_method: string | null
           attendance_decided_at: string | null
           attendance_decided_by: string | null
           attendance_justification: string | null
@@ -219,6 +222,8 @@ export type Database = {
           professional_amount_centavos: number
           professional_confirmed_at: string | null
           professional_id: string
+          professional_transfer_id: string | null
+          professional_transfer_status: string | null
           realizada_em: string | null
           remarcada_de: string | null
           reserva_expira_em: string | null
@@ -238,8 +243,11 @@ export type Database = {
         }
         Insert: {
           amount_captured_centavos?: number
+          asaas_invoice_url?: string | null
+          asaas_payment_id?: string | null
           asaas_payment_id_a?: string | null
           asaas_payment_id_b?: string | null
+          asaas_payment_method?: string | null
           attendance_decided_at?: string | null
           attendance_decided_by?: string | null
           attendance_justification?: string | null
@@ -272,6 +280,8 @@ export type Database = {
           professional_amount_centavos?: number
           professional_confirmed_at?: string | null
           professional_id: string
+          professional_transfer_id?: string | null
+          professional_transfer_status?: string | null
           realizada_em?: string | null
           remarcada_de?: string | null
           reserva_expira_em?: string | null
@@ -291,8 +301,11 @@ export type Database = {
         }
         Update: {
           amount_captured_centavos?: number
+          asaas_invoice_url?: string | null
+          asaas_payment_id?: string | null
           asaas_payment_id_a?: string | null
           asaas_payment_id_b?: string | null
+          asaas_payment_method?: string | null
           attendance_decided_at?: string | null
           attendance_decided_by?: string | null
           attendance_justification?: string | null
@@ -325,6 +338,8 @@ export type Database = {
           professional_amount_centavos?: number
           professional_confirmed_at?: string | null
           professional_id?: string
+          professional_transfer_id?: string | null
+          professional_transfer_status?: string | null
           realizada_em?: string | null
           remarcada_de?: string | null
           reserva_expira_em?: string | null
@@ -1558,6 +1573,106 @@ export type Database = {
             columns: ["professional_id"]
             isOneToOne: false
             referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patient_credit_refunds: {
+        Row: {
+          amount_centavos: number
+          created_at: string
+          credit_id: string
+          environment: string
+          failure_code: string | null
+          id: string
+          patient_id: string
+          processed_at: string | null
+          provider_refund_id: string | null
+          requested_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_centavos: number
+          created_at?: string
+          credit_id: string
+          environment?: string
+          failure_code?: string | null
+          id?: string
+          patient_id: string
+          processed_at?: string | null
+          provider_refund_id?: string | null
+          requested_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_centavos?: number
+          created_at?: string
+          credit_id?: string
+          environment?: string
+          failure_code?: string | null
+          id?: string
+          patient_id?: string
+          processed_at?: string | null
+          provider_refund_id?: string | null
+          requested_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_credit_refunds_credit_id_fkey"
+            columns: ["credit_id"]
+            isOneToOne: true
+            referencedRelation: "patient_credits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patient_credits: {
+        Row: {
+          amount_centavos: number
+          appointment_id: string
+          created_at: string
+          environment: string
+          id: string
+          origin: string
+          patient_id: string
+          provider_payment_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_centavos: number
+          appointment_id: string
+          created_at?: string
+          environment?: string
+          id?: string
+          origin: string
+          patient_id: string
+          provider_payment_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_centavos?: number
+          appointment_id?: string
+          created_at?: string
+          environment?: string
+          id?: string
+          origin?: string
+          patient_id?: string
+          provider_payment_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_credits_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
             referencedColumns: ["id"]
           },
         ]
