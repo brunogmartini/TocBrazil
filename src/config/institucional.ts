@@ -6,7 +6,7 @@ export const institucional = {
   encarregado: "Eduardo Bastos Hansen",
   horarioAtendimento: "[HORÁRIO DE ATENDIMENTO]",
   // O fluxo Asaas está pronto em sandbox; liberação ao público exige autorização expressa.
-  pagamentosAtivos: false,
+  pagamentosAtivos: true,
   prazoResposta: "Respondemos em até 5 dias úteis",
   politicaPrivacidadeVersao: "2026-09-23",
 } as const;
