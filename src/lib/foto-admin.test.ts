@@ -20,7 +20,8 @@ describe("foto adicionada pela gestão", () => {
     for (const tamanho of [1, 300, 599, 1200, 4000]) expect(validarFotoAdmin(png(tamanho, tamanho), "image/png")).toBe("png");
   });
   it("aceita retrato, paisagem e a foto enviada anteriormente", () => {
-    for (const [largura, altura] of [[600, 800], [1200, 600], [1078, 1074]]) expect(validarFotoAdmin(png(largura, altura), "image/png")).toBe("png");
+    const dimensoes: [number, number][] = [[600, 800], [1200, 600], [1078, 1074]];
+    for (const [largura, altura] of dimensoes) expect(validarFotoAdmin(png(largura, altura), "image/png")).toBe("png");
   });
   it("recusa dimensões vazias", () => expect(() => validarFotoAdmin(png(0, 600), "image/png")).toThrow());
   it("recusa arquivo acima de 5 MB", () => expect(() => validarFotoAdmin(new Uint8Array(LIMITE_FOTO_BYTES + 1), "image/png")).toThrow());

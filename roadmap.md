@@ -199,4 +199,4 @@
 
 ## Dimensões das fotos profissionais — 30/10/2026
 - [x] Remover exigência de foto quadrada e resolução mínima no cadastro e no envio pela gestão, preservando formato válido, limite de 5 MB e revisão manual.
-- [ ] Executar testes das diferentes resoluções e proporções.
+- [x] Oito testes de resolução, proporção, formato, limite de arquivo e autorização passaram; envio real administrativo continua dependente de sessão de gestão.
