@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import logoAsset from "@/assets/toc-brazil-logo.png.asset.json";
@@ -17,6 +18,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [minhaAreaTo, setMinhaAreaTo] = useState<Inicio | null>(null);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     let ativo = true;
@@ -48,6 +50,15 @@ export function SiteHeader() {
   }, [navigate]);
 
   const logado = minhaAreaTo !== null;
+
+  async function sair() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    setMinhaAreaTo(null);
+    setOpen(false);
+    navigate({ to: "/", replace: true });
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-xl">
@@ -85,7 +96,11 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-2 lg:flex">
           <Link to="/cadastro-profissional" className="btn-base btn-ghost">Sou psicólogo</Link>
-          <Link to="/auth" search={{ modo: "entrar" as const, redirect: undefined }} className="btn-base btn-primary">Entrar</Link>
+          {logado ? (
+            <button type="button" onClick={() => void sair()} className="btn-base btn-primary">Sair</button>
+          ) : (
+            <Link to="/auth" search={{ modo: "entrar" as const, redirect: undefined }} className="btn-base btn-primary">Entrar</Link>
+          )}
         </div>
 
         <button
@@ -124,7 +139,12 @@ export function SiteHeader() {
             )}
 
             <Link to="/cadastro-profissional" onClick={() => setOpen(false)} className="rounded-xl px-2 py-3 text-sm font-medium text-foreground">Sou psicólogo</Link>
-            <Link to="/auth" search={{ modo: "entrar" as const, redirect: undefined }} onClick={() => setOpen(false)} className="btn-base btn-primary mt-3 w-full">Entrar</Link>
+            {logado ? (
+              <button type="button" onClick={() => void sair()} className="btn-base btn-primary mt-3 w-full">Sair</button>
+            ) : (
+              <Link to="/auth" search={{ modo: "entrar" as const, redirect: undefined }} onClick={() => setOpen(false)} className="btn-base btn-primary mt-3 w-full">Entrar</Link>
+            )}
+
           </nav>
         </div>
       )}
