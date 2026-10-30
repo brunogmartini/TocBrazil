@@ -196,3 +196,7 @@
 - [x] Aplicar as três na ordem registrada e confirmar no banco as duas tabelas de crédito, os cinco campos da consulta e a função atualizada da fila
 - [x] Conferir que o site volta a compilar com os tipos atualizados (compilação aprovada)
 - [ ] Validar crédito e liquidação no Sandbox antes de liberar pagamentos públicos
+
+## Dimensões das fotos profissionais — 30/10/2026
+- [x] Remover exigência de foto quadrada e resolução mínima no cadastro e no envio pela gestão, preservando formato válido, limite de 5 MB e revisão manual.
+- [x] Oito testes de resolução, proporção, formato, limite de arquivo e autorização passaram; envio real administrativo continua dependente de sessão de gestão.

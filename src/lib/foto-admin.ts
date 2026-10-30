@@ -14,8 +14,8 @@ export function validarFotoAdmin(bytes: Uint8Array, mime: string) {
   let dimensoes;
   try { dimensoes = imageSize(bytes); } catch { throw new Error("Imagem inválida."); }
   if (dimensoes.type !== extensao) throw new Error("O formato da imagem não corresponde ao arquivo enviado.");
-  if (dimensoes.width < 600 || dimensoes.height < 600 || dimensoes.width !== dimensoes.height) {
-    throw new Error("A foto precisa ser quadrada e ter pelo menos 600 × 600 pixels.");
+  if (!Number.isInteger(dimensoes.width) || !Number.isInteger(dimensoes.height) || dimensoes.width <= 0 || dimensoes.height <= 0) {
+    throw new Error("Imagem inválida.");
   }
   return extensao;
 }

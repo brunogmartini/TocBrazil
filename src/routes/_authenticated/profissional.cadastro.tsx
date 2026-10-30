@@ -257,8 +257,8 @@ function CadastroProfissional() {
       imagem.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Imagem inválida.")); };
       imagem.src = url;
     }).catch(() => null);
-    if (!dimensoes || dimensoes.largura < 600 || dimensoes.altura < 600 || dimensoes.largura !== dimensoes.altura) {
-      return setErro("A foto precisa ser quadrada e ter pelo menos 600 × 600 pixels.");
+    if (!dimensoes || dimensoes.largura <= 0 || dimensoes.altura <= 0) {
+      return setErro("Imagem inválida.");
     }
     setEnviandoFoto(true);
     try {
@@ -442,7 +442,7 @@ function CadastroProfissional() {
         <div>
           <label htmlFor="foto-perfil" className="section-label">Foto do perfil</label>
           <input id="foto-perfil" type="file" accept="image/jpeg,image/png,image/webp" className="field-base mt-2" disabled={enviandoFoto} onChange={(e) => { const arquivo = e.target.files?.[0]; if (arquivo) void enviarFoto(arquivo); e.target.value = ""; }} />
-          <p className="mt-1 text-xs text-muted-foreground">Rosto visível, recente, quadrada e com no mínimo 600 × 600 pixels. A publicação depende de conferência manual.</p>
+          <p className="mt-1 text-xs text-muted-foreground">Rosto visível e foto recente. JPG, PNG ou WebP de até 5 MB, em diferentes dimensões. A publicação depende de conferência manual.</p>
           {dados.data?.profissional?.foto_url_temporaria && (
             <img
               src={dados.data.profissional.foto_url_temporaria}
