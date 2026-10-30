@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import logoAsset from "@/assets/toc-brazil-logo.png.asset.json";
@@ -17,6 +18,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [minhaAreaTo, setMinhaAreaTo] = useState<Inicio | null>(null);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     let ativo = true;
