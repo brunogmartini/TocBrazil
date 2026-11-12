@@ -200,3 +200,9 @@
 ## Dimensões das fotos profissionais — 30/10/2026
 - [x] Remover exigência de foto quadrada e resolução mínima no cadastro e no envio pela gestão, preservando formato válido, limite de 5 MB e revisão manual.
 - [x] Oito testes de resolução, proporção, formato, limite de arquivo e autorização passaram; envio real administrativo continua dependente de sessão de gestão.
+
+## Resposta dos botões de aprovação — 12/11/2026
+- [x] Identificar avisos fora da área visível e requisitos pendentes do perfil de teste; não alterar aprovação, publicação ou pagamentos.
+- [x] Mostrar resultado e andamento junto dos botões; três testes de sucesso, recusa e falha de sessão passaram e compilação aprovada.
+- [ ] Verificar cliques com sessão administrativa autorizada — a sessão própria disponível é de paciente; depende da escolha da conta de gestão.
+- [ ] Liberar agenda para teste de pagamento isolado — depende de ambiente de teste separado e requisitos de cadastro, contrato e recebimento; não publicar dados fictícios.

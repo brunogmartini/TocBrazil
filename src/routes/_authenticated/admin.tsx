@@ -27,6 +27,7 @@ import { AttendanceAdmin } from "@/components/attendance-admin";
 import { AsaasAdminLab } from "@/components/asaas-admin-lab";
 import { LegalAdmin } from "@/components/legal-admin";
 import { Button } from "@/components/ui/button";
+import { executarAcaoAdmin } from "@/lib/admin-action";
 import { supabase } from "@/integrations/supabase/client";
 import { ABORDAGENS_PERFIL, IDIOMAS_PERFIL, TEMAS_TOC_PERFIL } from "@/lib/perfil-profissional";
 
@@ -102,6 +103,8 @@ function Admin() {
   const [observacao, setObservacao] = useState<Record<string, string>>({});
   const [checklists, setChecklists] = useState<Record<string, Record<string, boolean>>>({});
   const [aviso, setAviso] = useState<string | null>(null);
+  const [resultadoPerfil, setResultadoPerfil] = useState<{ id: string; mensagem: string; ok: boolean } | null>(null);
+  const [acaoPerfil, setAcaoPerfil] = useState<{ id: string; tipo: "conferencia" | "status" } | null>(null);
   const [excluindo, setExcluindo] = useState<string | null>(null);
   const [enviandoFoto, setEnviandoFoto] = useState<string | null>(null);
   const [protecaoDocumentos, setProtecaoDocumentos] = useState<{ factorId: string; qr?: string; secret?: string } | null>(null);
@@ -171,11 +174,29 @@ function Admin() {
     status: "pendente" | "aprovado" | "rejeitado" | "suspenso",
     requerCorrecao = false,
   ) {
-    const r = await mudarStatusProf({
+    await executarPerfil(p, "status", () => mudarStatusProf({
       data: { id: p.id, status, observacao: observacao[p.id] ?? p.observacao_admin ?? "", requerCorrecao },
-    });
-    setAviso(r.ok ? "Status atualizado." : r.erro);
-    await atualizar();
+    }), status === "aprovado" ? "Perfil publicado." : "Status atualizado.");
+  }
+
+  async function executarPerfil(
+    p: ProfissionalAdmin,
+    tipo: "conferencia" | "status",
+    acao: Parameters<typeof executarAcaoAdmin>[0],
+    sucesso: string,
+  ) {
+    if (acaoPerfil) return;
+    setAcaoPerfil({ id: p.id, tipo });
+    setResultadoPerfil(null);
+    setAviso(null);
+    try {
+      const resultado = await executarAcaoAdmin(acao, sucesso);
+      setResultadoPerfil({ id: p.id, ...resultado });
+      setAviso(resultado.mensagem);
+      if (resultado.ok) await atualizar();
+    } finally {
+      setAcaoPerfil(null);
+    }
   }
 
   async function confirmarExclusao(p: ProfissionalAdmin) {
@@ -569,15 +590,15 @@ function Admin() {
                     </fieldset>}
 
                     {p.status !== "descredenciado" && <div className="flex flex-wrap gap-3">
-                      {!p.cadastro_conferido_em && <button type="button" className="btn-base btn-primary" onClick={async () => {
+                      {!p.cadastro_conferido_em && <Button type="button" onClick={() => {
                         const checklist = checklists[p.id] ?? {};
-                        const resultado = await conferirCadastro({ data: { id: p.id, checklist: { identity_matches: checklist["identity_matches"] === true, crp_active: checklist["crp_active"] === true, certificate_valid: checklist["certificate_valid"] === true, diploma_matches: checklist["diploma_matches"] === true, annex_v_compliant: checklist["annex_v_compliant"] === true } } });
-                        setAviso(resultado.ok ? "Cadastro aprovado. O contrato foi liberado para aceite." : resultado.erro);
-                        await atualizar();
-                      }} disabled={!itensConferencia.every(([chave]) => checklists[p.id]?.[chave])}>Aprovar e liberar contrato</button>}
-                      <button type="button" className="btn-base btn-primary" onClick={() => aplicarStatus(p, "aprovado")}>
-                        Publicar após assinatura
-                      </button>
+                        void executarPerfil(p, "conferencia", () => conferirCadastro({ data: { id: p.id, checklist: { identity_matches: checklist["identity_matches"] === true, crp_active: checklist["crp_active"] === true, certificate_valid: checklist["certificate_valid"] === true, diploma_matches: checklist["diploma_matches"] === true, annex_v_compliant: checklist["annex_v_compliant"] === true } } }), "Cadastro aprovado. O contrato foi liberado para aceite.");
+                      }} disabled={acaoPerfil !== null || !itensConferencia.every(([chave]) => checklists[p.id]?.[chave])}>
+                        {acaoPerfil?.id === p.id && acaoPerfil.tipo === "conferencia" ? "Conferindo cadastro…" : "Aprovar e liberar contrato"}
+                      </Button>}
+                      <Button type="button" disabled={acaoPerfil !== null} onClick={() => void aplicarStatus(p, "aprovado")}>
+                        {acaoPerfil?.id === p.id && acaoPerfil.tipo === "status" ? "Atualizando…" : "Publicar após assinatura"}
+                      </Button>
                       <button type="button" className="btn-base btn-ghost" disabled={!String(observacao[p.id] ?? p.observacao_admin ?? "").trim()} onClick={() => aplicarStatus(p, "pendente", true)}>
                         Solicitar correção
                       </button>
@@ -594,6 +615,9 @@ function Admin() {
                         {excluindo === p.id ? "Excluindo…" : "Excluir profissional"}
                       </Button>
                     </div>}
+                    {resultadoPerfil?.id === p.id && <p role={resultadoPerfil.ok ? "status" : "alert"} className="border-l-4 border-primary bg-muted p-4 text-sm">
+                      {resultadoPerfil.mensagem}
+                    </p>}
                     {p.documentos.some((d) => d.status !== "aprovado") && (
                       <p className="text-xs text-muted-foreground">
                         Atenção: ainda há documentos não aprovados. O perfil só deve ser publicado após a aprovação de todos os requisitos.
