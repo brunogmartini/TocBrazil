@@ -206,3 +206,9 @@
 - [x] Mostrar resultado e andamento junto dos botões; três testes de sucesso, recusa e falha de sessão passaram e compilação aprovada.
 - [x] Verificar ambos os cliques na conta de gestão escolhida: retornam recusa por perfil incompleto, agora visível junto aos botões; cadastro permanece pendente.
 - [ ] Liberar agenda para teste de pagamento isolado — depende de ambiente de teste separado e requisitos de cadastro, contrato e recebimento; não publicar dados fictícios.
+
+## Dados para repasse no lugar da conta Asaas — 12/11/2026
+- [x] Trocar a exigência de conta de recebimento Asaas por chave Pix ou conta bancária no CPF/CNPJ do profissional, conferida pela gestão.
+- [x] Formulário em Meu cadastro, conferência no painel de gestão, agenda e publicação passam a depender da conferência; sete testes de regras passaram.
+- [x] Prévia: dados Pix do Blabla salvos e visíveis na gestão como "Aguardando conferência"; botão de confirmar não clicado.
+- [ ] Publicar no site oficial — aguarda pedido.
