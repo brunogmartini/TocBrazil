@@ -23,7 +23,7 @@ export function ContractAcceptance() {
   const opened = new Set(state.data.openedAnnexes);
   const complete = scrollCompleted && annexes.every((document) => opened.has(document.key)) && checks.every(Boolean);
 
-  if (state.data.acceptance) return <div className="card-soft mt-5 p-7"><p className="font-semibold">Contrato {state.data.version} assinado eletronicamente.</p><p className="mt-2 text-sm text-muted-foreground">Aceite registrado em {new Date(state.data.acceptance.accepted_at).toLocaleString("pt-BR")}.</p>{!state.data.receivingActive && <p className="mt-5 border-t border-border pt-5 text-sm leading-relaxed">Credenciamento aprovado. Estamos finalizando a integração de pagamentos e avisaremos assim que seu perfil for publicado.</p>}</div>;
+  if (state.data.acceptance) return <div className="card-soft mt-5 p-7"><p className="font-semibold">Contrato {state.data.version} assinado eletronicamente.</p><p className="mt-2 text-sm text-muted-foreground">Aceite registrado em {new Date(state.data.acceptance.accepted_at).toLocaleString("pt-BR")}.</p>{!state.data.receivingActive && <p className="mt-5 border-t border-border pt-5 text-sm leading-relaxed">Credenciamento aprovado. Agora informe sua chave Pix ou conta bancária em Meu cadastro, na seção Dados para repasse; a gestão confere antes de liberar a agenda.</p>}</div>;
 
   return <div className="card-soft mt-5 p-5 sm:p-7">
     <p className="text-sm font-semibold">Versão {state.data.version}</p>

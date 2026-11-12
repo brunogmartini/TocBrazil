@@ -119,7 +119,7 @@ function PaginaAgenda() {
       ? "Documentos em análise. A agenda será liberada depois da conferência e do aceite do contrato."
       : !contrato.data.acceptance
         ? "Leia e aceite o contrato e os quatro anexos antes de configurar sua agenda."
-        : "Credenciamento aprovado. Estamos finalizando a integração de pagamentos e avisaremos assim que seu perfil for publicado.";
+        : "Credenciamento aprovado. Informe sua chave Pix ou conta bancária em Meu cadastro, na seção Dados para repasse; a gestão confere antes de liberar a agenda.";
     return <div className="professional-workspace container-page py-16"><h1 className="text-3xl">Agenda bloqueada</h1><p className="mt-4 max-w-xl text-muted-foreground">{mensagem}</p><Link to="/profissional/cadastro" className="btn-base btn-primary mt-8">Ir para o cadastro</Link></div>;
   }
 

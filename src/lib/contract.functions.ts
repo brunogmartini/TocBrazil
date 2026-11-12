@@ -45,7 +45,7 @@ export const professionalContractState = createServerFn({ method: "GET" })
       supabaseAdmin.from("contract_documents").select("document_key, display_name, sha256, storage_path, display_order, contract_version").eq("active", true).order("display_order"),
       supabaseAdmin.from("document_accesses").select("document_key, accessed_at").eq("user_id", context.userId).eq("contract_version", CONTRACT_VERSION),
       supabaseAdmin.from("document_acceptances").select("id, accepted_at, evidence_sha256").eq("user_id", context.userId).eq("contract_version", CONTRACT_VERSION).maybeSingle(),
-      supabaseAdmin.from("asaas_professional_accounts").select("status, wallet_id").eq("professional_id", professional.id).eq("environment", "sandbox").maybeSingle(),
+      supabaseAdmin.from("professional_payout_destinations").select("conferido_em").eq("professional_id", professional.id).maybeSingle(),
     ]);
     if (review?.decision !== "approved") return { available: false as const, reason: "under_review" as const };
     const signed = await Promise.all((documents ?? []).map(async (document) => {
@@ -63,7 +63,7 @@ export const professionalContractState = createServerFn({ method: "GET" })
       documents: signed,
       openedAnnexes: (accesses ?? []).map((row) => row.document_key),
       acceptance: acceptance ?? null,
-      receivingActive: Boolean(account?.wallet_id && account.status === "ativa"),
+      receivingActive: Boolean(account?.conferido_em),
     };
   });
 

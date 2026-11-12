@@ -393,6 +393,13 @@
       "when": 1792953034517,
       "tag": "0055_document_patient_credit_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1794501680237,
+      "tag": "0056_professional_payout_destinations",
+      "breakpoints": true
     }
   ]
 }

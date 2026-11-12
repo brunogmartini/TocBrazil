@@ -28,6 +28,9 @@ import { AsaasAdminLab } from "@/components/asaas-admin-lab";
 import { LegalAdmin } from "@/components/legal-admin";
 import { Button } from "@/components/ui/button";
 import { executarAcaoAdmin } from "@/lib/admin-action";
+import { conferirDadosRepasseAdmin } from "@/lib/repasse.functions";
+import { descreverRepasse } from "@/lib/repasse";
+import { formatarCpf, formatarCnpj } from "@/lib/documento-pessoa";
 import { supabase } from "@/integrations/supabase/client";
 import { ABORDAGENS_PERFIL, IDIOMAS_PERFIL, TEMAS_TOC_PERFIL } from "@/lib/perfil-profissional";
 
@@ -89,6 +92,7 @@ function Admin() {
   const mudarStatusFoto = useServerFn(definirStatusFoto);
   const enviarFotoAdmin = useServerFn(enviarFotoProfissionalAdmin);
   const editarProf = useServerFn(editarProfissionalAdmin);
+  const conferirRepasse = useServerFn(conferirDadosRepasseAdmin);
   const abrirDocumento = useServerFn(obterDocumentoCredenciamento);
   const mudarPagamento = useServerFn(definirStatusPagamento);
   const mudarConsulta = useServerFn(definirStatusConsultaAdmin);
@@ -104,7 +108,7 @@ function Admin() {
   const [checklists, setChecklists] = useState<Record<string, Record<string, boolean>>>({});
   const [aviso, setAviso] = useState<string | null>(null);
   const [resultadoPerfil, setResultadoPerfil] = useState<{ id: string; mensagem: string; ok: boolean } | null>(null);
-  const [acaoPerfil, setAcaoPerfil] = useState<{ id: string; tipo: "conferencia" | "status" } | null>(null);
+  const [acaoPerfil, setAcaoPerfil] = useState<{ id: string; tipo: "conferencia" | "status" | "repasse" } | null>(null);
   const [excluindo, setExcluindo] = useState<string | null>(null);
   const [enviandoFoto, setEnviandoFoto] = useState<string | null>(null);
   const [protecaoDocumentos, setProtecaoDocumentos] = useState<{ factorId: string; qr?: string; secret?: string } | null>(null);
@@ -181,7 +185,7 @@ function Admin() {
 
   async function executarPerfil(
     p: ProfissionalAdmin,
-    tipo: "conferencia" | "status",
+    tipo: "conferencia" | "status" | "repasse",
     acao: Parameters<typeof executarAcaoAdmin>[0],
     sucesso: string,
   ) {
@@ -582,6 +586,24 @@ function Admin() {
                         value={observacao[p.id] ?? p.observacao_admin ?? ""}
                         onChange={(e) => setObservacao({ ...observacao, [p.id]: e.target.value })}
                       />
+                    </div>
+
+                    <div className="rounded-lg border border-border p-4">
+                      <h3 className="text-base font-semibold">Dados para repasse</h3>
+                      {p.repasse ? (
+                        <div className="mt-2 space-y-1 text-sm">
+                          <p>{descreverRepasse(p.repasse)}</p>
+                          <p className="text-muted-foreground">Titular: {p.repasse.titular_nome} · {p.repasse.titular_documento.length === 11 ? formatarCpf(p.repasse.titular_documento) : formatarCnpj(p.repasse.titular_documento)}</p>
+                          <p className="text-muted-foreground">{p.repasse.conferido_em ? `Conferido em ${new Date(p.repasse.conferido_em).toLocaleString("pt-BR")}` : "Aguardando conferência da gestão."}</p>
+                          {!p.repasse.conferido_em && p.status !== "descredenciado" && (
+                            <Button type="button" className="mt-2" disabled={acaoPerfil !== null} onClick={() => void executarPerfil(p, "repasse", () => conferirRepasse({ data: { id: p.id } }), "Dados para repasse conferidos. O profissional já pode configurar a agenda.")}>
+                              {acaoPerfil?.id === p.id && acaoPerfil.tipo === "repasse" ? "Conferindo…" : "Confirmar dados para repasse"}
+                            </Button>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="mt-2 text-sm text-muted-foreground">O profissional ainda não informou a chave Pix ou conta bancária (em Meu cadastro, seção Dados para repasse).</p>
+                      )}
                     </div>
 
                     {!p.cadastro_conferido_em && <fieldset className="rounded-lg border border-border p-4">

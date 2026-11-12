@@ -7,6 +7,7 @@ import { primeiraDeteccaoPerfil, ROTULO_ANTICONTATO } from "@/lib/anticontato";
 import { ABORDAGENS_PERFIL, IDIOMAS_PERFIL, TEMAS_TOC_PERFIL } from "@/lib/perfil-profissional";
 import { TAXA_FIXA_CENTAVOS, valorProfissionalCentavos } from "@/lib/precos";
 import { z } from "zod";
+import type { RepasseSalvo } from "@/lib/repasse.functions";
 
 export type PacienteAdmin = {
   id: string;
@@ -70,6 +71,7 @@ export type ProfissionalAdmin = {
   consultas: number;
   consultasRealizadas: number;
   telefone: string | null;
+  repasse: RepasseSalvo | null;
   email_contato: string | null;
   email_login: string | null;
   graduacao: string | null;
@@ -193,7 +195,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
        supabaseAdmin.from("professional_admin_contacts").select("professional_id, telefone"),
       supabaseAdmin.from("platform_settings").select("chave, valor"),
       supabaseAdmin.from("availability_rules").select("professional_id"),
-      supabaseAdmin.from("asaas_professional_accounts").select("professional_id, wallet_id, status"),
+      supabaseAdmin.from("professional_payout_destinations").select("professional_id, metodo, pix_tipo, pix_chave, banco_codigo, agencia, conta, tipo_conta, titular_nome, titular_documento, conferido_em, updated_at"),
     ]);
 
     const nomePorId = new Map((perfis ?? []).map((p) => [p.id, p.nome ?? p.email ?? "—"]));
@@ -205,10 +207,9 @@ export const painelAdmin = createServerFn({ method: "GET" })
     }
     const comAgenda = new Set((regras ?? []).map((r) => r.professional_id));
     const comRecebimentoAtivo = new Set(
-      (contasRecebimento ?? [])
-        .filter((conta) => conta.status === "ativa" && Boolean(conta.wallet_id))
-        .map((conta) => conta.professional_id),
+      (contasRecebimento ?? []).filter((conta) => Boolean(conta.conferido_em)).map((conta) => conta.professional_id),
     );
+    const repassePorProfissional = new Map((contasRecebimento ?? []).map(({ professional_id, ...resto }) => [professional_id, resto as RepasseSalvo]));
     const consultasPorPaciente = new Map<string, { total: number; realizadas: number; pago: number }>();
     const consultasPorProfissional = new Map<string, { total: number; realizadas: number }>();
     for (const c of consultas ?? []) {
@@ -358,6 +359,7 @@ export const painelAdmin = createServerFn({ method: "GET" })
         consultas: stats?.total ?? 0,
         consultasRealizadas: stats?.realizadas ?? 0,
         telefone: telefoneProfissionalPorId.get(p.id) ?? null,
+        repasse: repassePorProfissional.get(p.id) ?? null,
         email_contato: p.email_contato,
         email_login: p.user_id ? (emailPorId.get(p.user_id) ?? null) : null,
         graduacao: p.graduacao,
@@ -563,10 +565,10 @@ export const definirStatusProfissional = createServerFn({ method: "POST" })
         return { ok: false as const, erro: "O profissional ainda não aceitou a versão ativa do contrato." };
       }
       const [{ data: conta }, { data: agenda }] = await Promise.all([
-        supabaseAdmin.from("asaas_professional_accounts").select("wallet_id, status").eq("professional_id", data.id).eq("status", "ativa").maybeSingle(),
+        supabaseAdmin.from("professional_payout_destinations").select("conferido_em").eq("professional_id", data.id).maybeSingle(),
         supabaseAdmin.from("availability_rules").select("id").eq("professional_id", data.id).limit(1),
       ]);
-      if (!conta?.wallet_id) return { ok: false as const, erro: "A conta de recebimento ainda não está ativa." };
+      if (!conta?.conferido_em) return { ok: false as const, erro: "Os dados para repasse (Pix ou conta bancária) ainda não foram informados pelo profissional ou conferidos pela gestão." };
       if (!agenda?.length) return { ok: false as const, erro: "O profissional ainda não configurou a agenda." };
     }
 

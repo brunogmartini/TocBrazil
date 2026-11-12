@@ -1985,6 +1985,62 @@ export type Database = {
           },
         ]
       }
+      professional_payout_destinations: {
+        Row: {
+          agencia: string | null
+          banco_codigo: string | null
+          conferido_em: string | null
+          conferido_por: string | null
+          conta: string | null
+          metodo: string
+          pix_chave: string | null
+          pix_tipo: string | null
+          professional_id: string
+          tipo_conta: string | null
+          titular_documento: string
+          titular_nome: string
+          updated_at: string
+        }
+        Insert: {
+          agencia?: string | null
+          banco_codigo?: string | null
+          conferido_em?: string | null
+          conferido_por?: string | null
+          conta?: string | null
+          metodo: string
+          pix_chave?: string | null
+          pix_tipo?: string | null
+          professional_id: string
+          tipo_conta?: string | null
+          titular_documento: string
+          titular_nome: string
+          updated_at?: string
+        }
+        Update: {
+          agencia?: string | null
+          banco_codigo?: string | null
+          conferido_em?: string | null
+          conferido_por?: string | null
+          conta?: string | null
+          metodo?: string
+          pix_chave?: string | null
+          pix_tipo?: string | null
+          professional_id?: string
+          tipo_conta?: string | null
+          titular_documento?: string
+          titular_nome?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_payout_destinations_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: true
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_payout_details: {
         Row: {
           agencia: string | null

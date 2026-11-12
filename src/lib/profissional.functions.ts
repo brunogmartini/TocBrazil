@@ -109,8 +109,8 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
           .gte("fim", new Date().toISOString())
           .order("inicio"),
         (await import("@/integrations/supabase/client.server")).supabaseAdmin
-          .from("asaas_professional_accounts")
-          .select("status, wallet_id")
+          .from("professional_payout_destinations")
+          .select("conferido_em")
           .eq("professional_id", profissional.id)
           .maybeSingle(),
         supabase.from("professional_admin_contacts").select("telefone").eq("professional_id", profissional.id).maybeSingle(),
@@ -132,8 +132,8 @@ export const meuCadastroProfissional = createServerFn({ method: "GET" })
       regras: regras ?? [],
       bloqueios: bloqueios ?? [],
        contrato: contratoVigente ? { aceito: true } : null,
-      recebimentoAtivo: Boolean(contaRecebimento?.wallet_id && contaRecebimento.status === "ativa"),
-       etapa: calcularEtapa(profissional, documentos ?? [], (regras ?? []).length > 0, Boolean(contratoVigente), Boolean(contaRecebimento?.wallet_id && contaRecebimento.status === "ativa")),
+      recebimentoAtivo: Boolean(contaRecebimento?.conferido_em),
+       etapa: calcularEtapa(profissional, documentos ?? [], (regras ?? []).length > 0, Boolean(contratoVigente), Boolean(contaRecebimento?.conferido_em)),
       email: (claims as { email?: string }).email ?? null,
     };
   });
@@ -705,14 +705,14 @@ export function calcularEtapa(
   }
   if (prof.status === "aprovado") {
     if (!temContrato) return { chave: "aprovado", titulo: "Aceite do contrato", descricao: "Leia o contrato e os anexos para prosseguir.", indice: 4 };
-    if (!recebimentoAtivo) return { chave: "aprovado", titulo: "Integração de pagamentos", descricao: "Aguarde a ativação da conta de recebimento antes de configurar a agenda.", indice: 5 };
+    if (!recebimentoAtivo) return { chave: "aprovado", titulo: "Dados para repasse", descricao: "Informe sua chave Pix ou conta bancária em Meu cadastro e aguarde a conferência da gestão para configurar a agenda.", indice: 5 };
     return temAgenda
       ? { chave: "publicado", titulo: "Perfil publicado", descricao: "Seu perfil está visível e recebe agendamentos.", indice: 6 }
       : { chave: "aprovado", titulo: "Cadastro aprovado", descricao: "Defina sua disponibilidade para receber agendamentos.", indice: 5 };
   }
   if (prof.cadastro_conferido_em) {
     if (!temContrato) return { chave: "aprovado", titulo: "Aceite do contrato", descricao: "Leia o contrato e os anexos para prosseguir.", indice: 4 };
-    if (!recebimentoAtivo) return { chave: "aprovado", titulo: "Integração de pagamentos", descricao: "Credenciamento aprovado. Estamos finalizando a integração de pagamentos e avisaremos assim que seu perfil for publicado.", indice: 5 };
+    if (!recebimentoAtivo) return { chave: "aprovado", titulo: "Dados para repasse", descricao: "Credenciamento aprovado. Informe sua chave Pix ou conta bancária em Meu cadastro; a gestão confere antes de liberar a agenda.", indice: 5 };
     return { chave: "aprovado", titulo: "Configurar agenda", descricao: "Defina ao menos um horário para concluir a publicação.", indice: 5 };
   }
   if (prof.requer_correcao) {

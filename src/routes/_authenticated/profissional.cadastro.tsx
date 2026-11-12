@@ -10,7 +10,7 @@ import {
   salvarCadastroProfissional,
   salvarFotoPerfilProfissional,
 } from "@/lib/profissional.functions";
-import { statusRecebimentoAsaas } from "@/lib/asaas.functions";
+import { RepasseForm } from "@/components/repasse-form";
 import { EtapasCadastro, ProfessionalNav } from "@/components/professional-nav";
 import { ContractAcceptance } from "@/components/contract-acceptance";
 import { exigirAreaProfissional } from "@/lib/role-access";
@@ -32,12 +32,12 @@ export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
       { title: "Meu cadastro profissional — TOC Brazil" },
       {
         name: "description",
-        content: "Complete seus dados, envie documentos para verificação e configure o recebimento direto.",
+        content: "Complete seus dados, envie documentos para verificação e informe seus dados para repasse.",
       },
       { property: "og:title", content: "Meu cadastro profissional — TOC Brazil" },
       {
         property: "og:description",
-        content: "Dados profissionais, documentos e recebimento direto na TOC Brazil.",
+        content: "Dados profissionais, documentos e dados para repasse na TOC Brazil.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -60,13 +60,8 @@ function CadastroProfissional() {
   const registrar = useServerFn(registrarDocumento);
   const remover = useServerFn(removerDocumento);
   const salvarFoto = useServerFn(salvarFotoPerfilProfissional);
-  const statusVinculo = useServerFn(statusRecebimentoAsaas);
 
   const dados = useQuery({ queryKey: ["cadastro-profissional"], queryFn: () => carregar() });
-  const vinculo = useQuery({
-    queryKey: ["vinculo-asaas"],
-    queryFn: () => statusVinculo(),
-  });
 
 
   const [form, setForm] = useState({
@@ -586,31 +581,19 @@ function CadastroProfissional() {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-2xl">Receber direto pela sua conta Asaas</h2>
+        <h2 className="text-2xl">Dados para repasse</h2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          A plataforma cria sua subconta de recebimento no Asaas após a conferência cadastral. O split
-          separa automaticamente a taxa fixa da plataforma do valor que vai para você.
+          O paciente paga à plataforma no agendamento. Depois da consulta realizada, repassamos a você o valor
+          da consulta menos a taxa fixa da plataforma, pela chave Pix ou conta bancária informada aqui.
         </p>
         <div className="card-soft mt-5 p-7">
-          {vinculo.data?.ativo ? (
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold">Conta ligada</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Conta preparada para split: taxa fixa em reais por consulta realizada.
-                </p>
-              </div>
-               <span className="pill">Ambiente de teste ativo</span>
-            </div>
-          ) : (
-            <p className="max-w-xl text-sm text-muted-foreground">{vinculo.data?.temCadastro ? "Sua subconta Asaas será criada pela equipe depois da conferência dos dados necessários para recebimento." : "Salve seus dados profissionais acima para iniciar a preparação do recebimento."}</p>
-          )}
+          <RepasseForm />
         </div>
       </section>
 
 
       <div className="mt-12 flex flex-wrap gap-3">
-        {vinculo.data?.ativo && <Link to="/profissional/agenda" className="btn-base btn-primary">Configurar minha agenda</Link>}
+        {dados.data?.recebimentoAtivo && <Link to="/profissional/agenda" className="btn-base btn-primary">Configurar minha agenda</Link>}
         <Link to="/profissional" className="btn-base btn-ghost">
           Voltar para a área do profissional
         </Link>
