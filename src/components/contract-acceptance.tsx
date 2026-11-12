@@ -51,7 +51,15 @@ export function ContractAcceptance() {
     <fieldset className="mt-7 border-t border-border pt-6"><legend className="text-lg font-semibold">Declarações de aceite</legend>{!scrollCompleted && <p className="mt-3 text-sm text-muted-foreground">Role o contrato até o fim para habilitar o aceite.</p>}<div className="mt-4 space-y-3">{state.data.declarations.map((declaration, index) => <label key={declaration} className={`flex items-start gap-3 border p-4 text-sm leading-relaxed ${index === 2 || index === 6 ? "border-primary bg-primary/5" : "border-border"}`}><input className="mt-1" type="checkbox" disabled={!scrollCompleted} checked={checks[index]} onChange={(event) => setChecks(checks.map((value, itemIndex) => itemIndex === index ? event.target.checked : value))} /><span>{declaration}</span></label>)}</div></fieldset>
     <dl className="mt-7 grid gap-3 border border-border bg-background p-4 text-sm sm:grid-cols-3"><div><dt className="text-muted-foreground">Nome</dt><dd className="font-semibold">{state.data.identity.name}</dd></div><div><dt className="text-muted-foreground">CPF</dt><dd className="font-semibold">{state.data.identity.cpf}</dd></div><div><dt className="text-muted-foreground">CRP</dt><dd className="font-semibold">{state.data.identity.crp} · {state.data.identity.uf}</dd></div></dl>
     <p className="mt-5 text-sm leading-relaxed text-muted-foreground">{state.data.signatureNotice}</p>
-    {message && <p className="mt-4 text-sm text-destructive" role="alert">{message}</p>}
+    {!complete && <div className="mt-5 border border-border bg-muted/40 p-4 text-sm" aria-live="polite">
+      <p className="font-semibold">Para habilitar a assinatura, falta:</p>
+      <ul className="mt-2 space-y-1 text-muted-foreground">
+        {!scrollCompleted && <li>• Rolar o contrato até a última página.</li>}
+        {annexes.filter((document) => !opened.has(document.key)).map((document) => <li key={document.key}>• Abrir o anexo “{document.name}”.</li>)}
+        {checks.some((value) => !value) && <li>• Marcar {checks.filter((value) => !value).length === 1 ? "a declaração restante" : `as ${checks.filter((value) => !value).length} declarações restantes`}.</li>}
+      </ul>
+    </div>}
+    {message && <p className={`mt-4 text-sm ${message.startsWith("Aceite eletrônico registrado") ? "text-primary" : "text-destructive"}`} role="alert">{message}</p>}
     <button type="button" className="btn-base btn-primary mt-6 disabled:opacity-50" disabled={!complete} onClick={async () => {
       setMessage(null);
       const result = await accept({ data: { scrollCompleted: true, declarations: checks } });

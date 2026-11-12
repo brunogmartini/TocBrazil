@@ -16,6 +16,7 @@ import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 import { MobileCta } from "../components/mobile-cta";
 import { CookieNotice } from "../components/cookie-notice";
+import { instalarIndicadorDeCarregamento } from "../lib/busy-indicator";
 
 function NotFoundComponent() {
   return (
@@ -127,6 +128,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useEffect(() => instalarIndicadorDeCarregamento(), []);
 
   return (
     <QueryClientProvider client={queryClient}>

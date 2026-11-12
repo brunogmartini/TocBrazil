@@ -586,3 +586,32 @@
 @utility agenda-passado {
   opacity: 0.55;
 }
+
+/* Indicador global de carregamento: aplicado pelo busy-indicator após um clique. */
+[data-busy] {
+  cursor: progress !important;
+  pointer-events: none;
+  opacity: 0.85;
+}
+[data-busy]::before {
+  content: "";
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.5em;
+  vertical-align: -0.15em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
+  animation: busy-spin 0.7s linear infinite;
+}
+[data-busy].gap-2::before,
+[data-busy].btn-base::before {
+  margin-right: 0;
+}
+@keyframes busy-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
