@@ -204,5 +204,5 @@
 ## Resposta dos botões de aprovação — 12/11/2026
 - [x] Identificar avisos fora da área visível e requisitos pendentes do perfil de teste; não alterar aprovação, publicação ou pagamentos.
 - [x] Mostrar resultado e andamento junto dos botões; três testes de sucesso, recusa e falha de sessão passaram e compilação aprovada.
-- [ ] Verificar cliques com sessão administrativa autorizada — a sessão própria disponível é de paciente; depende da escolha da conta de gestão.
+- [x] Verificar ambos os cliques na conta de gestão escolhida: retornam recusa por perfil incompleto, agora visível junto aos botões; cadastro permanece pendente.
 - [ ] Liberar agenda para teste de pagamento isolado — depende de ambiente de teste separado e requisitos de cadastro, contrato e recebimento; não publicar dados fictícios.
