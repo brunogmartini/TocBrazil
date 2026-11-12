@@ -36,6 +36,6 @@
 - Keep legal withdrawal separate from data deletion and enforce reacceptance in database booking guards; why: history and legally retained evidence must remain available during closure review.
 - Share signup document selection between the form and receipt validator, independently of post-approval contract gates; why: account creation must not require or record acceptance of an unavailable credentialing document.
 - Select only official applicable documents in the account consent panel and allow professional privacy acceptance while public professional terms are pending; why: pending text must not disable account completion or become accepted evidence.
-- Verify that every migration file in `drizzle/migrations/` actually reached the database by comparing each file's SHA-256 with the rows of `drizzle.__drizzle_migrations`; the database journal, not `drizzle/migrations/meta/_journal.json`, decides what ran, because migrations merged from GitHub can sit unapplied and only surface later as typecheck failures once the generated types catch up.
+- Verify migrations by comparing each `drizzle/migrations/` file's SHA-256 with `drizzle.__drizzle_migrations` rows, not `meta/_journal.json`; why: merged migrations can sit unapplied.
 - Keep review results beside profile actions and catch rejected requests; why: offscreen notices can make blocked actions seem unresponsive.
-- Show button loading state through the global busy indicator installed in the root route (click followed by a request marks the button busy); why: every action must visibly respond without per-button wiring.
+- Button loading state comes from the root-installed global busy indicator; why: every action visibly responds without per-button wiring.
