@@ -216,4 +216,6 @@
 ## CPF do paciente na janela de pagamento — 13/11/2026
 - [x] Janela de pagamento passa a pedir o CPF quando o perfil do paciente não tem um; CPF validado, salvo no perfil e pagamento retomado automaticamente.
 - [x] Compilação aprovada e testes de validação de CPF passaram.
-- [ ] Testar reserva com pagamento de ponta a ponta com conta de paciente sem CPF; publicar no site oficial após o teste.
+- [x] Ficha de dados pessoais criada automaticamente a partir da conta quando ela ainda não existe; o CPF deixa de ficar sem onde ficar guardado.
+- [x] Reserva testada de ponta a ponta com conta de paciente sem ficha: campo do CPF aparece, o CPF é salvo, a ficha é criada e a página segura do Asaas abre.
+- [x] Publicação pedida e site oficial respondendo; verificação de segurança sem achados antes de publicar.
