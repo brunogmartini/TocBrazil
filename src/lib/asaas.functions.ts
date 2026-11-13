@@ -73,11 +73,35 @@ export const iniciarPagamentoAsaas = createServerFn({ method: "POST" })
         if (!cpfValido(cpfDigitos)) {
           return { ok: false as const, codigo: "CPF_INVALIDO" as const, erro: "CPF inválido. Confira os números e tente novamente." };
         }
-        const { error: cpfErro } = await supabase
+        // Alguns pacientes não têm a linha de perfil criada; cria a partir
+        // dos dados da própria conta autenticada antes de gravar o CPF.
+        const { data: perfilAtual } = await supabaseAdmin
           .from("profiles")
-          .update({ cpf: cpfDigitos })
+          .select("id, cpf, nome, email")
           .eq("id", userId)
-          .is("cpf", null);
+          .maybeSingle();
+        let cpfErro: { code?: string } | null = null;
+        if (!perfilAtual) {
+          const { data: conta } = await supabaseAdmin.auth.admin.getUserById(userId);
+          const meta = (conta?.user?.user_metadata ?? {}) as Record<string, unknown>;
+          const nomeConta =
+            (typeof meta["nome"] === "string" && meta["nome"]) ||
+            (typeof meta["full_name"] === "string" && meta["full_name"]) ||
+            (typeof meta["name"] === "string" && meta["name"]) ||
+            null;
+          ({ error: cpfErro } = await supabaseAdmin.from("profiles").insert({
+            id: userId,
+            email: conta?.user?.email ?? null,
+            nome: nomeConta,
+            cpf: cpfDigitos,
+          }));
+        } else if (!perfilAtual.cpf) {
+          ({ error: cpfErro } = await supabaseAdmin
+            .from("profiles")
+            .update({ cpf: cpfDigitos })
+            .eq("id", userId)
+            .is("cpf", null));
+        }
         if (cpfErro) {
           console.error("profiles.cpf update failed", { code: cpfErro.code });
           return { ok: false as const, erro: "Não foi possível salvar seu CPF agora." };
@@ -89,6 +113,12 @@ export const iniciarPagamentoAsaas = createServerFn({ method: "POST" })
         .select("nome, email, cpf, telefone")
         .eq("id", userId)
         .maybeSingle();
+      if (perfil?.cpf && (!perfil.nome || !perfil.email)) {
+        return {
+          ok: false as const,
+          erro: "Complete seu nome e e-mail em Minha conta antes de pagar.",
+        };
+      }
       if (!perfil?.cpf || !perfil.nome || !perfil.email) {
         return {
           ok: false as const,
