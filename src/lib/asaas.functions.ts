@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { institucional } from "@/config/institucional";
+import { apenasDigitos, cpfValido } from "@/lib/documento-pessoa";
 
 const cardSchema = z.object({
   consultaId: z.string().uuid(),
@@ -11,6 +12,8 @@ const iniciarSchema = z.object({
   consultaId: z.string().uuid(),
   // UNDEFINED abre a página segura com Pix e cartão à escolha do paciente.
   metodo: z.enum(["UNDEFINED", "PIX", "CREDIT_CARD"]).default("UNDEFINED"),
+  // CPF informado na janela de pagamento quando o perfil ainda não tem um.
+  cpf: z.string().max(14).optional(),
 });
 
 function dataHojeSP(): string {
@@ -63,13 +66,35 @@ export const iniciarPagamentoAsaas = createServerFn({ method: "POST" })
 
     let customerId = clienteExistente?.asaas_customer_id ?? null;
     if (!customerId) {
+      // Se o perfil ainda não tem CPF, aceita o informado na janela de
+      // pagamento e o grava no perfil do próprio paciente (RLS: só o dono).
+      if (data.cpf) {
+        const cpfDigitos = apenasDigitos(data.cpf);
+        if (!cpfValido(cpfDigitos)) {
+          return { ok: false as const, codigo: "CPF_INVALIDO" as const, erro: "CPF inválido. Confira os números e tente novamente." };
+        }
+        const { error: cpfErro } = await supabase
+          .from("profiles")
+          .update({ cpf: cpfDigitos })
+          .eq("id", userId)
+          .is("cpf", null);
+        if (cpfErro) {
+          console.error("profiles.cpf update failed", { code: cpfErro.code });
+          return { ok: false as const, erro: "Não foi possível salvar seu CPF agora." };
+        }
+      }
+
       const { data: perfil } = await supabaseAdmin
         .from("profiles")
         .select("nome, email, cpf, telefone")
         .eq("id", userId)
         .maybeSingle();
       if (!perfil?.cpf || !perfil.nome || !perfil.email) {
-        return { ok: false as const, erro: "Complete seu nome, e-mail e CPF no perfil antes de pagar." };
+        return {
+          ok: false as const,
+          codigo: "CPF_PENDENTE" as const,
+          erro: "Para pagar, informe seu CPF. Ele é exigido pelo provedor de pagamento para emitir a cobrança.",
+        };
       }
       try {
         const cliente = await createCustomer({
