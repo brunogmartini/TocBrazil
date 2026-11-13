@@ -123,7 +123,7 @@ export const obterProfissional = createServerFn({ method: "GET" })
 export const listarHorariosLivres = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string; dias?: number }) => ({
     slug: String(data.slug),
-      dias: Math.min(Math.max(Number(data.dias ?? 3), 1), 3),
+      dias: Math.min(Math.max(Number(data.dias ?? 10), 1), 10),
   }))
   .handler(async ({ data }) => {
     const cliente = clientePublico();
@@ -370,7 +370,7 @@ export const criarAgendamento = createServerFn({ method: "POST" })
 
     const { data: livres } = await supabase.rpc("slots_disponiveis", {
       _slug: data.slug,
-      _dias: 3,
+      _dias: 10,
     });
     const inicioIso = new Date(data.inicio).toISOString();
     const disponivel = (livres ?? []).some(

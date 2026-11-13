@@ -37,7 +37,7 @@ export const iniciarPagamentoAsaas = createServerFn({ method: "POST" })
     const { data: consulta } = await supabase
       .from("appointments")
       .select(
-        "id, patient_id, professional_id, valor_centavos, payment_status, inicio, duracao_minutos, asaas_payment_id",
+        "id, patient_id, professional_id, valor_centavos, payment_status, inicio, duracao_minutos",
       )
       .eq("id", data.consultaId)
       .maybeSingle();

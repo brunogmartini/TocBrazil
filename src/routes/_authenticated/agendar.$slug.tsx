@@ -74,7 +74,7 @@ function Agendar() {
   });
   const horarios = useQuery({
     queryKey: ["horarios", slug],
-    queryFn: () => buscarHorarios({ data: { slug, dias: 3 } }),
+    queryFn: () => buscarHorarios({ data: { slug, dias: 10 } }),
   });
   const config = useQuery({ queryKey: ["config"], queryFn: () => buscarConfig() });
 
