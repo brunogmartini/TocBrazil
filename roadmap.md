@@ -212,3 +212,8 @@
 - [x] Formulário em Meu cadastro, conferência no painel de gestão, agenda e publicação passam a depender da conferência; sete testes de regras passaram.
 - [x] Prévia: dados Pix do Blabla salvos e visíveis na gestão como "Aguardando conferência"; botão de confirmar não clicado.
 - [ ] Publicar no site oficial — aguarda pedido.
+
+## CPF do paciente na janela de pagamento — 13/11/2026
+- [x] Janela de pagamento passa a pedir o CPF quando o perfil do paciente não tem um; CPF validado, salvo no perfil e pagamento retomado automaticamente.
+- [x] Compilação aprovada e testes de validação de CPF passaram.
+- [ ] Testar reserva com pagamento de ponta a ponta com conta de paciente sem CPF; publicar no site oficial após o teste.
