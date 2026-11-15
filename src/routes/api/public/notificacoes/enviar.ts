@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 /**
- * Disparo dos e-mails já programados (lembretes de 24h e de 15 minutos) e dos
+ * Disparo dos avisos de pagamento aprovado, lembretes de 24h e de 30 minutos e dos
  * avisos de vencimento de certidão e apólice (30, 15 e 7 dias).
  * Chamado pela tarefa agendada do banco, autenticada por token interno.
  */
@@ -24,17 +24,11 @@ async function processar(request: Request) {
   }
 
   const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+  const { deliverAppointmentNotice } = await import("@/services/appointment-email.server");
 
   const agora = new Date();
   let lembretes = 0;
   let avisos = 0;
-
-  const formatar = (iso: string) =>
-    new Date(iso).toLocaleString("pt-BR", {
-      timeZone: "America/Sao_Paulo",
-      dateStyle: "short",
-      timeStyle: "short",
-    });
 
   /* ---------- lembretes de consulta ---------- */
   const { data: pendentes } = await supabaseAdmin
@@ -42,45 +36,18 @@ async function processar(request: Request) {
     .select("id, user_id, appointment_id, tipo")
     .eq("canal", "email")
     .is("enviada_em", null)
-    .in("tipo", ["lembrete_24h", "lembrete_15min"])
+    .in("tipo", ["consulta_confirmada_profissional", "lembrete_24h", "lembrete_30min"])
     .lte("agendada_para", agora.toISOString())
+    .order("agendada_para", { ascending: false })
     .limit(50);
 
   for (const n of pendentes ?? []) {
     try {
-      const [{ data: paciente }, { data: consulta }] = await Promise.all([
-        supabaseAdmin.from("profiles").select("nome, email").eq("id", n.user_id).maybeSingle(),
-        n.appointment_id
-          ? supabaseAdmin
-              .from("appointments")
-              .select("inicio, status, professionals(nome)")
-              .eq("id", n.appointment_id)
-              .maybeSingle()
-          : Promise.resolve({ data: null }),
-      ]);
-
-      const ativa =
-        consulta && ["confirmada", "aguardando_pagamento"].includes(String(consulta.status));
-
-      if (paciente?.email && ativa) {
-        const prof = consulta.professionals as { nome?: string } | null;
-        await sendTemplateEmail("lembrete-consulta", paciente.email, {
-          templateData: {
-            nomePaciente: paciente.nome?.split(" ")[0] ?? null,
-            nomeProfissional: prof?.nome ?? "seu profissional",
-            quando: formatar(consulta.inicio),
-            emBreve: n.tipo === "lembrete_15min",
-          },
-          idempotencyKey: `${n.tipo}-${n.id}`,
-        });
-        lembretes += 1;
-      }
-      await supabaseAdmin
-        .from("notifications")
-        .update({ enviada_em: new Date().toISOString() })
-        .eq("id", n.id);
-    } catch (erro) {
-      console.error("falha ao enviar lembrete", n.id, erro);
+      if (await deliverAppointmentNotice(supabaseAdmin, n, agora.getTime())) lembretes += 1;
+    } catch {
+      console.error("falha ao enviar aviso de consulta", { notificationId: n.id });
+      // Stop this batch when sending fails (including rate limits); retry on the next scheduled call.
+      return Response.json({ lembretes, avisos, pendente: true }, { status: 503 });
     }
   }
 

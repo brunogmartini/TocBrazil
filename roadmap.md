@@ -220,6 +220,13 @@
 - [x] Reserva testada de ponta a ponta com conta de paciente sem ficha: campo do CPF aparece, o CPF é salvo, a ficha é criada e a página segura do Asaas abre.
 - [x] Publicação pedida e site oficial respondendo; verificação de segurança sem achados antes de publicar.
 
+## Link e e-mails das consultas — 15/11/2026
+- [x] Liberar o link 30 minutos antes, mantendo pagamento e isolamento; avisos conferidos em computador e 390px. Regra já aplicada no banco compartilhado.
+- [x] Preparar aviso ao psicólogo após pagamento aprovado e lembrete ao paciente com o link, usando avisos existentes e destinatários da consulta.
+- [x] Dezenove testes aprovados; função privada sem acesso anônimo, gatilho e hash da migração conferidos; chamada de envio sem autorização recusada. Documentos oficiais preservados.
+- [ ] Confirmar entrega real e fluxo completo de consulta paga — bloqueados pela verificação vencida do domínio notify.tocbrazil.com.br; envio direto não foi realizado.
+- [ ] Publicar alterações de tela e e-mails — aguarda pedido. Agendamento existente verifica lembretes a cada cinco minutos, podendo enviá-los entre 30 e 25 minutos antes, não no segundo exato.
+
 ## Cadastro, extrato e presença — 15/11/2026
 - [x] Unificar a situação do cadastro entre visão geral, agenda e Meu cadastro usando contrato e repasse reais; visão geral e Meu cadastro conferidos com a conta do Blabla.
 - [x] Excluir reservas sem pagamento e expiradas dos valores futuros; distinguir pagamento do paciente de repasse ao profissional. Prévia confirmou zero futuros, R$173 a receber e R$0 recebido.

@@ -18,7 +18,7 @@ const Email = ({
   quando = "",
   duracaoMinutos = 50,
   valor,
-  antecedenciaLinkMinutos = 15,
+  antecedenciaLinkMinutos = 30,
 }: Props) => (
   <Html lang="pt-BR" dir="ltr">
     <Head />
@@ -51,7 +51,7 @@ const Email = ({
         <Text style={paragrafo}>
           O endereço da sala de videochamada fica disponível na sua área da TOC Brazil a partir de{" "}
           {antecedenciaLinkMinutos} minutos antes do horário marcado, junto com as instruções do
-          profissional.
+          profissional. O psicólogo entrará somente no horário marcado; entrar antes não antecipa a consulta.
         </Text>
         <Text style={paragrafo}>
           A consulta acontece na ferramenta de videochamada mantida pelo próprio profissional. A TOC
@@ -73,6 +73,6 @@ export const template = {
     quando: "22/09/2026 às 15:00",
     duracaoMinutos: 50,
     valor: "R$ 220,00",
-    antecedenciaLinkMinutos: 15,
+    antecedenciaLinkMinutos: 30,
   },
 } satisfies TemplateEntry;

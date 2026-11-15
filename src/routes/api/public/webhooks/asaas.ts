@@ -52,7 +52,7 @@ async function processWebhook(request: Request) {
       const estornado = ["REFUNDED", "REFUND_REQUESTED"].includes(payment.status);
 
       if (pago) {
-        await supabaseAdmin
+        const { error: approvalError } = await supabaseAdmin
           .from("appointments")
           .update({
             payment_status: "aprovado",
@@ -61,6 +61,7 @@ async function processWebhook(request: Request) {
             ...(payment.billingType ? { asaas_payment_method: payment.billingType } : {}),
           })
           .eq("id", consulta.id);
+        if (approvalError) throw new Error("PAYMENT_APPROVAL_FAILED");
         await supabaseAdmin.from("payments").upsert(
           {
             appointment_id: consulta.id,
@@ -76,6 +77,17 @@ async function processWebhook(request: Request) {
           },
           { onConflict: "provider_ref" },
         );
+        // The database payment transition creates the fixed appointment notice.
+        // Email failure must not undo an approved payment; the existing scheduler retries it.
+        try {
+          const { data: notice } = await supabaseAdmin.from("notifications").select("id,user_id,appointment_id,tipo").eq("appointment_id", consulta.id).eq("tipo", "consulta_confirmada_profissional").is("enviada_em", null).limit(1).maybeSingle();
+          if (notice) {
+            const { deliverAppointmentNotice } = await import("@/services/appointment-email.server");
+            await deliverAppointmentNotice(supabaseAdmin, notice);
+          }
+        } catch {
+          console.error("Professional confirmation email pending", { appointmentId: consulta.id });
+        }
       } else if (estornado) {
         await supabaseAdmin.from("payments").update({ status: "estornado" }).eq("provider_ref", payment.id);
         // Fecha o crédito e o pedido de reembolso correspondentes, se houver.

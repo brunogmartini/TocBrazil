@@ -157,7 +157,7 @@ export function mapearConfiguracoes(rows: { chave: string; valor: unknown }[] | 
   const cfg: ConfiguracoesPlataforma = {
     taxaPorConsultaCentavos: Number(mapa["taxa_por_consulta_centavos"] ?? TAXA_FIXA_CENTAVOS),
     janelaCancelamentoHoras: Number(mapa["janela_cancelamento_horas"] ?? 24),
-    antecedenciaLinkMinutos: Number(mapa["antecedencia_link_minutos"] ?? 15),
+    antecedenciaLinkMinutos: 30,
     janelaConfirmacaoHoras: Number(mapa["janela_confirmacao_horas"] ?? 24),
     duracaoPadraoMinutos: Number(mapa["duracao_padrao_minutos"] ?? 50),
     cancelamentoHoras: Number(mapa["janela_cancelamento_horas"] ?? mapa["cancelamento_horas_minimas"] ?? 24),
@@ -452,11 +452,11 @@ export const criarAgendamento = createServerFn({ method: "POST" })
       {
         user_id: userId,
         appointment_id: criada.id,
-        tipo: "lembrete_15min",
+        tipo: "lembrete_30min",
         canal: "email",
-        titulo: "Sua consulta começa em 15 minutos",
+        titulo: "Sua consulta começa em 30 minutos",
         corpo: `Consulta com ${prof.nome} às ${quando}. O endereço da sala já está disponível na sua área.`,
-        agendada_para: new Date(new Date(criada.inicio).getTime() - 15 * 60000).toISOString(),
+        agendada_para: new Date(new Date(criada.inicio).getTime() - 30 * 60000).toISOString(),
       },
     ]);
 

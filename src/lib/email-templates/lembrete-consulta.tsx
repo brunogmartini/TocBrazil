@@ -1,5 +1,5 @@
 import React from "react";
-import { Body, Container, Head, Heading, Html, Preview, Text } from "@react-email/components";
+import { Body, Container, Head, Heading, Html, Preview, Text, Link } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 import { AVISO_URGENCIA, container, destaque, main, paragrafo, rodape, titulo } from "./estilos";
 
@@ -8,6 +8,7 @@ interface Props {
   nomeProfissional?: string;
   quando?: string;
   emBreve?: boolean;
+  meetingUrl?: string | null;
 }
 
 const Email = ({
@@ -15,6 +16,7 @@ const Email = ({
   nomeProfissional = "seu profissional",
   quando = "",
   emBreve = false,
+  meetingUrl,
 }: Props) => (
   <Html lang="pt-BR" dir="ltr">
     <Head />
@@ -40,10 +42,8 @@ const Email = ({
             </Text>
           ) : null}
         </div>
-        <Text style={paragrafo}>
-          Entre na sua área da TOC Brazil para ver o endereço da sala de videochamada e as instruções
-          do profissional.
-        </Text>
+        {emBreve && meetingUrl ? <Text style={paragrafo}><Link href={meetingUrl}>Entrar na sala do psicólogo</Link></Text> : <Text style={paragrafo}>Entre na sua área da TOC Brazil para ver as instruções do profissional.</Text>}
+        <Text style={paragrafo}>A consulta está confirmada. O psicólogo entrará somente no horário marcado. Entrar antes não antecipa o início da consulta.</Text>
         <Text style={rodape}>{AVISO_URGENCIA}</Text>
       </Container>
     </Body>
@@ -53,7 +53,7 @@ const Email = ({
 export const template = {
   component: Email,
   subject: (data: Record<string, unknown>) =>
-    data["emBreve"] ? "Sua consulta começa em 15 minutos" : "Lembrete: sua consulta é amanhã",
+    data["emBreve"] ? "Lembrete: sua consulta confirmada começa em 30 minutos" : "Lembrete: sua consulta é amanhã",
   displayName: "Lembrete de consulta",
   previewData: {
     nomePaciente: "Ana",

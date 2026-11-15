@@ -428,6 +428,13 @@
       "when": 1794738520881,
       "tag": "0060_explicit_attendance_report_privileges",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1794747812489,
+      "tag": "0061_appointment_link_30_minutes_and_paid_notice",
+      "breakpoints": true
     }
   ]
 }

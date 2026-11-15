@@ -55,7 +55,7 @@ const passos = [
   {
     titulo: "Receba o link e entre na sala do seu psicólogo",
     texto:
-      "A sala de videochamada é do profissional. O link fica disponível para você 15 minutos antes do horário.",
+      "A sala de videochamada é do profissional. O link fica disponível 30 minutos antes. O psicólogo entrará somente no horário marcado; entrar antes não antecipa a consulta.",
   },
 ];
 

@@ -22,7 +22,7 @@ export function AppointmentRoom({ id, professional = false, inicio, fim, payment
   const future = now < Date.parse(inicio);
   const available = paymentStatus === "aprovado" && now >= Date.parse(inicio) - releaseMinutes * 60000 && now <= Date.parse(fim) + 2 * 3600_000;
   if (!professional) {
-    if (available && room.data?.meeting_url) return <Button asChild className="h-auto whitespace-normal"><a href={room.data.meeting_url} target="_blank" rel="noopener noreferrer">Entrar na sala do profissional</a></Button>;
+    if (available && room.data?.meeting_url) return <div className="space-y-2"><Button asChild className="h-auto whitespace-normal"><a href={room.data.meeting_url} target="_blank" rel="noopener noreferrer">Entrar na sala do profissional</a></Button><p className="text-xs text-muted-foreground">O psicólogo entrará somente no horário marcado. Entrar antes não antecipa o início da consulta.</p></div>;
     return <p className="text-xs text-muted-foreground" role="status">{room.isError ? "Não foi possível consultar o link da sala agora." : now > Date.parse(fim) + 2 * 3600_000 ? "O acesso ao link desta consulta terminou." : paymentStatus !== "aprovado" ? "O link será liberado após a confirmação do pagamento e dentro do horário de acesso." : available ? "O profissional ainda não informou o link desta consulta." : `O link será liberado ${releaseMinutes} minutos antes da consulta`}</p>;
   }
   return <div className="space-y-3 border-t border-border pt-4">

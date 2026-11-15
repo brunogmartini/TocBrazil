@@ -13,5 +13,5 @@ describe("attendance rules", () => {
   it("existing confirmations cannot be repeated by the control", () => { expect(confirmationAvailable(inicio, "confirmada", inicio, start)).toBe(false); });
   it("missing link alert requires less than 24 hours", () => { expect(missingRoomAlert(inicio, false, start - 24 * 3600_000)).toBe(false); expect(missingRoomAlert(inicio, false, start - 24 * 3600_000 + 1)).toBe(true); expect(missingRoomAlert(inicio, true, start - 60000)).toBe(false); });
   it("accepts HTTPS only, without credentials", () => { expect(validMeetingUrl("https://meet.google.com/abc-defg-hij")).toBe(true); expect(validMeetingUrl("http://zoom.us/room")).toBe(false); expect(validMeetingUrl("https://user:pass@example.com")).toBe(false); expect(validMeetingUrl("not-a-url")).toBe(false); });
-  it("release is 15 minutes and expiry is two hours", () => { expect(LINK_RELEASE_MINUTES).toBe(15); expect(LINK_EXPIRY_HOURS).toBe(2); });
+  it("release is 30 minutes and expiry is two hours", () => { expect(LINK_RELEASE_MINUTES).toBe(30); expect(LINK_EXPIRY_HOURS).toBe(2); });
 });

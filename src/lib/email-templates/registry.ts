@@ -5,6 +5,7 @@ import { template as lembreteConsulta } from './lembrete-consulta'
 import { template as documentoVencendo } from './documento-vencendo'
 import { template as novoCadastroProfissional } from './novo-cadastro-profissional'
 import { template as cadastroProfissionalStatus } from './cadastro-profissional-status'
+import { template as consultaConfirmadaProfissional } from './consulta-confirmada-profissional'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -21,6 +22,7 @@ export interface TemplateEntry {
  */
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'consulta-confirmada': consultaConfirmada,
+  'consulta-confirmada-profissional': consultaConfirmadaProfissional,
   'lembrete-consulta': lembreteConsulta,
   'documento-vencendo': documentoVencendo,
   'novo-cadastro-profissional': novoCadastroProfissional,

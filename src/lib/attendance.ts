@@ -1,4 +1,4 @@
-export const LINK_RELEASE_MINUTES = 15;
+export const LINK_RELEASE_MINUTES = 30;
 export const LINK_EXPIRY_HOURS = 2;
 export const CONFIRMATION_HOURS = 48;
 export type AttendanceStatus = "agendada" | "em_analise" | "realizada" | "falta_paciente" | "falta_profissional";
