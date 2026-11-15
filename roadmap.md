@@ -219,3 +219,9 @@
 - [x] Ficha de dados pessoais criada automaticamente a partir da conta quando ela ainda não existe; o CPF deixa de ficar sem onde ficar guardado.
 - [x] Reserva testada de ponta a ponta com conta de paciente sem ficha: campo do CPF aparece, o CPF é salvo, a ficha é criada e a página segura do Asaas abre.
 - [x] Publicação pedida e site oficial respondendo; verificação de segurança sem achados antes de publicar.
+
+## Cadastro, extrato e presença — 15/11/2026
+- [ ] Unificar a situação do cadastro entre visão geral, agenda e Meu cadastro usando contrato e repasse reais.
+- [ ] Excluir reservas sem pagamento e expiradas dos valores futuros; distinguir pagamento do paciente de repasse ao profissional e verificar falha da consulta já confirmada.
+- [ ] Definir confirmação automática após 48 horas e relatos de não realização por ambas as partes; aguarda definição sobre confirmação do profissional.
+- [ ] Implementar e testar as regras aprovadas, com relatos administrativos privados e sem alterar documentos oficiais.
