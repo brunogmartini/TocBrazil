@@ -19,7 +19,7 @@ export async function processSettlementJob(appointmentId: string) {
     if (error || data.claim_token !== token || data.status !== "processing" || !data.locked_until || new Date(data.locked_until).getTime() < Date.now() + 60000) throw new Error("LEASE_LOST");
   }
   try {
-    const { data: a, error } = await db.from("appointments").select("id,fim,status,attendance_status,patient_confirmed_at,professional_confirmed_at,attendance_decided_at,valor_centavos,taxa_plataforma_centavos,patient_id,asaas_payment_id,asaas_payment_method,settlement_status").eq("id", appointmentId).single();
+    const { data: a, error } = await db.from("appointments").select("id,fim,status,attendance_status,patient_confirmed_at,professional_confirmed_at,attendance_decided_at,attendance_auto_completed_at,valor_centavos,taxa_plataforma_centavos,patient_id,asaas_payment_id,asaas_payment_method,settlement_status").eq("id", appointmentId).single();
     if (error || !a) throw new Error("APPOINTMENT_READ_FAILED");
     if (["REALIZADA", "FALTA_PACIENTE", "FALTA_PROFISSIONAL"].includes(job.outcome) && attendanceOutcome(a) !== job.outcome) throw new SettlementReview("OUTCOME_NOT_FINAL");
     if (a.settlement_status === "EXECUTADO") throw new SettlementReview("ALREADY_SETTLED");
@@ -103,7 +103,7 @@ export async function processSettlementJob(appointmentId: string) {
     const { data: updated, error: saveError } = await db.from("appointment_settlement_jobs").update({ status: review ? "review" : "retry", failure_code: code.slice(0,80), locked_until: null, available_at: new Date(Date.now() + 120000 * job.attempts).toISOString() }).eq("appointment_id", appointmentId).eq("claim_token",token).select("appointment_id");
     if (saveError) throw new Error("RETRY_SAVE_FAILED");
     if (updated?.length) {
-      const { error: statusError } = await db.from("appointments").update({ settlement_status: review ? "REVISAO" : "FALHOU" }).eq("id",appointmentId);
+      const { error: statusError } = await db.from("appointments").update({ settlement_status: "FALHOU" }).eq("id",appointmentId);
       if (statusError) throw new Error("STATUS_SAVE_FAILED");
     }
     return { ok: false as const, erro: "A cobrança está pendente de nova tentativa ou revisão da gestão." };

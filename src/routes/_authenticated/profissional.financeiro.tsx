@@ -30,6 +30,9 @@ const rotuloSituacao: Record<LancamentoFinanceiro["situacao"], string> = {
   cancelada: "Cancelada",
   nao_compareceu: "Não compareceu",
   aguardando_pagamento: "Aguardando pagamento",
+  expirada: "Reserva expirada",
+  remarcada: "Remarcada",
+  em_analise: "Presença em análise",
 };
 
 type Filtro = "todos" | "agendada" | "a_receber" | "pago";
@@ -93,7 +96,7 @@ function Financeiro() {
           <div className="professional-metric p-6">
             <p className="professional-label">Recebido</p>
             <p className="mt-2 font-display text-2xl">{moeda(resumo?.recebido ?? 0)}</p>
-            <p className="mt-2 text-xs text-muted-foreground">pagamentos confirmados no provedor</p>
+            <p className="mt-2 text-xs text-muted-foreground">repasses ao profissional registrados como pagos</p>
           </div>
           <div className="professional-metric p-6">
              <p className="professional-label">Taxas da plataforma</p>
@@ -143,7 +146,7 @@ function Financeiro() {
                 </thead>
                 <tbody>
                   {visiveis.map((l) => {
-                    const naoConta = l.situacao === "cancelada" || l.situacao === "nao_compareceu" || l.situacao === "aguardando_pagamento";
+                    const naoConta = !["agendada", "a_receber", "pago"].includes(l.situacao);
                     return (
                       <tr key={l.id} className={`border-b border-border/40 last:border-0 ${naoConta ? "opacity-60" : ""}`}>
                         <td className="px-5 py-3">

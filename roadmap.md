@@ -221,7 +221,11 @@
 - [x] Publicação pedida e site oficial respondendo; verificação de segurança sem achados antes de publicar.
 
 ## Cadastro, extrato e presença — 15/11/2026
-- [ ] Unificar a situação do cadastro entre visão geral, agenda e Meu cadastro usando contrato e repasse reais.
-- [ ] Excluir reservas sem pagamento e expiradas dos valores futuros; distinguir pagamento do paciente de repasse ao profissional e verificar falha da consulta já confirmada.
+- [x] Unificar a situação do cadastro entre visão geral, agenda e Meu cadastro usando contrato e repasse reais; visão geral e Meu cadastro conferidos com a conta do Blabla.
+- [x] Excluir reservas sem pagamento e expiradas dos valores futuros; distinguir pagamento do paciente de repasse ao profissional. Prévia confirmou zero futuros, R$173 a receber e R$0 recebido.
 - [x] Definir confirmação automática após 48 horas: exige confirmação do profissional, pagamento confirmado e ausência de relatos de problema; sem confirmação profissional, encaminhar à gestão.
-- [ ] Implementar e testar as regras aprovadas, com relatos administrativos privados e sem alterar documentos oficiais.
+- [x] Implementar regras de 48 horas, relatos privados, evidência automática e fila; 17 testes unitários e quatro testes reais de autorização passaram, sem alterar documentos oficiais.
+- [x] Identificar FINISH_FAILED: auditoria da finalização usava ação não permitida; corrigir a função no banco e manter o processamento idempotente, sem executar cobranças ou repasses reais no teste.
+- [x] Abrir campo de motivo na conta do profissional, computador e 390px, sem enviar declaração fictícia; formulário móvel sem transbordamento horizontal.
+- [ ] Validar envio/leitura de relato e passagem real do prazo de 48 horas ponta a ponta — depende de consultas sintéticas em ambiente isolado; nenhuma consulta real foi alterada para simular ausência.
+- [ ] Confirmar conclusão financeira da consulta antiga e recebimento manual — ainda pendente na fila; nenhum repasse foi executado e a atualização do servidor aguarda publicação.

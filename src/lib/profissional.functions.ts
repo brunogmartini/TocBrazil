@@ -11,6 +11,7 @@ import {
 } from "@/lib/perfil-profissional";
 import { TAXA_FIXA_CENTAVOS, valorProfissionalCentavos } from "@/lib/precos";
 import { apenasDigitos, cpfValido, cnpjValido, type TipoPessoa } from "@/lib/documento-pessoa";
+import { financialSituation, type FinancialSituation } from "@/lib/financial-summary";
 
 export const TEXTO_ACEITE_ELETRONICO =
   "Assinatura eletrônica: ao aceitar, ficam registrados nome completo, CPF, número de inscrição no CRP,\n\ndata, hora, endereço IP, geolocalização aproximada e identificador do dispositivo. É dispensada a\n\nassinatura de testemunhas quando a integridade do documento for conferida por provedor de assinatura\n\n(art. 784, § 4º, do Código de Processo Civil).";
@@ -838,13 +839,17 @@ export const minhaAgendaProfissional = createServerFn({ method: "GET" })
       ...rotuloPaciente(perfilPorId.get(c.patient_id), c.patient_id),
     }));
 
+    const { data: contratoVigente, error: contratoError } = await supabase.rpc("professional_contract_ready", { _professional_id: prof.id });
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: repasse, error: repasseError } = await supabaseAdmin.from("professional_payout_destinations").select("conferido_em").eq("professional_id", prof.id).maybeSingle();
+    if (contratoError || repasseError) throw new Error("Não foi possível conferir a situação do cadastro.");
     return {
       profissional: prof,
       consultas: lista,
       regras: regras ?? [],
       bloqueios: bloqueios ?? [],
       documentos: documentos ?? [],
-      etapa: calcularEtapa(prof, documentos ?? [], (regras ?? []).length > 0),
+      etapa: calcularEtapa(prof, documentos ?? [], (regras ?? []).length > 0, Boolean(contratoVigente), Boolean(repasse?.conferido_em)),
     };
   });
 
@@ -860,7 +865,7 @@ export const marcarConsultaRealizada = createServerFn({ method: "POST" })
     if (data.status !== "cancelada") {
       if (data.status === "nao_compareceu") return { ok: false as const, erro: "A presença será analisada pela gestão após a janela de confirmação." };
       const { error } = await supabase.rpc("appointment_attendance_confirm", { _appointment_id: data.id, _side: "profissional" });
-      return error ? { ok: false as const, erro: "A confirmação está disponível do início até 24 horas depois." } : { ok: true as const };
+      return error ? { ok: false as const, erro: "A confirmação está disponível após o término, até 48 horas depois." } : { ok: true as const };
     }
     const agora = new Date().toISOString();
     const extra = { cancelada_em: agora, cancelada_por: "profissional" };
@@ -909,7 +914,7 @@ export type LancamentoFinanceiro = {
   plataforma: number;
   liquido: number;
   taxaFixaCentavos: number;
-  situacao: "agendada" | "a_receber" | "pago" | "cancelada" | "nao_compareceu" | "aguardando_pagamento";
+  situacao: FinancialSituation;
   pagoEm: string | null;
   previstoPara: string | null;
 };
@@ -929,11 +934,15 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
     const { data: consultas } = await supabase
       .from("appointments")
       .select(
-        "id, inicio, status, payment_status, patient_id, valor_consulta_centavos, taxa_plataforma_centavos, valor_plataforma_centavos, valor_profissional_centavos",
+        "id, inicio, status, payment_status, attendance_status, patient_id, valor_consulta_centavos, taxa_plataforma_centavos, valor_plataforma_centavos, valor_profissional_centavos",
       )
       .eq("professional_id", prof.id)
       .order("inicio", { ascending: false })
       .limit(300);
+
+    const { data: repasses, error: repassesError } = await supabase.from("payouts").select("appointment_id,status,pago_em").eq("professional_id", prof.id).eq("status", "pago");
+    if (repassesError) throw new Error("Não foi possível conferir os repasses.");
+    const repassePorConsulta = new Map((repasses ?? []).filter(p => p.appointment_id).map(p => [p.appointment_id, p]));
 
     const { data: perfis } = await supabase.rpc("meus_pacientes_agendados");
     const perfilPorId = new Map(
@@ -944,11 +953,8 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
       const bruto = c.valor_consulta_centavos ?? 0;
       const plataforma = c.taxa_plataforma_centavos ?? cfg.taxaPorConsultaCentavos;
       const liquido = c.valor_profissional_centavos ?? Math.max(bruto - plataforma, 0);
-      let situacao: LancamentoFinanceiro["situacao"] = "agendada";
-      if (c.status === "aguardando_pagamento") situacao = "aguardando_pagamento";
-      else if (c.status === "cancelada") situacao = "cancelada";
-      else if (c.status === "nao_compareceu") situacao = "nao_compareceu";
-      else if (c.status === "realizada") situacao = c.payment_status === "aprovado" ? "pago" : "a_receber";
+      const repasse = repassePorConsulta.get(c.id);
+      const situacao = financialSituation(c, Boolean(repasse));
       const rotulo = rotuloPaciente(perfilPorId.get(c.patient_id), c.patient_id);
       return {
         id: c.id,
@@ -962,7 +968,7 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
         liquido,
         taxaFixaCentavos: plataforma,
         situacao,
-        pagoEm: c.status === "realizada" && c.payment_status === "aprovado" ? c.inicio : null,
+        pagoEm: repasse?.pago_em ?? null,
         previstoPara: null,
       };
     });
@@ -970,7 +976,7 @@ export const financeiroProfissional = createServerFn({ method: "GET" })
     const soma = (f: (l: LancamentoFinanceiro) => boolean) =>
       lancamentos.filter(f).reduce((s, l) => s + l.liquido, 0);
     const contabiliza = (l: LancamentoFinanceiro) =>
-      l.situacao === "a_receber" || l.situacao === "pago" || l.situacao === "nao_compareceu";
+      l.situacao === "a_receber" || l.situacao === "pago";
     const resumo = {
       futurosBruto: lancamentos.filter((l) => l.situacao === "agendada").reduce((s, l) => s + l.bruto, 0),
       futurosLiquido: soma((l) => l.situacao === "agendada"),

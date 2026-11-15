@@ -2,9 +2,9 @@ export type SettlementOutcome = "REALIZADA" | "FALTA_PACIENTE" | "FALTA_PROFISSI
 export function capturePortions(outcome: SettlementOutcome): string[] {
   return outcome === "REALIZADA" ? ["A", "B"] : ["FALTA_PACIENTE", "CANCELADA_TARDIA"].includes(outcome) ? ["A"] : [];
 }
-export function attendanceOutcome(a: { attendance_status: string; patient_confirmed_at: string | null; professional_confirmed_at: string | null; attendance_decided_at: string | null; fim: string }, now = Date.now()): SettlementOutcome | null {
+export function attendanceOutcome(a: { attendance_status: string; patient_confirmed_at: string | null; professional_confirmed_at: string | null; attendance_decided_at: string | null; attendance_auto_completed_at?: string | null; fim: string }, now = Date.now()): SettlementOutcome | null {
   if (new Date(a.fim).getTime() > now) return null;
-  if (a.attendance_status === "realizada" && ((a.patient_confirmed_at && a.professional_confirmed_at) || a.attendance_decided_at)) return "REALIZADA";
+  if (a.attendance_status === "realizada" && ((a.patient_confirmed_at && a.professional_confirmed_at) || a.attendance_decided_at || (a.attendance_auto_completed_at && a.professional_confirmed_at))) return "REALIZADA";
   if (!a.attendance_decided_at) return null;
   return a.attendance_status === "falta_paciente" ? "FALTA_PACIENTE" : a.attendance_status === "falta_profissional" ? "FALTA_PROFISSIONAL" : null;
 }

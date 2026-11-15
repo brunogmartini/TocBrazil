@@ -275,7 +275,8 @@ export const salvarPerfil = createServerFn({ method: "POST" })
   });
 
 /**
- * Confirmações incompletas após 24 horas do início são encaminhadas à gestão.
+ * Após 48 horas do término, reconhece presença confirmada pelo profissional sem
+ * manifestação do paciente nem disputa; os demais casos seguem para gestão.
  * Executado pelo servidor (papel de serviço) sempre que uma agenda é carregada.
  */
 export async function concluirConsultasVencidas() {
@@ -343,7 +344,7 @@ export const confirmarRealizacao = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string }) => ({ id: String(data.id) }))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("appointment_attendance_confirm", { _appointment_id: data.id, _side: "paciente" });
-    return error ? { ok: false as const, erro: "A confirmação está disponível do início até 24 horas depois." } : { ok: true as const };
+    return error ? { ok: false as const, erro: "A confirmação está disponível após o término, até 48 horas depois." } : { ok: true as const };
 
   });
 

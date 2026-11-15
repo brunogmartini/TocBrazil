@@ -39,3 +39,4 @@
 - Verify migrations by comparing each `drizzle/migrations/` file's SHA-256 with `drizzle.__drizzle_migrations` rows, not `meta/_journal.json`; why: merged migrations can sit unapplied.
 - Keep review results beside profile actions and catch rejected requests; why: offscreen notices can make blocked actions seem unresponsive.
 - Button loading state comes from the root-installed global busy indicator; why: every action visibly responds without per-button wiring.
+- Share finance rules to avoid divergent totals.

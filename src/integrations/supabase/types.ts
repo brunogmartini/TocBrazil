@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointment_attendance_reports: {
+        Row: {
+          appointment_id: string
+          author_id: string
+          created_at: string
+          id: string
+          reason: string
+          side: string
+        }
+        Insert: {
+          appointment_id: string
+          author_id: string
+          created_at?: string
+          id?: string
+          reason: string
+          side: string
+        }
+        Update: {
+          appointment_id?: string
+          author_id?: string
+          created_at?: string
+          id?: string
+          reason?: string
+          side?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_attendance_reports_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointment_messages: {
         Row: {
           appointment_id: string
@@ -190,6 +225,7 @@ export type Database = {
           asaas_payment_id_a: string | null
           asaas_payment_id_b: string | null
           asaas_payment_method: string | null
+          attendance_auto_completed_at: string | null
           attendance_decided_at: string | null
           attendance_decided_by: string | null
           attendance_justification: string | null
@@ -248,6 +284,7 @@ export type Database = {
           asaas_payment_id_a?: string | null
           asaas_payment_id_b?: string | null
           asaas_payment_method?: string | null
+          attendance_auto_completed_at?: string | null
           attendance_decided_at?: string | null
           attendance_decided_by?: string | null
           attendance_justification?: string | null
@@ -306,6 +343,7 @@ export type Database = {
           asaas_payment_id_a?: string | null
           asaas_payment_id_b?: string | null
           asaas_payment_method?: string | null
+          attendance_auto_completed_at?: string | null
           attendance_decided_at?: string | null
           attendance_decided_by?: string | null
           attendance_justification?: string | null
@@ -2505,6 +2543,14 @@ export type Database = {
           _observation?: string
           _status: string
         }
+        Returns: undefined
+      }
+      appointment_attendance_details: {
+        Args: { _appointment_id: string }
+        Returns: Json
+      }
+      appointment_attendance_report: {
+        Args: { _appointment_id: string; _reason: string; _side: string }
         Returns: undefined
       }
       appointment_attendance_reviews: {

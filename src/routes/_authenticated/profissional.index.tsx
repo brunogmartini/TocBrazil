@@ -56,7 +56,7 @@ function PainelProfissional() {
     .filter((c) => new Date(c.inicio).getTime() > agora && c.status !== "cancelada" && chaveDia(c.inicio) !== diaHoje)
     .slice(0, 6);
   const pendentesDeConclusao = consultas.filter(
-    (c) => c.status === "confirmada" && c.attendance_status === "agendada" && !c.professional_confirmed_at && new Date(c.inicio).getTime() <= agora && agora <= new Date(c.inicio).getTime() + 24 * 3600_000,
+    (c) => c.status === "confirmada" && c.payment_status === "aprovado" && c.attendance_status === "agendada" && !c.professional_confirmed_at && new Date(c.fim).getTime() <= agora && agora <= new Date(c.fim).getTime() + 48 * 3600_000,
   );
 
   async function recarregar() {
@@ -85,7 +85,8 @@ function PainelProfissional() {
     );
   }
 
-  const etapa = dados.data!.etapa;
+  const etapa = dados.data?.etapa;
+  if (!etapa) return null;
   const resumo = financeiro.data?.resumo;
 
   return (
@@ -174,7 +175,7 @@ function PainelProfissional() {
               {pendentesDeConclusao.length} consulta{pendentesDeConclusao.length > 1 ? "s" : ""} com horário encerrado
             </p>
             <p className="mt-1 text-muted-foreground">
-              Registre sua confirmação de presença; isso não executa repasses nem altera seu extrato.
+              Confirme a realização ou informe um problema. O repasse é uma etapa financeira separada.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {pendentesDeConclusao.map((c) => (

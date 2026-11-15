@@ -407,6 +407,27 @@
       "when": 1794529601721,
       "tag": "0057_restore_public_slot_lookup_permissions",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1794738197438,
+      "tag": "0058_attendance_48h_private_reports",
+      "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1794738478503,
+      "tag": "0059_protect_automatic_attendance_evidence",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1794738520881,
+      "tag": "0060_explicit_attendance_report_privileges",
+      "breakpoints": true
     }
   ]
 }
