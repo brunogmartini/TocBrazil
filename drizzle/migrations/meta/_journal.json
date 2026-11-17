@@ -435,6 +435,20 @@
       "when": 1794747812489,
       "tag": "0061_appointment_link_30_minutes_and_paid_notice",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1794923380466,
+      "tag": "0062_legal_functions_private_role_check",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1794923471347,
+      "tag": "0063_legal_record_acceptances_alias_fix",
+      "breakpoints": true
     }
   ]
 }
