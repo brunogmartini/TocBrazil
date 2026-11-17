@@ -1,3 +1,4 @@
+import { JANELA_PLATAFORMA, limitarFaixa } from "@/lib/horario-plataforma";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -203,6 +204,10 @@ function PaginaAgenda() {
           onSubmit={async (e) => {
             e.preventDefault();
             setErro(null);
+            if (faixas.some((f, i) => f.ativo && !limitarFaixa(i, f.inicio, f.fim))) {
+              setErro("Há um dia com horário fora do período da plataforma (seg–sex 8h–18h, sáb 8h–11h).");
+              return;
+            }
             const r = await salvar({
               data: {
                 regras: faixas
@@ -220,10 +225,12 @@ function PaginaAgenda() {
           }}
         >
           <p className="text-sm text-muted-foreground">
-            Esses horários se repetem toda semana. Depois, bloqueie exceções diretamente no calendário.
+            Esses horários se repetem toda semana. A plataforma aceita consultas de segunda a sexta das 8h às 18h e aos sábados das 8h às 11h; dentro disso, escolha seus horários e bloqueie exceções no calendário.
           </p>
           {DIAS_SEMANA.map((nome, i) => {
             const f = faixas[i]!;
+            const janela = JANELA_PLATAFORMA[i];
+            if (!janela) return null;
             return (
               <div key={nome} className="flex flex-wrap items-center gap-3 rounded-xl border border-border/60 p-3">
                 <label className="flex w-40 items-center gap-2 text-sm">
@@ -238,6 +245,8 @@ function PaginaAgenda() {
                   type="time"
                   className="field-base w-32"
                   value={f.inicio}
+                  min={janela.inicio}
+                  max={janela.fim}
                   disabled={!f.ativo}
                   onChange={(e) => setFaixas(faixas.map((x, j) => (j === i ? { ...x, inicio: e.target.value } : x)))}
                 />
@@ -246,6 +255,8 @@ function PaginaAgenda() {
                   type="time"
                   className="field-base w-32"
                   value={f.fim}
+                  min={janela.inicio}
+                  max={janela.fim}
                   disabled={!f.ativo}
                   onChange={(e) => setFaixas(faixas.map((x, j) => (j === i ? { ...x, fim: e.target.value } : x)))}
                 />
@@ -272,7 +283,11 @@ function PaginaAgenda() {
                   motivo: novoBloqueio.motivo,
                 },
               });
-              if (!r.ok) setErro(r.erro);
+              if (faixas.some((f, i) => f.ativo && !limitarFaixa(i, f.inicio, f.fim))) {
+              setErro("Há um dia com horário fora do período da plataforma (seg–sex 8h–18h, sáb 8h–11h).");
+              return;
+            }
+            if (!r.ok) setErro(r.erro);
               else {
                 setNovoBloqueio(null);
                 setAviso("Período bloqueado.");
@@ -341,7 +356,11 @@ function PaginaAgenda() {
               className="btn-base btn-ghost"
               onClick={async () => {
                 const r = await desbloquear({ data: { id: bloqueioSel.id } });
-                if (!r.ok) setErro(r.erro);
+                if (faixas.some((f, i) => f.ativo && !limitarFaixa(i, f.inicio, f.fim))) {
+              setErro("Há um dia com horário fora do período da plataforma (seg–sex 8h–18h, sáb 8h–11h).");
+              return;
+            }
+            if (!r.ok) setErro(r.erro);
                 else {
                   setBloqueioSel(null);
                   await recarregar();

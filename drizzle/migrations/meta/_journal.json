@@ -449,6 +449,13 @@
       "when": 1794923471347,
       "tag": "0063_legal_record_acceptances_alias_fix",
       "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1794923787857,
+      "tag": "0064_slots_platform_window",
+      "breakpoints": true
     }
   ]
 }

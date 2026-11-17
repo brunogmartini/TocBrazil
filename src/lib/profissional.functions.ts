@@ -1,3 +1,4 @@
+import { limitarFaixa } from "./horario-plataforma";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { createHash, randomUUID } from "crypto";
@@ -404,7 +405,10 @@ export const salvarDisponibilidade = createServerFn({ method: "POST" })
         hora_inicio: String(r.hora_inicio).slice(0, 5),
         hora_fim: String(r.hora_fim).slice(0, 5),
       }))
-      .filter((r) => r.hora_inicio < r.hora_fim)
+      .flatMap((r) => {
+        const f = limitarFaixa(r.weekday, r.hora_inicio, r.hora_fim);
+        return f ? [{ weekday: r.weekday, hora_inicio: f.inicio, hora_fim: f.fim }] : [];
+      })
       .slice(0, 21),
   }))
   .handler(async ({ data, context }) => {
