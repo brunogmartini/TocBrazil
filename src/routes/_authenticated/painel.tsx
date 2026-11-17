@@ -138,7 +138,6 @@ function Painel() {
         </div>
       </div>
 
-      <LegalUserPanel />
       {aviso && (
         <p className="card-soft mt-6 border-primary/40 p-4 text-sm" role="status">
           {aviso}
@@ -337,6 +336,8 @@ function Painel() {
           <CreditoPaciente />
         </aside>
       </div>
+
+      <LegalUserPanel />
 
       <Modal aberto={editandoPerfil} titulo="Meus dados" onFechar={() => setEditandoPerfil(false)} largura="max-w-md">
         <FormularioPerfil
