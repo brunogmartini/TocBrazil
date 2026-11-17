@@ -3,6 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 type AuditAction =
   | "login"
   | "logout"
+  | "payout_marked_paid"
   | "appointment_status_changed"
   | "credential_document_accessed"
   | "professional_registration_reviewed"

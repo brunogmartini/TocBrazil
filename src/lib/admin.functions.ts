@@ -49,6 +49,8 @@ export type PagamentoAdmin = {
   previstoPara: string | null;
   pagoEm: string | null;
   observacao: string | null;
+  repassePago: boolean;
+  repassePagoEm: string | null;
 };
 
 export type ProfissionalAdmin = {
@@ -269,7 +271,20 @@ export const painelAdmin = createServerFn({ method: "GET" })
         previstoPara: null,
         pagoEm: c.payment_status === "aprovado" ? c.inicio : null,
         observacao: null,
+        repassePago: false,
+        repassePagoEm: null,
       }));
+    if (pagamentos.length) {
+      const { data: repasses } = await supabaseAdmin
+        .from("payouts")
+        .select("appointment_id, pago_em")
+        .eq("status", "pago")
+        .in("appointment_id", pagamentos.map((p) => p.id));
+      for (const p of pagamentos) {
+        const r = (repasses ?? []).find((row) => row.appointment_id === p.id);
+        if (r) { p.repassePago = true; p.repassePagoEm = r.pago_em; }
+      }
+    }
 
     const idsProfissionais = (profissionais ?? []).map((p) => p.id);
     const [{ data: documentos }, { data: historico }, { data: contratos }, { data: decisoes }] = idsProfissionais.length
@@ -961,6 +976,46 @@ export const definirStatusPagamento = createServerFn({ method: "POST" })
       )
       .eq("id", data.id);
     if (error) return { ok: false as const, erro: "Não foi possível atualizar." };
+    return { ok: true as const };
+  });
+
+export const marcarRepassePago = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { appointmentId: string; pagoEm?: string | undefined; observacao?: string | undefined }) =>
+    z.object({
+      appointmentId: z.string().uuid(),
+      pagoEm: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      observacao: z.string().trim().max(300).optional(),
+    }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    await garantirAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: a } = await supabaseAdmin
+      .from("appointments")
+      .select("id, professional_id, status, payment_status, valor_consulta_centavos, valor_profissional_centavos, valor_plataforma_centavos")
+      .eq("id", data.appointmentId)
+      .maybeSingle();
+    if (!a || a.status !== "realizada" || a.payment_status !== "aprovado")
+      return { ok: false as const, erro: "Só é possível registrar repasse de consulta realizada e paga." };
+    const pagoEm = data.pagoEm ? new Date(`${data.pagoEm}T12:00:00-03:00`).toISOString() : new Date().toISOString();
+    const campos = { status: "pago" as const, pago_em: pagoEm, pago_por: context.userId, observacao: data.observacao || null };
+    const { data: existente } = await supabaseAdmin.from("payouts").select("id, status").eq("appointment_id", a.id).maybeSingle();
+    if (existente?.status === "pago") return { ok: false as const, erro: "Este repasse já foi registrado como pago." };
+    const { error } = existente
+      ? await supabaseAdmin.from("payouts").update(campos).eq("id", existente.id)
+      : await supabaseAdmin.from("payouts").insert({
+          ...campos,
+          appointment_id: a.id,
+          professional_id: a.professional_id,
+          valor_centavos: a.valor_profissional_centavos,
+          valor_bruto_centavos: a.valor_consulta_centavos,
+          valor_plataforma_centavos: a.valor_plataforma_centavos,
+          comissao_percent: 0,
+        });
+    if (error) return { ok: false as const, erro: "Não foi possível registrar o repasse." };
+    const { writeAuditEvent } = await import("@/lib/audit.server");
+    await writeAuditEvent({ actorId: context.userId, actorRole: "admin", action: "payout_marked_paid", entity: "appointment", entityId: a.id, metadata: { fields: ["status", "pago_em", "pago_por", "observacao"] } });
     return { ok: true as const };
   });
 

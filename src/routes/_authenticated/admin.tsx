@@ -9,6 +9,7 @@ import {
   definirStatusFoto,
   enviarFotoProfissionalAdmin,
   definirStatusPagamento,
+  marcarRepassePago,
   definirStatusProfissional,
   excluirProfissional,
   conferirCadastroProfissional,
@@ -95,6 +96,7 @@ function Admin() {
   const conferirRepasse = useServerFn(conferirDadosRepasseAdmin);
   const abrirDocumento = useServerFn(obterDocumentoCredenciamento);
   const mudarPagamento = useServerFn(definirStatusPagamento);
+  const registrarRepasse = useServerFn(marcarRepassePago);
   const mudarConsulta = useServerFn(definirStatusConsultaAdmin);
   const salvarCfg = useServerFn(salvarConfiguracoes);
   const carregarIndicadores = useServerFn(indicadoresGestao);
@@ -797,6 +799,7 @@ function Admin() {
                   <th className="p-3">Taxa fixa</th>
                   <th className="p-3">Valor do profissional</th>
                   <th className="p-3">Status</th>
+                  <th className="p-3">Repasse ao profissional</th>
                 </tr>
               </thead>
               <tbody>
@@ -812,10 +815,36 @@ function Admin() {
                       <span className="pill">{rotuloPagamento[r.status] ?? r.status}</span>
                       {r.pagoEm && <p className="mt-1 text-[11px] text-muted-foreground">aprovado em {dataBR(r.pagoEm)}</p>}
                     </td>
+                    <td className="p-3">
+                      {r.repassePago ? (
+                        <span className="pill">Pago{r.repassePagoEm ? ` em ${dataBR(r.repassePagoEm)}` : ""}</span>
+                      ) : r.status === "aprovado" ? (
+                        <button
+                          type="button"
+                          className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted"
+                          onClick={async () => {
+                            const data = window.prompt("Data do repasse (AAAA-MM-DD)", new Date().toISOString().slice(0, 10));
+                            if (!data) return;
+                            const observacao = window.prompt("Observação (opcional)") ?? "";
+                            try {
+                              const res = await registrarRepasse({ data: { appointmentId: r.id, pagoEm: data, observacao: observacao || undefined } });
+                              if (!res.ok) { window.alert(res.erro); return; }
+                              await painel.refetch();
+                            } catch {
+                              window.alert("Não foi possível registrar o repasse. Confira a data.");
+                            }
+                          }}
+                        >
+                          Marcar repasse como pago
+                        </button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
                 {pagamentosVisiveis.length === 0 && !painel.isLoading && (
-                  <tr><td colSpan={7} className="p-4 text-muted-foreground">Nenhum pagamento neste filtro.</td></tr>
+                  <tr><td colSpan={8} className="p-4 text-muted-foreground">Nenhum pagamento neste filtro.</td></tr>
                 )}
               </tbody>
             </table>
