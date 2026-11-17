@@ -159,23 +159,9 @@ function Painel() {
         </div>
       )}
 
-       <div className="mt-10 grid items-stretch gap-8 lg:grid-cols-[1.3fr_0.9fr]">
-        <div>
-           <section className="card-soft h-full p-6">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-xl">Calendário de consultas</h2>
-              <span className="text-xs text-muted-foreground">Toque em uma consulta para ver os detalhes</span>
-            </div>
-             <div className="mt-4">
-              <CalendarioConsultas
-                itens={itensCalendario}
-                selecionado={selecionada}
-                onSelecionar={(item) => setSelecionada(item.id)}
-              />
-            </div>
-           </section>
-
-          <section className="mt-12">
+       <div className="mt-10 grid items-start gap-8 lg:grid-cols-[1.3fr_0.9fr]">
+        <div className="min-w-0">
+          <section>
             <h2 className="text-xl">Próximas consultas</h2>
             {consultas.isLoading && <p className="mt-3 text-sm text-muted-foreground">Carregando…</p>}
             {!consultas.isLoading && proximas.length === 0 && (
@@ -258,6 +244,20 @@ function Painel() {
             </ul>
           </section>
 
+           <section className="card-soft mt-12 p-6">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-xl">Calendário de consultas</h2>
+              <span className="text-xs text-muted-foreground">Toque em uma consulta para ver os detalhes</span>
+            </div>
+             <div className="mt-4">
+              <CalendarioConsultas
+                itens={itensCalendario}
+                selecionado={selecionada}
+                onSelecionar={(item) => setSelecionada(item.id)}
+              />
+            </div>
+           </section>
+
           {historico.length > 0 && (
             <section className="mt-12">
               <h2 className="text-xl">Histórico</h2>
@@ -306,7 +306,7 @@ function Painel() {
           )}
         </div>
 
-         <aside className="flex h-full flex-col gap-8">
+         <aside className="flex flex-col gap-8">
            <section className="card-soft p-6">
             <h2 className="text-lg">Lembretes</h2>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
