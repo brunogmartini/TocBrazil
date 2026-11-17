@@ -72,10 +72,13 @@ function PaginaAgenda() {
 
   const [consulta, setConsulta] = useState<ConsultaAgenda | null>(null);
   const [bloqueioSel, setBloqueioSel] = useState<Bloqueio | null>(null);
+  // Padrão sugerido: segunda a sexta 8h–18h, sábado 8h–11h; o psicólogo pode alterar livremente.
+  const faixaPadrao = (i: number): Faixa =>
+    i === 6 ? { ativo: true, inicio: "08:00", fim: "11:00" } : { ativo: i >= 1 && i <= 5, inicio: "08:00", fim: "18:00" };
   const [novoBloqueio, setNovoBloqueio] = useState<{ inicio: string; fim: string; motivo: string } | null>(null);
   const [editandoDisponibilidade, setEditandoDisponibilidade] = useState(false);
   const [faixas, setFaixas] = useState<Faixa[]>(
-    DIAS_SEMANA.map((_, i) => ({ ativo: i >= 1 && i <= 5, inicio: "09:00", fim: "17:00" })),
+    DIAS_SEMANA.map((_, i) => faixaPadrao(i)),
   );
   const [aviso, setAviso] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
@@ -88,7 +91,7 @@ function PaginaAgenda() {
           const r = regras.find((x) => x.weekday === i);
           return r
             ? { ativo: true, inicio: r.hora_inicio.slice(0, 5), fim: r.hora_fim.slice(0, 5) }
-            : { ativo: false, inicio: "09:00", fim: "17:00" };
+            : { ...faixaPadrao(i), ativo: false };
         }),
       );
     }
