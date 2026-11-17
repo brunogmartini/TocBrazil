@@ -23,8 +23,6 @@ export async function deliverAppointmentNotice(admin: any, n: { id: string; user
     const { data: legalAllowed, error: legalError } = await admin.rpc("legal_access_allowed", { _user_id: a.patient_id });
     if (legalError) throw new Error("APPOINTMENT_NOTICE_LEGAL_CHECK_FAILED");
     meetingUrl = reminderMeetingUrl(a, legalAllowed === true, now);
-    // Never substitute a profile URL or send a link before its private access window.
-    if (!meetingUrl) return false;
   }
   const result = await sendTemplateEmail(professional ? "consulta-confirmada-profissional" : "lembrete-consulta", account.user.email, {
     templateData: {
